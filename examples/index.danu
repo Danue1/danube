@@ -28,8 +28,11 @@ b'a'
 type Foo = Bar;
 
 // enum
-enum Foo = Bar | Baz | Bax;
-enum Foo = Bar(Bar) | Baz(Baz) | Bax(Bax);
+enum Foo = Bar;
+enum Foo = Bar | Baz;
+enum Foo = Bar(Bar);
+enum Foo = | Bar;
+enum Foo = | Bar | Baz;
 
 // struct
 struct Foo(Bar);

@@ -14,12 +14,19 @@ pub struct ModuleNode {
 #[derive(Debug, PartialEq)]
 pub enum ItemNode {
   Struct(StructNode),
+  Enum(EnumNode),
 }
 
 #[derive(Debug, PartialEq)]
 pub struct StructNode {
   pub ident: Positioned<IdentNode>,
   pub fields: StructFieldsNode,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct EnumNode {
+  pub ident: Positioned<IdentNode>,
+  pub variant_list: Vec<Positioned<EnumVariantNode>>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -36,6 +43,12 @@ pub struct StructUnnamedFieldsNode {
 #[derive(Debug, PartialEq)]
 pub struct StructNamedFieldsNode {
   pub node_list: Vec<(Positioned<IdentNode>, Positioned<TypeNode>)>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct EnumVariantNode {
+  pub ident: Positioned<IdentNode>,
+  pub ty: Option<Positioned<TypeNode>>,
 }
 
 #[derive(Debug, PartialEq)]
