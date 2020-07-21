@@ -15,6 +15,7 @@ pub struct ModuleNode {
 pub enum ItemNode {
   Struct(StructNode),
   Enum(EnumNode),
+  Function(FunctionNode),
 }
 
 #[derive(Debug, PartialEq)]
@@ -27,6 +28,14 @@ pub struct StructNode {
 pub struct EnumNode {
   pub ident: Positioned<IdentNode>,
   pub variant_list: Vec<Positioned<EnumVariantNode>>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct FunctionNode {
+  pub ident: Positioned<IdentNode>,
+  pub return_type: Option<Positioned<TypeNode>>,
+  pub argument_list: Vec<Positioned<FunctionArgumentNode>>,
+  pub body: Positioned<String>, // TODO(Danuel): implement ExpressionNode
 }
 
 #[derive(Debug, PartialEq)]
@@ -47,6 +56,12 @@ pub struct StructNamedFieldsNode {
 
 #[derive(Debug, PartialEq)]
 pub struct EnumVariantNode {
+  pub ident: Positioned<IdentNode>,
+  pub ty: Option<Positioned<TypeNode>>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct FunctionArgumentNode {
   pub ident: Positioned<IdentNode>,
   pub ty: Option<Positioned<TypeNode>>,
 }

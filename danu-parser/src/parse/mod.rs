@@ -1,4 +1,5 @@
 mod enum_node;
+mod function_node;
 mod ident_node;
 mod struct_node;
 mod type_node;
@@ -6,6 +7,7 @@ mod value_node;
 
 use crate::*;
 use enum_node::enum_node;
+use function_node::function_node;
 use ident_node::ident_node;
 use nom::{
   branch::alt,
@@ -42,5 +44,6 @@ fn item_node(s: Span) -> Result<ItemNode> {
   alt((
     map(struct_node, ItemNode::Struct),
     map(enum_node, ItemNode::Enum),
+    map(function_node, ItemNode::Function),
   ))(s)
 }

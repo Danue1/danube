@@ -48,6 +48,14 @@ pub(crate) fn is_line_ending(c: char) -> bool {
   matches!(c, '\n' | '\r')
 }
 
+pub(crate) fn is_semicolon(c: char) -> bool {
+  c == ';'
+}
+
+pub(crate) fn is_right_brace(c: char) -> bool {
+  c == '}'
+}
+
 pub(crate) fn ignore_token0(s: Span) -> Result<()> {
   map(many0(is_a(", \t\r\n")), |_| ())(s)
 }
