@@ -29,21 +29,33 @@ type Foo = Bar;
 
 // enum
 enum Foo = Bar | Baz | Bax;
+enum Foo = Bar(Bar) | Baz(Baz) | Bax(Bax);
 
 // struct
 struct Foo(Bar);
+let foo = Foo(bar);
+
 struct Foo(Bar,);
+let foo = Foo(bar);
+
 struct Foo(Bar, Baz);
+let foo = Foo(bar, baz);
+
 struct Foo {
   bar: Bar
 }
+let foo = Foo { bar: bar };
+
 struct Foo {
   bar: Bar,
 }
+let foo = Foo { bar: bar };
+
 struct Foo {
   bar: Bar,
   baz: Baz
 }
+let foo = Foo { bar: bar, baz: baz };
 
 // variable
 let foo = ...;
@@ -105,6 +117,18 @@ impl Foo {
   fn bar() -> Baz = ...;
   fn bar(a) -> Baz = ...;
   fn bar(a: A) -> Baz =...;
+
+  fn bar(self) { ... }
+  fn bar(self, a) { ... }
+  fn bar(self, a: A) { ... }
+
+  fn bar(self) -> Baz { ... }
+  fn bar(self, a) -> Baz { ... }
+  fn bar(self, a: A) -> Baz { ... }
+
+  fn bar(self) -> Baz = ...;
+  fn bar(self, a) -> Baz = ...;
+  fn bar(self, a: A) -> Baz =...;
 }
 
 impl Foo for Bar;
@@ -120,7 +144,22 @@ impl Foo for Bar {
   fn bar() -> Baz = ...;
   fn bar(a) -> Baz = ...;
   fn bar(a: A) -> Baz =...;
+
+  fn bar(self) { ... }
+  fn bar(self, a) { ... }
+  fn bar(self, a: A) { ... }
+
+  fn bar(self) -> Baz { ... }
+  fn bar(self, a) -> Baz { ... }
+  fn bar(self, a: A) -> Baz { ... }
+
+  fn bar(self) -> Baz = ...;
+  fn bar(self, a) -> Baz = ...;
+  fn bar(self, a: A) -> Baz =...;
 }
+
+foo.bar();
+foo::bar();
 
 // control flows
 if foo { ... } else if foo { ... } else { ... }
