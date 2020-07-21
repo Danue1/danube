@@ -5,3 +5,5 @@ authors = ["Danuel <public.danuel@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+nom = "5.1.2"
+nom_locate = "2.0.0"
