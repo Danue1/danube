@@ -37,8 +37,10 @@ fn struct_unnamed_fields_node(s: Span) -> Result<StructUnnamedFieldsNode> {
       ignore_token0,
       opt(tuple((comma, ignore_token0))),
       right_parens,
+      ignore_token0,
+      semicolon,
     )),
-    |(_, _, node_list, _, _, _)| StructUnnamedFieldsNode { node_list },
+    |(_, _, node_list, _, _, _, _, _)| StructUnnamedFieldsNode { node_list },
   )(s)
 }
 
@@ -119,6 +121,9 @@ mod tests {
   #[test]
   fn test() {
     let source = r#"struct Foo { bar: [[Bar; 4]; 4] }"#;
+    dbg!(parse(source));
+
+    let source = r#"struct Foo(Bar);"#;
     dbg!(parse(source));
   }
 }
