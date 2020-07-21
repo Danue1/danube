@@ -16,6 +16,7 @@ pub enum ItemNode {
   Struct(StructNode),
   Enum(EnumNode),
   Function(FunctionNode),
+  TypeAlias(TypeAliasNode),
 }
 
 #[derive(Debug, PartialEq)]
@@ -36,6 +37,12 @@ pub struct FunctionNode {
   pub return_type: Option<Positioned<TypeNode>>,
   pub argument_list: Vec<Positioned<FunctionArgumentNode>>,
   pub body: Positioned<String>, // TODO(Danuel): implement ExpressionNode
+}
+
+#[derive(Debug, PartialEq)]
+pub struct TypeAliasNode {
+  pub ident: Positioned<IdentNode>,
+  pub ty: Positioned<TypeNode>,
 }
 
 #[derive(Debug, PartialEq)]

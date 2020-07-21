@@ -96,7 +96,7 @@ mod tests {
   use super::*;
 
   #[test]
-  fn test_() {
+  fn test() {
     let source = r#"fn foo() { ... }"#;
     dbg!(parse(source));
 

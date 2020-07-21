@@ -2,6 +2,7 @@ mod enum_node;
 mod function_node;
 mod ident_node;
 mod struct_node;
+mod type_alias_node;
 mod type_node;
 mod value_node;
 
@@ -16,6 +17,7 @@ use nom::{
   sequence::tuple,
 };
 use struct_node::struct_node;
+use type_alias_node::type_alias_node;
 use type_node::type_node;
 use value_node::value_usize;
 
@@ -45,5 +47,6 @@ fn item_node(s: Span) -> Result<ItemNode> {
     map(struct_node, ItemNode::Struct),
     map(enum_node, ItemNode::Enum),
     map(function_node, ItemNode::Function),
+    map(type_alias_node, ItemNode::TypeAlias),
   ))(s)
 }
