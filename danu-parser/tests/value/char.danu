@@ -1,0 +1,4 @@
+const A: char = 'a';
+const LINE_BREAK: char = '\n';
+const REVERSE_SLASH: char = '\\';
+const SINGLE_QUOTE: char = '\'';

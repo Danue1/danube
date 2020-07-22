@@ -63,6 +63,7 @@ pub struct ConstantNode {
 #[derive(Debug, PartialEq)]
 pub enum ValueNode {
   Bool(bool),
+  Char(char),
 }
 
 #[derive(Debug, PartialEq)]
