@@ -10,6 +10,7 @@ pub(super) fn statement_node(s: Span) -> Result<StatementNode> {
   alt((
     map(let_mut_node, StatementNode::LetMut),
     map(let_node, StatementNode::Let),
+    map(if_node, StatementNode::If),
   ))(s)
 }
 

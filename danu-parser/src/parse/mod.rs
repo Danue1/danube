@@ -1,4 +1,5 @@
 mod constant_node;
+mod control_flow_node;
 mod enum_node;
 mod expression_node;
 mod function_node;
@@ -13,11 +14,12 @@ mod value_node;
 
 use crate::*;
 use constant_node::{constant_node, trait_item_constant_node};
+use control_flow_node::if_node;
 use enum_node::enum_node;
 use expression_node::expression_node;
 use function_node::{function_node, trait_item_function_node};
 use ident_node::ident_node;
-use nom::{
+pub(self) use nom::{
   branch::alt,
   combinator::{all_consuming, map},
   multi::many0,
@@ -72,6 +74,7 @@ mod tests {
   fn test() {
     let path_list = [
       "tests/const",
+      "tests/control_flow",
       "tests/enum",
       "tests/expression",
       "tests/function",
