@@ -1,9 +1,9 @@
 use crate::*;
 use nom::{
   branch::alt,
-  bytes::complete::{tag, take_while1},
+  bytes::complete::{is_not, tag, take_while1},
   character::complete::anychar,
-  combinator::map,
+  combinator::{map, opt},
   sequence::tuple,
 };
 
@@ -11,6 +11,7 @@ pub(super) fn value_node(s: Span) -> Result<ValueNode> {
   alt((
     map(value_bool, ValueNode::Bool),
     map(value_char, ValueNode::Char),
+    map(value_string, ValueNode::String),
   ))(s)
 }
 
@@ -32,5 +33,16 @@ fn value_char(s: Span) -> Result<char> {
       single_quote,
     )),
     |(_, c, _)| c,
+  )(s)
+}
+
+fn value_string(s: Span) -> Result<String> {
+  map(
+    tuple((double_quote, opt(is_not("\"")), double_quote)),
+    |(_, string, _)| {
+      string
+        .map(|s| s.fragment().to_string())
+        .unwrap_or_else(String::new)
+    },
   )(s)
 }

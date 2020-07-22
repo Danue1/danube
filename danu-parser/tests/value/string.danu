@@ -1,0 +1,2 @@
+const EMPTY_STRING: String = "";
+const NON_EMPTY_STRING: String = "abc";
