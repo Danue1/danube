@@ -8,5 +8,6 @@ pub(super) fn expression_node(s: Span) -> Result<ExpressionNode> {
     map(expression_conditional_node, ExpressionNode::Conditional),
     map(loop_node, ExpressionNode::Loop),
     map(while_node, ExpressionNode::While),
+    map(pattern_match_node, ExpressionNode::PatternMatch),
   ))(s)
 }

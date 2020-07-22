@@ -100,18 +100,22 @@ fn function_argument_node(s: Span) -> Result<FunctionArgumentNode> {
 
 fn function_body(s: Span) -> Result<Vec<Positioned<StatementNode>>> {
   alt((
-    map(positioned(function_body_shorthand), |expression| {
-      vec![expression]
-    }),
+    map(function_body_shorthand, |statement| vec![statement]),
     function_body_block,
   ))(s)
 }
 
-fn function_body_shorthand(s: Span) -> Result<StatementNode> {
-  map(
-    tuple((equal, ignore_token0, expression_node, semicolon)),
-    |(_, _, expression, _)| StatementNode::Expression(expression),
-  )(s)
+fn function_body_shorthand(s: Span) -> Result<Positioned<StatementNode>> {
+  let (s, _) = tuple((equal, ignore_token0))(s)?;
+  let (s, start) = position(s)?;
+  let (s, expression) = expression_node(s)?;
+  let (s, end) = position(s)?;
+  let (s, _) = semicolon(s)?;
+
+  let node = StatementNode::Expression(expression);
+  let positioned = Positioned { start, end, node };
+
+  Ok((s, positioned))
 }
 
 fn function_body_block(s: Span) -> Result<Vec<Positioned<StatementNode>>> {

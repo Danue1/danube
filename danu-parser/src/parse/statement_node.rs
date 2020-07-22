@@ -14,6 +14,7 @@ pub(super) fn statement_node(s: Span) -> Result<StatementNode> {
     map(statement_conditional_node, StatementNode::Conditional),
     map(loop_node, StatementNode::Loop),
     map(while_node, StatementNode::While),
+    map(pattern_match_node, StatementNode::PatternMatch),
   ))(s)
 }
 

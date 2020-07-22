@@ -3,16 +3,16 @@ use nom::{combinator::map, sequence::tuple};
 
 #[derive(Debug, PartialEq)]
 pub struct Position {
-  line: usize,
-  column: usize,
-  offset: usize,
+  pub line: usize,
+  pub column: usize,
+  pub offset: usize,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct Positioned<T: Sized> {
-  start: Position,
-  end: Position,
-  node: T,
+  pub start: Position,
+  pub end: Position,
+  pub node: T,
 }
 
 pub(crate) fn position(s: Span) -> Result<Position> {

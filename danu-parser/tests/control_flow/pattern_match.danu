@@ -1,0 +1,37 @@
+fn foo() {
+  match true {
+    true => true,
+  }
+  match true {
+    true => true,
+    true => true,
+  }
+  match true {
+    true => { }
+  }
+  match true {
+    true => { },
+  }
+  match true {
+    true => { },
+    true => { }
+  }
+
+  let foo = match true {
+    true => true,
+  };
+  let foo = match true {
+    true => true,
+    true => true,
+  };
+  let foo = match true {
+    true => { }
+  };
+  let foo = match true {
+    true => { },
+  };
+  let foo = match true {
+    true => { },
+    true => { }
+  };
+}

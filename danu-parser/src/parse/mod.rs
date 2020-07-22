@@ -4,6 +4,7 @@ mod enum_node;
 mod expression_node;
 mod function_node;
 mod ident_node;
+mod pattern_node;
 mod statement_node;
 mod static_node;
 mod struct_node;
@@ -15,7 +16,8 @@ mod value_node;
 use crate::*;
 use constant_node::{constant_node, trait_item_constant_node};
 use control_flow_node::{
-  expression_conditional_node, loop_node, statement_conditional_node, while_node,
+  expression_conditional_node, loop_node, pattern_match_node, statement_conditional_node,
+  while_node,
 };
 use enum_node::enum_node;
 use expression_node::expression_node;
@@ -27,6 +29,7 @@ pub(self) use nom::{
   multi::many0,
   sequence::tuple,
 };
+use pattern_node::pattern_node;
 use statement_node::statement_node;
 use static_node::static_node;
 use struct_node::struct_node;
