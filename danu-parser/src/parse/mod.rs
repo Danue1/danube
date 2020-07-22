@@ -64,11 +64,11 @@ mod tests {
   #[test]
   fn test() {
     let path_list = [
-      // "tests/const",
-      // "tests/enum",
-      // "tests/function",
+      "tests/const",
+      "tests/enum",
+      "tests/function",
       "tests/struct",
-      // "tests/trait",
+      "tests/trait",
     ];
 
     for path in path_list.iter() {
