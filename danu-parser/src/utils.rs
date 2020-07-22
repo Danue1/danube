@@ -1,7 +1,7 @@
 use crate::*;
 use nom::{
   branch::alt,
-  bytes::complete::{is_a, is_not, tag, take_till},
+  bytes::complete::{is_a, is_not, tag},
   character::complete::char,
   combinator::{map, opt},
   multi::{many0, many1},
@@ -42,10 +42,6 @@ pub(crate) fn is_digit(c: char) -> bool {
 
 pub(crate) fn digit(s: Span) -> Result<Span> {
   is_a("0123456789")(s)
-}
-
-pub(crate) fn is_line_ending(c: char) -> bool {
-  matches!(c, '\n' | '\r')
 }
 
 pub(crate) fn is_semicolon(c: char) -> bool {
@@ -92,11 +88,7 @@ char_empty!(
   '+' => plus,
   '-' => hyphen,
   '=' => equal,
-  '@' => at,
-  '&' => ampersand,
-  '$' => dollar,
   '\\' => back_slash,
-  '!' => exclamation,
   '|' => pipeline,
   '\'' => single_quote,
   '"' => double_quote,
