@@ -145,6 +145,7 @@ pub enum StatementNode {
   LetMut(LetMutNode),
   Expression(ExpressionNode),
   Conditional(StatementConditionalNode),
+  Loop(LoopNode),
 }
 
 #[derive(Debug, PartialEq)]
@@ -165,6 +166,7 @@ pub struct LetMutNode {
 pub enum ExpressionNode {
   Value(ValueNode),
   Conditional(ExpressionConditionalNode),
+  Loop(LoopNode),
 }
 
 type IfElse = (Positioned<ExpressionNode>, Vec<Positioned<StatementNode>>);
@@ -183,4 +185,9 @@ pub struct ExpressionConditionalNode {
   pub if_true: Vec<Positioned<StatementNode>>,
   pub if_else_if: Option<Vec<IfElse>>,
   pub if_false: Vec<Positioned<StatementNode>>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct LoopNode {
+  pub body: Vec<Positioned<StatementNode>>,
 }

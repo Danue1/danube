@@ -69,6 +69,12 @@ pub(super) fn expression_conditional_node(s: Span) -> Result<ExpressionCondition
   )(s)
 }
 
+pub(super) fn loop_node(s: Span) -> Result<LoopNode> {
+  map(tuple((tag("loop"), ignore_token0, body)), |(_, _, body)| {
+    LoopNode { body }
+  })(s)
+}
+
 fn condition(s: Span) -> Result<Positioned<ExpressionNode>> {
   map(
     tuple((tag("if"), ignore_token1, positioned(expression_node))),
