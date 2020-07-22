@@ -7,13 +7,78 @@ use nom::{
   sequence::tuple,
 };
 
-pub(super) fn if_node(s: Span) -> Result<IfNode> {
+pub(super) fn statement_conditional_node(s: Span) -> Result<StatementConditionalNode> {
   map(
     tuple((
-      tag("if"),
-      ignore_token1,
-      positioned(expression_node),
+      condition,
       ignore_token0,
+      body,
+      opt(many1(map(
+        tuple((
+          ignore_token0,
+          tag("else"),
+          ignore_token1,
+          condition,
+          ignore_token0,
+          body,
+        )),
+        |(_, _, _, condition, _, body)| (condition, body),
+      ))),
+      opt(map(
+        tuple((ignore_token0, tag("else"), ignore_token0, body)),
+        |(_, _, _, statement_list)| statement_list,
+      )),
+    )),
+    |(condition, _, if_true, if_else_if, if_false)| StatementConditionalNode {
+      condition: Box::new(condition),
+      if_true,
+      if_else_if,
+      if_false,
+    },
+  )(s)
+}
+
+pub(super) fn expression_conditional_node(s: Span) -> Result<ExpressionConditionalNode> {
+  map(
+    tuple((
+      condition,
+      ignore_token0,
+      body,
+      opt(many1(map(
+        tuple((
+          ignore_token0,
+          tag("else"),
+          ignore_token1,
+          condition,
+          ignore_token0,
+          body,
+        )),
+        |(_, _, _, condition, _, body)| (condition, body),
+      ))),
+      map(
+        tuple((ignore_token0, tag("else"), ignore_token0, body)),
+        |(_, _, _, statement_list)| statement_list,
+      ),
+    )),
+    |(condition, _, if_true, if_else_if, if_false)| ExpressionConditionalNode {
+      condition: Box::new(condition),
+      if_true,
+      if_else_if,
+      if_false,
+    },
+  )(s)
+}
+
+fn condition(s: Span) -> Result<Positioned<ExpressionNode>> {
+  map(
+    tuple((tag("if"), ignore_token1, positioned(expression_node))),
+    |(_, _, condition)| condition,
+  )(s)
+}
+
+fn body(s: Span) -> Result<Vec<Positioned<StatementNode>>> {
+  map(
+    tuple((
       left_brace,
       ignore_token0,
       many0(map(
@@ -21,48 +86,7 @@ pub(super) fn if_node(s: Span) -> Result<IfNode> {
         |(statement, _)| statement,
       )),
       right_brace,
-      opt(many1(map(
-        tuple((
-          ignore_token0,
-          tag("else"),
-          ignore_token1,
-          tag("if"),
-          ignore_token1,
-          positioned(expression_node),
-          ignore_token0,
-          left_brace,
-          ignore_token0,
-          many0(map(
-            tuple((positioned(statement_node), ignore_token0)),
-            |(statement, _)| statement,
-          )),
-          ignore_token0,
-          right_brace,
-        )),
-        |(_, _, _, _, _, condition, _, _, _, statement_list, _, _)| (condition, statement_list),
-      ))),
-      opt(map(
-        tuple((
-          ignore_token0,
-          tag("else"),
-          ignore_token0,
-          left_brace,
-          ignore_token0,
-          many0(map(
-            tuple((positioned(statement_node), ignore_token0)),
-            |(statement, _)| statement,
-          )),
-          ignore_token0,
-          right_brace,
-        )),
-        |(_, _, _, _, _, statement_list, _, _)| statement_list,
-      )),
     )),
-    |(_, _, condition, _, _, _, if_true, _, if_else_if, if_false)| IfNode {
-      condition: Box::new(condition),
-      if_true,
-      if_else_if,
-      if_false,
-    },
+    |(_, _, body, _)| body,
   )(s)
 }

@@ -144,7 +144,7 @@ pub enum StatementNode {
   Let(LetNode),
   LetMut(LetMutNode),
   Expression(ExpressionNode),
-  If(IfNode),
+  Conditional(StatementConditionalNode),
 }
 
 #[derive(Debug, PartialEq)]
@@ -164,15 +164,23 @@ pub struct LetMutNode {
 #[derive(Debug, PartialEq)]
 pub enum ExpressionNode {
   Value(ValueNode),
-  If(IfNode),
+  Conditional(ExpressionConditionalNode),
 }
 
 type IfElse = (Positioned<ExpressionNode>, Vec<Positioned<StatementNode>>);
 
 #[derive(Debug, PartialEq)]
-pub struct IfNode {
+pub struct StatementConditionalNode {
   pub condition: Box<Positioned<ExpressionNode>>,
   pub if_true: Vec<Positioned<StatementNode>>,
   pub if_else_if: Option<Vec<IfElse>>,
   pub if_false: Option<Vec<Positioned<StatementNode>>>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct ExpressionConditionalNode {
+  pub condition: Box<Positioned<ExpressionNode>>,
+  pub if_true: Vec<Positioned<StatementNode>>,
+  pub if_else_if: Option<Vec<IfElse>>,
+  pub if_false: Vec<Positioned<StatementNode>>,
 }

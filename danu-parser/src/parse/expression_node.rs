@@ -5,6 +5,6 @@ use nom::combinator::map;
 pub(super) fn expression_node(s: Span) -> Result<ExpressionNode> {
   alt((
     map(value_node, ExpressionNode::Value),
-    map(if_node, ExpressionNode::If),
+    map(expression_conditional_node, ExpressionNode::Conditional),
   ))(s)
 }
