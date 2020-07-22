@@ -178,7 +178,8 @@ while let Foo(foo) = bar { ... }
 for foo in bar { ... }
 for Foo(foo) in bar { ... }
 
-match foo { bar -> ... }
-match foo { bar -> ..., baz -> ... }
-match foo { bar -> ..., baz -> { ... } }
-match foo { Bar(bar) -> ... }
+match foo { bar => ..., }
+match foo { bar => ..., baz => ..., }
+match foo { bar => ..., baz => { ... } }
+match foo { bar => ..., baz => { ... }, }
+match foo { Bar(bar) => ..., }
