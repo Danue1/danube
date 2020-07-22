@@ -21,6 +21,33 @@ pub(super) fn implement_node(s: Span) -> Result<ImplementNode> {
   )(s)
 }
 
+pub(super) fn implement_trait_node(s: Span) -> Result<ImplementTraitNode> {
+  map(
+    tuple((
+      tag("impl"),
+      ignore_token1,
+      positioned(ident_node),
+      ignore_token1,
+      tag("for"),
+      ignore_token1,
+      positioned(ident_node),
+      ignore_token0,
+      left_brace,
+      many1(map(
+        tuple((ignore_token0, positioned(implement_item_node))),
+        |(_, item)| item,
+      )),
+      ignore_token0,
+      right_brace,
+    )),
+    |(_, _, trait_ident, _, _, _, target, _, _, item_list, _, _)| ImplementTraitNode {
+      target,
+      trait_ident,
+      item_list,
+    },
+  )(s)
+}
+
 fn implement_item_node(s: Span) -> Result<ImplementItemNode> {
   alt((
     map(constant_node, ImplementItemNode::Constant),

@@ -1,9 +1,9 @@
 impl Foo {
-  const foo: Foo = false;
+  const bar: Bar = false;
 }
 impl Foo {
-  const foo: Foo = false;
-  const foo: Foo = false;
+  const bar: Bar = false;
+  const bar: Bar = false;
 }
 
 impl Foo {

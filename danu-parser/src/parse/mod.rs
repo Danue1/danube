@@ -24,7 +24,7 @@ use enum_node::enum_node;
 use expression_node::expression_node;
 use function_node::{function_node, trait_item_function_node};
 use ident_node::ident_node;
-use implement_node::implement_node;
+use implement_node::{implement_node, implement_trait_node};
 pub(self) use nom::{
   branch::alt,
   combinator::{all_consuming, map},
@@ -71,6 +71,7 @@ fn item_node(s: Span) -> Result<ItemNode> {
     map(constant_node, ItemNode::Constant),
     map(static_node, ItemNode::Static),
     map(implement_node, ItemNode::Implement),
+    map(implement_trait_node, ItemNode::ImplementTrait),
   ))(s)
 }
 
