@@ -28,7 +28,7 @@ fn value_char(s: Span) -> Result<char> {
   map(
     tuple((
       single_quote,
-      alt((map(tuple((reverse_slash, anychar)), |(_, c)| c), anychar)),
+      alt((map(tuple((back_slash, anychar)), |(_, c)| c), anychar)),
       single_quote,
     )),
     |(_, c, _)| c,

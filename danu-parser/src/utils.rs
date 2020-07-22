@@ -95,7 +95,7 @@ char_empty!(
   '@' => at,
   '&' => ampersand,
   '$' => dollar,
-  '\\' => reverse_slash,
+  '\\' => back_slash,
   '!' => exclamation,
   '|' => pipeline,
   '\'' => single_quote,
