@@ -202,10 +202,12 @@ pub struct WhileNode {
   pub body: Vec<Positioned<StatementNode>>,
 }
 
+type Branch = (Vec<Positioned<PatternNode>>, Vec<Positioned<StatementNode>>);
+
 #[derive(Debug, PartialEq)]
 pub struct PatternMatchNode {
   pub condition: Box<Positioned<ExpressionNode>>,
-  pub branch_list: Vec<(Vec<Positioned<PatternNode>>, Vec<Positioned<StatementNode>>)>,
+  pub branch_list: Vec<Branch>,
 }
 
 #[derive(Debug, PartialEq)]
