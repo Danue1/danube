@@ -69,6 +69,7 @@ mod tests {
       "tests/function",
       "tests/struct",
       "tests/trait",
+      "tests/type_alias",
     ];
 
     for path in path_list.iter() {
