@@ -19,6 +19,7 @@ pub enum ItemNode {
   TypeAlias(TypeAliasNode),
   TraitNode(TraitNode),
   Constant(ConstantNode),
+  Static(StaticNode),
 }
 
 #[derive(Debug, PartialEq)]
@@ -55,6 +56,13 @@ pub struct TraitNode {
 
 #[derive(Debug, PartialEq)]
 pub struct ConstantNode {
+  pub ident: Positioned<IdentNode>,
+  pub ty: Positioned<TypeNode>,
+  pub value: Positioned<ValueNode>, // TODO(Danuel): implement ExpressionNode
+}
+
+#[derive(Debug, PartialEq)]
+pub struct StaticNode {
   pub ident: Positioned<IdentNode>,
   pub ty: Positioned<TypeNode>,
   pub value: Positioned<ValueNode>, // TODO(Danuel): implement ExpressionNode

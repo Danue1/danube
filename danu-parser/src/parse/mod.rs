@@ -2,6 +2,7 @@ mod constant_node;
 mod enum_node;
 mod function_node;
 mod ident_node;
+mod static_node;
 mod struct_node;
 mod trait_node;
 mod type_alias_node;
@@ -9,7 +10,7 @@ mod type_node;
 mod value_node;
 
 use crate::*;
-use constant_node::*;
+use constant_node::{constant_node, trait_item_constant_node};
 use enum_node::enum_node;
 use function_node::{function_node, trait_item_function_node};
 use ident_node::ident_node;
@@ -19,6 +20,7 @@ use nom::{
   multi::many0,
   sequence::tuple,
 };
+use static_node::static_node;
 use struct_node::struct_node;
 use trait_node::trait_node;
 use type_alias_node::type_alias_node;
@@ -54,6 +56,7 @@ fn item_node(s: Span) -> Result<ItemNode> {
     map(type_alias_node, ItemNode::TypeAlias),
     map(trait_node, ItemNode::TraitNode),
     map(constant_node, ItemNode::Constant),
+    map(static_node, ItemNode::Static),
   ))(s)
 }
 
@@ -67,6 +70,7 @@ mod tests {
       "tests/const",
       "tests/enum",
       "tests/function",
+      "tests/static",
       "tests/struct",
       "tests/trait",
       "tests/type_alias",
