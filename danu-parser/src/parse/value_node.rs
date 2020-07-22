@@ -4,6 +4,7 @@ use nom::{
   bytes::complete::{tag, take, take_while, take_while1},
   character::complete::{anychar, char},
   combinator::{map, opt},
+  multi::separated_list,
   sequence::tuple,
 };
 
@@ -13,6 +14,7 @@ pub(super) fn value_node(s: Span) -> Result<ValueNode> {
     map(value_char, ValueNode::Char),
     value_numeric,
     map(value_string, ValueNode::String),
+    map(value_array, ValueNode::Array),
   ))(s)
 }
 
@@ -99,4 +101,21 @@ fn value_numeric(s: Span) -> Result<ValueNode> {
 
 fn value_string(s: Span) -> Result<String> {
   string(s)
+}
+
+fn value_array(s: Span) -> Result<Vec<ValueNode>> {
+  map(
+    tuple((
+      left_bracket,
+      ignore_token0,
+      opt(separated_list(
+        tuple((ignore_token0, comma, ignore_token0)),
+        value_node,
+      )),
+      ignore_token0,
+      opt(tuple((comma, ignore_token0))),
+      right_bracket,
+    )),
+    |(_, _, value_list, _, _, _)| value_list.unwrap_or_else(Vec::new),
+  )(s)
 }

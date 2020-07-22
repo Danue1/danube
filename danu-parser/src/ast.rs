@@ -67,6 +67,7 @@ pub enum ValueNode {
   Int(i128),
   Float(f64),
   String(String),
+  Array(Vec<ValueNode>),
 }
 
 #[derive(Debug, PartialEq)]

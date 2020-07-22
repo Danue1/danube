@@ -1,0 +1,9 @@
+const EMPTY_ARRAY: [int; 0] = [];
+const NON_EMPTY_ARRAY: [int; 4] = [1, 2, 3, 4];
+const MULTI_DIMENSIONAL_EMPTY_ARRAY: [[int; 0]; 0] = [];
+const MULTI_DIMENSIONAL_NON_EMPTY_ARRAY: [[int; 4]; 4] = [
+  [1, 2, 3, 4],
+  [5, 6, 7, 8],
+  [9, 10, 11, 12],
+  [13, 14, 15, 16],
+];
