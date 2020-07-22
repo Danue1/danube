@@ -1,8 +1,8 @@
 use crate::*;
 use nom::{
   branch::alt,
-  bytes::complete::{is_not, tag, take_while1},
-  character::complete::anychar,
+  bytes::complete::{tag, take, take_while, take_while1},
+  character::complete::{anychar, char},
   combinator::{map, opt},
   sequence::tuple,
 };
@@ -11,6 +11,7 @@ pub(super) fn value_node(s: Span) -> Result<ValueNode> {
   alt((
     map(value_bool, ValueNode::Bool),
     map(value_char, ValueNode::Char),
+    value_numeric,
     map(value_string, ValueNode::String),
   ))(s)
 }
@@ -36,13 +37,66 @@ fn value_char(s: Span) -> Result<char> {
   )(s)
 }
 
+fn value_numeric(s: Span) -> Result<ValueNode> {
+  enum Numeric {
+    Int(usize),
+    Float(usize),
+  }
+
+  let sign_to_int = |sign: Option<_>| if sign.is_some() { 1 } else { 0 };
+  let len = |s: Span| s.fragment().len();
+  fn zero<O, F>(f: F) -> impl Fn(Span) -> Result<O>
+  where
+    F: Fn(usize) -> O,
+  {
+    move |s: Span| map(take(0usize), |_| f(0))(s)
+  }
+
+  let (ss, sign) = map(opt(hyphen), sign_to_int)(s)?;
+
+  let (ss, majority) = alt((
+    map(tag("0"), |_| 1),
+    map(
+      tuple((take_while1(is_nonzero_digit), take_while(is_digit))),
+      |(nonzero_digit, digit)| len(nonzero_digit) + len(digit),
+    ),
+  ))(ss)?;
+
+  match alt((
+    map(tuple((dot, take_while(is_digit))), move |(_, minority)| {
+      if minority.fragment().is_empty() {
+        Numeric::Int(sign + majority)
+      } else {
+        Numeric::Float(1 + len(minority))
+      }
+    }),
+    zero(Numeric::Float),
+  ))(ss)?
+  {
+    (_, Numeric::Int(size)) => {
+      let (s, numeric) = take(size)(s)?;
+      Ok((s, ValueNode::Int(numeric.fragment().parse().unwrap())))
+    }
+    (ss, Numeric::Float(minority)) => {
+      let (_, exponential) = alt((
+        map(
+          tuple((
+            alt((char('e'), char('E'))),
+            opt(alt((plus, hyphen))),
+            take_while1(is_digit),
+          )),
+          |(_, sign, digit)| 1 + sign_to_int(sign) + len(digit),
+        ),
+        zero(|size| size),
+      ))(ss)?;
+
+      let (s, numeric) = take(sign + majority + minority + exponential)(s)?;
+
+      Ok((s, ValueNode::Float(numeric.fragment().parse().unwrap())))
+    }
+  }
+}
+
 fn value_string(s: Span) -> Result<String> {
-  map(
-    tuple((double_quote, opt(is_not("\"")), double_quote)),
-    |(_, string, _)| {
-      string
-        .map(|s| s.fragment().to_string())
-        .unwrap_or_else(String::new)
-    },
-  )(s)
+  string(s)
 }

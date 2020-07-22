@@ -1,0 +1,6 @@
+const FLOAT: float = 1.0;
+const FLOAT: float = -1.0;
+const FLOAT: float = 1e0;
+const FLOAT: float = -1e0;
+const FLOAT: float = 1.0e0;
+const FLOAT: float = -1.0e0;

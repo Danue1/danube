@@ -64,6 +64,8 @@ pub struct ConstantNode {
 pub enum ValueNode {
   Bool(bool),
   Char(char),
+  Int(i128),
+  Float(f64),
   String(String),
 }
 
