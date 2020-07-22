@@ -20,6 +20,7 @@ pub enum ItemNode {
   TraitNode(TraitNode),
   Constant(ConstantNode),
   Static(StaticNode),
+  Implement(ImplementNode),
 }
 
 #[derive(Debug, PartialEq)]
@@ -66,6 +67,12 @@ pub struct StaticNode {
   pub ident: Positioned<IdentNode>,
   pub ty: Positioned<TypeNode>,
   pub value: Positioned<LiteralValueNode>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct ImplementNode {
+  pub target: Positioned<IdentNode>,
+  pub item_list: Vec<Positioned<ImplementItemNode>>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -213,4 +220,10 @@ pub struct PatternMatchNode {
 #[derive(Debug, PartialEq)]
 pub enum PatternNode {
   Literal(LiteralValueNode),
+}
+
+#[derive(Debug, PartialEq)]
+pub enum ImplementItemNode {
+  Constant(ConstantNode),
+  Function(FunctionNode),
 }

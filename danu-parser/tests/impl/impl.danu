@@ -1,0 +1,69 @@
+impl Foo {
+  const foo: Foo = false;
+}
+impl Foo {
+  const foo: Foo = false;
+  const foo: Foo = false;
+}
+
+impl Foo {
+  fn bar() { }
+}
+impl Foo {
+  fn bar(a) { }
+}
+impl Foo {
+  fn bar(a: A) { }
+}
+
+impl Foo {
+  fn bar() {
+    false
+  }
+}
+impl Foo {
+  fn bar(a) {
+    false
+  }
+}
+impl Foo {
+  fn bar(a: A) {
+    false
+  }
+}
+
+impl Foo {
+  fn bar() -> Baz { }
+}
+impl Foo {
+  fn bar(a) -> Baz { }
+}
+impl Foo {
+  fn bar(a: A) -> Baz { }
+}
+
+impl Foo {
+  fn bar() -> Baz {
+    false
+  }
+}
+impl Foo {
+  fn bar(a) -> Baz {
+    false
+  }
+}
+impl Foo {
+  fn bar(a: A) -> Baz {
+    false
+  }
+}
+
+impl Foo {
+  fn bar() -> Baz = false;
+}
+impl Foo {
+  fn bar(a) -> Baz = false;
+}
+impl Foo {
+  fn bar(a: A) -> Baz = false;
+}
