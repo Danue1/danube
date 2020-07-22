@@ -73,7 +73,6 @@ char_empty!(
   ']' => right_bracket,
   '{' => left_brace,
   '}' => right_brace,
-  '>' => right_chevron,
   '.' => dot,
   ',' => comma,
   ':' => colon,
