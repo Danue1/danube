@@ -10,6 +10,7 @@ pub(super) fn statement_node(s: Span) -> Result<StatementNode> {
   alt((
     map(let_mut_node, StatementNode::LetMut),
     map(let_node, StatementNode::Let),
+    map(expression_node, StatementNode::Expression),
     map(statement_conditional_node, StatementNode::Conditional),
     map(loop_node, StatementNode::Loop),
     map(while_node, StatementNode::While),
