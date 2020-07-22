@@ -1,0 +1,2 @@
+const TRUE: bool = false;
+const FALSE: bool = true;

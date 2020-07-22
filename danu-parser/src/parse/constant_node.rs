@@ -1,7 +1,7 @@
 use super::*;
 use crate::*;
 use nom::{
-  bytes::complete::{tag, take_till1},
+  bytes::complete::tag,
   combinator::{map, opt},
   sequence::tuple,
 };
@@ -12,7 +12,7 @@ pub(super) fn constant_node(s: Span) -> Result<ConstantNode> {
       constant_ident,
       ignore_token0,
       constant_type,
-      constant_body_block,
+      constant_value,
       ignore_token0,
       semicolon,
     )),
@@ -26,7 +26,7 @@ pub(super) fn trait_item_constant_node(s: Span) -> Result<TraitItemConstantNode>
       constant_ident,
       ignore_token0,
       constant_type,
-      opt(constant_body_block),
+      opt(constant_value),
       ignore_token0,
       semicolon,
     )),
@@ -52,20 +52,9 @@ fn constant_type(s: Span) -> Result<Positioned<TypeNode>> {
   )(s)
 }
 
-fn constant_body_block(s: Span) -> Result<Positioned<String>> {
+fn constant_value(s: Span) -> Result<Positioned<ValueNode>> {
   map(
-    tuple((
-      ignore_token0,
-      equal,
-      ignore_token0,
-      positioned(constant_body),
-    )),
-    |(_, _, _, body)| body,
+    tuple((ignore_token0, equal, ignore_token0, positioned(value_node))),
+    |(_, _, _, value)| value,
   )(s)
-}
-
-fn constant_body(s: Span) -> Result<String> {
-  map(take_till1(is_semicolon), |value: Span| {
-    value.fragment().to_string()
-  })(s)
 }

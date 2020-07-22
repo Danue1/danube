@@ -57,7 +57,12 @@ pub struct TraitNode {
 pub struct ConstantNode {
   pub ident: Positioned<IdentNode>,
   pub ty: Positioned<TypeNode>,
-  pub value: Positioned<String>, // TODO(Danuel): implement ExpressionNode
+  pub value: Positioned<ValueNode>, // TODO(Danuel): implement ExpressionNode
+}
+
+#[derive(Debug, PartialEq)]
+pub enum ValueNode {
+  Bool(bool),
 }
 
 #[derive(Debug, PartialEq)]
@@ -98,7 +103,7 @@ pub enum TraitItemNode {
 pub struct TraitItemConstantNode {
   pub ident: Positioned<IdentNode>,
   pub ty: Positioned<TypeNode>,
-  pub default_value: Option<Positioned<String>>,
+  pub default_value: Option<Positioned<ValueNode>>,
 }
 
 #[derive(Debug, PartialEq)]

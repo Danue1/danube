@@ -2,7 +2,7 @@ trait Foo {
   const BAR: Bar;
 }
 trait Foo {
-  const BAR: Bar = ...;
+  const BAR: Bar = false;
 }
 
 trait Foo{

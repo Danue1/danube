@@ -23,7 +23,7 @@ use struct_node::struct_node;
 use trait_node::trait_node;
 use type_alias_node::type_alias_node;
 use type_node::type_node;
-use value_node::value_usize;
+use value_node::{value_node, value_usize};
 
 pub fn parse(source: &str) -> std::result::Result<ModuleNode, Error> {
   match all_consuming(map(
@@ -70,6 +70,7 @@ mod tests {
       "tests/struct",
       "tests/trait",
       "tests/type_alias",
+      "tests/value",
     ];
 
     for path in path_list.iter() {
