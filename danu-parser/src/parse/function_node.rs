@@ -3,7 +3,7 @@ use crate::*;
 use nom::{
   branch::alt,
   bytes::complete::{tag, take_till1},
-  combinator::{map, opt},
+  combinator::{cond, map, opt},
   multi::separated_list,
   sequence::tuple,
 };
@@ -26,7 +26,7 @@ pub(super) fn function_node(s: Span) -> Result<FunctionNode> {
         )),
         |(_, _, ty, _)| ty,
       )),
-      positioned(function_body),
+      function_body,
     )),
     |(_, _, ident, _, argument_list, _, return_type, body)| FunctionNode {
       ident,
@@ -35,6 +35,37 @@ pub(super) fn function_node(s: Span) -> Result<FunctionNode> {
       body,
     },
   )(s)
+}
+
+pub(super) fn trait_item_function_node(s: Span) -> Result<TraitItemFunctionNode> {
+  let (s, (_, _, ident, _, argument_list, _, return_type, body)) = tuple((
+    tag("fn"),
+    ignore_token1,
+    positioned(ident_node),
+    ignore_token0,
+    function_argument_list,
+    ignore_token0,
+    opt(map(
+      tuple((
+        tag("->"),
+        ignore_token0,
+        positioned(type_node),
+        ignore_token0,
+      )),
+      |(_, _, ty, _)| ty,
+    )),
+    opt(function_body),
+  ))(s)?;
+  let (s, _) = cond(body.is_none(), tuple((ignore_token0, semicolon)))(s)?;
+
+  let node = TraitItemFunctionNode {
+    ident,
+    return_type,
+    argument_list,
+    body,
+  };
+
+  Ok((s, node))
 }
 
 fn function_argument_list(s: Span) -> Result<Vec<Positioned<FunctionArgumentNode>>> {
@@ -67,28 +98,45 @@ fn function_argument_node(s: Span) -> Result<FunctionArgumentNode> {
   )(s)
 }
 
-fn function_body(s: Span) -> Result<String> {
+fn function_body(s: Span) -> Result<Positioned<String>> {
   alt((function_body_shorthand, function_body_block))(s)
 }
 
-fn function_body_shorthand(s: Span) -> Result<String> {
+fn function_body_shorthand(s: Span) -> Result<Positioned<String>> {
   map(
-    tuple((equal, ignore_token0, take_till1(is_semicolon), semicolon)),
-    |(_, _, body, _)| body.fragment().to_string(),
+    tuple((
+      equal,
+      ignore_token0,
+      positioned(function_body_shorthand_expression),
+      semicolon,
+    )),
+    |(_, _, body, _)| body,
   )(s)
 }
 
-fn function_body_block(s: Span) -> Result<String> {
+fn function_body_shorthand_expression(s: Span) -> Result<String> {
+  map(take_till1(is_semicolon), |expression: Span| {
+    expression.fragment().to_string()
+  })(s)
+}
+
+fn function_body_block(s: Span) -> Result<Positioned<String>> {
   map(
     tuple((
       left_brace,
       ignore_token0,
-      take_till1(is_right_brace),
+      positioned(function_body_block_expression),
       ignore_token0,
       right_brace,
     )),
-    |(_, _, body, _, _)| body.fragment().to_string(),
+    |(_, _, body, _, _)| body,
   )(s)
+}
+
+fn function_body_block_expression(s: Span) -> Result<String> {
+  map(take_till1(is_right_brace), |expression: Span| {
+    expression.fragment().to_string()
+  })(s)
 }
 
 #[cfg(test)]

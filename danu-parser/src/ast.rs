@@ -17,6 +17,8 @@ pub enum ItemNode {
   Enum(EnumNode),
   Function(FunctionNode),
   TypeAlias(TypeAliasNode),
+  TraitNode(TraitNode),
+  Constant(ConstantNode),
 }
 
 #[derive(Debug, PartialEq)]
@@ -46,6 +48,19 @@ pub struct TypeAliasNode {
 }
 
 #[derive(Debug, PartialEq)]
+pub struct TraitNode {
+  pub ident: Positioned<IdentNode>,
+  pub item_list: Vec<Positioned<TraitItemNode>>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct ConstantNode {
+  pub ident: Positioned<IdentNode>,
+  pub ty: Positioned<TypeNode>,
+  pub value: Positioned<String>, // TODO(Danuel): implement ExpressionNode
+}
+
+#[derive(Debug, PartialEq)]
 pub enum StructFieldsNode {
   Unnamed(StructUnnamedFieldsNode),
   Named(StructNamedFieldsNode),
@@ -71,6 +86,27 @@ pub struct EnumVariantNode {
 pub struct FunctionArgumentNode {
   pub ident: Positioned<IdentNode>,
   pub ty: Option<Positioned<TypeNode>>,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum TraitItemNode {
+  Constant(TraitItemConstantNode),
+  Function(TraitItemFunctionNode),
+}
+
+#[derive(Debug, PartialEq)]
+pub struct TraitItemConstantNode {
+  pub ident: Positioned<IdentNode>,
+  pub ty: Positioned<TypeNode>,
+  pub default_value: Option<Positioned<String>>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct TraitItemFunctionNode {
+  pub ident: Positioned<IdentNode>,
+  pub return_type: Option<Positioned<TypeNode>>,
+  pub argument_list: Vec<Positioned<FunctionArgumentNode>>,
+  pub body: Option<Positioned<String>>, // TODO(Danuel): implement ExpressionNode
 }
 
 #[derive(Debug, PartialEq)]

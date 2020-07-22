@@ -1,14 +1,17 @@
+mod constant_node;
 mod enum_node;
 mod function_node;
 mod ident_node;
 mod struct_node;
+mod trait_node;
 mod type_alias_node;
 mod type_node;
 mod value_node;
 
 use crate::*;
+use constant_node::*;
 use enum_node::enum_node;
-use function_node::function_node;
+use function_node::{function_node, trait_item_function_node};
 use ident_node::ident_node;
 use nom::{
   branch::alt,
@@ -17,6 +20,7 @@ use nom::{
   sequence::tuple,
 };
 use struct_node::struct_node;
+use trait_node::trait_node;
 use type_alias_node::type_alias_node;
 use type_node::type_node;
 use value_node::value_usize;
@@ -48,5 +52,7 @@ fn item_node(s: Span) -> Result<ItemNode> {
     map(enum_node, ItemNode::Enum),
     map(function_node, ItemNode::Function),
     map(type_alias_node, ItemNode::TypeAlias),
+    map(trait_node, ItemNode::TraitNode),
+    map(constant_node, ItemNode::Constant),
   ))(s)
 }
