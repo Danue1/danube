@@ -75,6 +75,22 @@ pub(super) fn loop_node(s: Span) -> Result<LoopNode> {
   })(s)
 }
 
+pub(super) fn while_node(s: Span) -> Result<WhileNode> {
+  map(
+    tuple((
+      tag("while"),
+      ignore_token1,
+      positioned(expression_node),
+      ignore_token0,
+      body,
+    )),
+    |(_, _, condition, _, body)| WhileNode {
+      condition: Box::new(condition),
+      body,
+    },
+  )(s)
+}
+
 fn condition(s: Span) -> Result<Positioned<ExpressionNode>> {
   map(
     tuple((tag("if"), ignore_token1, positioned(expression_node))),

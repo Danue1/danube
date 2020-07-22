@@ -14,7 +14,9 @@ mod value_node;
 
 use crate::*;
 use constant_node::{constant_node, trait_item_constant_node};
-use control_flow_node::{expression_conditional_node, loop_node, statement_conditional_node};
+use control_flow_node::{
+  expression_conditional_node, loop_node, statement_conditional_node, while_node,
+};
 use enum_node::enum_node;
 use expression_node::expression_node;
 use function_node::{function_node, trait_item_function_node};

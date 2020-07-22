@@ -146,6 +146,7 @@ pub enum StatementNode {
   Expression(ExpressionNode),
   Conditional(StatementConditionalNode),
   Loop(LoopNode),
+  While(WhileNode),
 }
 
 #[derive(Debug, PartialEq)]
@@ -167,6 +168,7 @@ pub enum ExpressionNode {
   Value(ValueNode),
   Conditional(ExpressionConditionalNode),
   Loop(LoopNode),
+  While(WhileNode),
 }
 
 type IfElse = (Positioned<ExpressionNode>, Vec<Positioned<StatementNode>>);
@@ -189,5 +191,11 @@ pub struct ExpressionConditionalNode {
 
 #[derive(Debug, PartialEq)]
 pub struct LoopNode {
+  pub body: Vec<Positioned<StatementNode>>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct WhileNode {
+  pub condition: Box<Positioned<ExpressionNode>>,
   pub body: Vec<Positioned<StatementNode>>,
 }
