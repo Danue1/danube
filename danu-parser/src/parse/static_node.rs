@@ -30,9 +30,14 @@ fn static_type(s: Span) -> Result<Positioned<TypeNode>> {
   )(s)
 }
 
-fn static_value(s: Span) -> Result<Positioned<ValueNode>> {
+fn static_value(s: Span) -> Result<Positioned<LiteralValueNode>> {
   map(
-    tuple((ignore_token0, equal, ignore_token0, positioned(value_node))),
+    tuple((
+      ignore_token0,
+      equal,
+      ignore_token0,
+      positioned(literal_value_node),
+    )),
     |(_, _, _, value)| value,
   )(s)
 }

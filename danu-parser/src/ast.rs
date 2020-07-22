@@ -58,24 +58,24 @@ pub struct TraitNode {
 pub struct ConstantNode {
   pub ident: Positioned<IdentNode>,
   pub ty: Positioned<TypeNode>,
-  pub value: Positioned<ValueNode>,
+  pub value: Positioned<LiteralValueNode>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct StaticNode {
   pub ident: Positioned<IdentNode>,
   pub ty: Positioned<TypeNode>,
-  pub value: Positioned<ValueNode>,
+  pub value: Positioned<LiteralValueNode>,
 }
 
 #[derive(Debug, PartialEq)]
-pub enum ValueNode {
+pub enum LiteralValueNode {
   Bool(bool),
   Char(char),
   Int(i128),
   Float(f64),
   String(String),
-  Array(Vec<ValueNode>),
+  Array(Vec<LiteralValueNode>),
 }
 
 #[derive(Debug, PartialEq)]
@@ -116,7 +116,7 @@ pub enum TraitItemNode {
 pub struct TraitItemConstantNode {
   pub ident: Positioned<IdentNode>,
   pub ty: Positioned<TypeNode>,
-  pub default_value: Option<Positioned<ValueNode>>,
+  pub default_value: Option<Positioned<LiteralValueNode>>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -166,7 +166,7 @@ pub struct LetMutNode {
 
 #[derive(Debug, PartialEq)]
 pub enum ExpressionNode {
-  Value(ValueNode),
+  Literal(LiteralValueNode),
   Conditional(ExpressionConditionalNode),
   Loop(LoopNode),
   While(WhileNode),
@@ -212,5 +212,5 @@ pub struct PatternMatchNode {
 
 #[derive(Debug, PartialEq)]
 pub enum PatternNode {
-  Value(ValueNode),
+  Literal(LiteralValueNode),
 }

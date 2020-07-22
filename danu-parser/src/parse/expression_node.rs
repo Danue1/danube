@@ -4,7 +4,7 @@ use nom::combinator::map;
 
 pub(super) fn expression_node(s: Span) -> Result<ExpressionNode> {
   alt((
-    map(value_node, ExpressionNode::Value),
+    map(literal_value_node, ExpressionNode::Literal),
     map(expression_conditional_node, ExpressionNode::Conditional),
     map(loop_node, ExpressionNode::Loop),
     map(while_node, ExpressionNode::While),

@@ -8,13 +8,13 @@ use nom::{
   sequence::tuple,
 };
 
-pub(super) fn value_node(s: Span) -> Result<ValueNode> {
+pub(super) fn literal_value_node(s: Span) -> Result<LiteralValueNode> {
   alt((
-    map(value_bool, ValueNode::Bool),
-    map(value_char, ValueNode::Char),
+    map(value_bool, LiteralValueNode::Bool),
+    map(value_char, LiteralValueNode::Char),
     value_numeric,
-    map(value_string, ValueNode::String),
-    map(value_array, ValueNode::Array),
+    map(value_string, LiteralValueNode::String),
+    map(value_array, LiteralValueNode::Array),
   ))(s)
 }
 
@@ -39,7 +39,7 @@ fn value_char(s: Span) -> Result<char> {
   )(s)
 }
 
-fn value_numeric(s: Span) -> Result<ValueNode> {
+fn value_numeric(s: Span) -> Result<LiteralValueNode> {
   enum Numeric {
     Int(usize),
     Float(usize),
@@ -77,7 +77,10 @@ fn value_numeric(s: Span) -> Result<ValueNode> {
   {
     (_, Numeric::Int(size)) => {
       let (s, numeric) = take(size)(s)?;
-      Ok((s, ValueNode::Int(numeric.fragment().parse().unwrap())))
+      Ok((
+        s,
+        LiteralValueNode::Int(numeric.fragment().parse().unwrap()),
+      ))
     }
     (ss, Numeric::Float(minority)) => {
       let (_, exponential) = alt((
@@ -94,7 +97,10 @@ fn value_numeric(s: Span) -> Result<ValueNode> {
 
       let (s, numeric) = take(sign + majority + minority + exponential)(s)?;
 
-      Ok((s, ValueNode::Float(numeric.fragment().parse().unwrap())))
+      Ok((
+        s,
+        LiteralValueNode::Float(numeric.fragment().parse().unwrap()),
+      ))
     }
   }
 }
@@ -103,14 +109,14 @@ fn value_string(s: Span) -> Result<String> {
   string(s)
 }
 
-fn value_array(s: Span) -> Result<Vec<ValueNode>> {
+fn value_array(s: Span) -> Result<Vec<LiteralValueNode>> {
   map(
     tuple((
       left_bracket,
       ignore_token0,
       opt(separated_list(
         tuple((ignore_token0, comma, ignore_token0)),
-        value_node,
+        literal_value_node,
       )),
       ignore_token0,
       opt(tuple((comma, ignore_token0))),

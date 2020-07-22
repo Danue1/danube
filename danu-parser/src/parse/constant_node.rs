@@ -52,9 +52,14 @@ fn constant_type(s: Span) -> Result<Positioned<TypeNode>> {
   )(s)
 }
 
-fn constant_value(s: Span) -> Result<Positioned<ValueNode>> {
+fn constant_value(s: Span) -> Result<Positioned<LiteralValueNode>> {
   map(
-    tuple((ignore_token0, equal, ignore_token0, positioned(value_node))),
+    tuple((
+      ignore_token0,
+      equal,
+      ignore_token0,
+      positioned(literal_value_node),
+    )),
     |(_, _, _, value)| value,
   )(s)
 }
