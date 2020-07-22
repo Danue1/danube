@@ -85,17 +85,3 @@ fn named_field(s: Span) -> Result<(Positioned<IdentNode>, Positioned<TypeNode>)>
     |(ident_node, _, _, _, type_node)| (ident_node, type_node),
   )(s)
 }
-
-#[cfg(test)]
-mod tests {
-  use super::*;
-
-  #[test]
-  fn test() {
-    let source = r#"struct Foo { bar: [[Bar; 4]; 4] }"#;
-    dbg!(parse(source));
-
-    let source = r#"struct Foo(Bar);"#;
-    dbg!(parse(source));
-  }
-}

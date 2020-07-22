@@ -56,3 +56,33 @@ fn item_node(s: Span) -> Result<ItemNode> {
     map(constant_node, ItemNode::Constant),
   ))(s)
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test() {
+    let path_list = [
+      // "tests/const",
+      // "tests/enum",
+      // "tests/function",
+      "tests/struct",
+      // "tests/trait",
+    ];
+
+    for path in path_list.iter() {
+      for entry in std::fs::read_dir(path).unwrap() {
+        if let Ok(entry) = entry {
+          let path = entry.path();
+          let source = std::fs::read_to_string(&path).unwrap();
+          if let Err(error) = parse(source.as_str()) {
+            dbg!(path);
+            dbg!(error);
+            panic!();
+          };
+        }
+      }
+    }
+  }
+}

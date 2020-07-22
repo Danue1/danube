@@ -69,14 +69,3 @@ fn constant_body(s: Span) -> Result<String> {
     value.fragment().to_string()
   })(s)
 }
-
-#[cfg(test)]
-mod tests {
-  use super::*;
-
-  #[test]
-  fn test() {
-    let source = r#"const FOO: Foo = ...;"#;
-    dbg!(parse(source));
-  }
-}

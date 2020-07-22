@@ -50,26 +50,3 @@ fn variant_node(s: Span) -> Result<EnumVariantNode> {
     |(ident, ty)| EnumVariantNode { ident, ty },
   )(s)
 }
-
-#[cfg(test)]
-mod tests {
-  use super::*;
-
-  #[test]
-  fn test() {
-    let source = r#"enum Foo = Bar;"#;
-    dbg!(parse(source));
-
-    let source = r#"enum Foo = Bar | Baz;"#;
-    dbg!(parse(source));
-
-    let source = r#"enum Foo = Bar(Bar);"#;
-    dbg!(parse(source));
-
-    let source = r#"enum Foo = | Bar;"#;
-    dbg!(parse(source));
-
-    let source = r#"enum Foo = | Bar | Baz;"#;
-    dbg!(parse(source));
-  }
-}

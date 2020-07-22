@@ -57,11 +57,11 @@ pub(crate) fn is_right_brace(c: char) -> bool {
 }
 
 pub(crate) fn ignore_token0(s: Span) -> Result<()> {
-  map(many0(is_a(", \t\r\n")), |_| ())(s)
+  map(many0(is_a(" \t\r\n")), |_| ())(s)
 }
 
 pub(crate) fn ignore_token1(s: Span) -> Result<()> {
-  map(many1(is_a(", \t\r\n")), |_| ())(s)
+  map(many1(is_a(" \t\r\n")), |_| ())(s)
 }
 
 pub(crate) fn char_empty(c: char) -> impl Fn(Span) -> Result<()> {

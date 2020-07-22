@@ -138,38 +138,3 @@ fn function_body_block_expression(s: Span) -> Result<String> {
     expression.fragment().to_string()
   })(s)
 }
-
-#[cfg(test)]
-mod tests {
-  use super::*;
-
-  #[test]
-  fn test() {
-    let source = r#"fn foo() { ... }"#;
-    dbg!(parse(source));
-
-    let source = r#"fn foo(a) { ... }"#;
-    dbg!(parse(source));
-
-    let source = r#"fn foo(a: A) { ... }"#;
-    dbg!(parse(source));
-
-    let source = r#"fn foo() -> Bar { ... }"#;
-    dbg!(parse(source));
-
-    let source = r#"fn foo(a) -> Bar { ... }"#;
-    dbg!(parse(source));
-
-    let source = r#"fn foo(a: A) -> Bar { ... }"#;
-    dbg!(parse(source));
-
-    let source = r#"fn foo() -> Bar = ...;"#;
-    dbg!(parse(source));
-
-    let source = r#"fn foo(a) -> Bar = ...;"#;
-    dbg!(parse(source));
-
-    let source = r#"fn foo(a: A) -> Bar = ...;"#;
-    dbg!(parse(source));
-  }
-}

@@ -18,14 +18,3 @@ pub(super) fn type_alias_node(s: Span) -> Result<TypeAliasNode> {
     |(_, _, ident, _, _, _, ty, _, _)| TypeAliasNode { ident, ty },
   )(s)
 }
-
-#[cfg(test)]
-mod tests {
-  use super::*;
-
-  #[test]
-  fn test() {
-    let source = r#"type Foo = Bar;"#;
-    dbg!(parse(source));
-  }
-}
