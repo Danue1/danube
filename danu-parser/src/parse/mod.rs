@@ -1,7 +1,9 @@
 mod constant_node;
 mod enum_node;
+mod expression_node;
 mod function_node;
 mod ident_node;
+mod statement_node;
 mod static_node;
 mod struct_node;
 mod trait_node;
@@ -12,6 +14,7 @@ mod value_node;
 use crate::*;
 use constant_node::{constant_node, trait_item_constant_node};
 use enum_node::enum_node;
+use expression_node::expression_node;
 use function_node::{function_node, trait_item_function_node};
 use ident_node::ident_node;
 use nom::{
@@ -20,6 +23,7 @@ use nom::{
   multi::many0,
   sequence::tuple,
 };
+use statement_node::statement_node;
 use static_node::static_node;
 use struct_node::struct_node;
 use trait_node::trait_node;
@@ -69,6 +73,7 @@ mod tests {
     let path_list = [
       "tests/const",
       "tests/enum",
+      "tests/expression",
       "tests/function",
       "tests/static",
       "tests/struct",

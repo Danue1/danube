@@ -2,7 +2,7 @@ use super::*;
 use crate::*;
 use nom::{
   branch::alt,
-  bytes::complete::{tag, take_till1},
+  bytes::complete::tag,
   combinator::{cond, map, opt},
   multi::separated_list,
   sequence::tuple,
@@ -98,43 +98,33 @@ fn function_argument_node(s: Span) -> Result<FunctionArgumentNode> {
   )(s)
 }
 
-fn function_body(s: Span) -> Result<Positioned<String>> {
-  alt((function_body_shorthand, function_body_block))(s)
+fn function_body(s: Span) -> Result<Vec<Positioned<StatementNode>>> {
+  alt((
+    map(positioned(function_body_shorthand), |expression| {
+      vec![expression]
+    }),
+    function_body_block,
+  ))(s)
 }
 
-fn function_body_shorthand(s: Span) -> Result<Positioned<String>> {
+fn function_body_shorthand(s: Span) -> Result<StatementNode> {
   map(
-    tuple((
-      equal,
-      ignore_token0,
-      positioned(function_body_shorthand_expression),
-      semicolon,
-    )),
-    |(_, _, body, _)| body,
+    tuple((equal, ignore_token0, expression_node, semicolon)),
+    |(_, _, expression, _)| StatementNode::Expression(expression),
   )(s)
 }
 
-fn function_body_shorthand_expression(s: Span) -> Result<String> {
-  map(take_till1(is_semicolon), |expression: Span| {
-    expression.fragment().to_string()
-  })(s)
-}
-
-fn function_body_block(s: Span) -> Result<Positioned<String>> {
+fn function_body_block(s: Span) -> Result<Vec<Positioned<StatementNode>>> {
   map(
     tuple((
       left_brace,
       ignore_token0,
-      positioned(function_body_block_expression),
-      ignore_token0,
+      many0(map(
+        tuple((positioned(statement_node), ignore_token0)),
+        |(expression, _)| expression,
+      )),
       right_brace,
     )),
-    |(_, _, body, _, _)| body,
+    |(_, _, expression_list, _)| expression_list,
   )(s)
-}
-
-fn function_body_block_expression(s: Span) -> Result<String> {
-  map(take_till1(is_right_brace), |expression: Span| {
-    expression.fragment().to_string()
-  })(s)
 }

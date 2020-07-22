@@ -1,11 +1,11 @@
-fn foo() { ... }
-fn foo(a) { ... }
-fn foo(a: A) { ... }
+fn foo() { }
+fn foo(a) { }
+fn foo(a: A) { }
 
-fn foo() -> Bar { ... }
-fn foo(a) -> Bar { ... }
-fn foo(a: A) -> Bar { ... }
+fn foo() -> Bar { }
+fn foo(a) -> Bar { }
+fn foo(a: A) -> Bar { }
 
-fn foo() -> Bar = ...;
-fn foo(a) -> Bar = ...;
-fn foo(a: A) -> Bar = ...;
+fn foo() -> Bar = false;
+fn foo(a) -> Bar = false;
+fn foo(a: A) -> Bar = false;

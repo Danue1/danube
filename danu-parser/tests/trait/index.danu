@@ -15,29 +15,29 @@ trait Foo{
   fn bar(a: A);
 }
 trait Foo{
-  fn bar() { ... }
+  fn bar() { }
 }
 trait Foo{
-  fn bar(a) { ... }
+  fn bar(a) { }
 }
 trait Foo{
-  fn bar(a: A) { ... }
+  fn bar(a: A) { }
 }
 trait Foo{
-  fn bar() -> Baz { ... }
+  fn bar() -> Baz { }
 }
 trait Foo{
-  fn bar(a) -> Baz { ... }
+  fn bar(a) -> Baz { }
 }
 trait Foo{
-  fn bar(a: A) -> Baz { ... }
+  fn bar(a: A) -> Baz { }
 }
 trait Foo{
-  fn bar() -> Baz = ...;
+  fn bar() -> Baz = false;
 }
 trait Foo{
-  fn bar(a) -> Baz = ...;
+  fn bar(a) -> Baz = false;
 }
 trait Foo{
-  fn bar(a: A) -> Baz = ...;
+  fn bar(a: A) -> Baz = false;
 }

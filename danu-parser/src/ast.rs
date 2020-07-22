@@ -39,7 +39,7 @@ pub struct FunctionNode {
   pub ident: Positioned<IdentNode>,
   pub return_type: Option<Positioned<TypeNode>>,
   pub argument_list: Vec<Positioned<FunctionArgumentNode>>,
-  pub body: Positioned<String>, // TODO(Danuel): implement ExpressionNode
+  pub body: Vec<Positioned<StatementNode>>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -58,14 +58,14 @@ pub struct TraitNode {
 pub struct ConstantNode {
   pub ident: Positioned<IdentNode>,
   pub ty: Positioned<TypeNode>,
-  pub value: Positioned<ValueNode>, // TODO(Danuel): implement ExpressionNode
+  pub value: Positioned<ValueNode>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct StaticNode {
   pub ident: Positioned<IdentNode>,
   pub ty: Positioned<TypeNode>,
-  pub value: Positioned<ValueNode>, // TODO(Danuel): implement ExpressionNode
+  pub value: Positioned<ValueNode>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -124,7 +124,7 @@ pub struct TraitItemFunctionNode {
   pub ident: Positioned<IdentNode>,
   pub return_type: Option<Positioned<TypeNode>>,
   pub argument_list: Vec<Positioned<FunctionArgumentNode>>,
-  pub body: Option<Positioned<String>>, // TODO(Danuel): implement ExpressionNode
+  pub body: Option<Vec<Positioned<StatementNode>>>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -137,4 +137,30 @@ pub enum TypeNode {
 pub struct TypeArrayNode {
   pub ty: Positioned<TypeNode>,
   pub size: usize,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum StatementNode {
+  Let(LetNode),
+  LetMut(LetMutNode),
+  Expression(ExpressionNode),
+}
+
+#[derive(Debug, PartialEq)]
+pub struct LetNode {
+  pub ident: Positioned<IdentNode>,
+  pub ty: Option<Positioned<TypeNode>>,
+  pub value: Positioned<ExpressionNode>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct LetMutNode {
+  pub ident: Positioned<IdentNode>,
+  pub ty: Option<Positioned<TypeNode>>,
+  pub value: Positioned<ExpressionNode>,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum ExpressionNode {
+  Value(ValueNode),
 }
