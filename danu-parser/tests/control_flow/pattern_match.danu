@@ -9,6 +9,8 @@ fn foo() {
   match true {
     Foo => true,
     Foo::Bar => true,
+    Foo(foo) => true,
+    Foo::Bar(bar) => true,
   }
   match true {
     true => { }
@@ -23,6 +25,8 @@ fn foo() {
   match true {
     Foo => { },
     Foo::Bar => { },
+    Foo(foo) => { },
+    Foo::Bar(bar) => { },
   }
 
   let foo = match true {
@@ -35,6 +39,8 @@ fn foo() {
   let foo = match true {
     Foo => true,
     Foo::Bar => true,
+    Foo(foo) => true,
+    Foo::Bar(bar) => true,
   };
   let foo = match true {
     true => { }
@@ -49,5 +55,7 @@ fn foo() {
   let foo = match true {
     Foo => { },
     Foo::Bar => { },
+    Foo(foo) => { },
+    Foo::Bar(bar) => { },
   };
 }

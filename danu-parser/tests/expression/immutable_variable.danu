@@ -1,5 +1,6 @@
 fn foo() {
   let foo = false;
-  let Foo = false;
   let Foo::Bar = false;
+  let Foo(foo) = false;
+  let Foo::Bar(bar) = false;
 }

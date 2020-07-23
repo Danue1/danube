@@ -227,6 +227,7 @@ pub struct PatternMatchNode {
 pub enum PatternNode {
   Literal(LiteralValueNode),
   Path(PathNode),
+  UnnamedStruct(UnnamedStructNode),
 }
 
 #[derive(Debug, PartialEq)]
@@ -237,5 +238,11 @@ pub enum ImplementItemNode {
 
 #[derive(Debug, PartialEq)]
 pub struct PathNode {
-  pub ident_list: Vec<IdentNode>,
+  pub ident_list: Vec<Positioned<IdentNode>>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct UnnamedStructNode {
+  pub path: PathNode,
+  pub field_list: Vec<Positioned<PatternNode>>,
 }
