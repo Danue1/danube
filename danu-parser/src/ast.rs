@@ -167,14 +167,14 @@ pub enum StatementNode {
 
 #[derive(Debug, PartialEq)]
 pub struct LetNode {
-  pub ident: Positioned<IdentNode>,
+  pub pattern: Positioned<PatternNode>,
   pub ty: Option<Positioned<TypeNode>>,
   pub value: Positioned<ExpressionNode>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct LetMutNode {
-  pub ident: Positioned<IdentNode>,
+  pub pattern: Positioned<PatternNode>,
   pub ty: Option<Positioned<TypeNode>>,
   pub value: Positioned<ExpressionNode>,
 }
@@ -226,10 +226,16 @@ pub struct PatternMatchNode {
 #[derive(Debug, PartialEq)]
 pub enum PatternNode {
   Literal(LiteralValueNode),
+  Path(PathNode),
 }
 
 #[derive(Debug, PartialEq)]
 pub enum ImplementItemNode {
   Constant(ConstantNode),
   Function(FunctionNode),
+}
+
+#[derive(Debug, PartialEq)]
+pub struct PathNode {
+  pub ident_list: Vec<IdentNode>,
 }

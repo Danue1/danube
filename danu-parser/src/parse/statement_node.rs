@@ -25,7 +25,7 @@ fn let_mut_node(s: Span) -> Result<LetMutNode> {
       ignore_token1,
       tag("mut"),
       ignore_token1,
-      positioned(ident_node),
+      positioned(pattern_node),
       ignore_token0,
       opt(map(
         tuple((colon, ignore_token0, positioned(type_node), ignore_token0)),
@@ -37,7 +37,7 @@ fn let_mut_node(s: Span) -> Result<LetMutNode> {
       ignore_token0,
       semicolon,
     )),
-    |(_, _, _, _, ident, _, ty, _, _, value, _, _)| LetMutNode { ident, ty, value },
+    |(_, _, _, _, pattern, _, ty, _, _, value, _, _)| LetMutNode { pattern, ty, value },
   )(s)
 }
 
@@ -46,7 +46,7 @@ fn let_node(s: Span) -> Result<LetNode> {
     tuple((
       tag("let"),
       ignore_token1,
-      positioned(ident_node),
+      positioned(pattern_node),
       ignore_token0,
       opt(map(
         tuple((colon, ignore_token0, positioned(type_node), ignore_token0)),
@@ -58,6 +58,6 @@ fn let_node(s: Span) -> Result<LetNode> {
       ignore_token0,
       semicolon,
     )),
-    |(_, _, ident, _, ty, _, _, value, _, _)| LetNode { ident, ty, value },
+    |(_, _, pattern, _, ty, _, _, value, _, _)| LetNode { pattern, ty, value },
   )(s)
 }

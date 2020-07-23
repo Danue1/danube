@@ -1,3 +1,5 @@
 fn foo() {
   let mut foo = false;
+  let mut Foo = false;
+  let mut Foo::Bar = false;
 }

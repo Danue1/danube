@@ -1,3 +1,5 @@
 fn foo() {
   let foo = false;
+  let Foo = false;
+  let Foo::Bar = false;
 }
