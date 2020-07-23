@@ -22,18 +22,17 @@ pub(super) fn statement_conditional_node(s: Span) -> Result<StatementConditional
           ignore_token0,
           body,
         )),
-        |(_, _, _, condition, _, body)| (condition, body),
+        |(_, _, _, condition, _, statement_list)| (condition, statement_list),
       ))),
       opt(map(
         tuple((ignore_token0, tag("else"), ignore_token0, body)),
         |(_, _, _, statement_list)| statement_list,
       )),
     )),
-    |(condition, _, if_true, if_else_if, if_false)| StatementConditionalNode {
-      condition: Box::new(condition),
-      if_true,
-      if_else_if,
-      if_false,
+    |(condition, _, statement_list, branch_list, other)| StatementConditionalNode {
+      main_branch: Box::new((condition, statement_list)),
+      branch_list,
+      other,
     },
   )(s)
 }
@@ -53,18 +52,17 @@ pub(super) fn expression_conditional_node(s: Span) -> Result<ExpressionCondition
           ignore_token0,
           body,
         )),
-        |(_, _, _, condition, _, body)| (condition, body),
+        |(_, _, _, condition, _, statement_list)| (condition, statement_list),
       ))),
       map(
         tuple((ignore_token0, tag("else"), ignore_token0, body)),
         |(_, _, _, statement_list)| statement_list,
       ),
     )),
-    |(condition, _, if_true, if_else_if, if_false)| ExpressionConditionalNode {
-      condition: Box::new(condition),
-      if_true,
-      if_else_if,
-      if_false,
+    |(condition, _, statement_list, branch_list, other)| ExpressionConditionalNode {
+      main_branch: Box::new((condition, statement_list)),
+      branch_list,
+      other,
     },
   )(s)
 }

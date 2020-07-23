@@ -188,22 +188,20 @@ pub enum ExpressionNode {
   PatternMatch(PatternMatchNode),
 }
 
-type IfElse = (Positioned<ExpressionNode>, Vec<Positioned<StatementNode>>);
+type ConditionalBranch = (Positioned<ExpressionNode>, Vec<Positioned<StatementNode>>);
 
 #[derive(Debug, PartialEq)]
 pub struct StatementConditionalNode {
-  pub condition: Box<Positioned<ExpressionNode>>,
-  pub if_true: Vec<Positioned<StatementNode>>,
-  pub if_else_if: Option<Vec<IfElse>>,
-  pub if_false: Option<Vec<Positioned<StatementNode>>>,
+  pub main_branch: Box<ConditionalBranch>,
+  pub branch_list: Option<Vec<ConditionalBranch>>,
+  pub other: Option<Vec<Positioned<StatementNode>>>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct ExpressionConditionalNode {
-  pub condition: Box<Positioned<ExpressionNode>>,
-  pub if_true: Vec<Positioned<StatementNode>>,
-  pub if_else_if: Option<Vec<IfElse>>,
-  pub if_false: Vec<Positioned<StatementNode>>,
+  pub main_branch: Box<ConditionalBranch>,
+  pub branch_list: Option<Vec<ConditionalBranch>>,
+  pub other: Vec<Positioned<StatementNode>>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -217,12 +215,12 @@ pub struct WhileNode {
   pub body: Vec<Positioned<StatementNode>>,
 }
 
-type Branch = (Vec<Positioned<PatternNode>>, Vec<Positioned<StatementNode>>);
+type PatternBranch = (Vec<Positioned<PatternNode>>, Vec<Positioned<StatementNode>>);
 
 #[derive(Debug, PartialEq)]
 pub struct PatternMatchNode {
   pub condition: Box<Positioned<ExpressionNode>>,
-  pub branch_list: Vec<Branch>,
+  pub branch_list: Vec<PatternBranch>,
 }
 
 #[derive(Debug, PartialEq)]
