@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct IdentNode {
   pub raw: String,
 }
@@ -228,6 +228,7 @@ pub enum PatternNode {
   Literal(LiteralValueNode),
   Path(PathNode),
   UnnamedStruct(UnnamedStructNode),
+  NamedStruct(NamedStructNode),
 }
 
 #[derive(Debug, PartialEq)]
@@ -245,4 +246,16 @@ pub struct PathNode {
 pub struct UnnamedStructNode {
   pub path: PathNode,
   pub field_list: Vec<Positioned<PatternNode>>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct NamedStructNode {
+  pub path: PathNode,
+  pub field_list: Vec<FieldNode>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct FieldNode {
+  pub ident: Positioned<IdentNode>,
+  pub pattern: Positioned<PatternNode>,
 }

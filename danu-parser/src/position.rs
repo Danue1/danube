@@ -1,14 +1,14 @@
 use crate::{Result, Span};
 use nom::{combinator::map, sequence::tuple};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Position {
   pub line: usize,
   pub column: usize,
   pub offset: usize,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Positioned<T: Sized> {
   pub start: Position,
   pub end: Position,

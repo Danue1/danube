@@ -11,6 +11,11 @@ fn foo() {
     Foo::Bar => true,
     Foo(foo) => true,
     Foo::Bar(bar) => true,
+    Foo { bar } => true,
+    Foo { bar, bar } => true,
+    Foo { bar: bar } => true,
+    Foo { bar: bar, bar: bar } => true,
+    Foo { bar: Bar { bar } } => true,
   }
   match true {
     true => { }
@@ -27,6 +32,11 @@ fn foo() {
     Foo::Bar => { },
     Foo(foo) => { },
     Foo::Bar(bar) => { },
+    Foo { bar } => { },
+    Foo { bar, bar } => { },
+    Foo { bar: bar } => { },
+    Foo { bar: bar, bar: bar } => { },
+    Foo { bar: Bar { bar } } => { },
   }
 
   let foo = match true {
@@ -41,6 +51,11 @@ fn foo() {
     Foo::Bar => true,
     Foo(foo) => true,
     Foo::Bar(bar) => true,
+    Foo { bar } => true,
+    Foo { bar, bar } => true,
+    Foo { bar: bar } => true,
+    Foo { bar: bar, bar: bar } => true,
+    Foo { bar: Bar { bar } } => true,
   };
   let foo = match true {
     true => { }
@@ -57,5 +72,10 @@ fn foo() {
     Foo::Bar => { },
     Foo(foo) => { },
     Foo::Bar(bar) => { },
+    Foo { bar } => { },
+    Foo { bar, bar } => { },
+    Foo { bar: bar } => { },
+    Foo { bar: bar, bar: bar } => { },
+    Foo { bar: Bar { bar } } => { },
   };
 }

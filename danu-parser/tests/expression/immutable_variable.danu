@@ -3,4 +3,9 @@ fn foo() {
   let Foo::Bar = false;
   let Foo(foo) = false;
   let Foo::Bar(bar) = false;
+  let Foo { bar } = false;
+  let Foo { bar, bar } = false;
+  let Foo { bar: bar } = false;
+  let Foo { bar: bar, bar: bar } = false;
+  let Foo { bar: Bar { bar } } = false;
 }

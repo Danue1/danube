@@ -3,4 +3,9 @@ fn foo() {
   let mut Foo::Bar = false;
   let mut Foo(foo) = false;
   let mut Foo::Bar(bar) = false;
+  let mut Foo { bar } = false;
+  let mut Foo { bar, bar } = false;
+  let mut Foo { bar: bar } = false;
+  let mut Foo { bar: bar, bar: bar } = false;
+  let mut Foo { bar: Bar { bar } } = false;
 }
