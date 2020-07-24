@@ -153,10 +153,13 @@ fn pattern_match_branch_statement(s: Span) -> Result<Vec<Positioned<StatementNod
 }
 
 fn pattern_match_statement_shorthand(s: Span) -> Result<Positioned<StatementNode>> {
-  let (s, (Positioned { start, end, node }, _, _)) = tuple((positioned(expression_node), ignore_token0, comma))(s)?;
-  let positioned = Positioned { start, end, node: StatementNode::Expression(node) };
-
-  Ok((s, positioned))
+  map(
+    tuple((positioned(expression_node), ignore_token0, comma)),
+    |(Positioned { position, node }, _, _)| Positioned {
+      position,
+      node: StatementNode::Expression(node),
+    },
+  )(s)
 }
 
 fn pattern_match_statement_block(s: Span) -> Result<Vec<Positioned<StatementNode>>> {

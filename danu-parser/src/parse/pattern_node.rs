@@ -85,8 +85,7 @@ fn field_node(s: Span) -> Result<FieldNode> {
     )),
     |(ident, pattern)| {
       let pattern = pattern.unwrap_or_else(|| Positioned {
-        start: ident.start.clone(),
-        end: ident.end.clone(),
+        position: ident.position.clone(),
         node: PatternNode::Path(PathNode {
           ident_list: vec![ident.clone()],
         }),

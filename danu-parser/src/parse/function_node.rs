@@ -106,10 +106,19 @@ fn function_body(s: Span) -> Result<Vec<Positioned<StatementNode>>> {
 }
 
 fn function_body_shorthand(s: Span) -> Result<Positioned<StatementNode>> {
-  let (s, (_, _, Positioned { start, end, node }, _, _)) = tuple((equal, ignore_token0, positioned(expression_node), ignore_token0, semicolon))(s)?;
-  let positioned = Positioned { start, end, node: StatementNode::Expression(node) };
-
-  Ok((s, positioned))
+  map(
+    tuple((
+      equal,
+      ignore_token0,
+      positioned(expression_node),
+      ignore_token0,
+      semicolon,
+    )),
+    |(_, _, Positioned { position, node }, _, _)| Positioned {
+      position,
+      node: StatementNode::Expression(node),
+    },
+  )(s)
 }
 
 fn function_body_block(s: Span) -> Result<Vec<Positioned<StatementNode>>> {
