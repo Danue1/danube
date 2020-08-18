@@ -10,8 +10,19 @@ pub(super) fn parse_expression_node(s: Tokens) -> ParseResult<ExpressionNode> {
     map(parse_while_node, ExpressionNode::While),
     map(parse_pattern_match_node, ExpressionNode::PatternMatch),
     map(parse_literal_value_node, ExpressionNode::Literal),
+    map(parse_break, |_| ExpressionNode::Break),
+    map(parse_continue, |_| ExpressionNode::Continue),
+    map(parse_return_node, ExpressionNode::Return),
     map(parse_array, ExpressionNode::Array),
   ))(s)
+}
+
+fn parse_break(s: Tokens) -> ParseResult<()> {
+  map(parse_keyword(Keyword::Break), |_| ())(s)
+}
+
+fn parse_continue(s: Tokens) -> ParseResult<()> {
+  map(parse_keyword(Keyword::Continue), |_| ())(s)
 }
 
 fn parse_array(s: Tokens) -> ParseResult<Vec<ExpressionNode>> {

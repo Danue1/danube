@@ -184,6 +184,9 @@ pub enum ExpressionNode {
   Loop(LoopNode),
   While(WhileNode),
   PatternMatch(PatternMatchNode),
+  Break,
+  Continue,
+  Return(ReturnNode),
   Literal(LiteralValueNode),
   Array(Vec<ExpressionNode>),
 }
@@ -221,6 +224,11 @@ pub type PatternBranch = (Vec<PatternNode>, Vec<StatementNode>);
 pub struct PatternMatchNode {
   pub condition: Box<ExpressionNode>,
   pub branch_list: Vec<PatternBranch>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct ReturnNode {
+  pub value: Option<Box<ExpressionNode>>,
 }
 
 #[derive(Debug, PartialEq)]
