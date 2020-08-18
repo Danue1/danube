@@ -180,6 +180,7 @@ pub struct LetMutNode {
 
 #[derive(Debug, PartialEq)]
 pub enum ExpressionNode {
+  Path(PathNode),
   Conditional(ExpressionConditionalNode),
   Loop(LoopNode),
   While(WhileNode),
@@ -189,6 +190,11 @@ pub enum ExpressionNode {
   Return(ReturnNode),
   Literal(LiteralValueNode),
   Array(Vec<ExpressionNode>),
+  FunctionCall(FunctionCallNode),
+  Index(IndexNode),
+  BinaryOperator(BinaryOperatorNode),
+  UnaryOperator(UnaryOperatorNode),
+  Field(ExpressionFieldNode),
 }
 
 pub type ConditionalBranch = (ExpressionNode, Vec<StatementNode>);
@@ -237,6 +243,64 @@ pub enum PatternNode {
   NamedStruct(NamedStructNode),
   Literal(LiteralValueNode),
   Path(PathNode),
+}
+
+#[derive(Debug, PartialEq)]
+pub struct FunctionCallNode {
+  pub argument_list: Vec<ExpressionNode>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct IndexNode {
+  pub array: Box<ExpressionNode>,
+  pub index: Box<ExpressionNode>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct BinaryOperatorNode {
+  pub kind: BinaryOperatorKind,
+  pub left: Box<ExpressionNode>,
+  pub right: Box<ExpressionNode>,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum BinaryOperatorKind {
+  Add,                // +
+  Sub,                // -
+  Mul,                // *
+  Div,                // /
+  Mod,                // %
+  And,                // &&
+  Or,                 // ||
+  BitXor,             // ^
+  BitAnd,             // &
+  BitOr,              // |
+  BitLeft,            // <<
+  BitRight,           // >>
+  Equal,              // ==
+  NotEqual,           // !=
+  LessThan,           // <
+  LessThanOrEqual,    // <=
+  GreaterThan,        // >
+  GreaterThanOrEqual, // >=
+}
+
+#[derive(Debug, PartialEq)]
+pub struct UnaryOperatorNode {
+  pub kind: UnaryOperatorKind,
+  pub value: Box<ExpressionNode>,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum UnaryOperatorKind {
+  Not,
+  Negative,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct ExpressionFieldNode {
+  pub left: Box<ExpressionNode>,
+  pub right: Box<IdentNode>,
 }
 
 #[derive(Debug, PartialEq)]

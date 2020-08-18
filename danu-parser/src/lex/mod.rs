@@ -261,8 +261,8 @@ fn parse_symbol4(s: LexSpan) -> LexResult<Symbol> {
 
 fn parse_symbol5(s: LexSpan) -> LexResult<Symbol> {
   alt((
-    map(tag(">="), |_| Symbol::GreaterThanEqual),
-    map(tag("<="), |_| Symbol::LessThanEqual),
+    map(tag(">="), |_| Symbol::GreaterThanOrEqual),
+    map(tag("<="), |_| Symbol::LessThanOrEqual),
     map(tag(">"), |_| Symbol::GreaterThan),
     map(tag("<"), |_| Symbol::LessThan),
     map(tag("="), |_| Symbol::Assign),
@@ -440,8 +440,8 @@ const static let mut fn trait struct type enum impl mod Self self pub"#;
         Token::Symbol(Symbol::BitXor),
         Token::Symbol(Symbol::BitLeft),
         Token::Symbol(Symbol::BitRight),
-        Token::Symbol(Symbol::GreaterThanEqual),
-        Token::Symbol(Symbol::LessThanEqual),
+        Token::Symbol(Symbol::GreaterThanOrEqual),
+        Token::Symbol(Symbol::LessThanOrEqual),
         Token::Symbol(Symbol::GreaterThan),
         Token::Symbol(Symbol::LessThan),
       ])
