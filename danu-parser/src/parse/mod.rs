@@ -125,7 +125,7 @@ mod tests {
   use super::*;
 
   #[test]
-  fn asdfgrhrtenrgouwrebhntglrwfeg() {
+  fn testcases() {
     let path_list = [
       "tests/const",
       "tests/control_flow",

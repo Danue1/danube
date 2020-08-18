@@ -175,6 +175,7 @@ pub struct TraitItemFunctionNode {
 #[derive(Debug, PartialEq, Clone)]
 pub enum TypeNode {
   Array(Box<TypeArrayNode>),
+  Tuple(Vec<TypeNode>),
   Ident(IdentNode),
 }
 
