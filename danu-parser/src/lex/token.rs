@@ -171,6 +171,7 @@ pub enum Keyword {
   Use,          // use
   Super,        // super
   As,           // as
+  Placeholder,  // _
 }
 
 #[derive(Debug, PartialEq, Clone)]

@@ -173,6 +173,7 @@ fn parse_identifier(s: LexSpan) -> LexResult<Identifier> {
     "use" => Identifier::Reserved(Keyword::Use),
     "super" => Identifier::Reserved(Keyword::Super),
     "as" => Identifier::Reserved(Keyword::As),
+    "_" => Identifier::Reserved(Keyword::Placeholder),
 
     "true" => Identifier::BooleanLiteral(true),
     "false" => Identifier::BooleanLiteral(false),
@@ -357,7 +358,7 @@ bar\"";
   #[test]
   fn keyword() {
     let source = r#"if else for while loop in break continue match return yield
-const static let mut fn trait struct type enum impl mod Self self pub async await use super as"#;
+const static let mut fn trait struct type enum impl mod Self self pub async await use super as _"#;
     assert_eq!(
       lex(source).map(|(_, token_list)| token_list),
       Ok(vec![
@@ -391,6 +392,7 @@ const static let mut fn trait struct type enum impl mod Self self pub async awai
         Token::Keyword(Keyword::Use),
         Token::Keyword(Keyword::Super),
         Token::Keyword(Keyword::As),
+        Token::Keyword(Keyword::Placeholder),
       ])
     );
   }
