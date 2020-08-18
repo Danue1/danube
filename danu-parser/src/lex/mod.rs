@@ -167,6 +167,8 @@ fn parse_identifier(s: LexSpan) -> LexResult<Identifier> {
     "Self" => Identifier::Reserved(Keyword::TypeSelf),
     "self" => Identifier::Reserved(Keyword::VariableSelf),
     "pub" => Identifier::Reserved(Keyword::Public),
+    "async" => Identifier::Reserved(Keyword::Async),
+    "await" => Identifier::Reserved(Keyword::Await),
 
     "true" => Identifier::BooleanLiteral(true),
     "false" => Identifier::BooleanLiteral(false),
@@ -351,7 +353,7 @@ bar\"";
   #[test]
   fn keyword() {
     let source = r#"if else for while loop in break continue match return
-const static let mut fn trait struct type enum impl mod Self self pub"#;
+const static let mut fn trait struct type enum impl mod Self self pub async await"#;
     assert_eq!(
       lex(source).map(|(_, token_list)| token_list),
       Ok(vec![
@@ -379,6 +381,8 @@ const static let mut fn trait struct type enum impl mod Self self pub"#;
         Token::Keyword(Keyword::TypeSelf),
         Token::Keyword(Keyword::VariableSelf),
         Token::Keyword(Keyword::Public),
+        Token::Keyword(Keyword::Async),
+        Token::Keyword(Keyword::Await),
       ])
     );
   }

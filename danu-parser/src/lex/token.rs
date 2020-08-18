@@ -165,6 +165,8 @@ pub enum Keyword {
   TypeSelf,     // Self
   VariableSelf, // self
   Public,       // pub
+  Async,        // async
+  Await,        // await
 }
 
 #[derive(Debug, PartialEq, Clone)]
