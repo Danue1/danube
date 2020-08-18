@@ -1,65 +1,99 @@
 use super::*;
-use crate::*;
-use nom::{
-  bytes::complete::tag,
-  combinator::{map, opt},
-  sequence::tuple,
-};
 
-pub(super) fn constant_node(s: Span) -> Result<ConstantNode> {
+pub(super) fn parse_constant_node(s: Tokens) -> ParseResult<ConstantNode> {
   map(
     tuple((
-      constant_ident,
-      ignore_token0,
-      constant_type,
-      constant_value,
-      ignore_token0,
-      semicolon,
+      parse_keyword(Keyword::Const),
+      parse_ident_node,
+      parse_symbol(Symbol::Colon),
+      parse_type_node,
+      parse_symbol(Symbol::Assign),
+      parse_expression_node,
+      parse_symbol(Symbol::Semicolon),
     )),
-    |(ident, _, ty, value, _, _)| ConstantNode { ident, ty, value },
+    |(_, ident, _, ty, _, value, _)| ConstantNode { ident, ty, value },
   )(s)
 }
 
-pub(super) fn trait_item_constant_node(s: Span) -> Result<TraitItemConstantNode> {
-  map(
-    tuple((
-      constant_ident,
-      ignore_token0,
-      constant_type,
-      opt(constant_value),
-      ignore_token0,
-      semicolon,
-    )),
-    |(ident, _, ty, default_value, _, _)| TraitItemConstantNode {
-      ident,
-      ty,
-      default_value,
-    },
-  )(s)
-}
+#[cfg(test)]
+mod tests {
+  use super::*;
 
-fn constant_ident(s: Span) -> Result<Positioned<IdentNode>> {
-  map(
-    tuple((tag("const"), ignore_token1, positioned(ident_node))),
-    |(_, _, ident)| ident,
-  )(s)
-}
+  fn compile(s: &str) -> ConstantNode {
+    let (_, token_list) = lex(s).unwrap();
+    let (_, node) = parse_constant_node(Tokens::new(&token_list)).unwrap();
 
-fn constant_type(s: Span) -> Result<Positioned<TypeNode>> {
-  map(
-    tuple((colon, ignore_token0, positioned(type_node))),
-    |(_, _, ty)| ty,
-  )(s)
-}
+    node
+  }
 
-fn constant_value(s: Span) -> Result<Positioned<LiteralValueNode>> {
-  map(
-    tuple((
-      ignore_token0,
-      equal,
-      ignore_token0,
-      positioned(literal_value_node),
-    )),
-    |(_, _, _, value)| value,
-  )(s)
+  #[test]
+  fn test() {
+    let source = "const FOO: bool = true;";
+    assert_eq!(
+      compile(source),
+      ConstantNode {
+        ident: IdentNode {
+          raw: "FOO".to_owned()
+        },
+        ty: TypeNode::Ident(IdentNode {
+          raw: "bool".to_owned()
+        }),
+        value: ExpressionNode::Literal(LiteralValueNode::Bool(true))
+      }
+    );
+  }
+
+  #[test]
+  fn array_type() {
+    let source = "const FOO: [bool; 0] = true;";
+    assert_eq!(
+      compile(source),
+      ConstantNode {
+        ident: IdentNode {
+          raw: "FOO".to_owned()
+        },
+        ty: TypeNode::Array(Box::new(TypeArrayNode {
+          ty: TypeNode::Ident(IdentNode {
+            raw: "bool".to_owned()
+          }),
+          size: 0
+        })),
+        value: ExpressionNode::Literal(LiteralValueNode::Bool(true))
+      }
+    );
+  }
+
+  #[test]
+  fn array_value_empty() {
+    let source = "const FOO: bool = [];";
+    assert_eq!(
+      compile(source),
+      ConstantNode {
+        ident: IdentNode {
+          raw: "FOO".to_owned()
+        },
+        ty: TypeNode::Ident(IdentNode {
+          raw: "bool".to_owned()
+        }),
+        value: ExpressionNode::Array(vec![])
+      }
+    );
+  }
+
+  #[test]
+  fn array_value_a_element() {
+    let source = "const FOO: bool = [true];";
+    assert_eq!(
+      compile(source),
+      ConstantNode {
+        ident: IdentNode {
+          raw: "FOO".to_owned()
+        },
+        ty: TypeNode::Ident(IdentNode {
+          raw: "bool".to_owned()
+        }),
+        value: ExpressionNode::Array(vec![ExpressionNode::Literal(LiteralValueNode::Bool(true))])
+      }
+    );
+  }
 }

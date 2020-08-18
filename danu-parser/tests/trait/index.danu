@@ -9,16 +9,10 @@ trait Foo{
   fn bar();
 }
 trait Foo{
-  fn bar(a);
-}
-trait Foo{
   fn bar(a: A);
 }
 trait Foo{
   fn bar() { }
-}
-trait Foo{
-  fn bar(a) { }
 }
 trait Foo{
   fn bar(a: A) { }
@@ -27,16 +21,10 @@ trait Foo{
   fn bar() -> Baz { }
 }
 trait Foo{
-  fn bar(a) -> Baz { }
-}
-trait Foo{
   fn bar(a: A) -> Baz { }
 }
 trait Foo{
   fn bar() -> Baz = false;
-}
-trait Foo{
-  fn bar(a) -> Baz = false;
 }
 trait Foo{
   fn bar(a: A) -> Baz = false;

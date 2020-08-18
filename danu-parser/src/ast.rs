@@ -1,5 +1,3 @@
-use crate::*;
-
 #[derive(Debug, Clone, PartialEq)]
 pub struct IdentNode {
   pub raw: String,
@@ -7,8 +5,8 @@ pub struct IdentNode {
 
 #[derive(Debug, PartialEq)]
 pub struct ModuleNode {
-  pub ident: Option<Positioned<IdentNode>>,
-  pub item_list: Vec<Positioned<ItemNode>>,
+  pub ident: Option<IdentNode>,
+  pub item_list: Vec<ItemNode>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -17,7 +15,7 @@ pub enum ItemNode {
   Enum(EnumNode),
   Function(FunctionNode),
   TypeAlias(TypeAliasNode),
-  TraitNode(TraitNode),
+  Trait(TraitNode),
   Constant(ConstantNode),
   Static(StaticNode),
   Implement(ImplementNode),
@@ -26,71 +24,70 @@ pub enum ItemNode {
 
 #[derive(Debug, PartialEq)]
 pub struct StructNode {
-  pub ident: Positioned<IdentNode>,
+  pub ident: IdentNode,
   pub fields: StructFieldsNode,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct EnumNode {
-  pub ident: Positioned<IdentNode>,
-  pub variant_list: Vec<Positioned<EnumVariantNode>>,
+  pub ident: IdentNode,
+  pub variant_list: Vec<EnumVariantNode>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct FunctionNode {
-  pub ident: Positioned<IdentNode>,
-  pub return_type: Option<Positioned<TypeNode>>,
-  pub argument_list: Vec<Positioned<FunctionArgumentNode>>,
-  pub body: Vec<Positioned<StatementNode>>,
+  pub ident: IdentNode,
+  pub argument_list: Vec<FunctionArgumentNode>,
+  pub return_type: Option<TypeNode>,
+  pub body: Vec<StatementNode>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct TypeAliasNode {
-  pub ident: Positioned<IdentNode>,
-  pub ty: Positioned<TypeNode>,
+  pub ident: IdentNode,
+  pub ty: TypeNode,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct TraitNode {
-  pub ident: Positioned<IdentNode>,
-  pub item_list: Vec<Positioned<TraitItemNode>>,
+  pub ident: IdentNode,
+  pub item_list: Vec<TraitItemNode>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct ConstantNode {
-  pub ident: Positioned<IdentNode>,
-  pub ty: Positioned<TypeNode>,
-  pub value: Positioned<LiteralValueNode>,
+  pub ident: IdentNode,
+  pub ty: TypeNode,
+  pub value: ExpressionNode,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct StaticNode {
-  pub ident: Positioned<IdentNode>,
-  pub ty: Positioned<TypeNode>,
-  pub value: Positioned<LiteralValueNode>,
+  pub ident: IdentNode,
+  pub ty: TypeNode,
+  pub value: LiteralValueNode,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct ImplementNode {
-  pub target: Positioned<IdentNode>,
-  pub item_list: Vec<Positioned<ImplementItemNode>>,
+  pub target: IdentNode,
+  pub item_list: Vec<ImplementItemNode>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct ImplementTraitNode {
-  pub target: Positioned<IdentNode>,
-  pub trait_ident: Positioned<IdentNode>,
-  pub item_list: Vec<Positioned<ImplementItemNode>>,
+  pub target: IdentNode,
+  pub trait_ident: IdentNode,
+  pub item_list: Vec<ImplementItemNode>,
 }
 
 #[derive(Debug, PartialEq)]
 pub enum LiteralValueNode {
   Bool(bool),
   Char(char),
-  Int(i128),
+  Int(i64),
   Float(f64),
   String(String),
-  Array(Vec<LiteralValueNode>),
 }
 
 #[derive(Debug, PartialEq)]
@@ -101,24 +98,24 @@ pub enum StructFieldsNode {
 
 #[derive(Debug, PartialEq)]
 pub struct StructUnnamedFieldsNode {
-  pub node_list: Vec<Positioned<TypeNode>>,
+  pub node_list: Vec<TypeNode>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct StructNamedFieldsNode {
-  pub node_list: Vec<(Positioned<IdentNode>, Positioned<TypeNode>)>,
+  pub node_list: Vec<(IdentNode, TypeNode)>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct EnumVariantNode {
-  pub ident: Positioned<IdentNode>,
-  pub ty: Option<Positioned<TypeNode>>,
+  pub ident: IdentNode,
+  pub ty: Option<TypeNode>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct FunctionArgumentNode {
-  pub ident: Positioned<IdentNode>,
-  pub ty: Option<Positioned<TypeNode>>,
+  pub ident: IdentNode,
+  pub ty: TypeNode,
 }
 
 #[derive(Debug, PartialEq)]
@@ -129,17 +126,17 @@ pub enum TraitItemNode {
 
 #[derive(Debug, PartialEq)]
 pub struct TraitItemConstantNode {
-  pub ident: Positioned<IdentNode>,
-  pub ty: Positioned<TypeNode>,
-  pub default_value: Option<Positioned<LiteralValueNode>>,
+  pub ident: IdentNode,
+  pub ty: TypeNode,
+  pub default_value: Option<LiteralValueNode>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct TraitItemFunctionNode {
-  pub ident: Positioned<IdentNode>,
-  pub return_type: Option<Positioned<TypeNode>>,
-  pub argument_list: Vec<Positioned<FunctionArgumentNode>>,
-  pub body: Option<Vec<Positioned<StatementNode>>>,
+  pub ident: IdentNode,
+  pub return_type: Option<TypeNode>,
+  pub argument_list: Vec<FunctionArgumentNode>,
+  pub body: Option<Vec<StatementNode>>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -150,85 +147,88 @@ pub enum TypeNode {
 
 #[derive(Debug, PartialEq)]
 pub struct TypeArrayNode {
-  pub ty: Positioned<TypeNode>,
+  pub ty: TypeNode,
   pub size: usize,
 }
 
 #[derive(Debug, PartialEq)]
 pub enum StatementNode {
+  Constant(ConstantNode),
+  Static(StaticNode),
   Let(LetNode),
   LetMut(LetMutNode),
-  Expression(ExpressionNode),
   Conditional(StatementConditionalNode),
   Loop(LoopNode),
   While(WhileNode),
   PatternMatch(PatternMatchNode),
+  Expression(ExpressionNode),
 }
 
 #[derive(Debug, PartialEq)]
 pub struct LetNode {
-  pub pattern: Positioned<PatternNode>,
-  pub ty: Option<Positioned<TypeNode>>,
-  pub value: Positioned<ExpressionNode>,
+  pub pattern: PatternNode,
+  pub ty: Option<TypeNode>,
+  pub value: ExpressionNode,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct LetMutNode {
-  pub pattern: Positioned<PatternNode>,
-  pub ty: Option<Positioned<TypeNode>>,
-  pub value: Positioned<ExpressionNode>,
+  pub pattern: PatternNode,
+  pub ty: Option<TypeNode>,
+  pub value: ExpressionNode,
 }
 
 #[derive(Debug, PartialEq)]
 pub enum ExpressionNode {
-  Literal(LiteralValueNode),
   Conditional(ExpressionConditionalNode),
   Loop(LoopNode),
   While(WhileNode),
   PatternMatch(PatternMatchNode),
+  Literal(LiteralValueNode),
+  Array(Vec<ExpressionNode>),
 }
 
-type ConditionalBranch = (Positioned<ExpressionNode>, Vec<Positioned<StatementNode>>);
+pub type ConditionalBranch = (ExpressionNode, Vec<StatementNode>);
 
 #[derive(Debug, PartialEq)]
 pub struct StatementConditionalNode {
   pub main_branch: Box<ConditionalBranch>,
-  pub branch_list: Option<Vec<ConditionalBranch>>,
-  pub other: Option<Vec<Positioned<StatementNode>>>,
+  pub branch_list: Vec<ConditionalBranch>,
+  pub other: Option<Vec<StatementNode>>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct ExpressionConditionalNode {
   pub main_branch: Box<ConditionalBranch>,
-  pub branch_list: Option<Vec<ConditionalBranch>>,
-  pub other: Vec<Positioned<StatementNode>>,
+  pub branch_list: Vec<ConditionalBranch>,
+  pub other: Vec<StatementNode>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct LoopNode {
-  pub body: Vec<Positioned<StatementNode>>,
+  pub body: Vec<StatementNode>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct WhileNode {
-  pub condition: Box<Positioned<ExpressionNode>>,
-  pub body: Vec<Positioned<StatementNode>>,
+  pub condition: Box<ExpressionNode>,
+  pub body: Vec<StatementNode>,
 }
 
-type PatternBranch = (Vec<Positioned<PatternNode>>, Vec<Positioned<StatementNode>>);
+pub type PatternBranch = (Vec<PatternNode>, Vec<StatementNode>);
 
 #[derive(Debug, PartialEq)]
 pub struct PatternMatchNode {
-  pub condition: Box<Positioned<ExpressionNode>>,
+  pub condition: Box<ExpressionNode>,
   pub branch_list: Vec<PatternBranch>,
 }
 
 #[derive(Debug, PartialEq)]
 pub enum PatternNode {
-  Literal(LiteralValueNode),
-  Path(PathNode),
   UnnamedStruct(UnnamedStructNode),
   NamedStruct(NamedStructNode),
+  Literal(LiteralValueNode),
+  Path(PathNode),
 }
 
 #[derive(Debug, PartialEq)]
@@ -239,13 +239,13 @@ pub enum ImplementItemNode {
 
 #[derive(Debug, PartialEq)]
 pub struct PathNode {
-  pub ident_list: Vec<Positioned<IdentNode>>,
+  pub ident_list: Vec<IdentNode>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct UnnamedStructNode {
   pub path: PathNode,
-  pub field_list: Vec<Positioned<PatternNode>>,
+  pub field_list: Vec<PatternNode>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -256,6 +256,6 @@ pub struct NamedStructNode {
 
 #[derive(Debug, PartialEq)]
 pub struct FieldNode {
-  pub ident: Positioned<IdentNode>,
-  pub pattern: Positioned<PatternNode>,
+  pub ident: IdentNode,
+  pub pattern: Option<PatternNode>,
 }

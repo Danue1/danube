@@ -1,7 +1,0 @@
-const A: char = 'a';
-const NEW_LINE: char = '\n';
-const CARRIAGE_RETURN: char = '\r';
-const TAB: char = '\t';
-const BACK_SLASH: char = '\\';
-const SINGLE_QUOTE: char = '\'';
-const NULL: char = '\0';

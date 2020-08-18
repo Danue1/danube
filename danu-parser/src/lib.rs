@@ -2,15 +2,16 @@
 
 mod ast;
 mod error;
+mod lex;
 mod parse;
-mod position;
-mod utils;
 
 pub use ast::*;
 pub use error::*;
+pub use lex::*;
 pub use parse::*;
-pub use position::*;
-pub(crate) use utils::*;
 
-type Result<'a, T> = nom::IResult<Span<'a>, T, Error<'a>>;
-type Span<'a> = nom_locate::LocatedSpan<&'a str>;
+pub fn compile(s: &str) {
+  let (_, token_list) = lex(s).unwrap();
+  let (_, module) = parse(Tokens::new(&token_list)).unwrap();
+  dbg!(module);
+}

@@ -1,87 +1,125 @@
 use super::*;
-use crate::*;
-use nom::{
-  branch::alt,
-  bytes::complete::tag,
-  combinator::{map, opt},
-  multi::separated_list,
-  sequence::tuple,
-};
 
-pub(super) fn struct_node(s: Span) -> Result<StructNode> {
+pub(super) fn parse_struct_node(s: Tokens) -> ParseResult<StructNode> {
   map(
     tuple((
-      tag("struct"),
-      ignore_token1,
-      positioned(ident_node),
-      ignore_token0,
-      struct_fields_node,
+      parse_keyword(Keyword::Struct),
+      parse_ident_node,
+      parse_struct_fields_node,
     )),
-    |(_, _, ident, _, fields)| StructNode { ident, fields },
+    |(_, ident, fields)| StructNode { ident, fields },
   )(s)
 }
 
-fn struct_fields_node(s: Span) -> Result<StructFieldsNode> {
-  alt((
-    map(struct_unnamed_fields_node, StructFieldsNode::Unnamed),
-    map(struct_named_fields_node, StructFieldsNode::Named),
-  ))(s)
-}
+#[cfg(test)]
+mod tests {
+  use super::*;
 
-fn struct_unnamed_fields_node(s: Span) -> Result<StructUnnamedFieldsNode> {
-  map(
-    tuple((
-      left_parens,
-      ignore_token0,
-      unnamed_field_list,
-      ignore_token0,
-      opt(tuple((comma, ignore_token0))),
-      right_parens,
-      ignore_token0,
-      semicolon,
-    )),
-    |(_, _, node_list, _, _, _, _, _)| StructUnnamedFieldsNode { node_list },
-  )(s)
-}
+  fn compile(s: &str) -> StructNode {
+    let (_, token_list) = lex(s).unwrap();
+    match parse_struct_node(Tokens::new(&token_list)) {
+      Ok((_, node)) => node,
+      Err(error) => {
+        dbg!(error);
+        panic!()
+      }
+    }
+  }
 
-fn struct_named_fields_node(s: Span) -> Result<StructNamedFieldsNode> {
-  map(
-    tuple((
-      left_brace,
-      ignore_token0,
-      named_field_list,
-      ignore_token0,
-      opt(tuple((comma, ignore_token0))),
-      right_brace,
-    )),
-    |(_, _, node_list, _, _, _)| StructNamedFieldsNode { node_list },
-  )(s)
-}
+  #[test]
+  fn unnamed_single() {
+    let source = "struct Foo(Bar);";
+    assert_eq!(
+      compile(source),
+      StructNode {
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        fields: StructFieldsNode::Unnamed(StructUnnamedFieldsNode {
+          node_list: vec![TypeNode::Ident(IdentNode {
+            raw: "Bar".to_owned()
+          })]
+        })
+      }
+    );
+  }
 
-fn unnamed_field_list(s: Span) -> Result<Vec<Positioned<TypeNode>>> {
-  separated_list(
-    tuple((ignore_token0, comma, ignore_token0)),
-    positioned(unnamed_field),
-  )(s)
-}
+  #[test]
+  fn unnamed_double() {
+    let source = "struct Foo(Bar, Baz);";
+    assert_eq!(
+      compile(source),
+      StructNode {
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        fields: StructFieldsNode::Unnamed(StructUnnamedFieldsNode {
+          node_list: vec![
+            TypeNode::Ident(IdentNode {
+              raw: "Bar".to_owned()
+            }),
+            TypeNode::Ident(IdentNode {
+              raw: "Baz".to_owned()
+            })
+          ]
+        })
+      }
+    );
+  }
 
-fn named_field_list(s: Span) -> Result<Vec<(Positioned<IdentNode>, Positioned<TypeNode>)>> {
-  separated_list(tuple((ignore_token0, comma, ignore_token0)), named_field)(s)
-}
+  #[test]
+  fn named_single() {
+    let source = "struct Foo { bar: Bar };";
+    assert_eq!(
+      compile(source),
+      StructNode {
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        fields: StructFieldsNode::Named(StructNamedFieldsNode {
+          node_list: vec![(
+            IdentNode {
+              raw: "bar".to_owned()
+            },
+            TypeNode::Ident(IdentNode {
+              raw: "Bar".to_owned()
+            })
+          )]
+        })
+      }
+    );
+  }
 
-fn unnamed_field(s: Span) -> Result<TypeNode> {
-  type_node(s)
-}
-
-fn named_field(s: Span) -> Result<(Positioned<IdentNode>, Positioned<TypeNode>)> {
-  map(
-    tuple((
-      positioned(ident_node),
-      ignore_token0,
-      colon,
-      ignore_token0,
-      positioned(type_node),
-    )),
-    |(ident_node, _, _, _, type_node)| (ident_node, type_node),
-  )(s)
+  #[test]
+  fn named_double() {
+    let source = "struct Foo { bar: Bar, baz: Baz };";
+    assert_eq!(
+      compile(source),
+      StructNode {
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        fields: StructFieldsNode::Named(StructNamedFieldsNode {
+          node_list: vec![
+            (
+              IdentNode {
+                raw: "bar".to_owned()
+              },
+              TypeNode::Ident(IdentNode {
+                raw: "Bar".to_owned()
+              })
+            ),
+            (
+              IdentNode {
+                raw: "baz".to_owned()
+              },
+              TypeNode::Ident(IdentNode {
+                raw: "Baz".to_owned()
+              })
+            ),
+          ]
+        })
+      }
+    );
+  }
 }

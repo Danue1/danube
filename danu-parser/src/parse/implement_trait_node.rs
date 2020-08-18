@@ -1,15 +1,21 @@
 use super::*;
 
-pub(super) fn parse_implement_node(s: Tokens) -> ParseResult<ImplementNode> {
+pub(super) fn parse_implement_trait_node(s: Tokens) -> ParseResult<ImplementTraitNode> {
   map(
     tuple((
       parse_keyword(Keyword::Impl),
+      parse_ident_node,
+      parse_keyword(Keyword::For),
       parse_ident_node,
       parse_symbol(Symbol::LeftBrace),
       many1(parse_implement_item_node),
       parse_symbol(Symbol::RightBrace),
     )),
-    |(_, target, _, item_list, _)| ImplementNode { target, item_list },
+    |(_, trait_ident, _, target, _, item_list, _)| ImplementTraitNode {
+      target,
+      trait_ident,
+      item_list,
+    },
   )(s)
 }
 
@@ -17,9 +23,9 @@ pub(super) fn parse_implement_node(s: Tokens) -> ParseResult<ImplementNode> {
 mod tests {
   use super::*;
 
-  fn compile(s: &str) -> ImplementNode {
+  fn compile(s: &str) -> ImplementTraitNode {
     let (_, token_list) = lex(s).unwrap();
-    match parse_implement_node(Tokens::new(&token_list)) {
+    match parse_implement_trait_node(Tokens::new(&token_list)) {
       Ok((_, node)) => node,
       Err(error) => {
         dbg!(error);
@@ -30,21 +36,24 @@ mod tests {
 
   #[test]
   fn constant() {
-    let source = "impl Foo {
-      const BAR: Baz = true;
+    let source = "impl Foo for Bar {
+      const BAZ: Bax = true;
     }";
     assert_eq!(
       compile(source),
-      ImplementNode {
+      ImplementTraitNode {
         target: IdentNode {
+          raw: "Bar".to_owned()
+        },
+        trait_ident: IdentNode {
           raw: "Foo".to_owned()
         },
         item_list: vec![ImplementItemNode::Constant(ConstantNode {
           ident: IdentNode {
-            raw: "BAR".to_owned()
+            raw: "BAZ".to_owned()
           },
           ty: TypeNode::Ident(IdentNode {
-            raw: "Baz".to_owned()
+            raw: "Bax".to_owned()
           }),
           value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
         })]
@@ -54,18 +63,21 @@ mod tests {
 
   #[test]
   fn function() {
-    let source = "impl Foo {
-      fn bar() { }
+    let source = "impl Foo for Bar {
+      fn baz() { }
     }";
     assert_eq!(
       compile(source),
-      ImplementNode {
+      ImplementTraitNode {
         target: IdentNode {
-          raw: "Foo".to_owned()
+          raw: "Bar".to_owned()
+        },
+        trait_ident: IdentNode {
+          raw: "Foo".to_owned(),
         },
         item_list: vec![ImplementItemNode::Function(FunctionNode {
           ident: IdentNode {
-            raw: "bar".to_owned()
+            raw: "baz".to_owned()
           },
           argument_list: vec![],
           return_type: None,

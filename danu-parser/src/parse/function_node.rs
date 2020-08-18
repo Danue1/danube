@@ -1,137 +1,259 @@
 use super::*;
-use crate::*;
-use nom::{
-  branch::alt,
-  bytes::complete::tag,
-  combinator::{cond, map, opt},
-  multi::separated_list,
-  sequence::tuple,
-};
 
-pub(super) fn function_node(s: Span) -> Result<FunctionNode> {
+pub(super) fn parse_function_node(s: Tokens) -> ParseResult<FunctionNode> {
   map(
     tuple((
-      tag("fn"),
-      ignore_token1,
-      positioned(ident_node),
-      ignore_token0,
-      function_argument_list,
-      ignore_token0,
-      opt(map(
-        tuple((
-          tag("->"),
-          ignore_token0,
-          positioned(type_node),
-          ignore_token0,
-        )),
-        |(_, _, ty, _)| ty,
-      )),
-      function_body,
+      parse_keyword(Keyword::Function),
+      parse_ident_node,
+      parse_function_argument_list,
+      opt(parse_function_type),
+      parse_function_body,
     )),
-    |(_, _, ident, _, argument_list, _, return_type, body)| FunctionNode {
+    |(_, ident, argument_list, return_type, body)| FunctionNode {
       ident,
-      return_type,
       argument_list,
+      return_type,
       body,
     },
   )(s)
 }
 
-pub(super) fn trait_item_function_node(s: Span) -> Result<TraitItemFunctionNode> {
-  let (s, (_, _, ident, _, argument_list, _, return_type, body)) = tuple((
-    tag("fn"),
-    ignore_token1,
-    positioned(ident_node),
-    ignore_token0,
-    function_argument_list,
-    ignore_token0,
-    opt(map(
-      tuple((
-        tag("->"),
-        ignore_token0,
-        positioned(type_node),
-        ignore_token0,
-      )),
-      |(_, _, ty, _)| ty,
-    )),
-    opt(function_body),
-  ))(s)?;
-  let (s, _) = cond(body.is_none(), tuple((ignore_token0, semicolon)))(s)?;
-
-  let node = TraitItemFunctionNode {
-    ident,
-    return_type,
-    argument_list,
-    body,
-  };
-
-  Ok((s, node))
-}
-
-fn function_argument_list(s: Span) -> Result<Vec<Positioned<FunctionArgumentNode>>> {
+fn parse_function_argument_list(s: Tokens) -> ParseResult<Vec<FunctionArgumentNode>> {
   map(
     tuple((
-      left_parens,
-      ignore_token0,
-      opt(separated_list(
-        tuple((ignore_token0, comma, ignore_token0)),
-        positioned(function_argument_node),
-      )),
-      ignore_token0,
-      opt(tuple((comma, ignore_token0))),
-      right_parens,
+      parse_symbol(Symbol::LeftParens),
+      separated_list(parse_symbol(Symbol::Comma), parse_function_argument_node),
+      opt(parse_symbol(Symbol::Comma)),
+      parse_symbol(Symbol::RightParens),
     )),
-    |(_, _, argument_list, _, _, _)| argument_list.unwrap_or_else(Vec::new),
+    |(_, argument_list, _, _)| argument_list,
   )(s)
 }
 
-fn function_argument_node(s: Span) -> Result<FunctionArgumentNode> {
+fn parse_function_type(s: Tokens) -> ParseResult<TypeNode> {
   map(
-    tuple((
-      positioned(ident_node),
-      opt(map(
-        tuple((ignore_token0, colon, ignore_token0, positioned(type_node))),
-        |(_, _, _, ty)| ty,
-      )),
-    )),
-    |(ident, ty)| FunctionArgumentNode { ident, ty },
+    tuple((parse_symbol(Symbol::ReturnArrow), parse_type_node)),
+    |(_, ty)| ty,
   )(s)
 }
 
-fn function_body(s: Span) -> Result<Vec<Positioned<StatementNode>>> {
-  alt((
-    map(function_body_shorthand, |statement| vec![statement]),
-    function_body_block,
-  ))(s)
+fn parse_function_body(s: Tokens) -> ParseResult<Vec<StatementNode>> {
+  alt((parse_function_body_shortcut, parse_function_body_longcut))(s)
 }
 
-fn function_body_shorthand(s: Span) -> Result<Positioned<StatementNode>> {
+fn parse_function_body_shortcut(s: Tokens) -> ParseResult<Vec<StatementNode>> {
   map(
     tuple((
-      equal,
-      ignore_token0,
-      positioned(expression_node),
-      ignore_token0,
-      semicolon,
+      parse_symbol(Symbol::Assign),
+      parse_expression_node,
+      parse_symbol(Symbol::Semicolon),
     )),
-    |(_, _, Positioned { position, node }, _, _)| Positioned {
-      position,
-      node: StatementNode::Expression(node),
-    },
+    |(_, expression, _)| vec![StatementNode::Expression(expression)],
   )(s)
 }
 
-fn function_body_block(s: Span) -> Result<Vec<Positioned<StatementNode>>> {
+fn parse_function_body_longcut(s: Tokens) -> ParseResult<Vec<StatementNode>> {
   map(
     tuple((
-      left_brace,
-      ignore_token0,
-      many0(map(
-        tuple((positioned(statement_node), ignore_token0)),
-        |(expression, _)| expression,
-      )),
-      right_brace,
+      parse_symbol(Symbol::LeftBrace),
+      many0(parse_statement_node),
+      parse_symbol(Symbol::RightBrace),
     )),
-    |(_, _, expression_list, _)| expression_list,
+    |(_, statement_list, _)| statement_list,
   )(s)
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  fn compile(s: &str) -> FunctionNode {
+    let (_, token_list) = lex(s).unwrap();
+    match parse_function_node(Tokens::new(&token_list)) {
+      Ok((_, node)) => node,
+      Err(error) => {
+        dbg!(error);
+        panic!()
+      }
+    }
+  }
+
+  #[test]
+  fn no_argument() {
+    let source = "fn foo() { }";
+    assert_eq!(
+      compile(source),
+      FunctionNode {
+        ident: IdentNode {
+          raw: "foo".to_owned()
+        },
+        argument_list: vec![],
+        return_type: None,
+        body: vec![]
+      }
+    );
+  }
+
+  #[test]
+  fn a_argument() {
+    let source = "fn foo(bar: Bar) { }";
+    assert_eq!(
+      compile(source),
+      FunctionNode {
+        ident: IdentNode {
+          raw: "foo".to_owned()
+        },
+        argument_list: vec![FunctionArgumentNode {
+          ident: IdentNode {
+            raw: "bar".to_owned()
+          },
+          ty: TypeNode::Ident(IdentNode {
+            raw: "Bar".to_owned()
+          })
+        }],
+        return_type: None,
+        body: vec![]
+      }
+    );
+  }
+
+  #[test]
+  fn two_argument() {
+    let source = "fn foo(bar: Bar, baz: Baz) { }";
+    assert_eq!(
+      compile(source),
+      FunctionNode {
+        ident: IdentNode {
+          raw: "foo".to_owned()
+        },
+        argument_list: vec![
+          FunctionArgumentNode {
+            ident: IdentNode {
+              raw: "bar".to_owned()
+            },
+            ty: TypeNode::Ident(IdentNode {
+              raw: "Bar".to_owned()
+            })
+          },
+          FunctionArgumentNode {
+            ident: IdentNode {
+              raw: "baz".to_owned()
+            },
+            ty: TypeNode::Ident(IdentNode {
+              raw: "Baz".to_owned()
+            })
+          }
+        ],
+        return_type: None,
+        body: vec![]
+      }
+    );
+  }
+
+  #[test]
+  fn function_conditional_if() {
+    let source = "fn foo() {
+      if true { }
+    }";
+    assert_eq!(
+      compile(source),
+      FunctionNode {
+        ident: IdentNode {
+          raw: "foo".to_owned()
+        },
+        argument_list: vec![],
+        return_type: None,
+        body: vec![StatementNode::Conditional(StatementConditionalNode {
+          main_branch: Box::new((
+            ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+            vec![],
+          )),
+          branch_list: vec![],
+          other: None
+        })]
+      }
+    );
+  }
+
+  #[test]
+  fn function_conditional_else() {
+    let source = "fn foo() {
+      if true { } else { }
+    }";
+    assert_eq!(
+      compile(source),
+      FunctionNode {
+        ident: IdentNode {
+          raw: "foo".to_owned()
+        },
+        argument_list: vec![],
+        return_type: None,
+        body: vec![StatementNode::Conditional(StatementConditionalNode {
+          main_branch: Box::new((
+            ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+            vec![],
+          )),
+          branch_list: vec![],
+          other: Some(vec![])
+        })]
+      }
+    );
+  }
+
+  #[test]
+  fn function_pattern_match() {
+    let source = "fn foo() {
+      match true {
+        true => { },
+      }
+    }";
+    assert_eq!(
+      compile(source),
+      FunctionNode {
+        ident: IdentNode {
+          raw: "foo".to_owned()
+        },
+        argument_list: vec![],
+        return_type: None,
+        body: vec![StatementNode::PatternMatch(PatternMatchNode {
+          condition: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true))),
+          branch_list: vec![(
+            vec![PatternNode::Literal(LiteralValueNode::Bool(true))],
+            vec![]
+          )],
+        })]
+      }
+    );
+  }
+
+  #[test]
+  fn function_expression_let_mut_pattern() {
+    let source = "fn foo() {
+      let mut Foo::Bar = true;
+    }";
+    assert_eq!(
+      compile(source),
+      FunctionNode {
+        ident: IdentNode {
+          raw: "foo".to_owned()
+        },
+        argument_list: vec![],
+        return_type: None,
+        body: vec![StatementNode::LetMut(LetMutNode {
+          pattern: PatternNode::Path(PathNode {
+            ident_list: vec![
+              IdentNode {
+                raw: "Foo".to_owned()
+              },
+              IdentNode {
+                raw: "Bar".to_owned()
+              }
+            ]
+          }),
+          ty: None,
+          value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+        })]
+      }
+    );
+  }
 }

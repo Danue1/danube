@@ -1,20 +1,42 @@
 use super::*;
-use crate::*;
-use nom::{bytes::complete::tag, combinator::map, sequence::tuple};
 
-pub(super) fn type_alias_node(s: Span) -> Result<TypeAliasNode> {
+pub(super) fn parse_type_alias_node(s: Tokens) -> ParseResult<TypeAliasNode> {
   map(
     tuple((
-      tag("type"),
-      ignore_token1,
-      positioned(ident_node),
-      ignore_token0,
-      equal,
-      ignore_token0,
-      positioned(type_node),
-      ignore_token0,
-      semicolon,
+      parse_keyword(Keyword::Type),
+      parse_ident_node,
+      parse_symbol(Symbol::Assign),
+      parse_type_node,
+      parse_symbol(Symbol::Semicolon),
     )),
-    |(_, _, ident, _, _, _, ty, _, _)| TypeAliasNode { ident, ty },
+    |(_, ident, _, ty, _)| TypeAliasNode { ident, ty },
   )(s)
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  fn compile(s: &str) -> TypeAliasNode {
+    let (_, token_list) = lex(s).unwrap();
+    let (_, node) = parse_type_alias_node(Tokens::new(&token_list)).unwrap();
+
+    node
+  }
+
+  #[test]
+  fn test() {
+    let source = "type Foo = bool;";
+    assert_eq!(
+      compile(source),
+      TypeAliasNode {
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        ty: TypeNode::Ident(IdentNode {
+          raw: "bool".to_owned()
+        })
+      }
+    );
+  }
 }

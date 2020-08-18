@@ -10,19 +10,11 @@ impl Foo for Bar {
   fn baz() { }
 }
 impl Foo for Bar {
-  fn baz(a) { }
-}
-impl Foo for Bar {
   fn baz(a: A) { }
 }
 
 impl Foo for Bar {
   fn baz() {
-    false
-  }
-}
-impl Foo for Bar {
-  fn baz(a) {
     false
   }
 }
@@ -36,19 +28,11 @@ impl Foo for Bar {
   fn baz() -> Bax { }
 }
 impl Foo for Bar {
-  fn baz(a) -> Bax { }
-}
-impl Foo for Bar {
   fn baz(a: A) -> Bax { }
 }
 
 impl Foo for Bar {
   fn baz() -> Bax {
-    false
-  }
-}
-impl Foo for Bar {
-  fn baz(a) -> Bax {
     false
   }
 }
@@ -60,9 +44,6 @@ impl Foo for Bar {
 
 impl Foo for Bar {
   fn baz() -> Bax = false;
-}
-impl Foo for Bar {
-  fn baz(a) -> Bax = false;
 }
 impl Foo for Bar {
   fn baz(a: A) -> Bax = false;

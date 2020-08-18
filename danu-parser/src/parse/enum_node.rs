@@ -1,52 +1,126 @@
 use super::*;
-use crate::*;
-use nom::{
-  bytes::complete::tag,
-  combinator::{map, opt},
-  multi::separated_list,
-  sequence::tuple,
-};
 
-pub(super) fn enum_node(s: Span) -> Result<EnumNode> {
+pub(super) fn parse_enum_node(s: Tokens) -> ParseResult<EnumNode> {
   map(
     tuple((
-      tag("enum"),
-      ignore_token1,
-      positioned(ident_node),
-      ignore_token0,
-      equal,
-      ignore_token0,
-      opt(tuple((pipeline, ignore_token0))),
-      separated_list(
-        tuple((ignore_token0, pipeline, ignore_token0)),
-        positioned(variant_node),
-      ),
-      ignore_token0,
-      semicolon,
+      parse_keyword(Keyword::Enum),
+      parse_ident_node,
+      parse_symbol(Symbol::Assign),
+      opt(parse_symbol(Symbol::BitOr)),
+      separated_nonempty_list(parse_symbol(Symbol::BitOr), parse_enum_variant_node),
+      parse_symbol(Symbol::Semicolon),
     )),
-    |(_, _, ident, _, _, _, _, variant_list, _, _)| EnumNode {
+    |(_, ident, _, _, variant_list, _)| EnumNode {
       ident,
       variant_list,
     },
   )(s)
 }
 
-fn variant_node(s: Span) -> Result<EnumVariantNode> {
-  map(
-    tuple((
-      positioned(ident_node),
-      opt(map(
-        tuple((
-          ignore_token0,
-          left_parens,
-          ignore_token0,
-          positioned(type_node),
-          ignore_token0,
-          right_parens,
-        )),
-        |(_, _, _, ty, _, _)| ty,
-      )),
-    )),
-    |(ident, ty)| EnumVariantNode { ident, ty },
-  )(s)
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  fn compile(s: &str) -> EnumNode {
+    let (_, token_list) = lex(s).unwrap();
+    match parse_enum_node(Tokens::new(&token_list)) {
+      Ok((_, node)) => node,
+      Err(error) => {
+        dbg!(error);
+        panic!()
+      }
+    }
+  }
+
+  #[test]
+  fn single() {
+    let source = "enum Foo = Bar;";
+    assert_eq!(
+      compile(source),
+      EnumNode {
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        variant_list: vec![EnumVariantNode {
+          ident: IdentNode {
+            raw: "Bar".to_owned()
+          },
+          ty: None
+        }]
+      }
+    );
+  }
+
+  #[test]
+  fn double() {
+    let source = "enum Foo = Bar | Baz;";
+    assert_eq!(
+      compile(source),
+      EnumNode {
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        variant_list: vec![
+          EnumVariantNode {
+            ident: IdentNode {
+              raw: "Bar".to_owned()
+            },
+            ty: None,
+          },
+          EnumVariantNode {
+            ident: IdentNode {
+              raw: "Baz".to_owned()
+            },
+            ty: None
+          }
+        ]
+      }
+    );
+  }
+
+  #[test]
+  fn pipe_single() {
+    let source = "enum Foo = | Bar;";
+    assert_eq!(
+      compile(source),
+      EnumNode {
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        variant_list: vec![EnumVariantNode {
+          ident: IdentNode {
+            raw: "Bar".to_owned()
+          },
+          ty: None
+        }]
+      }
+    );
+  }
+
+  #[test]
+  fn pipe_double() {
+    let source = "enum Foo = | Bar | Baz;";
+    assert_eq!(
+      compile(source),
+      EnumNode {
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        variant_list: vec![
+          EnumVariantNode {
+            ident: IdentNode {
+              raw: "Bar".to_owned()
+            },
+            ty: None,
+          },
+          EnumVariantNode {
+            ident: IdentNode {
+              raw: "Baz".to_owned()
+            },
+            ty: None
+          }
+        ]
+      }
+    );
+  }
 }

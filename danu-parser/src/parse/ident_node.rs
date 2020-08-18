@@ -1,6 +1,5 @@
-use crate::*;
-use nom::combinator::map;
+use super::*;
 
-pub(super) fn ident_node(s: Span) -> Result<IdentNode> {
-  map(name, |raw| IdentNode { raw })(s)
+pub(super) fn parse_ident_node(s: Tokens) -> ParseResult<IdentNode> {
+  map(parse_identifier, |identifier| IdentNode { raw: identifier })(s)
 }
