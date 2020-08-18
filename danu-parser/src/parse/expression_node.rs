@@ -27,10 +27,11 @@ fn parse_atomic_expression_node(s: Tokens) -> ParseResult<ExpressionNode> {
 }
 
 fn parse_expression_struct_node(s: Tokens) -> ParseResult<ExpressionStructNode> {
-  map(parse_expression_field_list, |field_list| {
+  map(parse_expression_field_list, |(field_list, rest)| {
     ExpressionStructNode {
       path: None,
       field_list,
+      rest,
     }
   })(s)
 }
@@ -86,10 +87,11 @@ fn parse_postfix_expression_node(s: Tokens, left: ExpressionNode) -> ParseResult
     }
     _ => {
       if let ExpressionNode::Path(path) = left.clone() {
-        if let Ok((s, field_list)) = parse_expression_field_list(s.clone()) {
+        if let Ok((s, (field_list, rest))) = parse_expression_field_list(s.clone()) {
           let node = ExpressionNode::Struct(ExpressionStructNode {
             path: Some(path),
             field_list,
+            rest,
           });
 
           parse_postfix_expression_node(s, node)
@@ -149,7 +151,9 @@ fn parse_tuple_operator(s: Tokens) -> ParseResult<Vec<ExpressionNode>> {
   )(s)
 }
 
-fn parse_expression_field_list(s: Tokens) -> ParseResult<Vec<(IdentNode, Option<ExpressionNode>)>> {
+fn parse_expression_field_list(
+  s: Tokens,
+) -> ParseResult<(Vec<ExpressionStructField>, Option<Box<ExpressionNode>>)> {
   map(
     tuple((
       parse_symbol(Symbol::LeftBrace),
@@ -164,9 +168,13 @@ fn parse_expression_field_list(s: Tokens) -> ParseResult<Vec<(IdentNode, Option<
         )),
       ),
       opt(parse_symbol(Symbol::Comma)),
+      opt(map(
+        tuple((parse_symbol(Symbol::RangeClose), parse_expression_node)),
+        |(_, expression)| Box::new(expression),
+      )),
       parse_symbol(Symbol::RightBrace),
     )),
-    |(_, expression_list, _, _)| expression_list,
+    |(_, expression_list, _, rest, _)| (expression_list, rest),
   )(s)
 }
 

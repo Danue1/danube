@@ -344,10 +344,13 @@ pub struct ExpressionFieldNode {
   pub right: Box<IdentNode>,
 }
 
+pub type ExpressionStructField = (IdentNode, Option<ExpressionNode>);
+
 #[derive(Debug, PartialEq, Clone)]
 pub struct ExpressionStructNode {
   pub path: Option<PathNode>,
-  pub field_list: Vec<(IdentNode, Option<ExpressionNode>)>,
+  pub field_list: Vec<ExpressionStructField>,
+  pub rest: Option<Box<ExpressionNode>>,
 }
 
 #[derive(Debug, PartialEq)]
