@@ -69,17 +69,37 @@ mod tests {
   }
 
   #[test]
+  fn unnamed_implicit() {
+    let source = "let (foo) = true;";
+    assert_eq!(
+      compile(source),
+      LetNode {
+        pattern: PatternNode::UnnamedStruct(UnnamedStructNode {
+          path: None,
+          field_list: vec![PatternNode::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "foo".to_owned()
+            }]
+          })]
+        }),
+        ty: None,
+        value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+      }
+    );
+  }
+
+  #[test]
   fn unnamed_single() {
     let source = "let Foo(foo) = true;";
     assert_eq!(
       compile(source),
       LetNode {
         pattern: PatternNode::UnnamedStruct(UnnamedStructNode {
-          path: PathNode {
+          path: Some(PathNode {
             ident_list: vec![IdentNode {
               raw: "Foo".to_owned()
             }]
-          },
+          }),
           field_list: vec![PatternNode::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "foo".to_owned()
@@ -99,11 +119,11 @@ mod tests {
       compile(source),
       LetNode {
         pattern: PatternNode::UnnamedStruct(UnnamedStructNode {
-          path: PathNode {
+          path: Some(PathNode {
             ident_list: vec![IdentNode {
               raw: "Foo".to_owned()
             }]
-          },
+          }),
           field_list: vec![
             PatternNode::Path(PathNode {
               ident_list: vec![IdentNode {
@@ -124,17 +144,38 @@ mod tests {
   }
 
   #[test]
+  fn named_single_implicit() {
+    let source = "let { foo } = true;";
+    assert_eq!(
+      compile(source),
+      LetNode {
+        pattern: PatternNode::NamedStruct(NamedStructNode {
+          path: None,
+          field_list: vec![FieldNode {
+            ident: IdentNode {
+              raw: "foo".to_owned()
+            },
+            pattern: None
+          }]
+        }),
+        ty: None,
+        value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+      }
+    );
+  }
+
+  #[test]
   fn named_single() {
     let source = "let Foo { foo } = true;";
     assert_eq!(
       compile(source),
       LetNode {
         pattern: PatternNode::NamedStruct(NamedStructNode {
-          path: PathNode {
+          path: Some(PathNode {
             ident_list: vec![IdentNode {
               raw: "Foo".to_owned()
             }]
-          },
+          }),
           field_list: vec![FieldNode {
             ident: IdentNode {
               raw: "foo".to_owned()
@@ -155,11 +196,11 @@ mod tests {
       compile(source),
       LetNode {
         pattern: PatternNode::NamedStruct(NamedStructNode {
-          path: PathNode {
+          path: Some(PathNode {
             ident_list: vec![IdentNode {
               raw: "Foo".to_owned()
             }]
-          },
+          }),
           field_list: vec![
             FieldNode {
               ident: IdentNode {

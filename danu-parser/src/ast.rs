@@ -316,13 +316,13 @@ pub struct PathNode {
 
 #[derive(Debug, PartialEq)]
 pub struct UnnamedStructNode {
-  pub path: PathNode,
+  pub path: Option<PathNode>,
   pub field_list: Vec<PatternNode>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct NamedStructNode {
-  pub path: PathNode,
+  pub path: Option<PathNode>,
   pub field_list: Vec<FieldNode>,
 }
 

@@ -167,6 +167,8 @@ pub enum Keyword {
   Public,       // pub
   Async,        // async
   Await,        // await
+  Use,          // use
+  Super,        // super
 }
 
 #[derive(Debug, PartialEq, Clone)]
