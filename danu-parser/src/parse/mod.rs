@@ -39,6 +39,11 @@ mod type_array_node;
 mod type_node;
 mod unary_operator_kind;
 mod unnamed_struct_node;
+mod use_extra;
+mod use_kind;
+mod use_node;
+mod use_root_ident;
+mod use_root_node;
 mod while_node;
 
 use crate::*;
@@ -84,6 +89,11 @@ use type_array_node::parse_type_array_node;
 use type_node::parse_type_node;
 use unary_operator_kind::parse_unary_operator_kind;
 use unnamed_struct_node::parse_unnamed_struct_node;
+use use_extra::parse_use_extra;
+use use_kind::parse_use_kind;
+use use_node::parse_use_node;
+use use_root_ident::parse_use_root_ident;
+use use_root_node::parse_use_root_node;
 use while_node::parse_while_node;
 
 type ParseResult<'a, T> = nom::IResult<Tokens<'a>, T, Error<'a>>;
@@ -97,6 +107,7 @@ pub fn parse(s: Tokens) -> ParseResult<ModuleNode> {
 
 fn parse_item(s: Tokens) -> ParseResult<ItemNode> {
   alt((
+    map(parse_use_node, ItemNode::Use),
     map(parse_struct_node, ItemNode::Struct),
     map(parse_enum_node, ItemNode::Enum),
     map(parse_function_node, ItemNode::Function),

@@ -11,6 +11,7 @@ pub struct ModuleNode {
 
 #[derive(Debug, PartialEq)]
 pub enum ItemNode {
+  Use(UseNode),
   Struct(StructNode),
   Enum(EnumNode),
   Function(FunctionNode),
@@ -20,6 +21,38 @@ pub enum ItemNode {
   Static(StaticNode),
   Implement(ImplementNode),
   ImplementTrait(ImplementTraitNode),
+}
+
+#[derive(Debug, PartialEq)]
+pub struct UseNode {
+  pub kind: UseKind<UseRootNode>,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum UseKind<T: Sized> {
+  Unnested(T),
+  Nested(Vec<T>),
+}
+
+#[derive(Debug, PartialEq)]
+pub struct UseRootNode {
+  pub ident: UseRootIdent,
+  pub extra: UseKind<UseExtra>,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum UseRootIdent {
+  Current,
+  Super,
+  Module,
+  Ident(IdentNode),
+}
+
+#[derive(Debug, PartialEq)]
+pub enum UseExtra {
+  All,
+  Ident(IdentNode, Option<IdentNode>),
+  Extra(IdentNode, Box<UseKind<UseExtra>>),
 }
 
 #[derive(Debug, PartialEq)]

@@ -151,6 +151,7 @@ pub enum Keyword {
   Continue,     // continue
   Match,        // match
   Return,       // return
+  Yield,        // yield
   Const,        // const
   Static,       // static
   Let,          // let
@@ -169,6 +170,7 @@ pub enum Keyword {
   Await,        // await
   Use,          // use
   Super,        // super
+  As,           // as
 }
 
 #[derive(Debug, PartialEq, Clone)]

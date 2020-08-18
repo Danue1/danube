@@ -153,6 +153,7 @@ fn parse_identifier(s: LexSpan) -> LexResult<Identifier> {
     "continue" => Identifier::Reserved(Keyword::Continue),
     "match" => Identifier::Reserved(Keyword::Match),
     "return" => Identifier::Reserved(Keyword::Return),
+    "yield" => Identifier::Reserved(Keyword::Yield),
     "const" => Identifier::Reserved(Keyword::Const),
     "static" => Identifier::Reserved(Keyword::Static),
     "let" => Identifier::Reserved(Keyword::Let),
@@ -169,6 +170,9 @@ fn parse_identifier(s: LexSpan) -> LexResult<Identifier> {
     "pub" => Identifier::Reserved(Keyword::Public),
     "async" => Identifier::Reserved(Keyword::Async),
     "await" => Identifier::Reserved(Keyword::Await),
+    "use" => Identifier::Reserved(Keyword::Use),
+    "super" => Identifier::Reserved(Keyword::Super),
+    "as" => Identifier::Reserved(Keyword::As),
 
     "true" => Identifier::BooleanLiteral(true),
     "false" => Identifier::BooleanLiteral(false),
@@ -352,8 +356,8 @@ bar\"";
 
   #[test]
   fn keyword() {
-    let source = r#"if else for while loop in break continue match return
-const static let mut fn trait struct type enum impl mod Self self pub async await"#;
+    let source = r#"if else for while loop in break continue match return yield
+const static let mut fn trait struct type enum impl mod Self self pub async await use super as"#;
     assert_eq!(
       lex(source).map(|(_, token_list)| token_list),
       Ok(vec![
@@ -367,6 +371,7 @@ const static let mut fn trait struct type enum impl mod Self self pub async awai
         Token::Keyword(Keyword::Continue),
         Token::Keyword(Keyword::Match),
         Token::Keyword(Keyword::Return),
+        Token::Keyword(Keyword::Yield),
         Token::Keyword(Keyword::Const),
         Token::Keyword(Keyword::Static),
         Token::Keyword(Keyword::Let),
@@ -383,6 +388,9 @@ const static let mut fn trait struct type enum impl mod Self self pub async awai
         Token::Keyword(Keyword::Public),
         Token::Keyword(Keyword::Async),
         Token::Keyword(Keyword::Await),
+        Token::Keyword(Keyword::Use),
+        Token::Keyword(Keyword::Super),
+        Token::Keyword(Keyword::As),
       ])
     );
   }
