@@ -101,6 +101,31 @@ pub struct StaticNode {
   pub value: LiteralValueNode,
 }
 
+#[derive(Debug, PartialEq, Clone)]
+pub struct AssignSugarNode {
+  pub kind: AssignSugarKind,
+  pub ident: IdentNode,
+  pub value: ExpressionNode,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum AssignSugarKind {
+  AddAssign, // +=
+  SubAssign, // -=
+  ExpAssign, // **=
+  MulAssign, // *=
+  DivAssign, // /=
+  ModAssign, // %=
+  AndAssign, // &&=
+  OrAssign,  // ||=
+
+  BitAndAssign,   // &=
+  BitOrAssign,    // |=
+  BitXorAssign,   // ^=
+  BitLeftAssign,  // <<=
+  BitRightAssign, // >>=
+}
+
 #[derive(Debug, PartialEq)]
 pub struct ImplementNode {
   pub target: IdentNode,
@@ -189,6 +214,7 @@ pub struct TypeArrayNode {
 pub enum StatementNode {
   Constant(ConstantNode),
   Static(StaticNode),
+  AssignSugar(AssignSugarNode),
   Let(LetNode),
   LetMut(LetMutNode),
   Conditional(StatementConditionalNode),

@@ -1,3 +1,5 @@
+mod assign_sugar_kind;
+mod assign_sugar_node;
 mod binary_operator_kind;
 mod constant_node;
 mod enum_node;
@@ -47,6 +49,8 @@ mod use_root_node;
 mod while_node;
 
 use crate::*;
+use assign_sugar_kind::parse_assign_sugar_kind;
+use assign_sugar_node::parse_assign_sugar_node;
 use binary_operator_kind::parse_binary_operator_kind;
 use constant_node::parse_constant_node;
 use enum_node::parse_enum_node;
