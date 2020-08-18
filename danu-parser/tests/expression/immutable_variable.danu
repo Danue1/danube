@@ -1,4 +1,5 @@
 fn foo() {
+  let _ = false;
   let foo = false;
   let Foo::Bar = false;
   let Foo(foo) = false;

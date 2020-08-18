@@ -275,6 +275,7 @@ pub struct ReturnNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum PatternNode {
+  Placeholder,
   UnnamedStruct(UnnamedStructNode),
   NamedStruct(NamedStructNode),
   Literal(LiteralValueNode),
