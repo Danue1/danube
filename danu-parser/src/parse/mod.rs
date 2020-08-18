@@ -137,6 +137,7 @@ mod tests {
       "tests/struct",
       "tests/trait",
       "tests/type_alias",
+      "tests/use",
       "tests/value",
     ];
 
