@@ -58,18 +58,27 @@ pub enum UseExtra {
 #[derive(Debug, PartialEq)]
 pub struct StructNode {
   pub ident: IdentNode,
+  pub generic: Option<GenericNode>,
   pub fields: StructFieldsNode,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct GenericNode {
+  pub path: PathNode,
+  pub trait_list: Vec<PathNode>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct EnumNode {
   pub ident: IdentNode,
+  pub generic: Option<GenericNode>,
   pub variant_list: Vec<EnumVariantNode>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct FunctionNode {
   pub ident: IdentNode,
+  pub generic: Option<GenericNode>,
   pub argument_list: Vec<FunctionArgumentNode>,
   pub return_type: Option<TypeNode>,
   pub body: Vec<StatementNode>,
@@ -84,6 +93,7 @@ pub struct TypeAliasNode {
 #[derive(Debug, PartialEq)]
 pub struct TraitNode {
   pub ident: IdentNode,
+  pub generic: Option<GenericNode>,
   pub item_list: Vec<TraitItemNode>,
 }
 
@@ -128,6 +138,7 @@ pub enum AssignSugarKind {
 
 #[derive(Debug, PartialEq)]
 pub struct ImplementNode {
+  pub generic: Option<GenericNode>,
   pub target: IdentNode,
   pub item_list: Vec<ImplementItemNode>,
 }
@@ -135,7 +146,9 @@ pub struct ImplementNode {
 #[derive(Debug, PartialEq)]
 pub struct ImplementTraitNode {
   pub target: IdentNode,
+  pub target_generic: Option<GenericNode>,
   pub trait_ident: IdentNode,
+  pub generic: Option<GenericNode>,
   pub item_list: Vec<ImplementItemNode>,
 }
 
@@ -192,8 +205,9 @@ pub struct TraitItemConstantNode {
 #[derive(Debug, PartialEq)]
 pub struct TraitItemFunctionNode {
   pub ident: IdentNode,
-  pub return_type: Option<TypeNode>,
+  pub generic: Option<GenericNode>,
   pub argument_list: Vec<FunctionArgumentNode>,
+  pub return_type: Option<TypeNode>,
   pub body: Option<Vec<StatementNode>>,
 }
 

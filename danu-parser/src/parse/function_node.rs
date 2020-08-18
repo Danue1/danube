@@ -5,12 +5,14 @@ pub(super) fn parse_function_node(s: Tokens) -> ParseResult<FunctionNode> {
     tuple((
       parse_keyword(Keyword::Function),
       parse_ident_node,
+      opt(parse_generic_node),
       parse_function_argument_list,
       opt(parse_function_type),
       parse_function_body,
     )),
-    |(_, ident, argument_list, return_type, body)| FunctionNode {
+    |(_, ident, generic, argument_list, return_type, body)| FunctionNode {
       ident,
+      generic,
       argument_list,
       return_type,
       body,
@@ -87,6 +89,7 @@ mod tests {
         ident: IdentNode {
           raw: "foo".to_owned()
         },
+        generic: None,
         argument_list: vec![],
         return_type: None,
         body: vec![]
@@ -103,6 +106,7 @@ mod tests {
         ident: IdentNode {
           raw: "foo".to_owned()
         },
+        generic: None,
         argument_list: vec![FunctionArgumentNode {
           ident: IdentNode {
             raw: "bar".to_owned()
@@ -126,6 +130,7 @@ mod tests {
         ident: IdentNode {
           raw: "foo".to_owned()
         },
+        generic: None,
         argument_list: vec![
           FunctionArgumentNode {
             ident: IdentNode {
@@ -161,6 +166,7 @@ mod tests {
         ident: IdentNode {
           raw: "foo".to_owned()
         },
+        generic: None,
         argument_list: vec![],
         return_type: None,
         body: vec![StatementNode::Conditional(StatementConditionalNode {
@@ -186,6 +192,7 @@ mod tests {
         ident: IdentNode {
           raw: "foo".to_owned()
         },
+        generic: None,
         argument_list: vec![],
         return_type: None,
         body: vec![StatementNode::Conditional(StatementConditionalNode {
@@ -213,6 +220,7 @@ mod tests {
         ident: IdentNode {
           raw: "foo".to_owned()
         },
+        generic: None,
         argument_list: vec![],
         return_type: None,
         body: vec![StatementNode::PatternMatch(PatternMatchNode {
@@ -237,6 +245,7 @@ mod tests {
         ident: IdentNode {
           raw: "foo".to_owned()
         },
+        generic: None,
         argument_list: vec![],
         return_type: None,
         body: vec![StatementNode::LetMut(LetMutNode {

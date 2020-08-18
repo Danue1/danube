@@ -152,6 +152,7 @@ pub enum Keyword {
   Match,        // match
   Return,       // return
   Yield,        // yield
+  Where,        // where
   Const,        // const
   Static,       // static
   Let,          // let

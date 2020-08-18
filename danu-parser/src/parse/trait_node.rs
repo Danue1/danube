@@ -5,11 +5,16 @@ pub(super) fn parse_trait_node(s: Tokens) -> ParseResult<TraitNode> {
     tuple((
       parse_keyword(Keyword::Trait),
       parse_ident_node,
+      opt(parse_generic_node),
       parse_symbol(Symbol::LeftBrace),
       many1(parse_trait_item_node),
       parse_symbol(Symbol::RightBrace),
     )),
-    |(_, ident, _, item_list, _)| TraitNode { ident, item_list },
+    |(_, ident, generic, _, item_list, _)| TraitNode {
+      ident,
+      generic,
+      item_list,
+    },
   )(s)
 }
 
@@ -39,6 +44,7 @@ mod test_constant {
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
+        generic: None,
         item_list: vec![TraitItemNode::Constant(TraitItemConstantNode {
           ident: IdentNode {
             raw: "FOO".to_owned()
@@ -63,6 +69,7 @@ mod test_constant {
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
+        generic: None,
         item_list: vec![TraitItemNode::Constant(TraitItemConstantNode {
           ident: IdentNode {
             raw: "FOO".to_owned()
@@ -103,10 +110,12 @@ mod test_function {
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
+        generic: None,
         item_list: vec![TraitItemNode::Function(TraitItemFunctionNode {
           ident: IdentNode {
             raw: "foo".to_owned()
           },
+          generic: None,
           argument_list: vec![],
           return_type: None,
           body: None,
@@ -126,10 +135,12 @@ mod test_function {
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
+        generic: None,
         item_list: vec![TraitItemNode::Function(TraitItemFunctionNode {
           ident: IdentNode {
             raw: "foo".to_owned()
           },
+          generic: None,
           argument_list: vec![FunctionArgumentNode {
             ident: IdentNode {
               raw: "bar".to_owned()
@@ -156,10 +167,12 @@ mod test_function {
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
+        generic: None,
         item_list: vec![TraitItemNode::Function(TraitItemFunctionNode {
           ident: IdentNode {
             raw: "foo".to_owned()
           },
+          generic: None,
           argument_list: vec![
             FunctionArgumentNode {
               ident: IdentNode {
@@ -198,10 +211,12 @@ mod test_function {
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
+        generic: None,
         item_list: vec![TraitItemNode::Function(TraitItemFunctionNode {
           ident: IdentNode {
             raw: "foo".to_owned()
           },
+          generic: None,
           argument_list: vec![],
           return_type: None,
           body: Some(vec![StatementNode::Constant(ConstantNode {
@@ -231,10 +246,12 @@ mod test_function {
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
+        generic: None,
         item_list: vec![TraitItemNode::Function(TraitItemFunctionNode {
           ident: IdentNode {
             raw: "foo".to_owned()
           },
+          generic: None,
           argument_list: vec![FunctionArgumentNode {
             ident: IdentNode {
               raw: "bar".to_owned()
@@ -271,10 +288,12 @@ mod test_function {
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
+        generic: None,
         item_list: vec![TraitItemNode::Function(TraitItemFunctionNode {
           ident: IdentNode {
             raw: "foo".to_owned()
           },
+          generic: None,
           argument_list: vec![
             FunctionArgumentNode {
               ident: IdentNode {

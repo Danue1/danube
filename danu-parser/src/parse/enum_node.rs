@@ -5,13 +5,15 @@ pub(super) fn parse_enum_node(s: Tokens) -> ParseResult<EnumNode> {
     tuple((
       parse_keyword(Keyword::Enum),
       parse_ident_node,
+      opt(parse_generic_node),
       parse_symbol(Symbol::Assign),
       opt(parse_symbol(Symbol::BitOr)),
       separated_nonempty_list(parse_symbol(Symbol::BitOr), parse_enum_variant_node),
       parse_symbol(Symbol::Semicolon),
     )),
-    |(_, ident, _, _, variant_list, _)| EnumNode {
+    |(_, ident, generic, _, _, variant_list, _)| EnumNode {
       ident,
+      generic,
       variant_list,
     },
   )(s)
@@ -41,6 +43,7 @@ mod tests {
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
+        generic: None,
         variant_list: vec![EnumVariantNode {
           ident: IdentNode {
             raw: "Bar".to_owned()
@@ -60,6 +63,7 @@ mod tests {
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
+        generic: None,
         variant_list: vec![
           EnumVariantNode {
             ident: IdentNode {
@@ -87,6 +91,7 @@ mod tests {
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
+        generic: None,
         variant_list: vec![EnumVariantNode {
           ident: IdentNode {
             raw: "Bar".to_owned()
@@ -106,6 +111,7 @@ mod tests {
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
+        generic: None,
         variant_list: vec![
           EnumVariantNode {
             ident: IdentNode {
@@ -120,6 +126,33 @@ mod tests {
             ty: None
           }
         ]
+      }
+    );
+  }
+
+  #[test]
+  fn single_generic() {
+    let source = "enum Foo<T> = T;";
+    assert_eq!(
+      compile(source),
+      EnumNode {
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        generic: Some(GenericNode {
+          path: PathNode {
+            ident_list: vec![IdentNode {
+              raw: "T".to_owned()
+            }]
+          },
+          trait_list: vec![]
+        }),
+        variant_list: vec![EnumVariantNode {
+          ident: IdentNode {
+            raw: "T".to_owned()
+          },
+          ty: None
+        }]
       }
     );
   }

@@ -5,9 +5,14 @@ pub(super) fn parse_struct_node(s: Tokens) -> ParseResult<StructNode> {
     tuple((
       parse_keyword(Keyword::Struct),
       parse_ident_node,
+      opt(parse_generic_node),
       parse_struct_fields_node,
     )),
-    |(_, ident, fields)| StructNode { ident, fields },
+    |(_, ident, generic, fields)| StructNode {
+      ident,
+      generic,
+      fields,
+    },
   )(s)
 }
 
@@ -35,6 +40,7 @@ mod tests {
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
+        generic: None,
         fields: StructFieldsNode::Unnamed(StructUnnamedFieldsNode {
           node_list: vec![TypeNode::Ident(IdentNode {
             raw: "Bar".to_owned()
@@ -53,6 +59,7 @@ mod tests {
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
+        generic: None,
         fields: StructFieldsNode::Unnamed(StructUnnamedFieldsNode {
           node_list: vec![
             TypeNode::Ident(IdentNode {
@@ -76,6 +83,7 @@ mod tests {
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
+        generic: None,
         fields: StructFieldsNode::Named(StructNamedFieldsNode {
           node_list: vec![(
             IdentNode {
@@ -99,6 +107,7 @@ mod tests {
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
+        generic: None,
         fields: StructFieldsNode::Named(StructNamedFieldsNode {
           node_list: vec![
             (
@@ -118,6 +127,99 @@ mod tests {
               })
             ),
           ]
+        })
+      }
+    );
+  }
+
+  #[test]
+  fn unnamed_generic() {
+    let source = "struct Foo<T>(T);";
+    assert_eq!(
+      compile(source),
+      StructNode {
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        generic: Some(GenericNode {
+          path: PathNode {
+            ident_list: vec![IdentNode {
+              raw: "T".to_owned()
+            }]
+          },
+          trait_list: vec![],
+        }),
+        fields: StructFieldsNode::Unnamed(StructUnnamedFieldsNode {
+          node_list: vec![TypeNode::Ident(IdentNode {
+            raw: "T".to_owned()
+          })]
+        })
+      }
+    );
+  }
+
+  #[test]
+  fn unnamed_generic_a_trait() {
+    let source = "struct Foo<T: Foo>(T);";
+    assert_eq!(
+      compile(source),
+      StructNode {
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        generic: Some(GenericNode {
+          path: PathNode {
+            ident_list: vec![IdentNode {
+              raw: "T".to_owned()
+            }]
+          },
+          trait_list: vec![PathNode {
+            ident_list: vec![IdentNode {
+              raw: "Foo".to_owned()
+            }]
+          }],
+        }),
+        fields: StructFieldsNode::Unnamed(StructUnnamedFieldsNode {
+          node_list: vec![TypeNode::Ident(IdentNode {
+            raw: "T".to_owned()
+          })]
+        })
+      }
+    );
+  }
+
+  #[test]
+  fn unnamed_generic_two_trait() {
+    let source = "struct Foo<T: Foo + Bar>(T);";
+    assert_eq!(
+      compile(source),
+      StructNode {
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        generic: Some(GenericNode {
+          path: PathNode {
+            ident_list: vec![IdentNode {
+              raw: "T".to_owned()
+            }]
+          },
+          trait_list: vec![
+            PathNode {
+              ident_list: vec![IdentNode {
+                raw: "Foo".to_owned()
+              }]
+            },
+            PathNode {
+              ident_list: vec![IdentNode {
+                raw: "Bar".to_owned()
+              }]
+            }
+          ],
+        }),
+        fields: StructFieldsNode::Unnamed(StructUnnamedFieldsNode {
+          node_list: vec![TypeNode::Ident(IdentNode {
+            raw: "T".to_owned()
+          })]
         })
       }
     );

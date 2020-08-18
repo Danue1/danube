@@ -5,15 +5,19 @@ pub(super) fn parse_implement_trait_node(s: Tokens) -> ParseResult<ImplementTrai
     tuple((
       parse_keyword(Keyword::Impl),
       parse_ident_node,
+      opt(parse_generic_node),
       parse_keyword(Keyword::For),
       parse_ident_node,
+      opt(parse_generic_node),
       parse_symbol(Symbol::LeftBrace),
       many1(parse_implement_item_node),
       parse_symbol(Symbol::RightBrace),
     )),
-    |(_, trait_ident, _, target, _, item_list, _)| ImplementTraitNode {
+    |(_, trait_ident, generic, _, target, target_generic, _, item_list, _)| ImplementTraitNode {
       target,
+      target_generic,
       trait_ident,
+      generic,
       item_list,
     },
   )(s)
@@ -45,9 +49,11 @@ mod tests {
         target: IdentNode {
           raw: "Bar".to_owned()
         },
+        target_generic: None,
         trait_ident: IdentNode {
           raw: "Foo".to_owned()
         },
+        generic: None,
         item_list: vec![ImplementItemNode::Constant(ConstantNode {
           ident: IdentNode {
             raw: "BAZ".to_owned()
@@ -72,13 +78,16 @@ mod tests {
         target: IdentNode {
           raw: "Bar".to_owned()
         },
+        target_generic: None,
         trait_ident: IdentNode {
           raw: "Foo".to_owned(),
         },
+        generic: None,
         item_list: vec![ImplementItemNode::Function(FunctionNode {
           ident: IdentNode {
             raw: "baz".to_owned()
           },
+          generic: None,
           argument_list: vec![],
           return_type: None,
           body: vec![]

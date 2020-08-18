@@ -5,12 +5,14 @@ pub(super) fn parse_trait_item_function_node(s: Tokens) -> ParseResult<TraitItem
     tuple((
       parse_keyword(Keyword::Function),
       parse_ident_node,
+      opt(parse_generic_node),
       parse_function_argument_list,
       opt(parse_function_type),
       parse_function_body,
     )),
-    |(_, ident, argument_list, return_type, body)| TraitItemFunctionNode {
+    |(_, ident, generic, argument_list, return_type, body)| TraitItemFunctionNode {
       ident,
+      generic,
       argument_list,
       return_type,
       body,
