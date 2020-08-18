@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct IdentNode {
   pub raw: String,
 }
@@ -87,14 +87,14 @@ pub struct TraitNode {
   pub item_list: Vec<TraitItemNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct ConstantNode {
   pub ident: IdentNode,
   pub ty: TypeNode,
   pub value: ExpressionNode,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct StaticNode {
   pub ident: IdentNode,
   pub ty: TypeNode,
@@ -114,7 +114,7 @@ pub struct ImplementTraitNode {
   pub item_list: Vec<ImplementItemNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum LiteralValueNode {
   Bool(bool),
   Char(char),
@@ -172,19 +172,19 @@ pub struct TraitItemFunctionNode {
   pub body: Option<Vec<StatementNode>>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum TypeNode {
   Array(Box<TypeArrayNode>),
   Ident(IdentNode),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct TypeArrayNode {
   pub ty: TypeNode,
   pub size: usize,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum StatementNode {
   Constant(ConstantNode),
   Static(StaticNode),
@@ -197,21 +197,21 @@ pub enum StatementNode {
   Expression(ExpressionNode),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct LetNode {
   pub pattern: PatternNode,
   pub ty: Option<TypeNode>,
   pub value: ExpressionNode,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct LetMutNode {
   pub pattern: PatternNode,
   pub ty: Option<TypeNode>,
   pub value: ExpressionNode,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum ExpressionNode {
   Path(PathNode),
   Conditional(ExpressionConditionalNode),
@@ -223,35 +223,37 @@ pub enum ExpressionNode {
   Return(ReturnNode),
   Literal(LiteralValueNode),
   Array(Vec<ExpressionNode>),
+  Tuple(TupleNode),
   FunctionCall(FunctionCallNode),
   Index(IndexNode),
   BinaryOperator(BinaryOperatorNode),
   UnaryOperator(UnaryOperatorNode),
   Field(ExpressionFieldNode),
+  Struct(ExpressionStructNode),
 }
 
 pub type ConditionalBranch = (ExpressionNode, Vec<StatementNode>);
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct StatementConditionalNode {
   pub main_branch: Box<ConditionalBranch>,
   pub branch_list: Vec<ConditionalBranch>,
   pub other: Option<Vec<StatementNode>>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct ExpressionConditionalNode {
   pub main_branch: Box<ConditionalBranch>,
   pub branch_list: Vec<ConditionalBranch>,
   pub other: Vec<StatementNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct LoopNode {
   pub body: Vec<StatementNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct WhileNode {
   pub condition: Box<ExpressionNode>,
   pub body: Vec<StatementNode>,
@@ -259,18 +261,18 @@ pub struct WhileNode {
 
 pub type PatternBranch = (Vec<PatternNode>, Vec<StatementNode>);
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct PatternMatchNode {
   pub condition: Box<ExpressionNode>,
   pub branch_list: Vec<PatternBranch>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct ReturnNode {
   pub value: Option<Box<ExpressionNode>>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum PatternNode {
   UnnamedStruct(UnnamedStructNode),
   NamedStruct(NamedStructNode),
@@ -278,25 +280,30 @@ pub enum PatternNode {
   Path(PathNode),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
+pub struct TupleNode {
+  pub node_list: Vec<ExpressionNode>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct FunctionCallNode {
   pub argument_list: Vec<ExpressionNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct IndexNode {
   pub array: Box<ExpressionNode>,
   pub index: Box<ExpressionNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct BinaryOperatorNode {
   pub kind: BinaryOperatorKind,
   pub left: Box<ExpressionNode>,
   pub right: Box<ExpressionNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum BinaryOperatorKind {
   Add,                // +
   Sub,                // -
@@ -318,22 +325,28 @@ pub enum BinaryOperatorKind {
   GreaterThanOrEqual, // >=
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct UnaryOperatorNode {
   pub kind: UnaryOperatorKind,
   pub value: Box<ExpressionNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum UnaryOperatorKind {
   Not,
   Negative,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct ExpressionFieldNode {
   pub left: Box<ExpressionNode>,
   pub right: Box<IdentNode>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct ExpressionStructNode {
+  pub path: Option<PathNode>,
+  pub field_list: Vec<(IdentNode, Option<ExpressionNode>)>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -342,24 +355,24 @@ pub enum ImplementItemNode {
   Function(FunctionNode),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct PathNode {
   pub ident_list: Vec<IdentNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct UnnamedStructNode {
   pub path: Option<PathNode>,
   pub field_list: Vec<PatternNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct NamedStructNode {
   pub path: Option<PathNode>,
   pub field_list: Vec<FieldNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct FieldNode {
   pub ident: IdentNode,
   pub pattern: Option<PatternNode>,

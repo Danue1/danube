@@ -8,6 +8,8 @@ pub(super) fn parse_expression_node(s: Tokens) -> ParseResult<ExpressionNode> {
 
 fn parse_atomic_expression_node(s: Tokens) -> ParseResult<ExpressionNode> {
   alt((
+    map(parse_expression_struct_node, ExpressionNode::Struct),
+    map(parse_expression_tuple_node, ExpressionNode::Tuple),
     map(parse_path_node, ExpressionNode::Path),
     map(
       parse_expression_conditional_node,
@@ -24,6 +26,19 @@ fn parse_atomic_expression_node(s: Tokens) -> ParseResult<ExpressionNode> {
   ))(s)
 }
 
+fn parse_expression_struct_node(s: Tokens) -> ParseResult<ExpressionStructNode> {
+  map(parse_expression_field_list, |field_list| {
+    ExpressionStructNode {
+      path: None,
+      field_list,
+    }
+  })(s)
+}
+
+fn parse_expression_tuple_node(s: Tokens) -> ParseResult<TupleNode> {
+  map(parse_tuple_operator, |node_list| TupleNode { node_list })(s)
+}
+
 fn parse_prefix_expression_node(s: Tokens) -> ParseResult<ExpressionNode> {
   map(
     tuple((parse_unary_operator_kind, parse_atomic_expression_node)),
@@ -38,6 +53,11 @@ fn parse_prefix_expression_node(s: Tokens) -> ParseResult<ExpressionNode> {
 
 fn parse_postfix_expression_node(s: Tokens, left: ExpressionNode) -> ParseResult<ExpressionNode> {
   match parse_operator_kind(s.clone()) {
+    Ok((s, OperatorKind::Tuple(node_list))) => {
+      let node = ExpressionNode::Tuple(TupleNode { node_list });
+
+      Ok((s, node))
+    }
     Ok((s, OperatorKind::Index(right))) => {
       let node = ExpressionNode::Index(IndexNode {
         array: Box::new(left),
@@ -64,11 +84,27 @@ fn parse_postfix_expression_node(s: Tokens, left: ExpressionNode) -> ParseResult
 
       parse_postfix_expression_node(s, node)
     }
-    _ => Ok((s, left)),
+    _ => {
+      if let ExpressionNode::Path(path) = left.clone() {
+        if let Ok((s, field_list)) = parse_expression_field_list(s.clone()) {
+          let node = ExpressionNode::Struct(ExpressionStructNode {
+            path: Some(path),
+            field_list,
+          });
+
+          parse_postfix_expression_node(s, node)
+        } else {
+          Ok((s, left))
+        }
+      } else {
+        Ok((s, left))
+      }
+    }
   }
 }
 
 enum OperatorKind {
+  Tuple(Vec<ExpressionNode>),
   Index(ExpressionNode),
   Field(IdentNode),
   Binary(BinaryOperatorKind),
@@ -76,6 +112,7 @@ enum OperatorKind {
 
 fn parse_operator_kind(s: Tokens) -> ParseResult<OperatorKind> {
   alt((
+    map(parse_tuple_operator, OperatorKind::Tuple),
     map(parse_index_operator, OperatorKind::Index),
     map(parse_field_operator, OperatorKind::Field),
     map(parse_binary_operator_kind, OperatorKind::Binary),
@@ -97,6 +134,39 @@ fn parse_field_operator(s: Tokens) -> ParseResult<IdentNode> {
   map(
     tuple((parse_symbol(Symbol::Dot), parse_ident_node)),
     |(_, ident)| ident,
+  )(s)
+}
+
+fn parse_tuple_operator(s: Tokens) -> ParseResult<Vec<ExpressionNode>> {
+  map(
+    tuple((
+      parse_symbol(Symbol::LeftParens),
+      separated_nonempty_list(parse_symbol(Symbol::Comma), parse_expression_node),
+      opt(parse_symbol(Symbol::Comma)),
+      parse_symbol(Symbol::RightParens),
+    )),
+    |(_, expression_list, _, _)| expression_list,
+  )(s)
+}
+
+fn parse_expression_field_list(s: Tokens) -> ParseResult<Vec<(IdentNode, Option<ExpressionNode>)>> {
+  map(
+    tuple((
+      parse_symbol(Symbol::LeftBrace),
+      separated_nonempty_list(
+        parse_symbol(Symbol::Comma),
+        tuple((
+          parse_ident_node,
+          opt(map(
+            tuple((parse_symbol(Symbol::DoubleColon), parse_expression_node)),
+            |(_, expression)| expression,
+          )),
+        )),
+      ),
+      opt(parse_symbol(Symbol::Comma)),
+      parse_symbol(Symbol::RightBrace),
+    )),
+    |(_, expression_list, _, _)| expression_list,
   )(s)
 }
 
