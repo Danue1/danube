@@ -116,14 +116,18 @@ mod tests {
         },
         generic: None,
         argument_list: vec![FunctionArgumentNode {
+          is_mutable: false,
           ident: IdentNode {
             raw: "bar".to_owned()
           },
-          ty: TypeNode::Path(PathNode {
-            ident_list: vec![IdentNode {
-              raw: "Bar".to_owned()
-            }]
-          })
+          ty: TypeNode::Path(
+            TypeImmutablity::Yes,
+            PathNode {
+              ident_list: vec![IdentNode {
+                raw: "Bar".to_owned()
+              }]
+            }
+          )
         }],
         return_type: None,
         body: vec![]
@@ -145,26 +149,98 @@ mod tests {
         generic: None,
         argument_list: vec![
           FunctionArgumentNode {
+            is_mutable: false,
             ident: IdentNode {
               raw: "bar".to_owned()
             },
-            ty: TypeNode::Path(PathNode {
-              ident_list: vec![IdentNode {
-                raw: "Bar".to_owned()
-              }]
-            })
+            ty: TypeNode::Path(
+              TypeImmutablity::Yes,
+              PathNode {
+                ident_list: vec![IdentNode {
+                  raw: "Bar".to_owned()
+                }]
+              }
+            )
           },
           FunctionArgumentNode {
+            is_mutable: false,
             ident: IdentNode {
               raw: "baz".to_owned()
             },
-            ty: TypeNode::Path(PathNode {
-              ident_list: vec![IdentNode {
-                raw: "Baz".to_owned()
-              }]
-            })
+            ty: TypeNode::Path(
+              TypeImmutablity::Yes,
+              PathNode {
+                ident_list: vec![IdentNode {
+                  raw: "Baz".to_owned()
+                }]
+              }
+            )
           }
         ],
+        return_type: None,
+        body: vec![]
+      }
+    );
+  }
+
+  #[test]
+  fn a_mutable_argument() {
+    let source = "fn foo(mut bar: Bar) { }";
+    assert_eq!(
+      compile(source),
+      FunctionNode {
+        visibility: None,
+        is_async: false,
+        ident: IdentNode {
+          raw: "foo".to_owned()
+        },
+        generic: None,
+        argument_list: vec![FunctionArgumentNode {
+          is_mutable: true,
+          ident: IdentNode {
+            raw: "bar".to_owned()
+          },
+          ty: TypeNode::Path(
+            TypeImmutablity::Yes,
+            PathNode {
+              ident_list: vec![IdentNode {
+                raw: "Bar".to_owned()
+              }]
+            }
+          )
+        }],
+        return_type: None,
+        body: vec![]
+      }
+    );
+  }
+
+  #[test]
+  fn a_mutable_type_argument() {
+    let source = "fn foo(bar: mut Bar) { }";
+    assert_eq!(
+      compile(source),
+      FunctionNode {
+        visibility: None,
+        is_async: false,
+        ident: IdentNode {
+          raw: "foo".to_owned()
+        },
+        generic: None,
+        argument_list: vec![FunctionArgumentNode {
+          is_mutable: false,
+          ident: IdentNode {
+            raw: "bar".to_owned()
+          },
+          ty: TypeNode::Path(
+            TypeImmutablity::No,
+            PathNode {
+              ident_list: vec![IdentNode {
+                raw: "Bar".to_owned()
+              }]
+            }
+          )
+        }],
         return_type: None,
         body: vec![]
       }

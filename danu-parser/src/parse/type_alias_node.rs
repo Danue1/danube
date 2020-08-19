@@ -39,11 +39,14 @@ mod tests {
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
-        ty: TypeNode::Path(PathNode {
-          ident_list: vec![IdentNode {
-            raw: "bool".to_owned()
-          }]
-        })
+        ty: TypeNode::Path(
+          TypeImmutablity::Yes,
+          PathNode {
+            ident_list: vec![IdentNode {
+              raw: "bool".to_owned()
+            }]
+          }
+        )
       }
     );
   }

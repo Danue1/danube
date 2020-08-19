@@ -68,11 +68,14 @@ mod tests {
           ident: IdentNode {
             raw: "BAZ".to_owned()
           },
-          ty: TypeNode::Path(PathNode {
-            ident_list: vec![IdentNode {
-              raw: "Bax".to_owned()
-            }]
-          }),
+          ty: TypeNode::Path(
+            TypeImmutablity::Yes,
+            PathNode {
+              ident_list: vec![IdentNode {
+                raw: "Bax".to_owned()
+              }]
+            }
+          ),
           value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
         })]
       }

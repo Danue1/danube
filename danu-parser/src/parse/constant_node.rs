@@ -42,11 +42,14 @@ mod tests {
         ident: IdentNode {
           raw: "FOO".to_owned()
         },
-        ty: TypeNode::Path(PathNode {
-          ident_list: vec![IdentNode {
-            raw: "bool".to_owned()
-          }]
-        }),
+        ty: TypeNode::Path(
+          TypeImmutablity::Yes,
+          PathNode {
+            ident_list: vec![IdentNode {
+              raw: "bool".to_owned()
+            }]
+          }
+        ),
         value: ExpressionNode::Literal(LiteralValueNode::Bool(true))
       }
     );
@@ -62,14 +65,20 @@ mod tests {
         ident: IdentNode {
           raw: "FOO".to_owned()
         },
-        ty: TypeNode::Array(Box::new(TypeArrayNode {
-          ty: TypeNode::Path(PathNode {
-            ident_list: vec![IdentNode {
-              raw: "bool".to_owned()
-            }]
-          }),
-          size: 0
-        })),
+        ty: TypeNode::Array(
+          TypeImmutablity::Yes,
+          TypeArrayNode {
+            ty: Box::new(TypeNode::Path(
+              TypeImmutablity::Yes,
+              PathNode {
+                ident_list: vec![IdentNode {
+                  raw: "bool".to_owned()
+                }]
+              }
+            )),
+            size: 0
+          }
+        ),
         value: ExpressionNode::Literal(LiteralValueNode::Bool(true))
       }
     );
@@ -85,11 +94,14 @@ mod tests {
         ident: IdentNode {
           raw: "FOO".to_owned()
         },
-        ty: TypeNode::Path(PathNode {
-          ident_list: vec![IdentNode {
-            raw: "bool".to_owned()
-          }]
-        }),
+        ty: TypeNode::Path(
+          TypeImmutablity::Yes,
+          PathNode {
+            ident_list: vec![IdentNode {
+              raw: "bool".to_owned()
+            }]
+          }
+        ),
         value: ExpressionNode::Array(vec![])
       }
     );
@@ -105,11 +117,14 @@ mod tests {
         ident: IdentNode {
           raw: "FOO".to_owned()
         },
-        ty: TypeNode::Path(PathNode {
-          ident_list: vec![IdentNode {
-            raw: "bool".to_owned()
-          }]
-        }),
+        ty: TypeNode::Path(
+          TypeImmutablity::Yes,
+          PathNode {
+            ident_list: vec![IdentNode {
+              raw: "bool".to_owned()
+            }]
+          }
+        ),
         value: ExpressionNode::Array(vec![ExpressionNode::Literal(LiteralValueNode::Bool(true))])
       }
     );

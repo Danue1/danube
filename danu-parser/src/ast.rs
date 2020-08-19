@@ -205,6 +205,7 @@ pub struct EnumVariantNode {
 #[derive(Debug, PartialEq)]
 pub struct FunctionArgumentNode {
   pub ident: IdentNode,
+  pub is_mutable: bool,
   pub ty: TypeNode,
 }
 
@@ -233,14 +234,20 @@ pub struct TraitItemFunctionNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum TypeNode {
-  Array(Box<TypeArrayNode>),
-  Tuple(Vec<TypeNode>),
-  Path(PathNode),
+  Array(TypeImmutablity, TypeArrayNode),
+  Tuple(TypeImmutablity, Vec<TypeNode>),
+  Path(TypeImmutablity, PathNode),
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum TypeImmutablity {
+  Yes,
+  No,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct TypeArrayNode {
-  pub ty: TypeNode,
+  pub ty: Box<TypeNode>,
   pub size: usize,
 }
 

@@ -1,13 +1,19 @@
 use super::*;
 
 pub(super) fn parse_type_node(s: Tokens) -> ParseResult<TypeNode> {
-  alt((
-    map(parse_type_array_node, |node| {
-      TypeNode::Array(Box::new(node))
-    }),
-    map(parse_type_tuple_node, TypeNode::Tuple),
-    map(parse_path_node, TypeNode::Path),
-  ))(s)
+  let (s, immutablitity) = parse_type_immutablity(s)?;
+  if let Ok((s, node)) = parse_type_array_node(s.clone()) {
+    Ok((s, TypeNode::Array(immutablitity, node)))
+  } else if let Ok((s, node)) = parse_type_tuple_node(s.clone()) {
+    Ok((s, TypeNode::Tuple(immutablitity, node)))
+  } else if let Ok((s, node)) = parse_path_node(s.clone()) {
+    Ok((s, TypeNode::Path(immutablitity, node)))
+  } else {
+    Err(nom::Err::Error(nom::error::make_error(
+      s,
+      nom::error::ErrorKind::Alt,
+    )))
+  }
 }
 
 fn parse_type_tuple_node(s: Tokens) -> ParseResult<Vec<TypeNode>> {

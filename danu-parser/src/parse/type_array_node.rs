@@ -10,7 +10,7 @@ pub(super) fn parse_type_array_node(s: Tokens) -> ParseResult<TypeArrayNode> {
       parse_symbol(Symbol::RightBracket),
     )),
     |(_, ty, _, size, _)| TypeArrayNode {
-      ty,
+      ty: Box::new(ty),
       size: size as usize,
     },
   )(s)
