@@ -116,6 +116,7 @@ mod test_function {
         },
         generic: None,
         item_list: vec![TraitItemNode::Function(TraitItemFunctionNode {
+          is_async: false,
           ident: IdentNode {
             raw: "foo".to_owned()
           },
@@ -141,6 +142,7 @@ mod test_function {
         },
         generic: None,
         item_list: vec![TraitItemNode::Function(TraitItemFunctionNode {
+          is_async: false,
           ident: IdentNode {
             raw: "foo".to_owned()
           },
@@ -175,6 +177,7 @@ mod test_function {
         },
         generic: None,
         item_list: vec![TraitItemNode::Function(TraitItemFunctionNode {
+          is_async: false,
           ident: IdentNode {
             raw: "foo".to_owned()
           },
@@ -223,6 +226,7 @@ mod test_function {
         },
         generic: None,
         item_list: vec![TraitItemNode::Function(TraitItemFunctionNode {
+          is_async: false,
           ident: IdentNode {
             raw: "foo".to_owned()
           },
@@ -260,6 +264,7 @@ mod test_function {
         },
         generic: None,
         item_list: vec![TraitItemNode::Function(TraitItemFunctionNode {
+          is_async: false,
           ident: IdentNode {
             raw: "foo".to_owned()
           },
@@ -306,6 +311,7 @@ mod test_function {
         },
         generic: None,
         item_list: vec![TraitItemNode::Function(TraitItemFunctionNode {
+          is_async: false,
           ident: IdentNode {
             raw: "foo".to_owned()
           },

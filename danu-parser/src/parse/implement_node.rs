@@ -77,6 +77,7 @@ mod tests {
         },
         generic: None,
         item_list: vec![ImplementItemNode::Function(FunctionNode {
+          is_async: false,
           ident: IdentNode {
             raw: "bar".to_owned()
           },

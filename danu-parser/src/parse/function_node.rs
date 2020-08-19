@@ -3,6 +3,7 @@ use super::*;
 pub(super) fn parse_function_node(s: Tokens) -> ParseResult<FunctionNode> {
   map(
     tuple((
+      opt(parse_keyword(Keyword::Async)),
       parse_keyword(Keyword::Function),
       parse_ident_node,
       opt(parse_generic_node),
@@ -10,7 +11,8 @@ pub(super) fn parse_function_node(s: Tokens) -> ParseResult<FunctionNode> {
       opt(parse_function_type),
       parse_function_body,
     )),
-    |(_, ident, generic, argument_list, return_type, body)| FunctionNode {
+    |(is_async, _, ident, generic, argument_list, return_type, body)| FunctionNode {
+      is_async: is_async.is_some(),
       ident,
       generic,
       argument_list,
@@ -86,6 +88,7 @@ mod tests {
     assert_eq!(
       compile(source),
       FunctionNode {
+        is_async: false,
         ident: IdentNode {
           raw: "foo".to_owned()
         },
@@ -103,6 +106,7 @@ mod tests {
     assert_eq!(
       compile(source),
       FunctionNode {
+        is_async: false,
         ident: IdentNode {
           raw: "foo".to_owned()
         },
@@ -129,6 +133,7 @@ mod tests {
     assert_eq!(
       compile(source),
       FunctionNode {
+        is_async: false,
         ident: IdentNode {
           raw: "foo".to_owned()
         },
@@ -169,6 +174,7 @@ mod tests {
     assert_eq!(
       compile(source),
       FunctionNode {
+        is_async: false,
         ident: IdentNode {
           raw: "foo".to_owned()
         },
@@ -195,6 +201,7 @@ mod tests {
     assert_eq!(
       compile(source),
       FunctionNode {
+        is_async: false,
         ident: IdentNode {
           raw: "foo".to_owned()
         },
@@ -223,6 +230,7 @@ mod tests {
     assert_eq!(
       compile(source),
       FunctionNode {
+        is_async: false,
         ident: IdentNode {
           raw: "foo".to_owned()
         },
@@ -248,6 +256,7 @@ mod tests {
     assert_eq!(
       compile(source),
       FunctionNode {
+        is_async: false,
         ident: IdentNode {
           raw: "foo".to_owned()
         },
@@ -268,6 +277,24 @@ mod tests {
           ty: None,
           value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
         })]
+      }
+    );
+  }
+
+  #[test]
+  fn async_function() {
+    let source = "async fn foo() { }";
+    assert_eq!(
+      compile(source),
+      FunctionNode {
+        is_async: true,
+        ident: IdentNode {
+          raw: "foo".to_owned()
+        },
+        generic: None,
+        argument_list: vec![],
+        return_type: None,
+        body: vec![]
       }
     );
   }

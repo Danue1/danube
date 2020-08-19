@@ -3,6 +3,7 @@ use super::*;
 pub(super) fn parse_trait_item_function_node(s: Tokens) -> ParseResult<TraitItemFunctionNode> {
   map(
     tuple((
+      opt(parse_keyword(Keyword::Async)),
       parse_keyword(Keyword::Function),
       parse_ident_node,
       opt(parse_generic_node),
@@ -10,7 +11,8 @@ pub(super) fn parse_trait_item_function_node(s: Tokens) -> ParseResult<TraitItem
       opt(parse_function_type),
       parse_function_body,
     )),
-    |(_, ident, generic, argument_list, return_type, body)| TraitItemFunctionNode {
+    |(is_async, _, ident, generic, argument_list, return_type, body)| TraitItemFunctionNode {
+      is_async: is_async.is_some(),
       ident,
       generic,
       argument_list,

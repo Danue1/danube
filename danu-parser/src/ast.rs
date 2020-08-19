@@ -77,6 +77,7 @@ pub struct EnumNode {
 
 #[derive(Debug, PartialEq)]
 pub struct FunctionNode {
+  pub is_async: bool,
   pub ident: IdentNode,
   pub generic: Option<GenericNode>,
   pub argument_list: Vec<FunctionArgumentNode>,
@@ -204,6 +205,7 @@ pub struct TraitItemConstantNode {
 
 #[derive(Debug, PartialEq)]
 pub struct TraitItemFunctionNode {
+  pub is_async: bool,
   pub ident: IdentNode,
   pub generic: Option<GenericNode>,
   pub argument_list: Vec<FunctionArgumentNode>,
