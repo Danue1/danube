@@ -78,12 +78,8 @@ fn parse_string(s: LexSpan) -> LexResult<String> {
       b"\"" => Ok((s, vec![])),
       b"\\" => {
         let (s, c) = take(1usize)(ss)?;
-        pis(s).map(|(s, done)| {
-          (
-            s,
-            concat_slice_vec(c.fragment().to_owned().as_bytes(), done),
-          )
-        })
+        let c = c.fragment().to_owned().as_bytes();
+        pis(s).map(|(s, done)| (s, concat_slice_vec(c, done)))
       }
       c => pis(ss).map(|(s, done)| (s, concat_slice_vec(c, done))),
     }
@@ -96,8 +92,7 @@ fn parse_string(s: LexSpan) -> LexResult<String> {
   }
 
   fn convert_vec_utf8(v: Vec<u8>) -> std::result::Result<String, std::str::Utf8Error> {
-    let slice = v.as_slice();
-    std::str::from_utf8(slice).map(|s| s.to_owned())
+    std::str::from_utf8(v.as_slice()).map(|s| s.to_owned())
   }
 
   map(
