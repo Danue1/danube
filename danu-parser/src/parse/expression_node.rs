@@ -67,6 +67,11 @@ fn parse_postfix_expression_node(s: Tokens, left: ExpressionNode) -> ParseResult
 
       parse_postfix_expression_node(s, node)
     }
+    Ok((s, OperatorKind::Await)) => {
+      let node = ExpressionNode::Await(Box::new(left));
+
+      parse_postfix_expression_node(s, node)
+    }
     Ok((s, OperatorKind::Field(right))) => {
       let node = ExpressionNode::Field(ExpressionFieldNode {
         left: Box::new(left),
@@ -108,6 +113,7 @@ fn parse_postfix_expression_node(s: Tokens, left: ExpressionNode) -> ParseResult
 enum OperatorKind {
   Tuple(Vec<ExpressionNode>),
   Index(ExpressionNode),
+  Await,
   Field(IdentNode),
   Binary(BinaryOperatorKind),
 }
@@ -116,9 +122,22 @@ fn parse_operator_kind(s: Tokens) -> ParseResult<OperatorKind> {
   alt((
     map(parse_tuple_operator, OperatorKind::Tuple),
     map(parse_index_operator, OperatorKind::Index),
+    map(parse_await_operator, |_| OperatorKind::Await),
     map(parse_field_operator, OperatorKind::Field),
     map(parse_binary_operator_kind, OperatorKind::Binary),
   ))(s)
+}
+
+fn parse_tuple_operator(s: Tokens) -> ParseResult<Vec<ExpressionNode>> {
+  map(
+    tuple((
+      parse_symbol(Symbol::LeftParens),
+      separated_nonempty_list(parse_symbol(Symbol::Comma), parse_expression_node),
+      opt(parse_symbol(Symbol::Comma)),
+      parse_symbol(Symbol::RightParens),
+    )),
+    |(_, expression_list, _, _)| expression_list,
+  )(s)
 }
 
 fn parse_index_operator(s: Tokens) -> ParseResult<ExpressionNode> {
@@ -132,22 +151,17 @@ fn parse_index_operator(s: Tokens) -> ParseResult<ExpressionNode> {
   )(s)
 }
 
+fn parse_await_operator(s: Tokens) -> ParseResult<()> {
+  map(
+    tuple((parse_symbol(Symbol::Dot), parse_keyword(Keyword::Await))),
+    |_| (),
+  )(s)
+}
+
 fn parse_field_operator(s: Tokens) -> ParseResult<IdentNode> {
   map(
     tuple((parse_symbol(Symbol::Dot), parse_ident_node)),
     |(_, ident)| ident,
-  )(s)
-}
-
-fn parse_tuple_operator(s: Tokens) -> ParseResult<Vec<ExpressionNode>> {
-  map(
-    tuple((
-      parse_symbol(Symbol::LeftParens),
-      separated_nonempty_list(parse_symbol(Symbol::Comma), parse_expression_node),
-      opt(parse_symbol(Symbol::Comma)),
-      parse_symbol(Symbol::RightParens),
-    )),
-    |(_, expression_list, _, _)| expression_list,
   )(s)
 }
 
@@ -246,6 +260,19 @@ mod tests {
         })),
         index: Box::new(ExpressionNode::Literal(LiteralValueNode::Int(1)))
       })
+    );
+  }
+
+  #[test]
+  fn await_operrator() {
+    let source = "foo.await";
+    assert_eq!(
+      compile(source),
+      ExpressionNode::Await(Box::new(ExpressionNode::Path(PathNode {
+        ident_list: vec![IdentNode {
+          raw: "foo".to_owned()
+        }]
+      })))
     );
   }
 

@@ -271,6 +271,7 @@ pub enum ExpressionNode {
   Index(IndexNode),
   BinaryOperator(BinaryOperatorNode),
   UnaryOperator(UnaryOperatorNode),
+  Await(Box<ExpressionNode>),
   Field(ExpressionFieldNode),
   Struct(ExpressionStructNode),
 }
