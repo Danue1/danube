@@ -10,11 +10,48 @@ type LexSpan<'a> = nom_locate::LocatedSpan<&'a str>;
 type LexResult<'a, T> = nom::IResult<LexSpan<'a>, T, Error<'a>>;
 
 pub fn lex(s: &str) -> LexResult<Vec<Token>> {
-  many0(map(tuple((ws, parse_token)), |(_, token)| token))(nom_locate::LocatedSpan::new(s))
+  fold_many0(
+    alt((map(parse_ignorable, |_| None), map(parse_token, Some))),
+    vec![],
+    |mut token_list, token| {
+      if let Some(token) = token {
+        token_list.push(token);
+      }
+      token_list
+    },
+  )(nom_locate::LocatedSpan::new(s))
 }
 
-fn ws(s: LexSpan) -> LexResult<()> {
-  map(many0(is_a(" \t\r\n")), |_| ())(s)
+fn parse_ignorable(s: LexSpan) -> LexResult<()> {
+  alt((parse_whitespace, parse_comment_line, parse_comment_block))(s)
+}
+
+fn parse_whitespace(s: LexSpan) -> LexResult<()> {
+  map(many1(is_a(" \t\r\n")), |_| ())(s)
+}
+
+fn parse_comment_line(s: LexSpan) -> LexResult<()> {
+  let (s, _) = tag("//")(s)?;
+
+  if let Some(line) = s.fragment().lines().next() {
+    let (s, _) = take(line.len())(s)?;
+
+    Ok((s, ()))
+  } else {
+    Ok((s, ()))
+  }
+}
+
+fn parse_comment_block(s: LexSpan) -> LexResult<()> {
+  let (s, _) = tag("/*")(s)?;
+
+  if let Some((size, _)) = s.fragment().match_indices("*/").next() {
+    let (s, _) = take(size + 2)(s)?;
+
+    Ok((s, ()))
+  } else {
+    Ok((LexSpan::new(""), ()))
+  }
 }
 
 fn parse_token(s: LexSpan) -> LexResult<Token> {
