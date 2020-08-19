@@ -6,7 +6,7 @@ pub(super) fn parse_type_node(s: Tokens) -> ParseResult<TypeNode> {
       TypeNode::Array(Box::new(node))
     }),
     map(parse_type_tuple_node, TypeNode::Tuple),
-    map(parse_ident_node, TypeNode::Ident),
+    map(parse_path_node, TypeNode::Path),
   ))(s)
 }
 

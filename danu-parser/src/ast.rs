@@ -139,15 +139,15 @@ pub enum AssignSugarKind {
 #[derive(Debug, PartialEq)]
 pub struct ImplementNode {
   pub generic: Option<GenericNode>,
-  pub target: IdentNode,
+  pub target: PathNode,
   pub item_list: Vec<ImplementItemNode>,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct ImplementTraitNode {
-  pub target: IdentNode,
+  pub target: PathNode,
   pub target_generic: Option<GenericNode>,
-  pub trait_ident: IdentNode,
+  pub trait_ident: PathNode,
   pub generic: Option<GenericNode>,
   pub item_list: Vec<ImplementItemNode>,
 }
@@ -215,7 +215,7 @@ pub struct TraitItemFunctionNode {
 pub enum TypeNode {
   Array(Box<TypeArrayNode>),
   Tuple(Vec<TypeNode>),
-  Ident(IdentNode),
+  Path(PathNode),
 }
 
 #[derive(Debug, PartialEq, Clone)]

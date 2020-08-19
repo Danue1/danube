@@ -60,8 +60,10 @@ mod tests {
             raw: "foo".to_owned()
           }]
         }),
-        ty: Some(TypeNode::Ident(IdentNode {
-          raw: "bool".to_owned()
+        ty: Some(TypeNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "bool".to_owned()
+          }]
         })),
         value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
       }

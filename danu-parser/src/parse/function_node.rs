@@ -111,8 +111,10 @@ mod tests {
           ident: IdentNode {
             raw: "bar".to_owned()
           },
-          ty: TypeNode::Ident(IdentNode {
-            raw: "Bar".to_owned()
+          ty: TypeNode::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "Bar".to_owned()
+            }]
           })
         }],
         return_type: None,
@@ -136,16 +138,20 @@ mod tests {
             ident: IdentNode {
               raw: "bar".to_owned()
             },
-            ty: TypeNode::Ident(IdentNode {
-              raw: "Bar".to_owned()
+            ty: TypeNode::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "Bar".to_owned()
+              }]
             })
           },
           FunctionArgumentNode {
             ident: IdentNode {
               raw: "baz".to_owned()
             },
-            ty: TypeNode::Ident(IdentNode {
-              raw: "Baz".to_owned()
+            ty: TypeNode::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "Baz".to_owned()
+              }]
             })
           }
         ],

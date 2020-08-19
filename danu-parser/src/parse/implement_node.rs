@@ -4,7 +4,7 @@ pub(super) fn parse_implement_node(s: Tokens) -> ParseResult<ImplementNode> {
   map(
     tuple((
       parse_keyword(Keyword::Impl),
-      parse_ident_node,
+      parse_path_node,
       opt(parse_generic_node),
       parse_symbol(Symbol::LeftBrace),
       many1(parse_implement_item_node),
@@ -41,16 +41,20 @@ mod tests {
     assert_eq!(
       compile(source),
       ImplementNode {
-        target: IdentNode {
-          raw: "Foo".to_owned()
+        target: PathNode {
+          ident_list: vec![IdentNode {
+            raw: "Foo".to_owned()
+          }]
         },
         generic: None,
         item_list: vec![ImplementItemNode::Constant(ConstantNode {
           ident: IdentNode {
             raw: "BAR".to_owned()
           },
-          ty: TypeNode::Ident(IdentNode {
-            raw: "Baz".to_owned()
+          ty: TypeNode::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "Baz".to_owned()
+            }]
           }),
           value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
         })]
@@ -66,8 +70,10 @@ mod tests {
     assert_eq!(
       compile(source),
       ImplementNode {
-        target: IdentNode {
-          raw: "Foo".to_owned()
+        target: PathNode {
+          ident_list: vec![IdentNode {
+            raw: "Foo".to_owned()
+          }]
         },
         generic: None,
         item_list: vec![ImplementItemNode::Function(FunctionNode {

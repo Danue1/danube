@@ -42,8 +42,10 @@ mod tests {
         },
         generic: None,
         fields: StructFieldsNode::Unnamed(StructUnnamedFieldsNode {
-          node_list: vec![TypeNode::Ident(IdentNode {
-            raw: "Bar".to_owned()
+          node_list: vec![TypeNode::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "Bar".to_owned()
+            }]
           })]
         })
       }
@@ -62,11 +64,15 @@ mod tests {
         generic: None,
         fields: StructFieldsNode::Unnamed(StructUnnamedFieldsNode {
           node_list: vec![
-            TypeNode::Ident(IdentNode {
-              raw: "Bar".to_owned()
+            TypeNode::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "Bar".to_owned()
+              }]
             }),
-            TypeNode::Ident(IdentNode {
-              raw: "Baz".to_owned()
+            TypeNode::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "Baz".to_owned()
+              }]
             })
           ]
         })
@@ -89,8 +95,10 @@ mod tests {
             IdentNode {
               raw: "bar".to_owned()
             },
-            TypeNode::Ident(IdentNode {
-              raw: "Bar".to_owned()
+            TypeNode::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "Bar".to_owned()
+              }]
             })
           )]
         })
@@ -114,16 +122,20 @@ mod tests {
               IdentNode {
                 raw: "bar".to_owned()
               },
-              TypeNode::Ident(IdentNode {
-                raw: "Bar".to_owned()
+              TypeNode::Path(PathNode {
+                ident_list: vec![IdentNode {
+                  raw: "Bar".to_owned()
+                }]
               })
             ),
             (
               IdentNode {
                 raw: "baz".to_owned()
               },
-              TypeNode::Ident(IdentNode {
-                raw: "Baz".to_owned()
+              TypeNode::Path(PathNode {
+                ident_list: vec![IdentNode {
+                  raw: "Baz".to_owned()
+                }]
               })
             ),
           ]
@@ -150,8 +162,10 @@ mod tests {
           trait_list: vec![],
         }),
         fields: StructFieldsNode::Unnamed(StructUnnamedFieldsNode {
-          node_list: vec![TypeNode::Ident(IdentNode {
-            raw: "T".to_owned()
+          node_list: vec![TypeNode::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "T".to_owned()
+            }]
           })]
         })
       }
@@ -180,8 +194,10 @@ mod tests {
           }],
         }),
         fields: StructFieldsNode::Unnamed(StructUnnamedFieldsNode {
-          node_list: vec![TypeNode::Ident(IdentNode {
-            raw: "T".to_owned()
+          node_list: vec![TypeNode::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "T".to_owned()
+            }]
           })]
         })
       }
@@ -217,8 +233,10 @@ mod tests {
           ],
         }),
         fields: StructFieldsNode::Unnamed(StructUnnamedFieldsNode {
-          node_list: vec![TypeNode::Ident(IdentNode {
-            raw: "T".to_owned()
+          node_list: vec![TypeNode::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "T".to_owned()
+            }]
           })]
         })
       }

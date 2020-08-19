@@ -49,8 +49,10 @@ mod test_constant {
           ident: IdentNode {
             raw: "FOO".to_owned()
           },
-          ty: TypeNode::Ident(IdentNode {
-            raw: "Bar".to_owned()
+          ty: TypeNode::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "Bar".to_owned()
+            }]
           }),
           default_value: None,
         })]
@@ -74,8 +76,10 @@ mod test_constant {
           ident: IdentNode {
             raw: "FOO".to_owned()
           },
-          ty: TypeNode::Ident(IdentNode {
-            raw: "Bar".to_owned()
+          ty: TypeNode::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "Bar".to_owned()
+            }]
           }),
           default_value: Some(LiteralValueNode::Bool(true)),
         })]
@@ -145,8 +149,10 @@ mod test_function {
             ident: IdentNode {
               raw: "bar".to_owned()
             },
-            ty: TypeNode::Ident(IdentNode {
-              raw: "Bar".to_owned()
+            ty: TypeNode::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "Bar".to_owned()
+              }]
             })
           }],
           return_type: None,
@@ -178,16 +184,20 @@ mod test_function {
               ident: IdentNode {
                 raw: "bar".to_owned()
               },
-              ty: TypeNode::Ident(IdentNode {
-                raw: "Bar".to_owned()
+              ty: TypeNode::Path(PathNode {
+                ident_list: vec![IdentNode {
+                  raw: "Bar".to_owned()
+                }]
               })
             },
             FunctionArgumentNode {
               ident: IdentNode {
                 raw: "baz".to_owned()
               },
-              ty: TypeNode::Ident(IdentNode {
-                raw: "Baz".to_owned()
+              ty: TypeNode::Path(PathNode {
+                ident_list: vec![IdentNode {
+                  raw: "Baz".to_owned()
+                }]
               })
             }
           ],
@@ -223,8 +233,10 @@ mod test_function {
             ident: IdentNode {
               raw: "FOO".to_owned(),
             },
-            ty: TypeNode::Ident(IdentNode {
-              raw: "bool".to_owned(),
+            ty: TypeNode::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "bool".to_owned(),
+              }]
             }),
             value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
           })]),
@@ -256,8 +268,10 @@ mod test_function {
             ident: IdentNode {
               raw: "bar".to_owned()
             },
-            ty: TypeNode::Ident(IdentNode {
-              raw: "Bar".to_owned()
+            ty: TypeNode::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "Bar".to_owned()
+              }]
             })
           }],
           return_type: None,
@@ -265,8 +279,10 @@ mod test_function {
             ident: IdentNode {
               raw: "FOO".to_owned(),
             },
-            ty: TypeNode::Ident(IdentNode {
-              raw: "bool".to_owned(),
+            ty: TypeNode::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "bool".to_owned(),
+              }]
             }),
             value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
           })]),
@@ -299,16 +315,20 @@ mod test_function {
               ident: IdentNode {
                 raw: "bar".to_owned()
               },
-              ty: TypeNode::Ident(IdentNode {
-                raw: "Bar".to_owned()
+              ty: TypeNode::Path(PathNode {
+                ident_list: vec![IdentNode {
+                  raw: "Bar".to_owned()
+                }]
               })
             },
             FunctionArgumentNode {
               ident: IdentNode {
                 raw: "baz".to_owned()
               },
-              ty: TypeNode::Ident(IdentNode {
-                raw: "Baz".to_owned()
+              ty: TypeNode::Path(PathNode {
+                ident_list: vec![IdentNode {
+                  raw: "Baz".to_owned()
+                }]
               })
             }
           ],
@@ -317,8 +337,10 @@ mod test_function {
             ident: IdentNode {
               raw: "FOO".to_owned(),
             },
-            ty: TypeNode::Ident(IdentNode {
-              raw: "bool".to_owned(),
+            ty: TypeNode::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "bool".to_owned(),
+              }]
             }),
             value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
           })]),

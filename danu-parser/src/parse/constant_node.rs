@@ -35,8 +35,10 @@ mod tests {
         ident: IdentNode {
           raw: "FOO".to_owned()
         },
-        ty: TypeNode::Ident(IdentNode {
-          raw: "bool".to_owned()
+        ty: TypeNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "bool".to_owned()
+          }]
         }),
         value: ExpressionNode::Literal(LiteralValueNode::Bool(true))
       }
@@ -53,8 +55,10 @@ mod tests {
           raw: "FOO".to_owned()
         },
         ty: TypeNode::Array(Box::new(TypeArrayNode {
-          ty: TypeNode::Ident(IdentNode {
-            raw: "bool".to_owned()
+          ty: TypeNode::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "bool".to_owned()
+            }]
           }),
           size: 0
         })),
@@ -72,8 +76,10 @@ mod tests {
         ident: IdentNode {
           raw: "FOO".to_owned()
         },
-        ty: TypeNode::Ident(IdentNode {
-          raw: "bool".to_owned()
+        ty: TypeNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "bool".to_owned()
+          }]
         }),
         value: ExpressionNode::Array(vec![])
       }
@@ -89,8 +95,10 @@ mod tests {
         ident: IdentNode {
           raw: "FOO".to_owned()
         },
-        ty: TypeNode::Ident(IdentNode {
-          raw: "bool".to_owned()
+        ty: TypeNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "bool".to_owned()
+          }]
         }),
         value: ExpressionNode::Array(vec![ExpressionNode::Literal(LiteralValueNode::Bool(true))])
       }
