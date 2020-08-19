@@ -53,7 +53,7 @@ mod test_constant {
             raw: "FOO".to_owned()
           },
           ty: TypeNode::Path(
-            TypeImmutablity::Yes,
+            Immutablity::Yes,
             PathNode {
               ident_list: vec![IdentNode {
                 raw: "Bar".to_owned()
@@ -84,7 +84,7 @@ mod test_constant {
             raw: "FOO".to_owned()
           },
           ty: TypeNode::Path(
-            TypeImmutablity::Yes,
+            Immutablity::Yes,
             PathNode {
               ident_list: vec![IdentNode {
                 raw: "Bar".to_owned()
@@ -160,12 +160,12 @@ mod test_function {
           },
           generic: None,
           argument_list: vec![FunctionArgumentNode {
-            is_mutable: false,
+            immutablity: Immutablity::Yes,
             ident: IdentNode {
               raw: "bar".to_owned()
             },
             ty: TypeNode::Path(
-              TypeImmutablity::Yes,
+              Immutablity::Yes,
               PathNode {
                 ident_list: vec![IdentNode {
                   raw: "Bar".to_owned()
@@ -201,12 +201,12 @@ mod test_function {
           generic: None,
           argument_list: vec![
             FunctionArgumentNode {
-              is_mutable: false,
+              immutablity: Immutablity::Yes,
               ident: IdentNode {
                 raw: "bar".to_owned()
               },
               ty: TypeNode::Path(
-                TypeImmutablity::Yes,
+                Immutablity::Yes,
                 PathNode {
                   ident_list: vec![IdentNode {
                     raw: "Bar".to_owned()
@@ -215,12 +215,12 @@ mod test_function {
               )
             },
             FunctionArgumentNode {
-              is_mutable: false,
+              immutablity: Immutablity::Yes,
               ident: IdentNode {
                 raw: "baz".to_owned()
               },
               ty: TypeNode::Path(
-                TypeImmutablity::Yes,
+                Immutablity::Yes,
                 PathNode {
                   ident_list: vec![IdentNode {
                     raw: "Baz".to_owned()
@@ -265,7 +265,7 @@ mod test_function {
               raw: "FOO".to_owned(),
             },
             ty: TypeNode::Path(
-              TypeImmutablity::Yes,
+              Immutablity::Yes,
               PathNode {
                 ident_list: vec![IdentNode {
                   raw: "bool".to_owned(),
@@ -301,12 +301,12 @@ mod test_function {
           },
           generic: None,
           argument_list: vec![FunctionArgumentNode {
-            is_mutable: false,
+            immutablity: Immutablity::Yes,
             ident: IdentNode {
               raw: "bar".to_owned()
             },
             ty: TypeNode::Path(
-              TypeImmutablity::Yes,
+              Immutablity::Yes,
               PathNode {
                 ident_list: vec![IdentNode {
                   raw: "Bar".to_owned()
@@ -321,7 +321,7 @@ mod test_function {
               raw: "FOO".to_owned(),
             },
             ty: TypeNode::Path(
-              TypeImmutablity::Yes,
+              Immutablity::Yes,
               PathNode {
                 ident_list: vec![IdentNode {
                   raw: "bool".to_owned(),
@@ -358,12 +358,12 @@ mod test_function {
           generic: None,
           argument_list: vec![
             FunctionArgumentNode {
-              is_mutable: false,
+              immutablity: Immutablity::Yes,
               ident: IdentNode {
                 raw: "bar".to_owned()
               },
               ty: TypeNode::Path(
-                TypeImmutablity::Yes,
+                Immutablity::Yes,
                 PathNode {
                   ident_list: vec![IdentNode {
                     raw: "Bar".to_owned()
@@ -372,12 +372,12 @@ mod test_function {
               )
             },
             FunctionArgumentNode {
-              is_mutable: false,
+              immutablity: Immutablity::Yes,
               ident: IdentNode {
                 raw: "baz".to_owned()
               },
               ty: TypeNode::Path(
-                TypeImmutablity::Yes,
+                Immutablity::Yes,
                 PathNode {
                   ident_list: vec![IdentNode {
                     raw: "Baz".to_owned()
@@ -393,7 +393,7 @@ mod test_function {
               raw: "FOO".to_owned(),
             },
             ty: TypeNode::Path(
-              TypeImmutablity::Yes,
+              Immutablity::Yes,
               PathNode {
                 ident_list: vec![IdentNode {
                   raw: "bool".to_owned(),

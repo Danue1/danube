@@ -116,12 +116,12 @@ mod tests {
         },
         generic: None,
         argument_list: vec![FunctionArgumentNode {
-          is_mutable: false,
+          immutablity: Immutablity::Yes,
           ident: IdentNode {
             raw: "bar".to_owned()
           },
           ty: TypeNode::Path(
-            TypeImmutablity::Yes,
+            Immutablity::Yes,
             PathNode {
               ident_list: vec![IdentNode {
                 raw: "Bar".to_owned()
@@ -149,12 +149,12 @@ mod tests {
         generic: None,
         argument_list: vec![
           FunctionArgumentNode {
-            is_mutable: false,
+            immutablity: Immutablity::Yes,
             ident: IdentNode {
               raw: "bar".to_owned()
             },
             ty: TypeNode::Path(
-              TypeImmutablity::Yes,
+              Immutablity::Yes,
               PathNode {
                 ident_list: vec![IdentNode {
                   raw: "Bar".to_owned()
@@ -163,12 +163,12 @@ mod tests {
             )
           },
           FunctionArgumentNode {
-            is_mutable: false,
+            immutablity: Immutablity::Yes,
             ident: IdentNode {
               raw: "baz".to_owned()
             },
             ty: TypeNode::Path(
-              TypeImmutablity::Yes,
+              Immutablity::Yes,
               PathNode {
                 ident_list: vec![IdentNode {
                   raw: "Baz".to_owned()
@@ -196,12 +196,12 @@ mod tests {
         },
         generic: None,
         argument_list: vec![FunctionArgumentNode {
-          is_mutable: true,
+          immutablity: Immutablity::Nope,
           ident: IdentNode {
             raw: "bar".to_owned()
           },
           ty: TypeNode::Path(
-            TypeImmutablity::Yes,
+            Immutablity::Yes,
             PathNode {
               ident_list: vec![IdentNode {
                 raw: "Bar".to_owned()
@@ -228,12 +228,12 @@ mod tests {
         },
         generic: None,
         argument_list: vec![FunctionArgumentNode {
-          is_mutable: false,
+          immutablity: Immutablity::Yes,
           ident: IdentNode {
             raw: "bar".to_owned()
           },
           ty: TypeNode::Path(
-            TypeImmutablity::No,
+            Immutablity::Nope,
             PathNode {
               ident_list: vec![IdentNode {
                 raw: "Bar".to_owned()
@@ -348,7 +348,8 @@ mod tests {
         generic: None,
         argument_list: vec![],
         return_type: None,
-        body: vec![StatementNode::LetMut(LetMutNode {
+        body: vec![StatementNode::Let(LetNode {
+          immutablity: Immutablity::Nope,
           pattern: PatternNode::Path(PathNode {
             ident_list: vec![
               IdentNode {

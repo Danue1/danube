@@ -6,7 +6,6 @@ pub(super) fn parse_statement_node(s: Tokens) -> ParseResult<StatementNode> {
     map(parse_static_node, StatementNode::Static),
     map(parse_assign_sugar_node, StatementNode::AssignSugar),
     map(parse_let_node, StatementNode::Let),
-    map(parse_let_mut_node, StatementNode::LetMut),
     map(parse_statement_conditional_node, StatementNode::Conditional),
     map(parse_loop_node, StatementNode::Loop),
     map(parse_while_node, StatementNode::While),

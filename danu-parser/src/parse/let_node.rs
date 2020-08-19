@@ -4,6 +4,7 @@ pub(super) fn parse_let_node(s: Tokens) -> ParseResult<LetNode> {
   map(
     tuple((
       parse_keyword(Keyword::Let),
+      parse_immutablity,
       parse_pattern_node,
       opt(map(
         tuple((parse_symbol(Symbol::Colon), parse_type_node)),
@@ -13,12 +14,17 @@ pub(super) fn parse_let_node(s: Tokens) -> ParseResult<LetNode> {
       parse_expression_node,
       parse_symbol(Symbol::Semicolon),
     )),
-    |(_, pattern, ty, _, value, _)| LetNode { pattern, ty, value },
+    |(_, immutablity, pattern, ty, _, value, _)| LetNode {
+      immutablity,
+      pattern,
+      ty,
+      value,
+    },
   )(s)
 }
 
 #[cfg(test)]
-mod tests {
+mod immutable_tests {
   use super::*;
 
   fn compile(s: &str) -> LetNode {
@@ -38,6 +44,7 @@ mod tests {
     assert_eq!(
       compile(source),
       LetNode {
+        immutablity: Immutablity::Yes,
         pattern: PatternNode::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
@@ -55,13 +62,14 @@ mod tests {
     assert_eq!(
       compile(source),
       LetNode {
+        immutablity: Immutablity::Yes,
         pattern: PatternNode::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         }),
         ty: Some(TypeNode::Path(
-          TypeImmutablity::Yes,
+          Immutablity::Yes,
           PathNode {
             ident_list: vec![IdentNode {
               raw: "bool".to_owned()
@@ -79,6 +87,7 @@ mod tests {
     assert_eq!(
       compile(source),
       LetNode {
+        immutablity: Immutablity::Yes,
         pattern: PatternNode::UnnamedStruct(UnnamedStructNode {
           path: None,
           field_list: vec![PatternNode::Path(PathNode {
@@ -99,6 +108,7 @@ mod tests {
     assert_eq!(
       compile(source),
       LetNode {
+        immutablity: Immutablity::Yes,
         pattern: PatternNode::UnnamedStruct(UnnamedStructNode {
           path: Some(PathNode {
             ident_list: vec![IdentNode {
@@ -123,6 +133,7 @@ mod tests {
     assert_eq!(
       compile(source),
       LetNode {
+        immutablity: Immutablity::Yes,
         pattern: PatternNode::UnnamedStruct(UnnamedStructNode {
           path: Some(PathNode {
             ident_list: vec![IdentNode {
@@ -154,6 +165,7 @@ mod tests {
     assert_eq!(
       compile(source),
       LetNode {
+        immutablity: Immutablity::Yes,
         pattern: PatternNode::NamedStruct(NamedStructNode {
           path: None,
           field_list: vec![FieldNode {
@@ -175,6 +187,7 @@ mod tests {
     assert_eq!(
       compile(source),
       LetNode {
+        immutablity: Immutablity::Yes,
         pattern: PatternNode::NamedStruct(NamedStructNode {
           path: Some(PathNode {
             ident_list: vec![IdentNode {
@@ -200,6 +213,7 @@ mod tests {
     assert_eq!(
       compile(source),
       LetNode {
+        immutablity: Immutablity::Yes,
         pattern: PatternNode::NamedStruct(NamedStructNode {
           path: Some(PathNode {
             ident_list: vec![IdentNode {
@@ -218,6 +232,88 @@ mod tests {
                 raw: "bar".to_owned()
               },
               pattern: None
+            }
+          ]
+        }),
+        ty: None,
+        value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+      }
+    );
+  }
+}
+
+#[cfg(test)]
+mod mutable_tests {
+  use super::*;
+
+  fn compile(s: &str) -> LetNode {
+    let (_, token_list) = lex(s).unwrap();
+    match parse_let_node(Tokens::new(&token_list)) {
+      Ok((_, node)) => node,
+      Err(error) => {
+        dbg!(error);
+        panic!()
+      }
+    }
+  }
+
+  #[test]
+  fn untyped() {
+    let source = "let mut foo = true;";
+    assert_eq!(
+      compile(source),
+      LetNode {
+        immutablity: Immutablity::Nope,
+        pattern: PatternNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "foo".to_owned()
+          }]
+        }),
+        ty: None,
+        value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+      }
+    );
+  }
+
+  #[test]
+  fn typed() {
+    let source = "let mut foo: bool = true;";
+    assert_eq!(
+      compile(source),
+      LetNode {
+        immutablity: Immutablity::Nope,
+        pattern: PatternNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "foo".to_owned()
+          }]
+        }),
+        ty: Some(TypeNode::Path(
+          Immutablity::Yes,
+          PathNode {
+            ident_list: vec![IdentNode {
+              raw: "bool".to_owned()
+            }]
+          }
+        )),
+        value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+      }
+    );
+  }
+
+  #[test]
+  fn pattern_unnamed() {
+    let source = "let mut Foo::Bar = true;";
+    assert_eq!(
+      compile(source),
+      LetNode {
+        immutablity: Immutablity::Nope,
+        pattern: PatternNode::Path(PathNode {
+          ident_list: vec![
+            IdentNode {
+              raw: "Foo".to_owned()
+            },
+            IdentNode {
+              raw: "Bar".to_owned()
             }
           ]
         }),

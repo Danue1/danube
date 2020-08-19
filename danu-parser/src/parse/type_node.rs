@@ -1,7 +1,7 @@
 use super::*;
 
 pub(super) fn parse_type_node(s: Tokens) -> ParseResult<TypeNode> {
-  let (s, immutablitity) = parse_type_immutablity(s)?;
+  let (s, immutablitity) = parse_immutablity(s)?;
   if let Ok((s, node)) = parse_type_array_node(s.clone()) {
     Ok((s, TypeNode::Array(immutablitity, node)))
   } else if let Ok((s, node)) = parse_type_tuple_node(s.clone()) {

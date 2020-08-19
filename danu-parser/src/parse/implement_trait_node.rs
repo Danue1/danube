@@ -69,7 +69,7 @@ mod tests {
             raw: "BAZ".to_owned()
           },
           ty: TypeNode::Path(
-            TypeImmutablity::Yes,
+            Immutablity::Yes,
             PathNode {
               ident_list: vec![IdentNode {
                 raw: "Bax".to_owned()

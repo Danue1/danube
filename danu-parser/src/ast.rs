@@ -205,7 +205,7 @@ pub struct EnumVariantNode {
 #[derive(Debug, PartialEq)]
 pub struct FunctionArgumentNode {
   pub ident: IdentNode,
-  pub is_mutable: bool,
+  pub immutablity: Immutablity,
   pub ty: TypeNode,
 }
 
@@ -234,15 +234,9 @@ pub struct TraitItemFunctionNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum TypeNode {
-  Array(TypeImmutablity, TypeArrayNode),
-  Tuple(TypeImmutablity, Vec<TypeNode>),
-  Path(TypeImmutablity, PathNode),
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub enum TypeImmutablity {
-  Yes,
-  No,
+  Array(Immutablity, TypeArrayNode),
+  Tuple(Immutablity, Vec<TypeNode>),
+  Path(Immutablity, PathNode),
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -252,12 +246,17 @@ pub struct TypeArrayNode {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+pub enum Immutablity {
+  Yes,
+  Nope,
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub enum StatementNode {
   Constant(ConstantNode),
   Static(StaticNode),
   AssignSugar(AssignSugarNode),
   Let(LetNode),
-  LetMut(LetMutNode),
   Conditional(StatementConditionalNode),
   Loop(LoopNode),
   While(WhileNode),
@@ -267,13 +266,7 @@ pub enum StatementNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct LetNode {
-  pub pattern: PatternNode,
-  pub ty: Option<TypeNode>,
-  pub value: ExpressionNode,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct LetMutNode {
+  pub immutablity: Immutablity,
   pub pattern: PatternNode,
   pub ty: Option<TypeNode>,
   pub value: ExpressionNode,

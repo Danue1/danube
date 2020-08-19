@@ -43,7 +43,7 @@ mod tests {
           raw: "FOO".to_owned()
         },
         ty: TypeNode::Path(
-          TypeImmutablity::Yes,
+          Immutablity::Yes,
           PathNode {
             ident_list: vec![IdentNode {
               raw: "bool".to_owned()
@@ -66,10 +66,10 @@ mod tests {
           raw: "FOO".to_owned()
         },
         ty: TypeNode::Array(
-          TypeImmutablity::Yes,
+          Immutablity::Yes,
           TypeArrayNode {
             ty: Box::new(TypeNode::Path(
-              TypeImmutablity::Yes,
+              Immutablity::Yes,
               PathNode {
                 ident_list: vec![IdentNode {
                   raw: "bool".to_owned()
@@ -95,7 +95,7 @@ mod tests {
           raw: "FOO".to_owned()
         },
         ty: TypeNode::Path(
-          TypeImmutablity::Yes,
+          Immutablity::Yes,
           PathNode {
             ident_list: vec![IdentNode {
               raw: "bool".to_owned()
@@ -118,7 +118,7 @@ mod tests {
           raw: "FOO".to_owned()
         },
         ty: TypeNode::Path(
-          TypeImmutablity::Yes,
+          Immutablity::Yes,
           PathNode {
             ident_list: vec![IdentNode {
               raw: "bool".to_owned()

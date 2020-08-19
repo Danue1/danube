@@ -46,7 +46,7 @@ mod tests {
         generic: None,
         fields: StructFieldsNode::Unnamed(StructUnnamedFieldsNode {
           node_list: vec![TypeNode::Path(
-            TypeImmutablity::Yes,
+            Immutablity::Yes,
             PathNode {
               ident_list: vec![IdentNode {
                 raw: "Bar".to_owned()
@@ -72,7 +72,7 @@ mod tests {
         fields: StructFieldsNode::Unnamed(StructUnnamedFieldsNode {
           node_list: vec![
             TypeNode::Path(
-              TypeImmutablity::Yes,
+              Immutablity::Yes,
               PathNode {
                 ident_list: vec![IdentNode {
                   raw: "Bar".to_owned()
@@ -80,7 +80,7 @@ mod tests {
               }
             ),
             TypeNode::Path(
-              TypeImmutablity::Yes,
+              Immutablity::Yes,
               PathNode {
                 ident_list: vec![IdentNode {
                   raw: "Baz".to_owned()
@@ -110,7 +110,7 @@ mod tests {
               raw: "bar".to_owned()
             },
             TypeNode::Path(
-              TypeImmutablity::Yes,
+              Immutablity::Yes,
               PathNode {
                 ident_list: vec![IdentNode {
                   raw: "Bar".to_owned()
@@ -141,7 +141,7 @@ mod tests {
                 raw: "bar".to_owned()
               },
               TypeNode::Path(
-                TypeImmutablity::Yes,
+                Immutablity::Yes,
                 PathNode {
                   ident_list: vec![IdentNode {
                     raw: "Bar".to_owned()
@@ -154,7 +154,7 @@ mod tests {
                 raw: "baz".to_owned()
               },
               TypeNode::Path(
-                TypeImmutablity::Yes,
+                Immutablity::Yes,
                 PathNode {
                   ident_list: vec![IdentNode {
                     raw: "Baz".to_owned()
@@ -188,7 +188,7 @@ mod tests {
         }),
         fields: StructFieldsNode::Unnamed(StructUnnamedFieldsNode {
           node_list: vec![TypeNode::Path(
-            TypeImmutablity::Yes,
+            Immutablity::Yes,
             PathNode {
               ident_list: vec![IdentNode {
                 raw: "T".to_owned()
@@ -224,7 +224,7 @@ mod tests {
         }),
         fields: StructFieldsNode::Unnamed(StructUnnamedFieldsNode {
           node_list: vec![TypeNode::Path(
-            TypeImmutablity::Yes,
+            Immutablity::Yes,
             PathNode {
               ident_list: vec![IdentNode {
                 raw: "T".to_owned()
@@ -267,7 +267,7 @@ mod tests {
         }),
         fields: StructFieldsNode::Unnamed(StructUnnamedFieldsNode {
           node_list: vec![TypeNode::Path(
-            TypeImmutablity::Yes,
+            Immutablity::Yes,
             PathNode {
               ident_list: vec![IdentNode {
                 raw: "T".to_owned()
