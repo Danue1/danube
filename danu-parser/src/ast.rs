@@ -1,4 +1,12 @@
 #[derive(Debug, PartialEq, Clone)]
+pub enum Visibility {
+  Public,
+  Super,
+  Module,
+  Restricted(PathNode),
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct IdentNode {
   pub raw: String,
 }
@@ -25,6 +33,7 @@ pub enum ItemNode {
 
 #[derive(Debug, PartialEq)]
 pub struct UseNode {
+  pub visibility: Option<Visibility>,
   pub kind: UseKind<UseRootNode>,
 }
 
@@ -57,6 +66,7 @@ pub enum UseExtra {
 
 #[derive(Debug, PartialEq)]
 pub struct StructNode {
+  pub visibility: Option<Visibility>,
   pub ident: IdentNode,
   pub generic: Option<GenericNode>,
   pub fields: StructFieldsNode,
@@ -70,6 +80,7 @@ pub struct GenericNode {
 
 #[derive(Debug, PartialEq)]
 pub struct EnumNode {
+  pub visibility: Option<Visibility>,
   pub ident: IdentNode,
   pub generic: Option<GenericNode>,
   pub variant_list: Vec<EnumVariantNode>,
@@ -77,6 +88,7 @@ pub struct EnumNode {
 
 #[derive(Debug, PartialEq)]
 pub struct FunctionNode {
+  pub visibility: Option<Visibility>,
   pub is_async: bool,
   pub ident: IdentNode,
   pub generic: Option<GenericNode>,
@@ -87,12 +99,14 @@ pub struct FunctionNode {
 
 #[derive(Debug, PartialEq)]
 pub struct TypeAliasNode {
+  pub visibility: Option<Visibility>,
   pub ident: IdentNode,
   pub ty: TypeNode,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct TraitNode {
+  pub visibility: Option<Visibility>,
   pub ident: IdentNode,
   pub generic: Option<GenericNode>,
   pub item_list: Vec<TraitItemNode>,
@@ -100,6 +114,7 @@ pub struct TraitNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ConstantNode {
+  pub visibility: Option<Visibility>,
   pub ident: IdentNode,
   pub ty: TypeNode,
   pub value: ExpressionNode,
@@ -107,6 +122,7 @@ pub struct ConstantNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct StaticNode {
+  pub visibility: Option<Visibility>,
   pub ident: IdentNode,
   pub ty: TypeNode,
   pub value: LiteralValueNode,
@@ -139,6 +155,7 @@ pub enum AssignSugarKind {
 
 #[derive(Debug, PartialEq)]
 pub struct ImplementNode {
+  pub visibility: Option<Visibility>,
   pub generic: Option<GenericNode>,
   pub target: PathNode,
   pub item_list: Vec<ImplementItemNode>,
@@ -146,6 +163,7 @@ pub struct ImplementNode {
 
 #[derive(Debug, PartialEq)]
 pub struct ImplementTraitNode {
+  pub visibility: Option<Visibility>,
   pub target: PathNode,
   pub target_generic: Option<GenericNode>,
   pub trait_ident: PathNode,

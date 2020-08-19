@@ -3,6 +3,7 @@ use super::*;
 pub(super) fn parse_trait_node(s: Tokens) -> ParseResult<TraitNode> {
   map(
     tuple((
+      opt(parse_visibility),
       parse_keyword(Keyword::Trait),
       parse_ident_node,
       opt(parse_generic_node),
@@ -10,7 +11,8 @@ pub(super) fn parse_trait_node(s: Tokens) -> ParseResult<TraitNode> {
       many1(parse_trait_item_node),
       parse_symbol(Symbol::RightBrace),
     )),
-    |(_, ident, generic, _, item_list, _)| TraitNode {
+    |(visibility, _, ident, generic, _, item_list, _)| TraitNode {
+      visibility,
       ident,
       generic,
       item_list,
@@ -41,6 +43,7 @@ mod test_constant {
     assert_eq!(
       compile(source),
       TraitNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
@@ -68,6 +71,7 @@ mod test_constant {
     assert_eq!(
       compile(source),
       TraitNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
@@ -111,6 +115,7 @@ mod test_function {
     assert_eq!(
       compile(source),
       TraitNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
@@ -137,6 +142,7 @@ mod test_function {
     assert_eq!(
       compile(source),
       TraitNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
@@ -172,6 +178,7 @@ mod test_function {
     assert_eq!(
       compile(source),
       TraitNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
@@ -221,6 +228,7 @@ mod test_function {
     assert_eq!(
       compile(source),
       TraitNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
@@ -234,6 +242,7 @@ mod test_function {
           argument_list: vec![],
           return_type: None,
           body: Some(vec![StatementNode::Constant(ConstantNode {
+            visibility: None,
             ident: IdentNode {
               raw: "FOO".to_owned(),
             },
@@ -259,6 +268,7 @@ mod test_function {
     assert_eq!(
       compile(source),
       TraitNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
@@ -281,6 +291,7 @@ mod test_function {
           }],
           return_type: None,
           body: Some(vec![StatementNode::Constant(ConstantNode {
+            visibility: None,
             ident: IdentNode {
               raw: "FOO".to_owned(),
             },
@@ -306,6 +317,7 @@ mod test_function {
     assert_eq!(
       compile(source),
       TraitNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
@@ -340,6 +352,7 @@ mod test_function {
           ],
           return_type: None,
           body: Some(vec![StatementNode::Constant(ConstantNode {
+            visibility: None,
             ident: IdentNode {
               raw: "FOO".to_owned(),
             },

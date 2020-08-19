@@ -47,6 +47,7 @@ mod use_kind;
 mod use_node;
 mod use_root_ident;
 mod use_root_node;
+mod visibility;
 mod while_node;
 
 use crate::*;
@@ -100,6 +101,7 @@ use use_kind::parse_use_kind;
 use use_node::parse_use_node;
 use use_root_ident::parse_use_root_ident;
 use use_root_node::parse_use_root_node;
+use visibility::parse_visibility;
 use while_node::parse_while_node;
 
 type ParseResult<'a, T> = nom::IResult<Tokens<'a>, T, Error<'a>>;

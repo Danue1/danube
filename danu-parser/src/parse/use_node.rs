@@ -3,11 +3,12 @@ use super::*;
 pub(super) fn parse_use_node(s: Tokens) -> ParseResult<UseNode> {
   map(
     tuple((
+      opt(parse_visibility),
       parse_keyword(Keyword::Use),
       parse_use_kind(parse_use_root_node),
       parse_symbol(Symbol::Semicolon),
     )),
-    |(_, kind, _)| UseNode { kind },
+    |(visibility, _, kind, _)| UseNode { visibility, kind },
   )(s)
 }
 
@@ -28,6 +29,7 @@ mod tests {
     assert_eq!(
       compile(source),
       UseNode {
+        visibility: None,
         kind: UseKind::Unnested(UseRootNode {
           ident: UseRootIdent::Current,
           extra: UseKind::Unnested(UseExtra::Ident(
@@ -47,6 +49,7 @@ mod tests {
     assert_eq!(
       compile(source),
       UseNode {
+        visibility: None,
         kind: UseKind::Unnested(UseRootNode {
           ident: UseRootIdent::Super,
           extra: UseKind::Unnested(UseExtra::Ident(
@@ -66,6 +69,7 @@ mod tests {
     assert_eq!(
       compile(source),
       UseNode {
+        visibility: None,
         kind: UseKind::Unnested(UseRootNode {
           ident: UseRootIdent::Module,
           extra: UseKind::Unnested(UseExtra::Ident(
@@ -85,6 +89,7 @@ mod tests {
     assert_eq!(
       compile(source),
       UseNode {
+        visibility: None,
         kind: UseKind::Unnested(UseRootNode {
           ident: UseRootIdent::Ident(IdentNode {
             raw: "foo".to_owned()
@@ -106,6 +111,7 @@ mod tests {
     assert_eq!(
       compile(source),
       UseNode {
+        visibility: None,
         kind: UseKind::Unnested(UseRootNode {
           ident: UseRootIdent::Ident(IdentNode {
             raw: "foo".to_owned()
@@ -132,6 +138,7 @@ mod tests {
     assert_eq!(
       compile(source),
       UseNode {
+        visibility: None,
         kind: UseKind::Nested(vec![UseRootNode {
           ident: UseRootIdent::Current,
           extra: UseKind::Unnested(UseExtra::Ident(
@@ -151,6 +158,7 @@ mod tests {
     assert_eq!(
       compile(source),
       UseNode {
+        visibility: None,
         kind: UseKind::Nested(vec![
           UseRootNode {
             ident: UseRootIdent::Current,
@@ -181,6 +189,7 @@ mod tests {
     assert_eq!(
       compile(source),
       UseNode {
+        visibility: None,
         kind: UseKind::Nested(vec![UseRootNode {
           ident: UseRootIdent::Current,
           extra: UseKind::Unnested(UseExtra::Ident(

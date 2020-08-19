@@ -3,6 +3,7 @@ use super::*;
 pub(super) fn parse_function_node(s: Tokens) -> ParseResult<FunctionNode> {
   map(
     tuple((
+      opt(parse_visibility),
       opt(parse_keyword(Keyword::Async)),
       parse_keyword(Keyword::Function),
       parse_ident_node,
@@ -11,7 +12,8 @@ pub(super) fn parse_function_node(s: Tokens) -> ParseResult<FunctionNode> {
       opt(parse_function_type),
       parse_function_body,
     )),
-    |(is_async, _, ident, generic, argument_list, return_type, body)| FunctionNode {
+    |(visibility, is_async, _, ident, generic, argument_list, return_type, body)| FunctionNode {
+      visibility,
       is_async: is_async.is_some(),
       ident,
       generic,
@@ -88,6 +90,7 @@ mod tests {
     assert_eq!(
       compile(source),
       FunctionNode {
+        visibility: None,
         is_async: false,
         ident: IdentNode {
           raw: "foo".to_owned()
@@ -106,6 +109,7 @@ mod tests {
     assert_eq!(
       compile(source),
       FunctionNode {
+        visibility: None,
         is_async: false,
         ident: IdentNode {
           raw: "foo".to_owned()
@@ -133,6 +137,7 @@ mod tests {
     assert_eq!(
       compile(source),
       FunctionNode {
+        visibility: None,
         is_async: false,
         ident: IdentNode {
           raw: "foo".to_owned()
@@ -174,6 +179,7 @@ mod tests {
     assert_eq!(
       compile(source),
       FunctionNode {
+        visibility: None,
         is_async: false,
         ident: IdentNode {
           raw: "foo".to_owned()
@@ -201,6 +207,7 @@ mod tests {
     assert_eq!(
       compile(source),
       FunctionNode {
+        visibility: None,
         is_async: false,
         ident: IdentNode {
           raw: "foo".to_owned()
@@ -230,6 +237,7 @@ mod tests {
     assert_eq!(
       compile(source),
       FunctionNode {
+        visibility: None,
         is_async: false,
         ident: IdentNode {
           raw: "foo".to_owned()
@@ -256,6 +264,7 @@ mod tests {
     assert_eq!(
       compile(source),
       FunctionNode {
+        visibility: None,
         is_async: false,
         ident: IdentNode {
           raw: "foo".to_owned()
@@ -287,6 +296,7 @@ mod tests {
     assert_eq!(
       compile(source),
       FunctionNode {
+        visibility: None,
         is_async: true,
         ident: IdentNode {
           raw: "foo".to_owned()

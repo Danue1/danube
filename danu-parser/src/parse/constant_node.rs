@@ -3,6 +3,7 @@ use super::*;
 pub(super) fn parse_constant_node(s: Tokens) -> ParseResult<ConstantNode> {
   map(
     tuple((
+      opt(parse_visibility),
       parse_keyword(Keyword::Const),
       parse_ident_node,
       parse_symbol(Symbol::Colon),
@@ -11,7 +12,12 @@ pub(super) fn parse_constant_node(s: Tokens) -> ParseResult<ConstantNode> {
       parse_expression_node,
       parse_symbol(Symbol::Semicolon),
     )),
-    |(_, ident, _, ty, _, value, _)| ConstantNode { ident, ty, value },
+    |(visibility, _, ident, _, ty, _, value, _)| ConstantNode {
+      visibility,
+      ident,
+      ty,
+      value,
+    },
   )(s)
 }
 
@@ -32,6 +38,7 @@ mod tests {
     assert_eq!(
       compile(source),
       ConstantNode {
+        visibility: None,
         ident: IdentNode {
           raw: "FOO".to_owned()
         },
@@ -51,6 +58,7 @@ mod tests {
     assert_eq!(
       compile(source),
       ConstantNode {
+        visibility: None,
         ident: IdentNode {
           raw: "FOO".to_owned()
         },
@@ -73,6 +81,7 @@ mod tests {
     assert_eq!(
       compile(source),
       ConstantNode {
+        visibility: None,
         ident: IdentNode {
           raw: "FOO".to_owned()
         },
@@ -92,6 +101,7 @@ mod tests {
     assert_eq!(
       compile(source),
       ConstantNode {
+        visibility: None,
         ident: IdentNode {
           raw: "FOO".to_owned()
         },

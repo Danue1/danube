@@ -3,12 +3,14 @@ use super::*;
 pub(super) fn parse_struct_node(s: Tokens) -> ParseResult<StructNode> {
   map(
     tuple((
+      opt(parse_visibility),
       parse_keyword(Keyword::Struct),
       parse_ident_node,
       opt(parse_generic_node),
       parse_struct_fields_node,
     )),
-    |(_, ident, generic, fields)| StructNode {
+    |(visibility, _, ident, generic, fields)| StructNode {
+      visibility,
       ident,
       generic,
       fields,
@@ -37,6 +39,7 @@ mod tests {
     assert_eq!(
       compile(source),
       StructNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
@@ -58,6 +61,7 @@ mod tests {
     assert_eq!(
       compile(source),
       StructNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
@@ -86,6 +90,7 @@ mod tests {
     assert_eq!(
       compile(source),
       StructNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
@@ -112,6 +117,7 @@ mod tests {
     assert_eq!(
       compile(source),
       StructNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
@@ -150,6 +156,7 @@ mod tests {
     assert_eq!(
       compile(source),
       StructNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
@@ -178,6 +185,7 @@ mod tests {
     assert_eq!(
       compile(source),
       StructNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
@@ -210,6 +218,7 @@ mod tests {
     assert_eq!(
       compile(source),
       StructNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },

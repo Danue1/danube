@@ -3,6 +3,7 @@ use super::*;
 pub(super) fn parse_enum_node(s: Tokens) -> ParseResult<EnumNode> {
   map(
     tuple((
+      opt(parse_visibility),
       parse_keyword(Keyword::Enum),
       parse_ident_node,
       opt(parse_generic_node),
@@ -11,7 +12,8 @@ pub(super) fn parse_enum_node(s: Tokens) -> ParseResult<EnumNode> {
       separated_nonempty_list(parse_symbol(Symbol::BitOr), parse_enum_variant_node),
       parse_symbol(Symbol::Semicolon),
     )),
-    |(_, ident, generic, _, _, variant_list, _)| EnumNode {
+    |(visibility, _, ident, generic, _, _, variant_list, _)| EnumNode {
+      visibility,
       ident,
       generic,
       variant_list,
@@ -40,6 +42,7 @@ mod tests {
     assert_eq!(
       compile(source),
       EnumNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
@@ -60,6 +63,7 @@ mod tests {
     assert_eq!(
       compile(source),
       EnumNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
@@ -88,6 +92,7 @@ mod tests {
     assert_eq!(
       compile(source),
       EnumNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
@@ -108,6 +113,7 @@ mod tests {
     assert_eq!(
       compile(source),
       EnumNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },
@@ -136,6 +142,7 @@ mod tests {
     assert_eq!(
       compile(source),
       EnumNode {
+        visibility: None,
         ident: IdentNode {
           raw: "Foo".to_owned()
         },

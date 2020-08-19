@@ -3,6 +3,7 @@ use super::*;
 pub(super) fn parse_static_node(s: Tokens) -> ParseResult<StaticNode> {
   map(
     tuple((
+      opt(parse_visibility),
       parse_keyword(Keyword::Static),
       parse_ident_node,
       parse_symbol(Symbol::Colon),
@@ -11,7 +12,12 @@ pub(super) fn parse_static_node(s: Tokens) -> ParseResult<StaticNode> {
       parse_literal_value_node,
       parse_symbol(Symbol::Semicolon),
     )),
-    |(_, ident, _, ty, _, value, _)| StaticNode { ident, ty, value },
+    |(visibility, _, ident, _, ty, _, value, _)| StaticNode {
+      visibility,
+      ident,
+      ty,
+      value,
+    },
   )(s)
 }
 
@@ -32,6 +38,7 @@ mod tests {
     assert_eq!(
       compile(source),
       StaticNode {
+        visibility: None,
         ident: IdentNode {
           raw: "FOO".to_owned()
         },
