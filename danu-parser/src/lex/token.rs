@@ -212,6 +212,7 @@ pub enum Symbol {
   And,                // &&
   Or,                 // ||
   Not,                // !
+  Question,           // ?
   BitAndAssign,       // &=
   BitOrAssign,        // |=
   BitXorAssign,       // ^=

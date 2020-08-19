@@ -248,6 +248,7 @@ fn parse_symbol3(s: LexSpan) -> LexResult<Symbol> {
     map(tag("&&"), |_| Symbol::And),
     map(tag("||"), |_| Symbol::Or),
     map(tag("!"), |_| Symbol::Not),
+    map(tag("?"), |_| Symbol::Question),
   ))(s)
 }
 
@@ -404,7 +405,7 @@ const static let mut fn trait struct type enum impl mod Self self pub async awai
     let source = "( ) [ ] { }
 -> => ..= .. . , :: : ;
 == = != += -= **= *= /= %= &&= ||=
-+ - ** * / % && || !
++ - ** * / % && || ! ?
 &= |= ^= <<= >>= & | ~ ^ << >>
 >= <= > <";
     assert_eq!(
@@ -445,6 +446,7 @@ const static let mut fn trait struct type enum impl mod Self self pub async awai
         Token::Symbol(Symbol::And),
         Token::Symbol(Symbol::Or),
         Token::Symbol(Symbol::Not),
+        Token::Symbol(Symbol::Question),
         Token::Symbol(Symbol::BitAndAssign),
         Token::Symbol(Symbol::BitOrAssign),
         Token::Symbol(Symbol::BitXorAssign),

@@ -37,7 +37,10 @@ fn parse_expression_struct_node(s: Tokens) -> ParseResult<ExpressionStructNode> 
 }
 
 fn parse_expression_tuple_node(s: Tokens) -> ParseResult<TupleNode> {
-  map(parse_tuple_operator, |node_list| TupleNode { node_list })(s)
+  map(parse_tuple_operator, |node_list| TupleNode {
+    field: None,
+    node_list,
+  })(s)
 }
 
 fn parse_prefix_expression_node(s: Tokens) -> ParseResult<ExpressionNode> {
@@ -54,21 +57,29 @@ fn parse_prefix_expression_node(s: Tokens) -> ParseResult<ExpressionNode> {
 
 fn parse_postfix_expression_node(s: Tokens, left: ExpressionNode) -> ParseResult<ExpressionNode> {
   match parse_operator_kind(s.clone()) {
-    Ok((s, OperatorKind::Tuple(node_list))) => {
-      let node = ExpressionNode::Tuple(TupleNode { node_list });
+    Ok((s, OperatorKind::Await)) => {
+      let node = ExpressionNode::Await(Box::new(left));
 
-      Ok((s, node))
+      parse_postfix_expression_node(s, node)
+    }
+    Ok((s, OperatorKind::Try)) => {
+      let node = ExpressionNode::Try(Box::new(left));
+
+      parse_postfix_expression_node(s, node)
+    }
+    Ok((s, OperatorKind::Tuple(node_list))) => {
+      let node = ExpressionNode::Tuple(TupleNode {
+        field: Some(Box::new(left)),
+        node_list,
+      });
+
+      parse_postfix_expression_node(s, node)
     }
     Ok((s, OperatorKind::Index(right))) => {
       let node = ExpressionNode::Index(IndexNode {
         array: Box::new(left),
         index: Box::new(right),
       });
-
-      parse_postfix_expression_node(s, node)
-    }
-    Ok((s, OperatorKind::Await)) => {
-      let node = ExpressionNode::Await(Box::new(left));
 
       parse_postfix_expression_node(s, node)
     }
@@ -111,18 +122,20 @@ fn parse_postfix_expression_node(s: Tokens, left: ExpressionNode) -> ParseResult
 }
 
 enum OperatorKind {
+  Await,
+  Try,
   Tuple(Vec<ExpressionNode>),
   Index(ExpressionNode),
-  Await,
   Field(IdentNode),
   Binary(BinaryOperatorKind),
 }
 
 fn parse_operator_kind(s: Tokens) -> ParseResult<OperatorKind> {
   alt((
+    map(parse_await_operator, |_| OperatorKind::Await),
+    map(parse_try_operator, |_| OperatorKind::Try),
     map(parse_tuple_operator, OperatorKind::Tuple),
     map(parse_index_operator, OperatorKind::Index),
-    map(parse_await_operator, |_| OperatorKind::Await),
     map(parse_field_operator, OperatorKind::Field),
     map(parse_binary_operator_kind, OperatorKind::Binary),
   ))(s)
@@ -132,7 +145,7 @@ fn parse_tuple_operator(s: Tokens) -> ParseResult<Vec<ExpressionNode>> {
   map(
     tuple((
       parse_symbol(Symbol::LeftParens),
-      separated_nonempty_list(parse_symbol(Symbol::Comma), parse_expression_node),
+      separated_list(parse_symbol(Symbol::Comma), parse_expression_node),
       opt(parse_symbol(Symbol::Comma)),
       parse_symbol(Symbol::RightParens),
     )),
@@ -156,6 +169,10 @@ fn parse_await_operator(s: Tokens) -> ParseResult<()> {
     tuple((parse_symbol(Symbol::Dot), parse_keyword(Keyword::Await))),
     |_| (),
   )(s)
+}
+
+fn parse_try_operator(s: Tokens) -> ParseResult<()> {
+  map(parse_symbol(Symbol::Question), |_| ())(s)
 }
 
 fn parse_field_operator(s: Tokens) -> ParseResult<IdentNode> {
@@ -272,6 +289,51 @@ mod tests {
         ident_list: vec![IdentNode {
           raw: "foo".to_owned()
         }]
+      })))
+    );
+  }
+
+  #[test]
+  fn tuple_await_operator() {
+    let source = "foo().await";
+    assert_eq!(
+      compile(source),
+      ExpressionNode::Await(Box::new(ExpressionNode::Tuple(TupleNode {
+        field: Some(Box::new(ExpressionNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "foo".to_owned()
+          }]
+        }))),
+        node_list: vec![],
+      })))
+    );
+  }
+
+  #[test]
+  fn try_operator() {
+    let source = "foo?";
+    assert_eq!(
+      compile(source),
+      ExpressionNode::Try(Box::new(ExpressionNode::Path(PathNode {
+        ident_list: vec![IdentNode {
+          raw: "foo".to_owned()
+        }]
+      })))
+    );
+  }
+
+  #[test]
+  fn tuple_try_operator() {
+    let source = "foo()?";
+    assert_eq!(
+      compile(source),
+      ExpressionNode::Try(Box::new(ExpressionNode::Tuple(TupleNode {
+        field: Some(Box::new(ExpressionNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "foo".to_owned()
+          }]
+        }))),
+        node_list: vec![],
       })))
     );
   }

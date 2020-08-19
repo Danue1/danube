@@ -285,11 +285,11 @@ pub enum ExpressionNode {
   Literal(LiteralValueNode),
   Array(Vec<ExpressionNode>),
   Tuple(TupleNode),
-  FunctionCall(FunctionCallNode),
   Index(IndexNode),
   BinaryOperator(BinaryOperatorNode),
   UnaryOperator(UnaryOperatorNode),
   Await(Box<ExpressionNode>),
+  Try(Box<ExpressionNode>),
   Field(ExpressionFieldNode),
   Struct(ExpressionStructNode),
 }
@@ -345,12 +345,8 @@ pub enum PatternNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct TupleNode {
+  pub field: Option<Box<ExpressionNode>>,
   pub node_list: Vec<ExpressionNode>,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct FunctionCallNode {
-  pub argument_list: Vec<ExpressionNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
