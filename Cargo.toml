@@ -1,4 +1,4 @@
 [workspace]
 members = [
-  "danu-parser"
+  "danube-parser"
 ]

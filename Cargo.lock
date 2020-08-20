@@ -21,7 +21,7 @@ version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
-name = "danu-parser"
+name = "danube-parser"
 version = "0.1.0"
 dependencies = [
  "nom 5.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
