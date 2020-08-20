@@ -310,6 +310,18 @@ mod tests {
   }
 
   #[test]
+  fn prefix_negative_int() {
+    let source = "-1";
+    assert_eq!(
+      compile(source),
+      ExpressionNode::UnaryOperator(UnaryOperatorNode {
+        kind: UnaryOperatorKind::Negative,
+        value: Box::new(ExpressionNode::Literal(LiteralValueNode::Int(1)))
+      })
+    );
+  }
+
+  #[test]
   fn index() {
     let source = "foo[1]";
     assert_eq!(

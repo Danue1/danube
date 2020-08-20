@@ -113,15 +113,13 @@ fn parse_numeric(s: LexSpan) -> LexResult<Numeric> {
   let sign_to_int = |sign: Option<_>| if sign.is_some() { 1 } else { 0 };
   let len = |s: LexSpan| s.fragment().len();
 
-  let (ss, sign) = map(opt(char('-')), sign_to_int)(s)?;
-
   let (ss, majority) = alt((
     map(tag("0"), |_| 1),
     map(
       tuple((take_while1(is_nonzero_digit), take_while(is_digit))),
       |(nonzero_digit, digit)| len(nonzero_digit) + len(digit),
     ),
-  ))(ss)?;
+  ))(s)?;
 
   let (ss, minority) = opt(map(
     tuple((char('.'), take_while(is_digit))),
@@ -146,11 +144,11 @@ fn parse_numeric(s: LexSpan) -> LexResult<Numeric> {
 
   match numeric {
     Some(n) => {
-      let (s, numeric) = take(sign + majority + n)(s)?;
+      let (s, numeric) = take(majority + n)(s)?;
       Ok((s, Numeric::Float(numeric.fragment().parse().unwrap())))
     }
     None => {
-      let (s, numeric) = take(sign + majority)(s)?;
+      let (s, numeric) = take(majority)(s)?;
       Ok((s, Numeric::Int(numeric.fragment().parse().unwrap())))
     }
   }
@@ -347,7 +345,7 @@ bar\"";
     let source = r#"-1"#;
     assert_eq!(
       lex(source).map(|(_, token_list)| token_list),
-      Ok(vec![Token::IntLiteral(-1)])
+      Ok(vec![Token::Symbol(Symbol::Sub), Token::IntLiteral(1)])
     );
   }
 
@@ -362,7 +360,7 @@ bar\"";
     let source = r#"-1.0"#;
     assert_eq!(
       lex(source).map(|(_, token_list)| token_list),
-      Ok(vec![Token::FloatLiteral(-1.0)])
+      Ok(vec![Token::Symbol(Symbol::Sub), Token::FloatLiteral(1.0)])
     );
 
     let source = r#"1e0"#;
@@ -374,7 +372,7 @@ bar\"";
     let source = r#"-1e0"#;
     assert_eq!(
       lex(source).map(|(_, token_list)| token_list),
-      Ok(vec![Token::FloatLiteral(-1e0)])
+      Ok(vec![Token::Symbol(Symbol::Sub), Token::FloatLiteral(1e0)])
     );
 
     let source = r#"1.0e0"#;
@@ -386,7 +384,7 @@ bar\"";
     let source = r#"-1.0e0"#;
     assert_eq!(
       lex(source).map(|(_, token_list)| token_list),
-      Ok(vec![Token::FloatLiteral(-1.0e0)])
+      Ok(vec![Token::Symbol(Symbol::Sub), Token::FloatLiteral(1.0e0)])
     );
   }
 
