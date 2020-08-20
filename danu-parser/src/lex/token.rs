@@ -182,6 +182,7 @@ pub enum Symbol {
   RightBracket,       // ]
   LeftBrace,          // {
   RightBrace,         // }
+  ChainArrow,         // |>
   ReturnArrow,        // ->
   BranchArrow,        // =>
   RangeOpen,          // ..=

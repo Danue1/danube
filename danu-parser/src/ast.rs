@@ -392,6 +392,7 @@ pub enum BinaryOperatorKind {
   LessThanOrEqual,    // <=
   GreaterThan,        // >
   GreaterThanOrEqual, // >=
+  PipelineChain,      // |>
 }
 
 #[derive(Debug, PartialEq, Clone)]

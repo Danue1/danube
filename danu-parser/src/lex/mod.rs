@@ -241,6 +241,7 @@ fn parse_symbol0(s: LexSpan) -> LexResult<Symbol> {
 
 fn parse_symbol1(s: LexSpan) -> LexResult<Symbol> {
   alt((
+    map(tag("|>"), |_| Symbol::ChainArrow),
     map(tag("->"), |_| Symbol::ReturnArrow),
     map(tag("=>"), |_| Symbol::BranchArrow),
     map(tag("..="), |_| Symbol::RangeOpen),
@@ -435,7 +436,7 @@ const static let mut fn trait struct type enum impl mod Self self pub async awai
   #[test]
   fn symbol() {
     let source = "( ) [ ] { }
--> => ..= .. . , :: : ;
+|> -> => ..= .. . , :: : ;
 == = != += -= **= *= /= %= &&= ||=
 + - ** * / % && || ! ?
 &= |= ^= <<= >>= & | ~ ^ << >>
@@ -449,6 +450,7 @@ const static let mut fn trait struct type enum impl mod Self self pub async awai
         Token::Symbol(Symbol::RightBracket),
         Token::Symbol(Symbol::LeftBrace),
         Token::Symbol(Symbol::RightBrace),
+        Token::Symbol(Symbol::ChainArrow),
         Token::Symbol(Symbol::ReturnArrow),
         Token::Symbol(Symbol::BranchArrow),
         Token::Symbol(Symbol::RangeOpen),

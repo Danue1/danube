@@ -377,4 +377,25 @@ mod tests {
       })
     );
   }
+
+  #[test]
+  fn pipeline_chain() {
+    let source = "foo |> bar";
+    assert_eq!(
+      compile(source),
+      ExpressionNode::BinaryOperator(BinaryOperatorNode {
+        kind: BinaryOperatorKind::PipelineChain,
+        left: Box::new(ExpressionNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "foo".to_owned()
+          }]
+        })),
+        right: Box::new(ExpressionNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "bar".to_owned()
+          }]
+        }))
+      })
+    );
+  }
 }

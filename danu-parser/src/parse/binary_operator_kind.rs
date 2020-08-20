@@ -34,5 +34,8 @@ pub(super) fn parse_binary_operator_kind(s: Tokens) -> ParseResult<BinaryOperato
     map(parse_symbol(Symbol::GreaterThanOrEqual), |_| {
       BinaryOperatorKind::GreaterThanOrEqual
     }),
+    map(parse_symbol(Symbol::ChainArrow), |_| {
+      BinaryOperatorKind::PipelineChain
+    }),
   ))(s)
 }
