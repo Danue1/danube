@@ -260,6 +260,7 @@ pub enum StatementNode {
   Conditional(StatementConditionalNode),
   Loop(LoopNode),
   While(WhileNode),
+  For(ForNode),
   PatternMatch(PatternMatchNode),
   Expression(ExpressionNode),
 }
@@ -278,6 +279,7 @@ pub enum ExpressionNode {
   Conditional(ExpressionConditionalNode),
   Loop(LoopNode),
   While(WhileNode),
+  For(ForNode),
   PatternMatch(PatternMatchNode),
   Break,
   Continue,
@@ -318,6 +320,14 @@ pub struct LoopNode {
 #[derive(Debug, PartialEq, Clone)]
 pub struct WhileNode {
   pub condition: Box<ExpressionNode>,
+  pub body: Vec<StatementNode>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct ForNode {
+  pub immutablity: Immutablity,
+  pub pattern: PatternNode,
+  pub iteration: Box<ExpressionNode>,
   pub body: Vec<StatementNode>,
 }
 

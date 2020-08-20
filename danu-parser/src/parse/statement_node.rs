@@ -9,6 +9,7 @@ pub(super) fn parse_statement_node(s: Tokens) -> ParseResult<StatementNode> {
     map(parse_statement_conditional_node, StatementNode::Conditional),
     map(parse_loop_node, StatementNode::Loop),
     map(parse_while_node, StatementNode::While),
+    map(parse_for_node, StatementNode::For),
     map(parse_pattern_match_node, StatementNode::PatternMatch),
     map(parse_expression_node, StatementNode::Expression),
   ))(s)
