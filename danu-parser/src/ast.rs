@@ -288,8 +288,11 @@ pub enum ExpressionNode {
   Array(Vec<ExpressionNode>),
   Tuple(TupleNode),
   Index(IndexNode),
-  BinaryOperator(BinaryOperatorNode),
   UnaryOperator(UnaryOperatorNode),
+  PipelineChain(PipelineChainNode),
+  ArithmeticOrLogical(ArithmeticOrLogicalNode),
+  Comparison(ComparisonNode),
+  LazyBooleann(LazyBooleanNode),
   Await(Box<ExpressionNode>),
   Try(Box<ExpressionNode>),
   Field(ExpressionFieldNode),
@@ -366,33 +369,60 @@ pub struct IndexNode {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct BinaryOperatorNode {
-  pub kind: BinaryOperatorKind,
+pub struct PipelineChainNode {
   pub left: Box<ExpressionNode>,
   pub right: Box<ExpressionNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum BinaryOperatorKind {
-  Add,                // +
-  Sub,                // -
-  Mul,                // *
-  Div,                // /
-  Mod,                // %
-  And,                // &&
-  Or,                 // ||
-  BitXor,             // ^
-  BitAnd,             // &
-  BitOr,              // |
-  BitLeft,            // <<
-  BitRight,           // >>
+pub struct ArithmeticOrLogicalNode {
+  pub kind: ArithmeticOrLogicalKind,
+  pub left: Box<ExpressionNode>,
+  pub right: Box<ExpressionNode>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum ArithmeticOrLogicalKind {
+  Add,      // +
+  Sub,      // -
+  Mul,      // *
+  Div,      // /
+  Mod,      // %
+  BitAnd,   // &
+  BitOr,    // |
+  BitXor,   // ^
+  BitLeft,  // <<
+  BitRight, // >>
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct ComparisonNode {
+  pub kind: ComparisonKind,
+  pub left: Box<ExpressionNode>,
+  pub right: Box<ExpressionNode>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum ComparisonKind {
   Equal,              // ==
   NotEqual,           // !=
-  LessThan,           // <
-  LessThanOrEqual,    // <=
   GreaterThan,        // >
+  LessThan,           // <
   GreaterThanOrEqual, // >=
-  PipelineChain,      // |>
+  LessThanOrEqual,    // <=
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct LazyBooleanNode {
+  pub kind: LazyBooleanKind,
+  pub left: Box<ExpressionNode>,
+  pub right: Box<ExpressionNode>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum LazyBooleanKind {
+  And, // &&
+  Or,  // ||
 }
 
 #[derive(Debug, PartialEq, Clone)]

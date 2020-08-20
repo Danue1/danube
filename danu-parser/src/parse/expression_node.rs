@@ -92,9 +92,38 @@ fn parse_postfix_expression_node(s: Tokens, left: ExpressionNode) -> ParseResult
 
       parse_postfix_expression_node(s, node)
     }
-    Ok((s, OperatorKind::Binary(kind))) => {
+    Ok((s, OperatorKind::PipelineChain)) => {
       let (s, right) = parse_expression_node(s)?;
-      let node = ExpressionNode::BinaryOperator(BinaryOperatorNode {
+      let node = ExpressionNode::PipelineChain(PipelineChainNode {
+        left: Box::new(left),
+        right: Box::new(right),
+      });
+
+      parse_postfix_expression_node(s, node)
+    }
+    Ok((s, OperatorKind::ArithmeticOrLogical(kind))) => {
+      let (s, right) = parse_expression_node(s)?;
+      let node = ExpressionNode::ArithmeticOrLogical(ArithmeticOrLogicalNode {
+        kind,
+        left: Box::new(left),
+        right: Box::new(right),
+      });
+
+      parse_postfix_expression_node(s, node)
+    }
+    Ok((s, OperatorKind::Comparison(kind))) => {
+      let (s, right) = parse_expression_node(s)?;
+      let node = ExpressionNode::Comparison(ComparisonNode {
+        kind,
+        left: Box::new(left),
+        right: Box::new(right),
+      });
+
+      parse_postfix_expression_node(s, node)
+    }
+    Ok((s, OperatorKind::LazyBoolean(kind))) => {
+      let (s, right) = parse_expression_node(s)?;
+      let node = ExpressionNode::LazyBooleann(LazyBooleanNode {
         kind,
         left: Box::new(left),
         right: Box::new(right),
@@ -128,7 +157,10 @@ enum OperatorKind {
   Tuple(Vec<ExpressionNode>),
   Index(ExpressionNode),
   Field(IdentNode),
-  Binary(BinaryOperatorKind),
+  PipelineChain,
+  ArithmeticOrLogical(ArithmeticOrLogicalKind),
+  Comparison(ComparisonKind),
+  LazyBoolean(LazyBooleanKind),
 }
 
 fn parse_operator_kind(s: Tokens) -> ParseResult<OperatorKind> {
@@ -138,7 +170,15 @@ fn parse_operator_kind(s: Tokens) -> ParseResult<OperatorKind> {
     map(parse_tuple_operator, OperatorKind::Tuple),
     map(parse_index_operator, OperatorKind::Index),
     map(parse_field_operator, OperatorKind::Field),
-    map(parse_binary_operator_kind, OperatorKind::Binary),
+    map(parse_pipeline_chain_operator, |_| {
+      OperatorKind::PipelineChain
+    }),
+    map(
+      parse_arithmetic_or_logical_kind,
+      OperatorKind::ArithmeticOrLogical,
+    ),
+    map(parse_comparison_kind, OperatorKind::Comparison),
+    map(parse_lazy_boolean_kind, OperatorKind::LazyBoolean),
   ))(s)
 }
 
@@ -181,6 +221,10 @@ fn parse_field_operator(s: Tokens) -> ParseResult<IdentNode> {
     tuple((parse_symbol(Symbol::Dot), parse_ident_node)),
     |(_, ident)| ident,
   )(s)
+}
+
+fn parse_pipeline_chain_operator(s: Tokens) -> ParseResult<()> {
+  map(parse_symbol(Symbol::ChainArrow), |_| ())(s)
 }
 
 fn parse_expression_field_list(
@@ -362,8 +406,8 @@ mod tests {
     let source = "foo + bar";
     assert_eq!(
       compile(source),
-      ExpressionNode::BinaryOperator(BinaryOperatorNode {
-        kind: BinaryOperatorKind::Add,
+      ExpressionNode::ArithmeticOrLogical(ArithmeticOrLogicalNode {
+        kind: ArithmeticOrLogicalKind::Add,
         left: Box::new(ExpressionNode::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
@@ -383,8 +427,7 @@ mod tests {
     let source = "foo |> bar";
     assert_eq!(
       compile(source),
-      ExpressionNode::BinaryOperator(BinaryOperatorNode {
-        kind: BinaryOperatorKind::PipelineChain,
+      ExpressionNode::PipelineChain(PipelineChainNode {
         left: Box::new(ExpressionNode::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
