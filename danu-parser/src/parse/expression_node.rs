@@ -402,12 +402,138 @@ mod tests {
   }
 
   #[test]
-  fn binary() {
+  fn arithemtic_add() {
     let source = "foo + bar";
     assert_eq!(
       compile(source),
       ExpressionNode::ArithmeticOrLogical(ArithmeticOrLogicalNode {
         kind: ArithmeticOrLogicalKind::Add,
+        left: Box::new(ExpressionNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "foo".to_owned()
+          }]
+        })),
+        right: Box::new(ExpressionNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "bar".to_owned()
+          }]
+        }))
+      })
+    );
+  }
+
+  #[test]
+  fn arithemtic_add_mul() {
+    let source = "foo + bar * baz";
+    assert_eq!(
+      compile(source),
+      ExpressionNode::ArithmeticOrLogical(ArithmeticOrLogicalNode {
+        kind: ArithmeticOrLogicalKind::Add,
+        left: Box::new(ExpressionNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "foo".to_owned()
+          }]
+        })),
+        right: Box::new(ExpressionNode::ArithmeticOrLogical(
+          ArithmeticOrLogicalNode {
+            kind: ArithmeticOrLogicalKind::Mul,
+            left: Box::new(ExpressionNode::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "bar".to_owned()
+              }]
+            })),
+            right: Box::new(ExpressionNode::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "baz".to_owned()
+              }]
+            }))
+          }
+        ))
+      })
+    );
+  }
+
+  #[test]
+  #[ignore]
+  fn arithemtic_mul_add() {
+    let source = "foo * bar + baz";
+    assert_eq!(
+      compile(source),
+      ExpressionNode::ArithmeticOrLogical(ArithmeticOrLogicalNode {
+        kind: ArithmeticOrLogicalKind::Add,
+        left: Box::new(ExpressionNode::ArithmeticOrLogical(
+          ArithmeticOrLogicalNode {
+            kind: ArithmeticOrLogicalKind::Mul,
+            left: Box::new(ExpressionNode::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "foo".to_owned()
+              }]
+            })),
+            right: Box::new(ExpressionNode::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "bar".to_owned()
+              }]
+            }))
+          }
+        )),
+        right: Box::new(ExpressionNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "baz".to_owned()
+          }]
+        }))
+      })
+    );
+  }
+
+  #[test]
+  fn logical() {
+    let source = "foo & bar";
+    assert_eq!(
+      compile(source),
+      ExpressionNode::ArithmeticOrLogical(ArithmeticOrLogicalNode {
+        kind: ArithmeticOrLogicalKind::BitAnd,
+        left: Box::new(ExpressionNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "foo".to_owned()
+          }]
+        })),
+        right: Box::new(ExpressionNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "bar".to_owned()
+          }]
+        }))
+      })
+    );
+  }
+
+  #[test]
+  fn comparison() {
+    let source = "foo < bar";
+    assert_eq!(
+      compile(source),
+      ExpressionNode::Comparison(ComparisonNode {
+        kind: ComparisonKind::LessThan,
+        left: Box::new(ExpressionNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "foo".to_owned()
+          }]
+        })),
+        right: Box::new(ExpressionNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "bar".to_owned()
+          }]
+        }))
+      })
+    );
+  }
+
+  #[test]
+  fn lazy_boolean() {
+    let source = "foo && bar";
+    assert_eq!(
+      compile(source),
+      ExpressionNode::LazyBooleann(LazyBooleanNode {
+        kind: LazyBooleanKind::And,
         left: Box::new(ExpressionNode::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
