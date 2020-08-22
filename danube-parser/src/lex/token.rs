@@ -135,7 +135,6 @@ pub enum Token {
   StringLiteral(String),
   Identifier(String),
   Illegal,
-  EOF,
 }
 
 #[derive(Debug, PartialEq, Clone)]

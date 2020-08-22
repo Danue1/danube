@@ -10,5 +10,6 @@ include = ["LICENSE", "Cargo.toml", "src/**/*.rs"]
 
 [workspace]
 members = [
-  "danube-parser"
+  "danube-parser",
+  "danube-runtime",
 ]
