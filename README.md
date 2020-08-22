@@ -13,7 +13,7 @@ fn main() {
 
 ## Special Thanks
 
-This language was named Danube by @thehighestend !
+This language was named Danube by [@thehighestend](https://github.com/thehighestend)!
 
 ## License
 
