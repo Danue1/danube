@@ -558,6 +558,72 @@ mod tests {
   }
 
   #[test]
+  fn struct_add_struct() {
+    let source = "foo(bar) + baz(bax)";
+    assert_eq!(
+      compile(source),
+      ExpressionNode::InfixOperator(InfixOperatorNode {
+        kind: InfixOperatorKind::Add,
+        left: Box::new(ExpressionNode::Tuple(TupleNode {
+          field: Some(Box::new(ExpressionNode::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "foo".to_owned()
+            }]
+          }))),
+          node_list: vec![ExpressionNode::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "bar".to_owned()
+            }]
+          })]
+        })),
+        right: Box::new(ExpressionNode::Tuple(TupleNode {
+          field: Some(Box::new(ExpressionNode::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "baz".to_owned()
+            }]
+          }))),
+          node_list: vec![ExpressionNode::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "bax".to_owned()
+            }]
+          })]
+        })),
+      })
+    )
+  }
+
+  #[test]
+  fn field_add_field() {
+    let source = "foo.bar + baz.bax";
+    assert_eq!(
+      compile(source),
+      ExpressionNode::InfixOperator(InfixOperatorNode {
+        kind: InfixOperatorKind::Add,
+        left: Box::new(ExpressionNode::Field(ExpressionFieldNode {
+          left: Box::new(ExpressionNode::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "foo".to_owned()
+            }]
+          })),
+          right: Box::new(IdentNode {
+            raw: "bar".to_owned()
+          })
+        })),
+        right: Box::new(ExpressionNode::Field(ExpressionFieldNode {
+          left: Box::new(ExpressionNode::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "baz".to_owned()
+            }]
+          })),
+          right: Box::new(IdentNode {
+            raw: "bax".to_owned()
+          })
+        })),
+      })
+    )
+  }
+
+  #[test]
   fn logical() {
     let source = "foo & bar";
     assert_eq!(
