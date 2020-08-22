@@ -263,14 +263,16 @@ mod tests {
         generic: None,
         argument_list: vec![],
         return_type: None,
-        body: vec![StatementNode::Conditional(StatementConditionalNode {
-          main_branch: Box::new((
-            ExpressionNode::Literal(LiteralValueNode::Bool(true)),
-            vec![],
-          )),
-          branch_list: vec![],
-          other: None
-        })]
+        body: vec![StatementNode::Expression(ExpressionNode::Conditional(
+          ConditionalNode {
+            main_branch: Box::new((
+              ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+              vec![],
+            )),
+            branch_list: vec![],
+            other: None
+          }
+        ))]
       }
     );
   }
@@ -291,14 +293,16 @@ mod tests {
         generic: None,
         argument_list: vec![],
         return_type: None,
-        body: vec![StatementNode::Conditional(StatementConditionalNode {
-          main_branch: Box::new((
-            ExpressionNode::Literal(LiteralValueNode::Bool(true)),
-            vec![],
-          )),
-          branch_list: vec![],
-          other: Some(vec![])
-        })]
+        body: vec![StatementNode::Expression(ExpressionNode::Conditional(
+          ConditionalNode {
+            main_branch: Box::new((
+              ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+              vec![],
+            )),
+            branch_list: vec![],
+            other: Some(vec![])
+          }
+        ))]
       }
     );
   }
@@ -321,13 +325,15 @@ mod tests {
         generic: None,
         argument_list: vec![],
         return_type: None,
-        body: vec![StatementNode::PatternMatch(PatternMatchNode {
-          condition: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true))),
-          branch_list: vec![(
-            vec![PatternNode::Literal(LiteralValueNode::Bool(true))],
-            vec![]
-          )],
-        })]
+        body: vec![StatementNode::Expression(ExpressionNode::PatternMatch(
+          PatternMatchNode {
+            condition: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true))),
+            branch_list: vec![(
+              vec![PatternNode::Literal(LiteralValueNode::Bool(true))],
+              vec![]
+            )],
+          }
+        ))]
       }
     );
   }

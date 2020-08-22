@@ -1,26 +1,14 @@
 use super::*;
 
 pub(super) fn parse_statement_node(s: Tokens) -> ParseResult<StatementNode> {
-  map(
-    tuple((
-      parse_statement_node_atomic,
-      opt(parse_symbol(Symbol::Semicolon)),
-    )),
-    |(node, _)| node,
-  )(s)
-}
-
-fn parse_statement_node_atomic(s: Tokens) -> ParseResult<StatementNode> {
   alt((
     map(parse_constant_node, StatementNode::Constant),
     map(parse_static_node, StatementNode::Static),
     map(parse_assign_sugar_node, StatementNode::AssignSugar),
     map(parse_let_node, StatementNode::Let),
-    map(parse_statement_conditional_node, StatementNode::Conditional),
-    map(parse_loop_node, StatementNode::Loop),
-    map(parse_while_node, StatementNode::While),
-    map(parse_for_node, StatementNode::For),
-    map(parse_pattern_match_node, StatementNode::PatternMatch),
     map(parse_expression_node, StatementNode::Expression),
+    map(parse_symbol(Symbol::Semicolon), |_| {
+      StatementNode::Semicolon
+    }),
   ))(s)
 }

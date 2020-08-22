@@ -1,8 +1,6 @@
 use super::*;
 
-pub(super) fn parse_expression_conditional_node(
-  s: Tokens,
-) -> ParseResult<ExpressionConditionalNode> {
+pub(super) fn parse_expression_conditional_node(s: Tokens) -> ParseResult<ConditionalNode> {
   map(
     tuple((
       parse_keyword(Keyword::If),
@@ -15,13 +13,13 @@ pub(super) fn parse_expression_conditional_node(
         )),
         |(_, _, conditional_branch)| conditional_branch,
       )),
-      map(
+      opt(map(
         tuple((parse_keyword(Keyword::Else), parse_branch_body)),
         |(_, statement_list)| statement_list,
-      ),
+      )),
     )),
     |(_, if_conditional_branch, else_if_conditional_branch, else_conditional_branch)| {
-      ExpressionConditionalNode {
+      ConditionalNode {
         main_branch: Box::new(if_conditional_branch),
         branch_list: else_if_conditional_branch,
         other: else_conditional_branch,
@@ -45,7 +43,7 @@ fn parse_branch_body(s: Tokens) -> ParseResult<Vec<StatementNode>> {
 mod tests {
   use super::*;
 
-  fn compile(s: &str) -> ExpressionConditionalNode {
+  fn compile(s: &str) -> ConditionalNode {
     let (_, token_list) = lex(s).unwrap();
     match parse_expression_conditional_node(Tokens::new(&token_list)) {
       Ok((_, node)) => node,
@@ -61,13 +59,13 @@ mod tests {
     let source = "if true { } else { }";
     assert_eq!(
       compile(source),
-      ExpressionConditionalNode {
+      ConditionalNode {
         main_branch: Box::new((
           ExpressionNode::Literal(LiteralValueNode::Bool(true)),
           vec![]
         )),
         branch_list: vec![],
-        other: vec![],
+        other: Some(vec![]),
       }
     );
   }
@@ -77,7 +75,7 @@ mod tests {
     let source = "if true { } else if true { } else { }";
     assert_eq!(
       compile(source),
-      ExpressionConditionalNode {
+      ConditionalNode {
         main_branch: Box::new((
           ExpressionNode::Literal(LiteralValueNode::Bool(true)),
           vec![]
@@ -86,7 +84,7 @@ mod tests {
           ExpressionNode::Literal(LiteralValueNode::Bool(true)),
           vec![]
         )],
-        other: vec![],
+        other: Some(vec![]),
       }
     );
   }

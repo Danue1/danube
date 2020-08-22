@@ -257,12 +257,8 @@ pub enum StatementNode {
   Static(StaticNode),
   AssignSugar(AssignSugarNode),
   Let(LetNode),
-  Conditional(StatementConditionalNode),
-  Loop(LoopNode),
-  While(WhileNode),
-  For(ForNode),
-  PatternMatch(PatternMatchNode),
   Expression(ExpressionNode),
+  Semicolon,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -276,7 +272,7 @@ pub struct LetNode {
 #[derive(Debug, PartialEq, Clone)]
 pub enum ExpressionNode {
   Path(PathNode),
-  Conditional(ExpressionConditionalNode),
+  Conditional(ConditionalNode),
   Loop(LoopNode),
   While(WhileNode),
   For(ForNode),
@@ -299,17 +295,10 @@ pub enum ExpressionNode {
 pub type ConditionalBranch = (ExpressionNode, Vec<StatementNode>);
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct StatementConditionalNode {
+pub struct ConditionalNode {
   pub main_branch: Box<ConditionalBranch>,
   pub branch_list: Vec<ConditionalBranch>,
   pub other: Option<Vec<StatementNode>>,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct ExpressionConditionalNode {
-  pub main_branch: Box<ConditionalBranch>,
-  pub branch_list: Vec<ConditionalBranch>,
-  pub other: Vec<StatementNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
