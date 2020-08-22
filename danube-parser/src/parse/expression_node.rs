@@ -182,7 +182,7 @@ fn infix_binding_power(kind: InfixOperatorKind) -> Precedence {
 enum OperatorKind {
   Await,
   Try,
-  Tuple(Vec<ExpressionNode>),
+  Tuple(Vec<(Option<IdentNode>, ExpressionNode)>),
   Index(ExpressionNode),
   Field(IdentNode),
   InfixOperator(InfixOperatorKind),
@@ -199,11 +199,20 @@ fn parse_operator_kind(s: Tokens) -> ParseResult<OperatorKind> {
   ))(s)
 }
 
-fn parse_tuple_operator(s: Tokens) -> ParseResult<Vec<ExpressionNode>> {
+fn parse_tuple_operator(s: Tokens) -> ParseResult<Vec<(Option<IdentNode>, ExpressionNode)>> {
   map(
     tuple((
       parse_symbol(Symbol::LeftParens),
-      separated_list(parse_symbol(Symbol::Comma), parse_expression_node),
+      separated_list(
+        parse_symbol(Symbol::Comma),
+        tuple((
+          opt(map(
+            tuple((parse_ident_node, parse_symbol(Symbol::Assign))),
+            |(name, _)| name,
+          )),
+          parse_expression_node,
+        )),
+      ),
       opt(parse_symbol(Symbol::Comma)),
       parse_symbol(Symbol::RightParens),
     )),
@@ -387,6 +396,70 @@ mod tests {
           raw: "foo".to_owned()
         }]
       })))
+    );
+  }
+
+  #[test]
+  fn tuple() {
+    let source = "foo()";
+    assert_eq!(
+      compile(source),
+      ExpressionNode::Tuple(TupleNode {
+        field: Some(Box::new(ExpressionNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "foo".to_owned()
+          }]
+        }))),
+        node_list: vec![],
+      })
+    );
+  }
+
+  #[test]
+  fn tuple_argument() {
+    let source = "foo(bar)";
+    assert_eq!(
+      compile(source),
+      ExpressionNode::Tuple(TupleNode {
+        field: Some(Box::new(ExpressionNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "foo".to_owned()
+          }]
+        }))),
+        node_list: vec![(
+          None,
+          ExpressionNode::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "bar".to_owned()
+            }]
+          })
+        )],
+      })
+    );
+  }
+
+  #[test]
+  fn tuple_named_argument() {
+    let source = "foo(bar = baz)";
+    assert_eq!(
+      compile(source),
+      ExpressionNode::Tuple(TupleNode {
+        field: Some(Box::new(ExpressionNode::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "foo".to_owned()
+          }]
+        }))),
+        node_list: vec![(
+          Some(IdentNode {
+            raw: "bar".to_owned()
+          }),
+          ExpressionNode::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "baz".to_owned()
+            }]
+          })
+        )],
+      })
     );
   }
 
@@ -582,11 +655,14 @@ mod tests {
               raw: "foo".to_owned()
             }]
           }))),
-          node_list: vec![ExpressionNode::Path(PathNode {
-            ident_list: vec![IdentNode {
-              raw: "bar".to_owned()
-            }]
-          })]
+          node_list: vec![(
+            None,
+            ExpressionNode::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "bar".to_owned()
+              }]
+            })
+          )]
         })),
         right: Box::new(ExpressionNode::Tuple(TupleNode {
           field: Some(Box::new(ExpressionNode::Path(PathNode {
@@ -594,11 +670,14 @@ mod tests {
               raw: "baz".to_owned()
             }]
           }))),
-          node_list: vec![ExpressionNode::Path(PathNode {
-            ident_list: vec![IdentNode {
-              raw: "bax".to_owned()
-            }]
-          })]
+          node_list: vec![(
+            None,
+            ExpressionNode::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "bax".to_owned()
+              }]
+            })
+          )]
         })),
       })
     )
