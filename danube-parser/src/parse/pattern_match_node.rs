@@ -28,7 +28,7 @@ pub(super) fn parse_pattern_match_node(s: Tokens) -> ParseResult<PatternMatchNod
 }
 
 fn parse_body(s: Tokens) -> ParseResult<Vec<StatementNode>> {
-  alt((parse_body_shortcut, parse_body_longcut))(s)
+  alt((parse_body_longcut, parse_body_shortcut))(s)
 }
 
 fn parse_body_shortcut(s: Tokens) -> ParseResult<Vec<StatementNode>> {

@@ -290,6 +290,7 @@ pub enum ExpressionNode {
   Try(Box<ExpressionNode>),
   Field(ExpressionFieldNode),
   Struct(ExpressionStructNode),
+  Block(Vec<StatementNode>),
 }
 
 pub type ConditionalBranch = (ExpressionNode, Vec<StatementNode>);

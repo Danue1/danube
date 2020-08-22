@@ -28,6 +28,7 @@ fn parse_atomic_expression_node(s: Tokens) -> ParseResult<ExpressionNode> {
     map(parse_continue, |_| ExpressionNode::Continue),
     map(parse_return_node, ExpressionNode::Return),
     map(parse_array, ExpressionNode::Array),
+    map(parse_block, ExpressionNode::Block),
   ))(s)
 }
 
@@ -283,6 +284,17 @@ fn parse_array(s: Tokens) -> ParseResult<Vec<ExpressionNode>> {
       parse_symbol(Symbol::RightBracket),
     )),
     |(_, expression_list, _, _)| expression_list,
+  )(s)
+}
+
+fn parse_block(s: Tokens) -> ParseResult<Vec<StatementNode>> {
+  map(
+    tuple((
+      parse_symbol(Symbol::LeftBrace),
+      many0(parse_statement_node),
+      parse_symbol(Symbol::RightBrace),
+    )),
+    |(_, node_list, _)| node_list,
   )(s)
 }
 
@@ -704,6 +716,23 @@ mod tests {
           }]
         }))
       })
+    );
+  }
+
+  #[test]
+  fn block() {
+    let source = "{ }";
+    assert_eq!(compile(source), ExpressionNode::Block(vec![]));
+  }
+
+  #[test]
+  fn block_in_block() {
+    let source = "{ { } }";
+    assert_eq!(
+      compile(source),
+      ExpressionNode::Block(vec![StatementNode::Expression(ExpressionNode::Block(
+        vec![]
+      ))])
     );
   }
 }
