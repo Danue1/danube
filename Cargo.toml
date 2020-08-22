@@ -1,3 +1,13 @@
+[package]
+name = "danube"
+version = "0.1.0"
+authors = ["Danue1"]
+edition = "2018"
+description = "Danube is a programming language strongly inspired by Rust, but it is an interpreter language without a lifetime and ownership model."
+repository = "https://github.com/Danue1/danube"
+license = "MIT"
+include = ["LICENSE", "Cargo.toml", "src/**/*.rs"]
+
 [workspace]
 members = [
   "danube-parser"
