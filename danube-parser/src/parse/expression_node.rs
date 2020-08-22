@@ -102,8 +102,8 @@ fn parse_postfix_expression_node(
     }
     Ok((s, OperatorKind::Field(rhs))) => {
       let node = ExpressionNode::Field(ExpressionFieldNode {
-        left: Box::new(lhs),
-        right: Box::new(rhs),
+        lhs: Box::new(lhs),
+        rhs: Box::new(rhs),
       });
 
       parse_postfix_expression_node(s, precedence, node)
@@ -143,8 +143,8 @@ fn parse_infix_expression_node(
       let (s, rhs) = parse_postfix_expression_node(s, right_precedence, rhs)?;
       let rhs = ExpressionNode::InfixOperator(InfixOperatorNode {
         kind,
-        left: Box::new(lhs),
-        right: Box::new(rhs),
+        lhs: Box::new(lhs),
+        rhs: Box::new(rhs),
       });
 
       parse_infix_expression_node(s, precedence, rhs)
@@ -511,12 +511,12 @@ mod tests {
     assert_eq!(
       compile(source),
       ExpressionNode::Field(ExpressionFieldNode {
-        left: Box::new(ExpressionNode::Path(PathNode {
+        lhs: Box::new(ExpressionNode::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         })),
-        right: Box::new(IdentNode {
+        rhs: Box::new(IdentNode {
           raw: "bar".to_owned()
         })
       })
@@ -530,12 +530,12 @@ mod tests {
       compile(source),
       ExpressionNode::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::Add,
-        left: Box::new(ExpressionNode::Path(PathNode {
+        lhs: Box::new(ExpressionNode::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         })),
-        right: Box::new(ExpressionNode::Path(PathNode {
+        rhs: Box::new(ExpressionNode::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "bar".to_owned()
           }]
@@ -551,19 +551,19 @@ mod tests {
       compile(source),
       ExpressionNode::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::Add,
-        left: Box::new(ExpressionNode::Path(PathNode {
+        lhs: Box::new(ExpressionNode::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         })),
-        right: Box::new(ExpressionNode::InfixOperator(InfixOperatorNode {
+        rhs: Box::new(ExpressionNode::InfixOperator(InfixOperatorNode {
           kind: InfixOperatorKind::Mul,
-          left: Box::new(ExpressionNode::Path(PathNode {
+          lhs: Box::new(ExpressionNode::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "bar".to_owned()
             }]
           })),
-          right: Box::new(ExpressionNode::Path(PathNode {
+          rhs: Box::new(ExpressionNode::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "baz".to_owned()
             }]
@@ -580,20 +580,20 @@ mod tests {
       compile(source),
       ExpressionNode::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::Add,
-        left: Box::new(ExpressionNode::InfixOperator(InfixOperatorNode {
+        lhs: Box::new(ExpressionNode::InfixOperator(InfixOperatorNode {
           kind: InfixOperatorKind::Mul,
-          left: Box::new(ExpressionNode::Path(PathNode {
+          lhs: Box::new(ExpressionNode::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "foo".to_owned()
             }]
           })),
-          right: Box::new(ExpressionNode::Path(PathNode {
+          rhs: Box::new(ExpressionNode::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "bar".to_owned()
             }]
           }))
         })),
-        right: Box::new(ExpressionNode::Path(PathNode {
+        rhs: Box::new(ExpressionNode::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "baz".to_owned()
           }]
@@ -609,27 +609,27 @@ mod tests {
       compile(source),
       ExpressionNode::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::Add,
-        left: Box::new(ExpressionNode::InfixOperator(InfixOperatorNode {
+        lhs: Box::new(ExpressionNode::InfixOperator(InfixOperatorNode {
           kind: InfixOperatorKind::Mul,
-          left: Box::new(ExpressionNode::Path(PathNode {
+          lhs: Box::new(ExpressionNode::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "foo".to_owned()
             }]
           })),
-          right: Box::new(ExpressionNode::Path(PathNode {
+          rhs: Box::new(ExpressionNode::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "bar".to_owned()
             }]
           }))
         })),
-        right: Box::new(ExpressionNode::InfixOperator(InfixOperatorNode {
+        rhs: Box::new(ExpressionNode::InfixOperator(InfixOperatorNode {
           kind: InfixOperatorKind::Mul,
-          left: Box::new(ExpressionNode::Path(PathNode {
+          lhs: Box::new(ExpressionNode::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "baz".to_owned()
             }]
           })),
-          right: Box::new(ExpressionNode::Path(PathNode {
+          rhs: Box::new(ExpressionNode::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "bax".to_owned()
             }]
@@ -646,7 +646,7 @@ mod tests {
       compile(source),
       ExpressionNode::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::Add,
-        left: Box::new(ExpressionNode::Tuple(TupleNode {
+        lhs: Box::new(ExpressionNode::Tuple(TupleNode {
           field: Some(Box::new(ExpressionNode::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "foo".to_owned()
@@ -661,7 +661,7 @@ mod tests {
             })
           )]
         })),
-        right: Box::new(ExpressionNode::Tuple(TupleNode {
+        rhs: Box::new(ExpressionNode::Tuple(TupleNode {
           field: Some(Box::new(ExpressionNode::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "baz".to_owned()
@@ -687,23 +687,23 @@ mod tests {
       compile(source),
       ExpressionNode::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::Add,
-        left: Box::new(ExpressionNode::Field(ExpressionFieldNode {
-          left: Box::new(ExpressionNode::Path(PathNode {
+        lhs: Box::new(ExpressionNode::Field(ExpressionFieldNode {
+          lhs: Box::new(ExpressionNode::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "foo".to_owned()
             }]
           })),
-          right: Box::new(IdentNode {
+          rhs: Box::new(IdentNode {
             raw: "bar".to_owned()
           })
         })),
-        right: Box::new(ExpressionNode::Field(ExpressionFieldNode {
-          left: Box::new(ExpressionNode::Path(PathNode {
+        rhs: Box::new(ExpressionNode::Field(ExpressionFieldNode {
+          lhs: Box::new(ExpressionNode::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "baz".to_owned()
             }]
           })),
-          right: Box::new(IdentNode {
+          rhs: Box::new(IdentNode {
             raw: "bax".to_owned()
           })
         })),
@@ -718,12 +718,12 @@ mod tests {
       compile(source),
       ExpressionNode::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::BitAnd,
-        left: Box::new(ExpressionNode::Path(PathNode {
+        lhs: Box::new(ExpressionNode::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         })),
-        right: Box::new(ExpressionNode::Path(PathNode {
+        rhs: Box::new(ExpressionNode::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "bar".to_owned()
           }]
@@ -739,12 +739,12 @@ mod tests {
       compile(source),
       ExpressionNode::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::LessThan,
-        left: Box::new(ExpressionNode::Path(PathNode {
+        lhs: Box::new(ExpressionNode::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         })),
-        right: Box::new(ExpressionNode::Path(PathNode {
+        rhs: Box::new(ExpressionNode::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "bar".to_owned()
           }]
@@ -760,12 +760,12 @@ mod tests {
       compile(source),
       ExpressionNode::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::And,
-        left: Box::new(ExpressionNode::Path(PathNode {
+        lhs: Box::new(ExpressionNode::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         })),
-        right: Box::new(ExpressionNode::Path(PathNode {
+        rhs: Box::new(ExpressionNode::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "bar".to_owned()
           }]
@@ -781,12 +781,12 @@ mod tests {
       compile(source),
       ExpressionNode::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::ChainArrow,
-        left: Box::new(ExpressionNode::Path(PathNode {
+        lhs: Box::new(ExpressionNode::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         })),
-        right: Box::new(ExpressionNode::Path(PathNode {
+        rhs: Box::new(ExpressionNode::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "bar".to_owned()
           }]

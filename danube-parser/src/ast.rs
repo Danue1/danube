@@ -358,8 +358,8 @@ pub struct IndexNode {
 #[derive(Debug, PartialEq, Clone)]
 pub struct InfixOperatorNode {
   pub kind: InfixOperatorKind,
-  pub left: Box<ExpressionNode>,
-  pub right: Box<ExpressionNode>,
+  pub lhs: Box<ExpressionNode>,
+  pub rhs: Box<ExpressionNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -402,8 +402,8 @@ pub enum UnaryOperatorKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ExpressionFieldNode {
-  pub left: Box<ExpressionNode>,
-  pub right: Box<IdentNode>,
+  pub lhs: Box<ExpressionNode>,
+  pub rhs: Box<IdentNode>,
 }
 
 pub type ExpressionStructField = (IdentNode, Option<ExpressionNode>);
