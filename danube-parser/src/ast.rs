@@ -289,10 +289,7 @@ pub enum ExpressionNode {
   Tuple(TupleNode),
   Index(IndexNode),
   UnaryOperator(UnaryOperatorNode),
-  PipelineChain(PipelineChainNode),
-  ArithmeticOrLogical(ArithmeticOrLogicalNode),
-  Comparison(ComparisonNode),
-  LazyBooleann(LazyBooleanNode),
+  InfixOperator(InfixOperatorNode),
   Await(Box<ExpressionNode>),
   Try(Box<ExpressionNode>),
   Field(ExpressionFieldNode),
@@ -369,20 +366,14 @@ pub struct IndexNode {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct PipelineChainNode {
+pub struct InfixOperatorNode {
+  pub kind: InfixOperatorKind,
   pub left: Box<ExpressionNode>,
   pub right: Box<ExpressionNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct ArithmeticOrLogicalNode {
-  pub kind: ArithmeticOrLogicalKind,
-  pub left: Box<ExpressionNode>,
-  pub right: Box<ExpressionNode>,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub enum ArithmeticOrLogicalKind {
+pub enum InfixOperatorKind {
   Add,      // +
   Sub,      // -
   Mul,      // *
@@ -393,36 +384,18 @@ pub enum ArithmeticOrLogicalKind {
   BitXor,   // ^
   BitLeft,  // <<
   BitRight, // >>
-}
 
-#[derive(Debug, PartialEq, Clone)]
-pub struct ComparisonNode {
-  pub kind: ComparisonKind,
-  pub left: Box<ExpressionNode>,
-  pub right: Box<ExpressionNode>,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub enum ComparisonKind {
   Equal,              // ==
   NotEqual,           // !=
   GreaterThan,        // >
   LessThan,           // <
   GreaterThanOrEqual, // >=
   LessThanOrEqual,    // <=
-}
 
-#[derive(Debug, PartialEq, Clone)]
-pub struct LazyBooleanNode {
-  pub kind: LazyBooleanKind,
-  pub left: Box<ExpressionNode>,
-  pub right: Box<ExpressionNode>,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub enum LazyBooleanKind {
   And, // &&
   Or,  // ||
+
+  ChainArrow, // |>
 }
 
 #[derive(Debug, PartialEq, Clone)]
