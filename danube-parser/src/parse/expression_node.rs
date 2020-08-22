@@ -132,28 +132,28 @@ fn parse_postfix_expression_node(
 }
 
 fn parse_infix_expression_node(
-  mut s: Tokens,
+  s: Tokens,
   precedence: Precedence,
-  mut lhs: ExpressionNode,
+  lhs: ExpressionNode,
 ) -> ParseResult<ExpressionNode> {
-  while let Ok((ss, kind)) = parse_infix_operator_kind(s.clone()) {
+  if let Ok((ss, kind)) = parse_infix_operator_kind(s.clone()) {
     let right_precedence = infix_binding_power(kind.clone());
     if right_precedence < precedence {
-      break;
+      Ok((s, lhs))
     } else {
-      let (ss, rhs) = parse_prefixable_expression_node(ss)?;
-      let (ss, rhs) = parse_postfix_expression_node(ss, right_precedence, rhs)?;
-
-      s = ss;
-      lhs = ExpressionNode::InfixOperator(InfixOperatorNode {
+      let (s, rhs) = parse_prefixable_expression_node(ss)?;
+      let (s, rhs) = parse_postfix_expression_node(s, right_precedence, rhs)?;
+      let rhs = ExpressionNode::InfixOperator(InfixOperatorNode {
         kind,
         left: Box::new(lhs),
         right: Box::new(rhs),
       });
-    }
-  }
 
-  Ok((s, lhs))
+      parse_infix_expression_node(s, precedence, rhs)
+    }
+  } else {
+    Ok((s, lhs))
+  }
 }
 
 fn infix_binding_power(kind: InfixOperatorKind) -> Precedence {
