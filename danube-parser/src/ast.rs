@@ -346,7 +346,13 @@ pub enum PatternNode {
 #[derive(Debug, PartialEq, Clone)]
 pub struct TupleNode {
   pub field: Option<Box<ExpressionNode>>,
-  pub node_list: Vec<(Option<IdentNode>, ExpressionNode)>,
+  pub argument_list: Vec<TupleArgument>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct TupleArgument {
+  pub name: Option<IdentNode>,
+  pub value: ExpressionNode,
 }
 
 #[derive(Debug, PartialEq, Clone)]

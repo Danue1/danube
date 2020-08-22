@@ -40,9 +40,9 @@ fn parse_expression_struct_node(s: Tokens) -> ParseResult<ExpressionStructNode> 
 }
 
 fn parse_expression_tuple_node(s: Tokens) -> ParseResult<TupleNode> {
-  map(parse_tuple_operator, |node_list| TupleNode {
+  map(parse_tuple_operator, |argument_list| TupleNode {
     field: None,
-    node_list,
+    argument_list,
   })(s)
 }
 
@@ -84,10 +84,10 @@ fn parse_postfix_expression_node(
 
       parse_postfix_expression_node(s, precedence, node)
     }
-    Ok((s, OperatorKind::Tuple(node_list))) => {
+    Ok((s, OperatorKind::Tuple(argument_list))) => {
       let node = ExpressionNode::Tuple(TupleNode {
         field: Some(Box::new(lhs)),
-        node_list,
+        argument_list,
       });
 
       parse_postfix_expression_node(s, precedence, node)
@@ -179,7 +179,7 @@ fn infix_binding_power(kind: InfixOperatorKind) -> Precedence {
 enum OperatorKind {
   Await,
   Try,
-  Tuple(Vec<(Option<IdentNode>, ExpressionNode)>),
+  Tuple(Vec<TupleArgument>),
   Index(ExpressionNode),
   Field(IdentNode),
   InfixOperator(InfixOperatorKind),
@@ -196,19 +196,22 @@ fn parse_operator_kind(s: Tokens) -> ParseResult<OperatorKind> {
   ))(s)
 }
 
-fn parse_tuple_operator(s: Tokens) -> ParseResult<Vec<(Option<IdentNode>, ExpressionNode)>> {
+fn parse_tuple_operator(s: Tokens) -> ParseResult<Vec<TupleArgument>> {
   map(
     tuple((
       parse_symbol(Symbol::LeftParens),
       separated_list(
         parse_symbol(Symbol::Comma),
-        tuple((
-          opt(map(
-            tuple((parse_ident_node, parse_symbol(Symbol::Assign))),
-            |(name, _)| name,
+        map(
+          tuple((
+            opt(map(
+              tuple((parse_ident_node, parse_symbol(Symbol::Assign))),
+              |(name, _)| name,
+            )),
+            parse_expression_node,
           )),
-          parse_expression_node,
-        )),
+          |(name, value)| TupleArgument { name, value },
+        ),
       ),
       opt(parse_symbol(Symbol::Comma)),
       parse_symbol(Symbol::RightParens),
@@ -407,7 +410,7 @@ mod tests {
             raw: "foo".to_owned()
           }]
         }))),
-        node_list: vec![],
+        argument_list: vec![],
       })
     );
   }
@@ -423,14 +426,14 @@ mod tests {
             raw: "foo".to_owned()
           }]
         }))),
-        node_list: vec![(
-          None,
-          ExpressionNode::Path(PathNode {
+        argument_list: vec![TupleArgument {
+          name: None,
+          value: ExpressionNode::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "bar".to_owned()
             }]
           })
-        )],
+        }],
       })
     );
   }
@@ -446,16 +449,16 @@ mod tests {
             raw: "foo".to_owned()
           }]
         }))),
-        node_list: vec![(
-          Some(IdentNode {
+        argument_list: vec![TupleArgument {
+          name: Some(IdentNode {
             raw: "bar".to_owned()
           }),
-          ExpressionNode::Path(PathNode {
+          value: ExpressionNode::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "baz".to_owned()
             }]
           })
-        )],
+        }],
       })
     );
   }
@@ -471,7 +474,7 @@ mod tests {
             raw: "foo".to_owned()
           }]
         }))),
-        node_list: vec![],
+        argument_list: vec![],
       })))
     );
   }
@@ -500,7 +503,7 @@ mod tests {
             raw: "foo".to_owned()
           }]
         }))),
-        node_list: vec![],
+        argument_list: vec![],
       })))
     );
   }
@@ -652,14 +655,14 @@ mod tests {
               raw: "foo".to_owned()
             }]
           }))),
-          node_list: vec![(
-            None,
-            ExpressionNode::Path(PathNode {
+          argument_list: vec![TupleArgument {
+            name: None,
+            value: ExpressionNode::Path(PathNode {
               ident_list: vec![IdentNode {
                 raw: "bar".to_owned()
               }]
             })
-          )]
+          }]
         })),
         rhs: Box::new(ExpressionNode::Tuple(TupleNode {
           field: Some(Box::new(ExpressionNode::Path(PathNode {
@@ -667,14 +670,14 @@ mod tests {
               raw: "baz".to_owned()
             }]
           }))),
-          node_list: vec![(
-            None,
-            ExpressionNode::Path(PathNode {
+          argument_list: vec![TupleArgument {
+            name: None,
+            value: ExpressionNode::Path(PathNode {
               ident_list: vec![IdentNode {
                 raw: "bax".to_owned()
               }]
             })
-          )]
+          }]
         })),
       })
     )
