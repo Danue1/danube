@@ -226,5 +226,5 @@ use a::b as c; // b alias to c
 
 use self::a; // import ./a
 use super::a; // import ../a
-use crate::a; // import <root_file>::a
+use mod::a; // import <root_module>::a
 ```
