@@ -1,6 +1,6 @@
 use super::*;
 
-pub(super) fn parse_expression_conditional_node(s: Tokens) -> ParseResult<ConditionalNode> {
+pub(super) fn parse_conditional_node(s: Tokens) -> ParseResult<ConditionalNode> {
   map(
     tuple((
       parse_keyword(Keyword::If),
@@ -45,7 +45,7 @@ mod tests {
 
   fn compile(s: &str) -> ConditionalNode {
     let (_, token_list) = lex(s).unwrap();
-    match parse_expression_conditional_node(Tokens::new(&token_list)) {
+    match parse_conditional_node(Tokens::new(&token_list)) {
       Ok((_, node)) => node,
       Err(error) => {
         dbg!(error);

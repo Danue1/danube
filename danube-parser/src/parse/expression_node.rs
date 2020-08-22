@@ -15,10 +15,7 @@ fn parse_atomic_expression_node(s: Tokens) -> ParseResult<ExpressionNode> {
     map(parse_expression_struct_node, ExpressionNode::Struct),
     map(parse_expression_tuple_node, ExpressionNode::Tuple),
     map(parse_path_node, ExpressionNode::Path),
-    map(
-      parse_expression_conditional_node,
-      ExpressionNode::Conditional,
-    ),
+    map(parse_conditional_node, ExpressionNode::Conditional),
     map(parse_loop_node, ExpressionNode::Loop),
     map(parse_while_node, ExpressionNode::While),
     map(parse_for_node, ExpressionNode::For),
