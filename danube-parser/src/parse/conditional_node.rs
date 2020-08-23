@@ -4,12 +4,12 @@ pub(super) fn parse_conditional_node(s: Tokens) -> ParseResult<ConditionalNode> 
   map(
     tuple((
       parse_keyword(Keyword::If),
-      tuple((parse_expression_node, parse_block_node)),
+      tuple((parse_condition_node, parse_block_node)),
       many0(map(
         tuple((
           parse_keyword(Keyword::Else),
           parse_keyword(Keyword::If),
-          tuple((parse_expression_node, parse_block_node)),
+          tuple((parse_condition_node, parse_block_node)),
         )),
         |(_, _, block)| block,
       )),
@@ -20,7 +20,7 @@ pub(super) fn parse_conditional_node(s: Tokens) -> ParseResult<ConditionalNode> 
     )),
     |(_, if_conditional_branch, else_if_conditional_branch, else_conditional_branch)| {
       ConditionalNode {
-        main_branch: Box::new(if_conditional_branch),
+        main_branch: if_conditional_branch,
         branch_list: else_if_conditional_branch,
         other: else_conditional_branch,
       }
@@ -44,21 +44,74 @@ mod tests {
   }
 
   #[test]
+  fn if_branch() {
+    let source = "if true { }";
+    assert_eq!(
+      compile(source),
+      ConditionalNode {
+        main_branch: (
+          ConditionNode {
+            pattern: None,
+            value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+          },
+          BlockNode {
+            statement_list: vec![]
+          },
+        ),
+        branch_list: vec![],
+        other: None,
+      }
+    );
+  }
+
+  #[test]
   fn if_branch_else_branch() {
     let source = "if true { } else { }";
     assert_eq!(
       compile(source),
       ConditionalNode {
-        main_branch: Box::new((
-          ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+        main_branch: (
+          ConditionNode {
+            pattern: None,
+            value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+          },
           BlockNode {
             statement_list: vec![]
           },
-        )),
+        ),
         branch_list: vec![],
         other: Some(BlockNode {
           statement_list: vec![]
         }),
+      }
+    );
+  }
+
+  #[test]
+  fn if_branch_else_if_branch() {
+    let source = "if true { } else if true { }";
+    assert_eq!(
+      compile(source),
+      ConditionalNode {
+        main_branch: (
+          ConditionNode {
+            pattern: None,
+            value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+          },
+          BlockNode {
+            statement_list: vec![]
+          },
+        ),
+        branch_list: vec![(
+          ConditionNode {
+            pattern: None,
+            value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+          },
+          BlockNode {
+            statement_list: vec![]
+          },
+        )],
+        other: None,
       }
     );
   }
@@ -69,14 +122,20 @@ mod tests {
     assert_eq!(
       compile(source),
       ConditionalNode {
-        main_branch: Box::new((
-          ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+        main_branch: (
+          ConditionNode {
+            pattern: None,
+            value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+          },
           BlockNode {
             statement_list: vec![]
           },
-        )),
+        ),
         branch_list: vec![(
-          ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+          ConditionNode {
+            pattern: None,
+            value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+          },
           BlockNode {
             statement_list: vec![]
           },
@@ -84,6 +143,62 @@ mod tests {
         other: Some(BlockNode {
           statement_list: vec![]
         }),
+      }
+    );
+  }
+
+  #[test]
+  fn if_let_branch() {
+    let source = "if let foo = true { }";
+    assert_eq!(
+      compile(source),
+      ConditionalNode {
+        main_branch: (
+          ConditionNode {
+            pattern: Some((
+              Immutablity::Yes,
+              PatternNode::Path(PathNode {
+                ident_list: vec![IdentNode {
+                  raw: "foo".to_owned()
+                }]
+              })
+            )),
+            value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+          },
+          BlockNode {
+            statement_list: vec![]
+          },
+        ),
+        branch_list: vec![],
+        other: None,
+      }
+    );
+  }
+
+  #[test]
+  fn if_let_mut_branch() {
+    let source = "if let mut foo = true { }";
+    assert_eq!(
+      compile(source),
+      ConditionalNode {
+        main_branch: (
+          ConditionNode {
+            pattern: Some((
+              Immutablity::Nope,
+              PatternNode::Path(PathNode {
+                ident_list: vec![IdentNode {
+                  raw: "foo".to_owned()
+                }]
+              })
+            )),
+            value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+          },
+          BlockNode {
+            statement_list: vec![]
+          },
+        ),
+        branch_list: vec![],
+        other: None,
       }
     );
   }

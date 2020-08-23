@@ -293,11 +293,17 @@ pub enum ExpressionNode {
   Block(BlockNode),
 }
 
-pub type ConditionalBranch = (ExpressionNode, BlockNode);
+#[derive(Debug, PartialEq, Clone)]
+pub struct ConditionNode {
+  pub pattern: Option<(Immutablity, PatternNode)>,
+  pub value: Box<ExpressionNode>,
+}
+
+pub type ConditionalBranch = (ConditionNode, BlockNode);
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ConditionalNode {
-  pub main_branch: Box<ConditionalBranch>,
+  pub main_branch: ConditionalBranch,
   pub branch_list: Vec<ConditionalBranch>,
   pub other: Option<BlockNode>,
 }
@@ -309,7 +315,7 @@ pub struct LoopNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct WhileNode {
-  pub condition: Box<ExpressionNode>,
+  pub condition: ConditionNode,
   pub block: BlockNode,
 }
 

@@ -4,13 +4,10 @@ pub(super) fn parse_while_node(s: Tokens) -> ParseResult<WhileNode> {
   map(
     tuple((
       parse_keyword(Keyword::While),
-      parse_expression_node,
+      parse_condition_node,
       parse_block_node,
     )),
-    |(_, condition, block)| WhileNode {
-      condition: Box::new(condition),
-      block,
-    },
+    |(_, condition, block)| WhileNode { condition, block },
   )(s)
 }
 
@@ -30,12 +27,63 @@ mod tests {
   }
 
   #[test]
-  fn test() {
+  fn value() {
     let source = "while true { }";
     assert_eq!(
       compile(source),
       WhileNode {
-        condition: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true))),
+        condition: ConditionNode {
+          pattern: None,
+          value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+        },
+        block: BlockNode {
+          statement_list: vec![]
+        }
+      }
+    );
+  }
+
+  #[test]
+  fn let_value() {
+    let source = "while let foo = true { }";
+    assert_eq!(
+      compile(source),
+      WhileNode {
+        condition: ConditionNode {
+          pattern: Some((
+            Immutablity::Yes,
+            PatternNode::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "foo".to_owned(),
+              }]
+            })
+          )),
+          value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+        },
+        block: BlockNode {
+          statement_list: vec![]
+        }
+      }
+    );
+  }
+
+  #[test]
+  fn let_mut_value() {
+    let source = "while let mut foo = true { }";
+    assert_eq!(
+      compile(source),
+      WhileNode {
+        condition: ConditionNode {
+          pattern: Some((
+            Immutablity::Nope,
+            PatternNode::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "foo".to_owned(),
+              }]
+            })
+          )),
+          value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+        },
         block: BlockNode {
           statement_list: vec![]
         }

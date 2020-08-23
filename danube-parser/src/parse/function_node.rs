@@ -267,12 +267,15 @@ mod tests {
         block: BlockNode {
           statement_list: vec![StatementNode::Expression(ExpressionNode::Conditional(
             ConditionalNode {
-              main_branch: Box::new((
-                ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+              main_branch: (
+                ConditionNode {
+                  pattern: None,
+                  value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true))),
+                },
                 BlockNode {
                   statement_list: vec![]
                 },
-              )),
+              ),
               branch_list: vec![],
               other: None
             }
@@ -301,12 +304,15 @@ mod tests {
         block: BlockNode {
           statement_list: vec![StatementNode::Expression(ExpressionNode::Conditional(
             ConditionalNode {
-              main_branch: Box::new((
-                ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+              main_branch: (
+                ConditionNode {
+                  pattern: None,
+                  value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+                },
                 BlockNode {
                   statement_list: vec![]
                 },
-              )),
+              ),
               branch_list: vec![],
               other: Some(BlockNode {
                 statement_list: vec![]

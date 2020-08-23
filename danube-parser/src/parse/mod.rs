@@ -1,6 +1,7 @@
 mod assign_sugar_kind;
 mod assign_sugar_node;
 mod block_node;
+mod condition_node;
 mod conditional_node;
 mod constant_node;
 mod enum_node;
@@ -55,6 +56,7 @@ use crate::*;
 use assign_sugar_kind::parse_assign_sugar_kind;
 use assign_sugar_node::parse_assign_sugar_node;
 use block_node::parse_block_node;
+use condition_node::parse_condition_node;
 use conditional_node::parse_conditional_node;
 use constant_node::parse_constant_node;
 use enum_node::parse_enum_node;
