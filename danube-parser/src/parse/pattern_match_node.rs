@@ -27,23 +27,14 @@ pub(super) fn parse_pattern_match_node(s: Tokens) -> ParseResult<PatternMatchNod
   )(s)
 }
 
-fn parse_body(s: Tokens) -> ParseResult<Vec<StatementNode>> {
-  alt((parse_body_longcut, parse_body_shortcut))(s)
+fn parse_body(s: Tokens) -> ParseResult<BlockNode> {
+  alt((parse_block_node, parse_body_shortcut))(s)
 }
 
-fn parse_body_shortcut(s: Tokens) -> ParseResult<Vec<StatementNode>> {
-  map(parse_statement_node, |statement| vec![statement])(s)
-}
-
-fn parse_body_longcut(s: Tokens) -> ParseResult<Vec<StatementNode>> {
-  map(
-    tuple((
-      parse_symbol(Symbol::LeftBrace),
-      many0(parse_statement_node),
-      parse_symbol(Symbol::RightBrace),
-    )),
-    |(_, statement_list, _)| statement_list,
-  )(s)
+fn parse_body_shortcut(s: Tokens) -> ParseResult<BlockNode> {
+  map(parse_statement_node, |statement| BlockNode {
+    statement_list: vec![statement],
+  })(s)
 }
 
 #[cfg(test)]
@@ -72,9 +63,11 @@ mod tests {
         condition: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true))),
         branch_list: vec![(
           vec![PatternNode::Literal(LiteralValueNode::Bool(true))],
-          vec![StatementNode::Expression(ExpressionNode::Literal(
-            LiteralValueNode::Bool(true)
-          ))]
+          BlockNode {
+            statement_list: vec![StatementNode::Expression(ExpressionNode::Literal(
+              LiteralValueNode::Bool(true)
+            ))]
+          },
         )],
       }
     );
@@ -93,15 +86,19 @@ mod tests {
         branch_list: vec![
           (
             vec![PatternNode::Literal(LiteralValueNode::Bool(true))],
-            vec![StatementNode::Expression(ExpressionNode::Literal(
-              LiteralValueNode::Bool(true)
-            ))]
+            BlockNode {
+              statement_list: vec![StatementNode::Expression(ExpressionNode::Literal(
+                LiteralValueNode::Bool(true)
+              ))]
+            }
           ),
           (
             vec![PatternNode::Literal(LiteralValueNode::Bool(false))],
-            vec![StatementNode::Expression(ExpressionNode::Literal(
-              LiteralValueNode::Bool(false)
-            ))]
+            BlockNode {
+              statement_list: vec![StatementNode::Expression(ExpressionNode::Literal(
+                LiteralValueNode::Bool(false)
+              ))]
+            },
           )
         ],
       }
@@ -119,7 +116,9 @@ mod tests {
         condition: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true))),
         branch_list: vec![(
           vec![PatternNode::Literal(LiteralValueNode::Bool(true))],
-          vec![]
+          BlockNode {
+            statement_list: vec![]
+          },
         )],
       }
     );
@@ -138,11 +137,15 @@ mod tests {
         branch_list: vec![
           (
             vec![PatternNode::Literal(LiteralValueNode::Bool(true))],
-            vec![]
+            BlockNode {
+              statement_list: vec![]
+            },
           ),
           (
             vec![PatternNode::Literal(LiteralValueNode::Bool(false))],
-            vec![]
+            BlockNode {
+              statement_list: vec![]
+            },
           )
         ],
       }
@@ -163,7 +166,9 @@ mod tests {
             PatternNode::Literal(LiteralValueNode::Bool(true)),
             PatternNode::Literal(LiteralValueNode::Bool(false))
           ],
-          vec![]
+          BlockNode {
+            statement_list: vec![]
+          },
         )],
       }
     );

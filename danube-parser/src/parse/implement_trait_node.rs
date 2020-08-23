@@ -112,7 +112,9 @@ mod tests {
           generic: None,
           argument_list: vec![],
           return_type: None,
-          body: vec![]
+          block: BlockNode {
+            statement_list: vec![]
+          },
         })]
       }
     );

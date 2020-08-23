@@ -134,7 +134,7 @@ mod test_function {
           generic: None,
           argument_list: vec![],
           return_type: None,
-          body: None,
+          block: None,
         })]
       }
     );
@@ -174,7 +174,7 @@ mod test_function {
             )
           }],
           return_type: None,
-          body: None,
+          block: None,
         })]
       }
     );
@@ -230,7 +230,7 @@ mod test_function {
             }
           ],
           return_type: None,
-          body: None,
+          block: None
         })]
       }
     );
@@ -259,21 +259,23 @@ mod test_function {
           generic: None,
           argument_list: vec![],
           return_type: None,
-          body: Some(vec![StatementNode::Constant(ConstantNode {
-            visibility: None,
-            ident: IdentNode {
-              raw: "FOO".to_owned(),
-            },
-            ty: TypeNode::Path(
-              Immutablity::Yes,
-              PathNode {
-                ident_list: vec![IdentNode {
-                  raw: "bool".to_owned(),
-                }]
-              }
-            ),
-            value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
-          })]),
+          block: Some(BlockNode {
+            statement_list: vec![StatementNode::Constant(ConstantNode {
+              visibility: None,
+              ident: IdentNode {
+                raw: "FOO".to_owned(),
+              },
+              ty: TypeNode::Path(
+                Immutablity::Yes,
+                PathNode {
+                  ident_list: vec![IdentNode {
+                    raw: "bool".to_owned(),
+                  }]
+                }
+              ),
+              value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+            })]
+          }),
         })]
       }
     );
@@ -315,21 +317,23 @@ mod test_function {
             )
           }],
           return_type: None,
-          body: Some(vec![StatementNode::Constant(ConstantNode {
-            visibility: None,
-            ident: IdentNode {
-              raw: "FOO".to_owned(),
-            },
-            ty: TypeNode::Path(
-              Immutablity::Yes,
-              PathNode {
-                ident_list: vec![IdentNode {
-                  raw: "bool".to_owned(),
-                }]
-              }
-            ),
-            value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
-          })]),
+          block: Some(BlockNode {
+            statement_list: vec![StatementNode::Constant(ConstantNode {
+              visibility: None,
+              ident: IdentNode {
+                raw: "FOO".to_owned(),
+              },
+              ty: TypeNode::Path(
+                Immutablity::Yes,
+                PathNode {
+                  ident_list: vec![IdentNode {
+                    raw: "bool".to_owned(),
+                  }]
+                }
+              ),
+              value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+            })]
+          }),
         })]
       }
     );
@@ -387,21 +391,23 @@ mod test_function {
             }
           ],
           return_type: None,
-          body: Some(vec![StatementNode::Constant(ConstantNode {
-            visibility: None,
-            ident: IdentNode {
-              raw: "FOO".to_owned(),
-            },
-            ty: TypeNode::Path(
-              Immutablity::Yes,
-              PathNode {
-                ident_list: vec![IdentNode {
-                  raw: "bool".to_owned(),
-                }]
-              }
-            ),
-            value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
-          })]),
+          block: Some(BlockNode {
+            statement_list: vec![StatementNode::Constant(ConstantNode {
+              visibility: None,
+              ident: IdentNode {
+                raw: "FOO".to_owned(),
+              },
+              ty: TypeNode::Path(
+                Immutablity::Yes,
+                PathNode {
+                  ident_list: vec![IdentNode {
+                    raw: "bool".to_owned(),
+                  }]
+                }
+              ),
+              value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+            })]
+          }),
         })]
       }
     );

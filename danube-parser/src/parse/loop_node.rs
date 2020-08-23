@@ -2,13 +2,8 @@ use super::*;
 
 pub(super) fn parse_loop_node(s: Tokens) -> ParseResult<LoopNode> {
   map(
-    tuple((
-      parse_keyword(Keyword::Loop),
-      parse_symbol(Symbol::LeftBrace),
-      many0(parse_statement_node),
-      parse_symbol(Symbol::RightBrace),
-    )),
-    |(_, _, body, _)| LoopNode { body },
+    tuple((parse_keyword(Keyword::Loop), parse_block_node)),
+    |(_, block)| LoopNode { block },
   )(s)
 }
 
@@ -30,6 +25,13 @@ mod tests {
   #[test]
   fn test() {
     let source = "loop { }";
-    assert_eq!(compile(source), LoopNode { body: vec![] });
+    assert_eq!(
+      compile(source),
+      LoopNode {
+        block: BlockNode {
+          statement_list: vec![]
+        },
+      }
+    );
   }
 }

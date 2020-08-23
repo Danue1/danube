@@ -5,13 +5,11 @@ pub(super) fn parse_while_node(s: Tokens) -> ParseResult<WhileNode> {
     tuple((
       parse_keyword(Keyword::While),
       parse_expression_node,
-      parse_symbol(Symbol::LeftBrace),
-      many0(parse_statement_node),
-      parse_symbol(Symbol::RightBrace),
+      parse_block_node,
     )),
-    |(_, condition, _, body, _)| WhileNode {
+    |(_, condition, block)| WhileNode {
       condition: Box::new(condition),
-      body,
+      block,
     },
   )(s)
 }
@@ -37,8 +35,10 @@ mod tests {
     assert_eq!(
       compile(source),
       WhileNode {
-        condition: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)),),
-        body: vec![]
+        condition: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true))),
+        block: BlockNode {
+          statement_list: vec![]
+        }
       }
     );
   }

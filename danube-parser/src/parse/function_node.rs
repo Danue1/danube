@@ -12,14 +12,14 @@ pub(super) fn parse_function_node(s: Tokens) -> ParseResult<FunctionNode> {
       opt(parse_function_type),
       parse_function_body,
     )),
-    |(visibility, is_async, _, ident, generic, argument_list, return_type, body)| FunctionNode {
+    |(visibility, is_async, _, ident, generic, argument_list, return_type, block)| FunctionNode {
       visibility,
       is_async: is_async.is_some(),
       ident,
       generic,
       argument_list,
       return_type,
-      body,
+      block,
     },
   )(s)
 }
@@ -43,29 +43,20 @@ fn parse_function_type(s: Tokens) -> ParseResult<TypeNode> {
   )(s)
 }
 
-fn parse_function_body(s: Tokens) -> ParseResult<Vec<StatementNode>> {
-  alt((parse_function_body_shortcut, parse_function_body_longcut))(s)
+fn parse_function_body(s: Tokens) -> ParseResult<BlockNode> {
+  alt((parse_function_body_shortcut, parse_block_node))(s)
 }
 
-fn parse_function_body_shortcut(s: Tokens) -> ParseResult<Vec<StatementNode>> {
+fn parse_function_body_shortcut(s: Tokens) -> ParseResult<BlockNode> {
   map(
     tuple((
       parse_symbol(Symbol::Assign),
       parse_expression_node,
       parse_symbol(Symbol::Semicolon),
     )),
-    |(_, expression, _)| vec![StatementNode::Expression(expression)],
-  )(s)
-}
-
-fn parse_function_body_longcut(s: Tokens) -> ParseResult<Vec<StatementNode>> {
-  map(
-    tuple((
-      parse_symbol(Symbol::LeftBrace),
-      many0(parse_statement_node),
-      parse_symbol(Symbol::RightBrace),
-    )),
-    |(_, statement_list, _)| statement_list,
+    |(_, expression, _)| BlockNode {
+      statement_list: vec![StatementNode::Expression(expression)],
+    },
   )(s)
 }
 
@@ -98,7 +89,9 @@ mod tests {
         generic: None,
         argument_list: vec![],
         return_type: None,
-        body: vec![]
+        block: BlockNode {
+          statement_list: vec![]
+        },
       }
     );
   }
@@ -130,7 +123,9 @@ mod tests {
           )
         }],
         return_type: None,
-        body: vec![]
+        block: BlockNode {
+          statement_list: vec![]
+        },
       }
     );
   }
@@ -178,7 +173,9 @@ mod tests {
           }
         ],
         return_type: None,
-        body: vec![]
+        block: BlockNode {
+          statement_list: vec![]
+        },
       }
     );
   }
@@ -210,7 +207,9 @@ mod tests {
           )
         }],
         return_type: None,
-        body: vec![]
+        block: BlockNode {
+          statement_list: vec![]
+        },
       }
     );
   }
@@ -242,7 +241,9 @@ mod tests {
           )
         }],
         return_type: None,
-        body: vec![]
+        block: BlockNode {
+          statement_list: vec![]
+        },
       }
     );
   }
@@ -263,16 +264,20 @@ mod tests {
         generic: None,
         argument_list: vec![],
         return_type: None,
-        body: vec![StatementNode::Expression(ExpressionNode::Conditional(
-          ConditionalNode {
-            main_branch: Box::new((
-              ExpressionNode::Literal(LiteralValueNode::Bool(true)),
-              vec![],
-            )),
-            branch_list: vec![],
-            other: None
-          }
-        ))]
+        block: BlockNode {
+          statement_list: vec![StatementNode::Expression(ExpressionNode::Conditional(
+            ConditionalNode {
+              main_branch: Box::new((
+                ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+                BlockNode {
+                  statement_list: vec![]
+                },
+              )),
+              branch_list: vec![],
+              other: None
+            }
+          ))]
+        },
       }
     );
   }
@@ -293,16 +298,22 @@ mod tests {
         generic: None,
         argument_list: vec![],
         return_type: None,
-        body: vec![StatementNode::Expression(ExpressionNode::Conditional(
-          ConditionalNode {
-            main_branch: Box::new((
-              ExpressionNode::Literal(LiteralValueNode::Bool(true)),
-              vec![],
-            )),
-            branch_list: vec![],
-            other: Some(vec![])
-          }
-        ))]
+        block: BlockNode {
+          statement_list: vec![StatementNode::Expression(ExpressionNode::Conditional(
+            ConditionalNode {
+              main_branch: Box::new((
+                ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+                BlockNode {
+                  statement_list: vec![]
+                },
+              )),
+              branch_list: vec![],
+              other: Some(BlockNode {
+                statement_list: vec![]
+              }),
+            }
+          ))]
+        },
       }
     );
   }
@@ -325,15 +336,19 @@ mod tests {
         generic: None,
         argument_list: vec![],
         return_type: None,
-        body: vec![StatementNode::Expression(ExpressionNode::PatternMatch(
-          PatternMatchNode {
-            condition: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true))),
-            branch_list: vec![(
-              vec![PatternNode::Literal(LiteralValueNode::Bool(true))],
-              vec![]
-            )],
-          }
-        ))]
+        block: BlockNode {
+          statement_list: vec![StatementNode::Expression(ExpressionNode::PatternMatch(
+            PatternMatchNode {
+              condition: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true))),
+              branch_list: vec![(
+                vec![PatternNode::Literal(LiteralValueNode::Bool(true))],
+                BlockNode {
+                  statement_list: vec![]
+                },
+              )],
+            }
+          ))]
+        },
       }
     );
   }
@@ -354,21 +369,23 @@ mod tests {
         generic: None,
         argument_list: vec![],
         return_type: None,
-        body: vec![StatementNode::Let(LetNode {
-          immutablity: Immutablity::Nope,
-          pattern: PatternNode::Path(PathNode {
-            ident_list: vec![
-              IdentNode {
-                raw: "Foo".to_owned()
-              },
-              IdentNode {
-                raw: "Bar".to_owned()
-              }
-            ]
-          }),
-          ty: None,
-          value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
-        })]
+        block: BlockNode {
+          statement_list: vec![StatementNode::Let(LetNode {
+            immutablity: Immutablity::Nope,
+            pattern: PatternNode::Path(PathNode {
+              ident_list: vec![
+                IdentNode {
+                  raw: "Foo".to_owned()
+                },
+                IdentNode {
+                  raw: "Bar".to_owned()
+                },
+              ]
+            }),
+            ty: None,
+            value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+          })]
+        },
       }
     );
   }
@@ -387,7 +404,9 @@ mod tests {
         generic: None,
         argument_list: vec![],
         return_type: None,
-        body: vec![]
+        block: BlockNode {
+          statement_list: vec![]
+        },
       }
     );
   }

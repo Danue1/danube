@@ -8,15 +8,13 @@ pub(super) fn parse_for_node(s: Tokens) -> ParseResult<ForNode> {
       parse_pattern_node,
       parse_keyword(Keyword::In),
       parse_expression_node,
-      parse_symbol(Symbol::LeftBrace),
-      many0(parse_statement_node),
-      parse_symbol(Symbol::RightBrace),
+      parse_block_node,
     )),
-    |(_, immutablity, pattern, _, iteration, _, body, _)| ForNode {
+    |(_, immutablity, pattern, _, iteration, block)| ForNode {
       immutablity,
       pattern,
       iteration: Box::new(iteration),
-      body,
+      block,
     },
   )(s)
 }
@@ -53,7 +51,9 @@ mod tests {
           ExpressionNode::Literal(LiteralValueNode::Int(2)),
           ExpressionNode::Literal(LiteralValueNode::Int(3)),
         ])),
-        body: vec![],
+        block: BlockNode {
+          statement_list: vec![],
+        },
       }
     );
   }

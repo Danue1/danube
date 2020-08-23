@@ -4,18 +4,18 @@ pub(super) fn parse_conditional_node(s: Tokens) -> ParseResult<ConditionalNode> 
   map(
     tuple((
       parse_keyword(Keyword::If),
-      tuple((parse_expression_node, parse_branch_body)),
+      tuple((parse_expression_node, parse_block_node)),
       many0(map(
         tuple((
           parse_keyword(Keyword::Else),
           parse_keyword(Keyword::If),
-          tuple((parse_expression_node, parse_branch_body)),
+          tuple((parse_expression_node, parse_block_node)),
         )),
-        |(_, _, conditional_branch)| conditional_branch,
+        |(_, _, block)| block,
       )),
       opt(map(
-        tuple((parse_keyword(Keyword::Else), parse_branch_body)),
-        |(_, statement_list)| statement_list,
+        tuple((parse_keyword(Keyword::Else), parse_block_node)),
+        |(_, block)| block,
       )),
     )),
     |(_, if_conditional_branch, else_if_conditional_branch, else_conditional_branch)| {
@@ -25,17 +25,6 @@ pub(super) fn parse_conditional_node(s: Tokens) -> ParseResult<ConditionalNode> 
         other: else_conditional_branch,
       }
     },
-  )(s)
-}
-
-fn parse_branch_body(s: Tokens) -> ParseResult<Vec<StatementNode>> {
-  map(
-    tuple((
-      parse_symbol(Symbol::LeftBrace),
-      many0(parse_statement_node),
-      parse_symbol(Symbol::RightBrace),
-    )),
-    |(_, statement_list, _)| statement_list,
   )(s)
 }
 
@@ -62,10 +51,14 @@ mod tests {
       ConditionalNode {
         main_branch: Box::new((
           ExpressionNode::Literal(LiteralValueNode::Bool(true)),
-          vec![]
+          BlockNode {
+            statement_list: vec![]
+          },
         )),
         branch_list: vec![],
-        other: Some(vec![]),
+        other: Some(BlockNode {
+          statement_list: vec![]
+        }),
       }
     );
   }
@@ -78,13 +71,19 @@ mod tests {
       ConditionalNode {
         main_branch: Box::new((
           ExpressionNode::Literal(LiteralValueNode::Bool(true)),
-          vec![]
+          BlockNode {
+            statement_list: vec![]
+          },
         )),
         branch_list: vec![(
           ExpressionNode::Literal(LiteralValueNode::Bool(true)),
-          vec![]
+          BlockNode {
+            statement_list: vec![]
+          },
         )],
-        other: Some(vec![]),
+        other: Some(BlockNode {
+          statement_list: vec![]
+        }),
       }
     );
   }

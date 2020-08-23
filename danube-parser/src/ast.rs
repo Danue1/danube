@@ -94,7 +94,7 @@ pub struct FunctionNode {
   pub generic: Option<GenericNode>,
   pub argument_list: Vec<FunctionArgumentNode>,
   pub return_type: Option<TypeNode>,
-  pub body: Vec<StatementNode>,
+  pub block: BlockNode,
 }
 
 #[derive(Debug, PartialEq)]
@@ -229,7 +229,7 @@ pub struct TraitItemFunctionNode {
   pub generic: Option<GenericNode>,
   pub argument_list: Vec<FunctionArgumentNode>,
   pub return_type: Option<TypeNode>,
-  pub body: Option<Vec<StatementNode>>,
+  pub block: Option<BlockNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -290,27 +290,27 @@ pub enum ExpressionNode {
   Try(Box<ExpressionNode>),
   Field(ExpressionFieldNode),
   Struct(ExpressionStructNode),
-  Block(Vec<StatementNode>),
+  Block(BlockNode),
 }
 
-pub type ConditionalBranch = (ExpressionNode, Vec<StatementNode>);
+pub type ConditionalBranch = (ExpressionNode, BlockNode);
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ConditionalNode {
   pub main_branch: Box<ConditionalBranch>,
   pub branch_list: Vec<ConditionalBranch>,
-  pub other: Option<Vec<StatementNode>>,
+  pub other: Option<BlockNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct LoopNode {
-  pub body: Vec<StatementNode>,
+  pub block: BlockNode,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct WhileNode {
   pub condition: Box<ExpressionNode>,
-  pub body: Vec<StatementNode>,
+  pub block: BlockNode,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -318,10 +318,10 @@ pub struct ForNode {
   pub immutablity: Immutablity,
   pub pattern: PatternNode,
   pub iteration: Box<ExpressionNode>,
-  pub body: Vec<StatementNode>,
+  pub block: BlockNode,
 }
 
-pub type PatternBranch = (Vec<PatternNode>, Vec<StatementNode>);
+pub type PatternBranch = (Vec<PatternNode>, BlockNode);
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct PatternMatchNode {
@@ -419,6 +419,11 @@ pub struct ExpressionStructNode {
   pub path: Option<PathNode>,
   pub field_list: Vec<ExpressionStructField>,
   pub rest: Option<Box<ExpressionNode>>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct BlockNode {
+  pub statement_list: Vec<StatementNode>,
 }
 
 #[derive(Debug, PartialEq)]

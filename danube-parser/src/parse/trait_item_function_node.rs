@@ -11,13 +11,13 @@ pub(super) fn parse_trait_item_function_node(s: Tokens) -> ParseResult<TraitItem
       opt(parse_function_type),
       parse_function_body,
     )),
-    |(is_async, _, ident, generic, argument_list, return_type, body)| TraitItemFunctionNode {
+    |(is_async, _, ident, generic, argument_list, return_type, block)| TraitItemFunctionNode {
       is_async: is_async.is_some(),
       ident,
       generic,
       argument_list,
       return_type,
-      body,
+      block,
     },
   )(s)
 }
@@ -41,32 +41,23 @@ fn parse_function_type(s: Tokens) -> ParseResult<TypeNode> {
   )(s)
 }
 
-fn parse_function_body(s: Tokens) -> ParseResult<Option<Vec<StatementNode>>> {
+fn parse_function_body(s: Tokens) -> ParseResult<Option<BlockNode>> {
   alt((
     map(parse_function_body_shrotcut, Some),
-    map(parse_function_body_longcut, Some),
+    map(parse_block_node, Some),
     map(parse_symbol(Symbol::Semicolon), |_| None),
   ))(s)
 }
 
-fn parse_function_body_shrotcut(s: Tokens) -> ParseResult<Vec<StatementNode>> {
+fn parse_function_body_shrotcut(s: Tokens) -> ParseResult<BlockNode> {
   map(
     tuple((
       parse_symbol(Symbol::Assign),
       parse_expression_node,
       parse_symbol(Symbol::Semicolon),
     )),
-    |(_, expression, _)| vec![StatementNode::Expression(expression)],
-  )(s)
-}
-
-fn parse_function_body_longcut(s: Tokens) -> ParseResult<Vec<StatementNode>> {
-  map(
-    tuple((
-      parse_symbol(Symbol::LeftBrace),
-      many0(parse_statement_node),
-      parse_symbol(Symbol::RightBrace),
-    )),
-    |(_, statement_list, _)| statement_list,
+    |(_, expression, _)| BlockNode {
+      statement_list: vec![StatementNode::Expression(expression)],
+    },
   )(s)
 }
