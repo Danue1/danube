@@ -1,45 +1,45 @@
 use super::*;
 
-pub(super) fn parse_assign_sugar_kind(s: Tokens) -> ParseResult<AssignSugarKind> {
+pub(super) fn parse_compound_assign_kind(s: Tokens) -> ParseResult<CompoundAssignKind> {
   alt((
     map(parse_symbol(Symbol::AddAssign), |_| {
-      AssignSugarKind::AddAssign
+      CompoundAssignKind::AddAssign
     }),
     map(parse_symbol(Symbol::SubAssign), |_| {
-      AssignSugarKind::SubAssign
+      CompoundAssignKind::SubAssign
     }),
     map(parse_symbol(Symbol::ExpAssign), |_| {
-      AssignSugarKind::ExpAssign
+      CompoundAssignKind::ExpAssign
     }),
     map(parse_symbol(Symbol::MulAssign), |_| {
-      AssignSugarKind::MulAssign
+      CompoundAssignKind::MulAssign
     }),
     map(parse_symbol(Symbol::DivAssign), |_| {
-      AssignSugarKind::DivAssign
+      CompoundAssignKind::DivAssign
     }),
     map(parse_symbol(Symbol::ModAssign), |_| {
-      AssignSugarKind::ModAssign
+      CompoundAssignKind::ModAssign
     }),
     map(parse_symbol(Symbol::AndAssign), |_| {
-      AssignSugarKind::AndAssign
+      CompoundAssignKind::AndAssign
     }),
     map(parse_symbol(Symbol::OrAssign), |_| {
-      AssignSugarKind::OrAssign
+      CompoundAssignKind::OrAssign
     }),
     map(parse_symbol(Symbol::BitAndAssign), |_| {
-      AssignSugarKind::BitAndAssign
+      CompoundAssignKind::BitAndAssign
     }),
     map(parse_symbol(Symbol::BitOrAssign), |_| {
-      AssignSugarKind::BitOrAssign
+      CompoundAssignKind::BitOrAssign
     }),
     map(parse_symbol(Symbol::BitXorAssign), |_| {
-      AssignSugarKind::BitXorAssign
+      CompoundAssignKind::BitXorAssign
     }),
     map(parse_symbol(Symbol::BitLeftAssign), |_| {
-      AssignSugarKind::BitLeftAssign
+      CompoundAssignKind::BitLeftAssign
     }),
     map(parse_symbol(Symbol::BitRightAssign), |_| {
-      AssignSugarKind::BitRightAssign
+      CompoundAssignKind::BitRightAssign
     }),
   ))(s)
 }

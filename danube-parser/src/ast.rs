@@ -129,14 +129,14 @@ pub struct StaticNode {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct AssignSugarNode {
-  pub kind: AssignSugarKind,
-  pub ident: IdentNode,
-  pub value: ExpressionNode,
+pub struct CompoundAssignNode {
+  pub kind: CompoundAssignKind,
+  pub lhs: ExpressionNode,
+  pub rhs: ExpressionNode,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum AssignSugarKind {
+pub enum CompoundAssignKind {
   AddAssign, // +=
   SubAssign, // -=
   ExpAssign, // **=
@@ -255,7 +255,7 @@ pub enum Immutablity {
 pub enum StatementNode {
   Constant(ConstantNode),
   Static(StaticNode),
-  AssignSugar(AssignSugarNode),
+  CompoundAssign(CompoundAssignNode),
   Let(LetNode),
   Expression(ExpressionNode),
   Semicolon,
