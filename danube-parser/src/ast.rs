@@ -17,7 +17,7 @@ pub struct ModuleNode {
   pub item_list: Vec<ItemNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum ItemNode {
   Use(UseNode),
   Struct(StructNode),
@@ -31,25 +31,25 @@ pub enum ItemNode {
   ImplementTrait(ImplementTraitNode),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct UseNode {
   pub visibility: Option<Visibility>,
   pub kind: UseKind<UseRootNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum UseKind<T: Sized> {
   Unnested(T),
   Nested(Vec<T>),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct UseRootNode {
   pub ident: UseRootIdent,
   pub extra: UseKind<UseExtra>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum UseRootIdent {
   Current,
   Super,
@@ -57,14 +57,14 @@ pub enum UseRootIdent {
   Ident(IdentNode),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum UseExtra {
   All,
   Ident(IdentNode, Option<IdentNode>),
   Extra(IdentNode, Box<UseKind<UseExtra>>),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct StructNode {
   pub visibility: Option<Visibility>,
   pub ident: IdentNode,
@@ -72,13 +72,13 @@ pub struct StructNode {
   pub fields: StructFieldsNode,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct GenericNode {
   pub path: PathNode,
   pub trait_list: Vec<PathNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct EnumNode {
   pub visibility: Option<Visibility>,
   pub ident: IdentNode,
@@ -86,7 +86,7 @@ pub struct EnumNode {
   pub variant_list: Vec<EnumVariantNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct FunctionNode {
   pub visibility: Option<Visibility>,
   pub is_async: bool,
@@ -97,14 +97,14 @@ pub struct FunctionNode {
   pub block: BlockNode,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct TypeAliasNode {
   pub visibility: Option<Visibility>,
   pub ident: IdentNode,
   pub ty: TypeNode,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct TraitNode {
   pub visibility: Option<Visibility>,
   pub ident: IdentNode,
@@ -153,7 +153,7 @@ pub enum CompoundAssignKind {
   BitRightAssign, // >>=
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct ImplementNode {
   pub visibility: Option<Visibility>,
   pub generic: Option<GenericNode>,
@@ -161,7 +161,7 @@ pub struct ImplementNode {
   pub item_list: Vec<ImplementItemNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct ImplementTraitNode {
   pub visibility: Option<Visibility>,
   pub target: PathNode,
@@ -180,49 +180,49 @@ pub enum LiteralValueNode {
   String(String),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum StructFieldsNode {
   Unnamed(StructUnnamedFieldsNode),
   Named(StructNamedFieldsNode),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct StructUnnamedFieldsNode {
   pub node_list: Vec<TypeNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct StructNamedFieldsNode {
   pub node_list: Vec<(IdentNode, TypeNode)>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct EnumVariantNode {
   pub ident: IdentNode,
   pub ty: Option<TypeNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct FunctionArgumentNode {
   pub ident: IdentNode,
   pub immutablity: Immutablity,
   pub ty: TypeNode,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum TraitItemNode {
   Constant(TraitItemConstantNode),
   Function(TraitItemFunctionNode),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct TraitItemConstantNode {
   pub ident: IdentNode,
   pub ty: TypeNode,
   pub default_value: Option<LiteralValueNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct TraitItemFunctionNode {
   pub is_async: bool,
   pub ident: IdentNode,
@@ -253,8 +253,7 @@ pub enum Immutablity {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum StatementNode {
-  Constant(ConstantNode),
-  Static(StaticNode),
+  Item(Box<ItemNode>),
   CompoundAssign(CompoundAssignNode),
   Let(LetNode),
   Expression(ExpressionNode),
@@ -432,7 +431,7 @@ pub struct BlockNode {
   pub statement_list: Vec<StatementNode>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum ImplementItemNode {
   Constant(ConstantNode),
   Function(FunctionNode),

@@ -260,21 +260,23 @@ mod test_function {
           argument_list: vec![],
           return_type: None,
           block: Some(BlockNode {
-            statement_list: vec![StatementNode::Constant(ConstantNode {
-              visibility: None,
-              ident: IdentNode {
-                raw: "FOO".to_owned(),
-              },
-              ty: TypeNode::Path(
-                Immutablity::Yes,
-                PathNode {
-                  ident_list: vec![IdentNode {
-                    raw: "bool".to_owned(),
-                  }]
-                }
-              ),
-              value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
-            })]
+            statement_list: vec![StatementNode::Item(Box::new(ItemNode::Constant(
+              ConstantNode {
+                visibility: None,
+                ident: IdentNode {
+                  raw: "FOO".to_owned(),
+                },
+                ty: TypeNode::Path(
+                  Immutablity::Yes,
+                  PathNode {
+                    ident_list: vec![IdentNode {
+                      raw: "bool".to_owned(),
+                    }]
+                  }
+                ),
+                value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+              }
+            )))]
           }),
         })]
       }
@@ -318,21 +320,23 @@ mod test_function {
           }],
           return_type: None,
           block: Some(BlockNode {
-            statement_list: vec![StatementNode::Constant(ConstantNode {
-              visibility: None,
-              ident: IdentNode {
-                raw: "FOO".to_owned(),
-              },
-              ty: TypeNode::Path(
-                Immutablity::Yes,
-                PathNode {
-                  ident_list: vec![IdentNode {
-                    raw: "bool".to_owned(),
-                  }]
-                }
-              ),
-              value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
-            })]
+            statement_list: vec![StatementNode::Item(Box::new(ItemNode::Constant(
+              ConstantNode {
+                visibility: None,
+                ident: IdentNode {
+                  raw: "FOO".to_owned(),
+                },
+                ty: TypeNode::Path(
+                  Immutablity::Yes,
+                  PathNode {
+                    ident_list: vec![IdentNode {
+                      raw: "bool".to_owned(),
+                    }]
+                  }
+                ),
+                value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+              }
+            )))]
           }),
         })]
       }
@@ -392,21 +396,23 @@ mod test_function {
           ],
           return_type: None,
           block: Some(BlockNode {
-            statement_list: vec![StatementNode::Constant(ConstantNode {
-              visibility: None,
-              ident: IdentNode {
-                raw: "FOO".to_owned(),
-              },
-              ty: TypeNode::Path(
-                Immutablity::Yes,
-                PathNode {
-                  ident_list: vec![IdentNode {
-                    raw: "bool".to_owned(),
-                  }]
-                }
-              ),
-              value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
-            })]
+            statement_list: vec![StatementNode::Item(Box::new(ItemNode::Constant(
+              ConstantNode {
+                visibility: None,
+                ident: IdentNode {
+                  raw: "FOO".to_owned(),
+                },
+                ty: TypeNode::Path(
+                  Immutablity::Yes,
+                  PathNode {
+                    ident_list: vec![IdentNode {
+                      raw: "bool".to_owned(),
+                    }]
+                  }
+                ),
+                value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+              }
+            )))]
           }),
         })]
       }

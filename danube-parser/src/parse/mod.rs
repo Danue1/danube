@@ -19,6 +19,7 @@ mod implement_item_node;
 mod implement_node;
 mod implement_trait_node;
 mod infix_operator_kind;
+mod item_node;
 mod keyword;
 mod let_node;
 mod literal_value_node;
@@ -74,6 +75,7 @@ use implement_item_node::parse_implement_item_node;
 use implement_node::parse_implement_node;
 use implement_trait_node::parse_implement_trait_node;
 use infix_operator_kind::parse_infix_operator_kind;
+use item_node::parse_item_node;
 use keyword::parse_keyword;
 use let_node::parse_let_node;
 use literal_value_node::{parse_int, parse_literal_value_node};
@@ -111,25 +113,10 @@ use while_node::parse_while_node;
 type ParseResult<'a, T> = nom::IResult<Tokens<'a>, T, Error<'a>>;
 
 pub fn parse(s: Tokens) -> ParseResult<ModuleNode> {
-  all_consuming(map(many0(parse_item), |item_list| ModuleNode {
+  all_consuming(map(many0(parse_item_node), |item_list| ModuleNode {
     ident: None,
     item_list,
   }))(s)
-}
-
-fn parse_item(s: Tokens) -> ParseResult<ItemNode> {
-  alt((
-    map(parse_use_node, ItemNode::Use),
-    map(parse_struct_node, ItemNode::Struct),
-    map(parse_enum_node, ItemNode::Enum),
-    map(parse_function_node, ItemNode::Function),
-    map(parse_type_alias_node, ItemNode::TypeAlias),
-    map(parse_trait_node, ItemNode::Trait),
-    map(parse_constant_node, ItemNode::Constant),
-    map(parse_static_node, ItemNode::Static),
-    map(parse_implement_node, ItemNode::Implement),
-    map(parse_implement_trait_node, ItemNode::ImplementTrait),
-  ))(s)
 }
 
 #[cfg(test)]
