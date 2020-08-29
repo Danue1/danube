@@ -1,37 +1,37 @@
 use super::*;
 
-pub(super) fn parse_expression_node(s: Tokens) -> ParseResult<ExpressionNode> {
+pub(super) fn parse_expression_kind(s: Tokens) -> ParseResult<ExpressionKind> {
   let (s, node) = parse_prefixable_expression_node(s)?;
 
   parse_postfix_expression_node(s, Precedence::Lowest, node)
 }
 
-fn parse_prefixable_expression_node(s: Tokens) -> ParseResult<ExpressionNode> {
+fn parse_prefixable_expression_node(s: Tokens) -> ParseResult<ExpressionKind> {
   alt((parse_prefix_expression_node, parse_atomic_expression_node))(s)
 }
 
-fn parse_atomic_expression_node(s: Tokens) -> ParseResult<ExpressionNode> {
+fn parse_atomic_expression_node(s: Tokens) -> ParseResult<ExpressionKind> {
   alt((
-    map(parse_expression_struct_node, ExpressionNode::Struct),
-    map(parse_expression_tuple_node, ExpressionNode::Tuple),
-    map(parse_path_node, ExpressionNode::Path),
-    map(parse_conditional_node, ExpressionNode::Conditional),
-    map(parse_loop_node, ExpressionNode::Loop),
-    map(parse_while_node, ExpressionNode::While),
-    map(parse_for_node, ExpressionNode::For),
-    map(parse_pattern_match_node, ExpressionNode::PatternMatch),
-    map(parse_literal_value_node, ExpressionNode::Literal),
-    map(parse_break, |_| ExpressionNode::Break),
-    map(parse_continue, |_| ExpressionNode::Continue),
-    map(parse_return_node, ExpressionNode::Return),
-    map(parse_array, ExpressionNode::Array),
-    map(parse_block_node, ExpressionNode::Block),
+    map(parse_expression_struct_node, ExpressionKind::Struct),
+    map(parse_expression_tuple_node, ExpressionKind::Tuple),
+    map(parse_path_node, ExpressionKind::Path),
+    map(parse_conditional_node, ExpressionKind::Conditional),
+    map(parse_loop_node, ExpressionKind::Loop),
+    map(parse_while_node, ExpressionKind::While),
+    map(parse_for_node, ExpressionKind::For),
+    map(parse_pattern_match_node, ExpressionKind::PatternMatch),
+    map(parse_literal_value_kind, ExpressionKind::Literal),
+    map(parse_break, |_| ExpressionKind::Break),
+    map(parse_continue, |_| ExpressionKind::Continue),
+    map(parse_return_node, ExpressionKind::Return),
+    map(parse_array, ExpressionKind::Array),
+    map(parse_block_node, ExpressionKind::Block),
   ))(s)
 }
 
-fn parse_expression_struct_node(s: Tokens) -> ParseResult<ExpressionStructNode> {
+fn parse_expression_struct_node(s: Tokens) -> ParseResult<ExpressionKindStructNode> {
   map(parse_expression_field_list, |(field_list, rest)| {
-    ExpressionStructNode {
+    ExpressionKindStructNode {
       path: None,
       field_list,
       rest,
@@ -46,11 +46,11 @@ fn parse_expression_tuple_node(s: Tokens) -> ParseResult<TupleNode> {
   })(s)
 }
 
-fn parse_prefix_expression_node(s: Tokens) -> ParseResult<ExpressionNode> {
+fn parse_prefix_expression_node(s: Tokens) -> ParseResult<ExpressionKind> {
   map(
-    tuple((parse_unary_operator_kind, parse_expression_node)),
+    tuple((parse_unary_operator_kind, parse_expression_kind)),
     |(kind, value)| {
-      ExpressionNode::UnaryOperator(UnaryOperatorNode {
+      ExpressionKind::UnaryOperator(UnaryOperatorNode {
         kind,
         value: Box::new(value),
       })
@@ -71,21 +71,21 @@ enum Precedence {
 fn parse_postfix_expression_node(
   s: Tokens,
   precedence: Precedence,
-  lhs: ExpressionNode,
-) -> ParseResult<ExpressionNode> {
+  lhs: ExpressionKind,
+) -> ParseResult<ExpressionKind> {
   match parse_operator_kind(s.clone()) {
     Ok((s, OperatorKind::Await)) => {
-      let node = ExpressionNode::Await(Box::new(lhs));
+      let node = ExpressionKind::Await(Box::new(lhs));
 
       parse_postfix_expression_node(s, precedence, node)
     }
     Ok((s, OperatorKind::Try)) => {
-      let node = ExpressionNode::Try(Box::new(lhs));
+      let node = ExpressionKind::Try(Box::new(lhs));
 
       parse_postfix_expression_node(s, precedence, node)
     }
     Ok((s, OperatorKind::Tuple(argument_list))) => {
-      let node = ExpressionNode::Tuple(TupleNode {
+      let node = ExpressionKind::Tuple(TupleNode {
         field: Some(Box::new(lhs)),
         argument_list,
       });
@@ -93,7 +93,7 @@ fn parse_postfix_expression_node(
       parse_postfix_expression_node(s, precedence, node)
     }
     Ok((s, OperatorKind::Index(rhs))) => {
-      let node = ExpressionNode::Index(IndexNode {
+      let node = ExpressionKind::Index(IndexNode {
         array: Box::new(lhs),
         index: Box::new(rhs),
       });
@@ -101,7 +101,7 @@ fn parse_postfix_expression_node(
       parse_postfix_expression_node(s, precedence, node)
     }
     Ok((s, OperatorKind::Field(rhs))) => {
-      let node = ExpressionNode::Field(ExpressionFieldNode {
+      let node = ExpressionKind::Field(ExpressionKindFieldNode {
         lhs: Box::new(lhs),
         rhs: Box::new(rhs),
       });
@@ -110,9 +110,9 @@ fn parse_postfix_expression_node(
     }
     Ok((_, OperatorKind::InfixOperator(_))) => parse_infix_expression_node(s, precedence, lhs),
     _ => {
-      if let ExpressionNode::Path(path) = lhs.clone() {
+      if let ExpressionKind::Path(path) = lhs.clone() {
         if let Ok((s, (field_list, rest))) = parse_expression_field_list(s.clone()) {
-          let node = ExpressionNode::Struct(ExpressionStructNode {
+          let node = ExpressionKind::Struct(ExpressionKindStructNode {
             path: Some(path),
             field_list,
             rest,
@@ -132,8 +132,8 @@ fn parse_postfix_expression_node(
 fn parse_infix_expression_node(
   s: Tokens,
   precedence: Precedence,
-  lhs: ExpressionNode,
-) -> ParseResult<ExpressionNode> {
+  lhs: ExpressionKind,
+) -> ParseResult<ExpressionKind> {
   if let Ok((ss, kind)) = parse_infix_operator_kind(s.clone()) {
     let right_precedence = infix_binding_power(kind.clone());
     if right_precedence < precedence {
@@ -141,7 +141,7 @@ fn parse_infix_expression_node(
     } else {
       let (s, rhs) = parse_prefixable_expression_node(ss)?;
       let (s, rhs) = parse_postfix_expression_node(s, right_precedence, rhs)?;
-      let rhs = ExpressionNode::InfixOperator(InfixOperatorNode {
+      let rhs = ExpressionKind::InfixOperator(InfixOperatorNode {
         kind,
         lhs: Box::new(lhs),
         rhs: Box::new(rhs),
@@ -180,7 +180,7 @@ enum OperatorKind {
   Await,
   Try,
   Tuple(Vec<TupleArgument>),
-  Index(ExpressionNode),
+  Index(ExpressionKind),
   Field(IdentNode),
   InfixOperator(InfixOperatorKind),
 }
@@ -208,7 +208,7 @@ fn parse_tuple_operator(s: Tokens) -> ParseResult<Vec<TupleArgument>> {
               tuple((parse_ident_node, parse_symbol(Symbol::Assign))),
               |(name, _)| name,
             )),
-            parse_expression_node,
+            parse_expression_kind,
           )),
           |(name, value)| TupleArgument { name, value },
         ),
@@ -220,11 +220,11 @@ fn parse_tuple_operator(s: Tokens) -> ParseResult<Vec<TupleArgument>> {
   )(s)
 }
 
-fn parse_index_operator(s: Tokens) -> ParseResult<ExpressionNode> {
+fn parse_index_operator(s: Tokens) -> ParseResult<ExpressionKind> {
   map(
     tuple((
       parse_symbol(Symbol::LeftBracket),
-      parse_expression_node,
+      parse_expression_kind,
       parse_symbol(Symbol::RightBracket),
     )),
     |(_, expression, _)| expression,
@@ -251,7 +251,7 @@ fn parse_field_operator(s: Tokens) -> ParseResult<IdentNode> {
 
 fn parse_expression_field_list(
   s: Tokens,
-) -> ParseResult<(Vec<ExpressionStructField>, Option<Box<ExpressionNode>>)> {
+) -> ParseResult<(Vec<ExpressionKindStructField>, Option<Box<ExpressionKind>>)> {
   map(
     tuple((
       parse_symbol(Symbol::LeftBrace),
@@ -260,14 +260,14 @@ fn parse_expression_field_list(
         tuple((
           parse_ident_node,
           opt(map(
-            tuple((parse_symbol(Symbol::DoubleColon), parse_expression_node)),
+            tuple((parse_symbol(Symbol::DoubleColon), parse_expression_kind)),
             |(_, expression)| expression,
           )),
         )),
       ),
       opt(parse_symbol(Symbol::Comma)),
       opt(map(
-        tuple((parse_symbol(Symbol::RangeClose), parse_expression_node)),
+        tuple((parse_symbol(Symbol::RangeClose), parse_expression_kind)),
         |(_, expression)| Box::new(expression),
       )),
       parse_symbol(Symbol::RightBrace),
@@ -284,11 +284,11 @@ fn parse_continue(s: Tokens) -> ParseResult<()> {
   map(parse_keyword(Keyword::Continue), |_| ())(s)
 }
 
-fn parse_array(s: Tokens) -> ParseResult<Vec<ExpressionNode>> {
+fn parse_array(s: Tokens) -> ParseResult<Vec<ExpressionKind>> {
   map(
     tuple((
       parse_symbol(Symbol::LeftBracket),
-      separated_list(parse_symbol(Symbol::Comma), parse_expression_node),
+      separated_list(parse_symbol(Symbol::Comma), parse_expression_kind),
       opt(parse_symbol(Symbol::Comma)),
       parse_symbol(Symbol::RightBracket),
     )),
@@ -300,10 +300,10 @@ fn parse_array(s: Tokens) -> ParseResult<Vec<ExpressionNode>> {
 mod tests {
   use super::*;
 
-  fn compile(s: &str) -> ExpressionNode {
+  fn compile(s: &str) -> ExpressionKind {
     let (_, token_list) = lex(s).unwrap();
     dbg!(&token_list);
-    let (_, node) = parse_expression_node(Tokens::new(&token_list)).unwrap();
+    let (_, node) = parse_expression_kind(Tokens::new(&token_list)).unwrap();
 
     node
   }
@@ -313,9 +313,9 @@ mod tests {
     let source = "!true";
     assert_eq!(
       compile(source),
-      ExpressionNode::UnaryOperator(UnaryOperatorNode {
+      ExpressionKind::UnaryOperator(UnaryOperatorNode {
         kind: UnaryOperatorKind::Not,
-        value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+        value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
       })
     );
   }
@@ -325,9 +325,9 @@ mod tests {
     let source = "-true";
     assert_eq!(
       compile(source),
-      ExpressionNode::UnaryOperator(UnaryOperatorNode {
+      ExpressionKind::UnaryOperator(UnaryOperatorNode {
         kind: UnaryOperatorKind::Negative,
-        value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+        value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
       })
     );
   }
@@ -337,11 +337,11 @@ mod tests {
     let source = "--true";
     assert_eq!(
       compile(source),
-      ExpressionNode::UnaryOperator(UnaryOperatorNode {
+      ExpressionKind::UnaryOperator(UnaryOperatorNode {
         kind: UnaryOperatorKind::Negative,
-        value: Box::new(ExpressionNode::UnaryOperator(UnaryOperatorNode {
+        value: Box::new(ExpressionKind::UnaryOperator(UnaryOperatorNode {
           kind: UnaryOperatorKind::Negative,
-          value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+          value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
         }))
       })
     );
@@ -352,9 +352,9 @@ mod tests {
     let source = "-1";
     assert_eq!(
       compile(source),
-      ExpressionNode::UnaryOperator(UnaryOperatorNode {
+      ExpressionKind::UnaryOperator(UnaryOperatorNode {
         kind: UnaryOperatorKind::Negative,
-        value: Box::new(ExpressionNode::Literal(LiteralValueNode::Int(1)))
+        value: Box::new(ExpressionKind::Literal(LiteralValueKind::Int(1)))
       })
     );
   }
@@ -364,13 +364,13 @@ mod tests {
     let source = "foo[1]";
     assert_eq!(
       compile(source),
-      ExpressionNode::Index(IndexNode {
-        array: Box::new(ExpressionNode::Path(PathNode {
+      ExpressionKind::Index(IndexNode {
+        array: Box::new(ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         })),
-        index: Box::new(ExpressionNode::Literal(LiteralValueNode::Int(1)))
+        index: Box::new(ExpressionKind::Literal(LiteralValueKind::Int(1)))
       })
     );
   }
@@ -380,7 +380,7 @@ mod tests {
     let source = "foo.await";
     assert_eq!(
       compile(source),
-      ExpressionNode::Await(Box::new(ExpressionNode::Path(PathNode {
+      ExpressionKind::Await(Box::new(ExpressionKind::Path(PathNode {
         ident_list: vec![IdentNode {
           raw: "foo".to_owned()
         }]
@@ -393,8 +393,8 @@ mod tests {
     let source = "foo()";
     assert_eq!(
       compile(source),
-      ExpressionNode::Tuple(TupleNode {
-        field: Some(Box::new(ExpressionNode::Path(PathNode {
+      ExpressionKind::Tuple(TupleNode {
+        field: Some(Box::new(ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
@@ -409,15 +409,15 @@ mod tests {
     let source = "foo(bar)";
     assert_eq!(
       compile(source),
-      ExpressionNode::Tuple(TupleNode {
-        field: Some(Box::new(ExpressionNode::Path(PathNode {
+      ExpressionKind::Tuple(TupleNode {
+        field: Some(Box::new(ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         }))),
         argument_list: vec![TupleArgument {
           name: None,
-          value: ExpressionNode::Path(PathNode {
+          value: ExpressionKind::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "bar".to_owned()
             }]
@@ -432,8 +432,8 @@ mod tests {
     let source = "foo(bar = baz)";
     assert_eq!(
       compile(source),
-      ExpressionNode::Tuple(TupleNode {
-        field: Some(Box::new(ExpressionNode::Path(PathNode {
+      ExpressionKind::Tuple(TupleNode {
+        field: Some(Box::new(ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
@@ -442,7 +442,7 @@ mod tests {
           name: Some(IdentNode {
             raw: "bar".to_owned()
           }),
-          value: ExpressionNode::Path(PathNode {
+          value: ExpressionKind::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "baz".to_owned()
             }]
@@ -457,8 +457,8 @@ mod tests {
     let source = "foo().await";
     assert_eq!(
       compile(source),
-      ExpressionNode::Await(Box::new(ExpressionNode::Tuple(TupleNode {
-        field: Some(Box::new(ExpressionNode::Path(PathNode {
+      ExpressionKind::Await(Box::new(ExpressionKind::Tuple(TupleNode {
+        field: Some(Box::new(ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
@@ -473,7 +473,7 @@ mod tests {
     let source = "foo?";
     assert_eq!(
       compile(source),
-      ExpressionNode::Try(Box::new(ExpressionNode::Path(PathNode {
+      ExpressionKind::Try(Box::new(ExpressionKind::Path(PathNode {
         ident_list: vec![IdentNode {
           raw: "foo".to_owned()
         }]
@@ -486,8 +486,8 @@ mod tests {
     let source = "foo()?";
     assert_eq!(
       compile(source),
-      ExpressionNode::Try(Box::new(ExpressionNode::Tuple(TupleNode {
-        field: Some(Box::new(ExpressionNode::Path(PathNode {
+      ExpressionKind::Try(Box::new(ExpressionKind::Tuple(TupleNode {
+        field: Some(Box::new(ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
@@ -502,8 +502,8 @@ mod tests {
     let source = "foo.bar";
     assert_eq!(
       compile(source),
-      ExpressionNode::Field(ExpressionFieldNode {
-        lhs: Box::new(ExpressionNode::Path(PathNode {
+      ExpressionKind::Field(ExpressionKindFieldNode {
+        lhs: Box::new(ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
@@ -520,14 +520,14 @@ mod tests {
     let source = "foo + bar";
     assert_eq!(
       compile(source),
-      ExpressionNode::InfixOperator(InfixOperatorNode {
+      ExpressionKind::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::Add,
-        lhs: Box::new(ExpressionNode::Path(PathNode {
+        lhs: Box::new(ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         })),
-        rhs: Box::new(ExpressionNode::Path(PathNode {
+        rhs: Box::new(ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "bar".to_owned()
           }]
@@ -541,21 +541,21 @@ mod tests {
     let source = "foo + bar * baz";
     assert_eq!(
       compile(source),
-      ExpressionNode::InfixOperator(InfixOperatorNode {
+      ExpressionKind::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::Add,
-        lhs: Box::new(ExpressionNode::Path(PathNode {
+        lhs: Box::new(ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         })),
-        rhs: Box::new(ExpressionNode::InfixOperator(InfixOperatorNode {
+        rhs: Box::new(ExpressionKind::InfixOperator(InfixOperatorNode {
           kind: InfixOperatorKind::Mul,
-          lhs: Box::new(ExpressionNode::Path(PathNode {
+          lhs: Box::new(ExpressionKind::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "bar".to_owned()
             }]
           })),
-          rhs: Box::new(ExpressionNode::Path(PathNode {
+          rhs: Box::new(ExpressionKind::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "baz".to_owned()
             }]
@@ -570,22 +570,22 @@ mod tests {
     let source = "foo * bar + baz";
     assert_eq!(
       compile(source),
-      ExpressionNode::InfixOperator(InfixOperatorNode {
+      ExpressionKind::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::Add,
-        lhs: Box::new(ExpressionNode::InfixOperator(InfixOperatorNode {
+        lhs: Box::new(ExpressionKind::InfixOperator(InfixOperatorNode {
           kind: InfixOperatorKind::Mul,
-          lhs: Box::new(ExpressionNode::Path(PathNode {
+          lhs: Box::new(ExpressionKind::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "foo".to_owned()
             }]
           })),
-          rhs: Box::new(ExpressionNode::Path(PathNode {
+          rhs: Box::new(ExpressionKind::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "bar".to_owned()
             }]
           }))
         })),
-        rhs: Box::new(ExpressionNode::Path(PathNode {
+        rhs: Box::new(ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "baz".to_owned()
           }]
@@ -599,29 +599,29 @@ mod tests {
     let source = "foo * bar + baz * bax";
     assert_eq!(
       compile(source),
-      ExpressionNode::InfixOperator(InfixOperatorNode {
+      ExpressionKind::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::Add,
-        lhs: Box::new(ExpressionNode::InfixOperator(InfixOperatorNode {
+        lhs: Box::new(ExpressionKind::InfixOperator(InfixOperatorNode {
           kind: InfixOperatorKind::Mul,
-          lhs: Box::new(ExpressionNode::Path(PathNode {
+          lhs: Box::new(ExpressionKind::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "foo".to_owned()
             }]
           })),
-          rhs: Box::new(ExpressionNode::Path(PathNode {
+          rhs: Box::new(ExpressionKind::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "bar".to_owned()
             }]
           }))
         })),
-        rhs: Box::new(ExpressionNode::InfixOperator(InfixOperatorNode {
+        rhs: Box::new(ExpressionKind::InfixOperator(InfixOperatorNode {
           kind: InfixOperatorKind::Mul,
-          lhs: Box::new(ExpressionNode::Path(PathNode {
+          lhs: Box::new(ExpressionKind::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "baz".to_owned()
             }]
           })),
-          rhs: Box::new(ExpressionNode::Path(PathNode {
+          rhs: Box::new(ExpressionKind::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "bax".to_owned()
             }]
@@ -636,32 +636,32 @@ mod tests {
     let source = "foo(bar) + baz(bax)";
     assert_eq!(
       compile(source),
-      ExpressionNode::InfixOperator(InfixOperatorNode {
+      ExpressionKind::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::Add,
-        lhs: Box::new(ExpressionNode::Tuple(TupleNode {
-          field: Some(Box::new(ExpressionNode::Path(PathNode {
+        lhs: Box::new(ExpressionKind::Tuple(TupleNode {
+          field: Some(Box::new(ExpressionKind::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "foo".to_owned()
             }]
           }))),
           argument_list: vec![TupleArgument {
             name: None,
-            value: ExpressionNode::Path(PathNode {
+            value: ExpressionKind::Path(PathNode {
               ident_list: vec![IdentNode {
                 raw: "bar".to_owned()
               }]
             })
           }]
         })),
-        rhs: Box::new(ExpressionNode::Tuple(TupleNode {
-          field: Some(Box::new(ExpressionNode::Path(PathNode {
+        rhs: Box::new(ExpressionKind::Tuple(TupleNode {
+          field: Some(Box::new(ExpressionKind::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "baz".to_owned()
             }]
           }))),
           argument_list: vec![TupleArgument {
             name: None,
-            value: ExpressionNode::Path(PathNode {
+            value: ExpressionKind::Path(PathNode {
               ident_list: vec![IdentNode {
                 raw: "bax".to_owned()
               }]
@@ -677,10 +677,10 @@ mod tests {
     let source = "foo.bar + baz.bax";
     assert_eq!(
       compile(source),
-      ExpressionNode::InfixOperator(InfixOperatorNode {
+      ExpressionKind::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::Add,
-        lhs: Box::new(ExpressionNode::Field(ExpressionFieldNode {
-          lhs: Box::new(ExpressionNode::Path(PathNode {
+        lhs: Box::new(ExpressionKind::Field(ExpressionKindFieldNode {
+          lhs: Box::new(ExpressionKind::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "foo".to_owned()
             }]
@@ -689,8 +689,8 @@ mod tests {
             raw: "bar".to_owned()
           })
         })),
-        rhs: Box::new(ExpressionNode::Field(ExpressionFieldNode {
-          lhs: Box::new(ExpressionNode::Path(PathNode {
+        rhs: Box::new(ExpressionKind::Field(ExpressionKindFieldNode {
+          lhs: Box::new(ExpressionKind::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "baz".to_owned()
             }]
@@ -708,14 +708,14 @@ mod tests {
     let source = "foo & bar";
     assert_eq!(
       compile(source),
-      ExpressionNode::InfixOperator(InfixOperatorNode {
+      ExpressionKind::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::BitAnd,
-        lhs: Box::new(ExpressionNode::Path(PathNode {
+        lhs: Box::new(ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         })),
-        rhs: Box::new(ExpressionNode::Path(PathNode {
+        rhs: Box::new(ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "bar".to_owned()
           }]
@@ -729,14 +729,14 @@ mod tests {
     let source = "foo < bar";
     assert_eq!(
       compile(source),
-      ExpressionNode::InfixOperator(InfixOperatorNode {
+      ExpressionKind::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::LessThan,
-        lhs: Box::new(ExpressionNode::Path(PathNode {
+        lhs: Box::new(ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         })),
-        rhs: Box::new(ExpressionNode::Path(PathNode {
+        rhs: Box::new(ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "bar".to_owned()
           }]
@@ -750,14 +750,14 @@ mod tests {
     let source = "foo && bar";
     assert_eq!(
       compile(source),
-      ExpressionNode::InfixOperator(InfixOperatorNode {
+      ExpressionKind::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::And,
-        lhs: Box::new(ExpressionNode::Path(PathNode {
+        lhs: Box::new(ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         })),
-        rhs: Box::new(ExpressionNode::Path(PathNode {
+        rhs: Box::new(ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "bar".to_owned()
           }]
@@ -771,14 +771,14 @@ mod tests {
     let source = "foo |> bar";
     assert_eq!(
       compile(source),
-      ExpressionNode::InfixOperator(InfixOperatorNode {
+      ExpressionKind::InfixOperator(InfixOperatorNode {
         kind: InfixOperatorKind::ChainArrow,
-        lhs: Box::new(ExpressionNode::Path(PathNode {
+        lhs: Box::new(ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         })),
-        rhs: Box::new(ExpressionNode::Path(PathNode {
+        rhs: Box::new(ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "bar".to_owned()
           }]
@@ -792,7 +792,7 @@ mod tests {
     let source = "{ }";
     assert_eq!(
       compile(source),
-      ExpressionNode::Block(BlockNode {
+      ExpressionKind::Block(BlockNode {
         statement_list: vec![]
       }),
     );
@@ -803,8 +803,8 @@ mod tests {
     let source = "{ { } }";
     assert_eq!(
       compile(source),
-      ExpressionNode::Block(BlockNode {
-        statement_list: vec![StatementNode::Expression(ExpressionNode::Block(
+      ExpressionKind::Block(BlockNode {
+        statement_list: vec![StatementKind::ExpressionKind(ExpressionKind::Block(
           BlockNode {
             statement_list: vec![]
           }

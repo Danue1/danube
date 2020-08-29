@@ -3,7 +3,7 @@ use super::*;
 pub(super) fn parse_use_node(s: Tokens) -> ParseResult<UseNode> {
   map(
     tuple((
-      opt(parse_visibility),
+      opt(parse_visibility_kind),
       parse_keyword(Keyword::Use),
       parse_use_kind(parse_use_root_node),
       parse_symbol(Symbol::Semicolon),
@@ -31,8 +31,8 @@ mod tests {
       UseNode {
         visibility: None,
         kind: UseKind::Unnested(UseRootNode {
-          ident: UseRootIdent::Current,
-          extra: UseKind::Unnested(UseExtra::Ident(
+          ident: UseRootIdentKind::Current,
+          extra: UseKind::Unnested(UseExtraKind::Ident(
             IdentNode {
               raw: "foo".to_owned()
             },
@@ -51,8 +51,8 @@ mod tests {
       UseNode {
         visibility: None,
         kind: UseKind::Unnested(UseRootNode {
-          ident: UseRootIdent::Super,
-          extra: UseKind::Unnested(UseExtra::Ident(
+          ident: UseRootIdentKind::Super,
+          extra: UseKind::Unnested(UseExtraKind::Ident(
             IdentNode {
               raw: "foo".to_owned()
             },
@@ -71,8 +71,8 @@ mod tests {
       UseNode {
         visibility: None,
         kind: UseKind::Unnested(UseRootNode {
-          ident: UseRootIdent::Module,
-          extra: UseKind::Unnested(UseExtra::Ident(
+          ident: UseRootIdentKind::Module,
+          extra: UseKind::Unnested(UseExtraKind::Ident(
             IdentNode {
               raw: "foo".to_owned()
             },
@@ -91,10 +91,10 @@ mod tests {
       UseNode {
         visibility: None,
         kind: UseKind::Unnested(UseRootNode {
-          ident: UseRootIdent::Ident(IdentNode {
+          ident: UseRootIdentKind::Ident(IdentNode {
             raw: "foo".to_owned()
           }),
-          extra: UseKind::Unnested(UseExtra::Ident(
+          extra: UseKind::Unnested(UseExtraKind::Ident(
             IdentNode {
               raw: "bar".to_owned()
             },
@@ -113,14 +113,14 @@ mod tests {
       UseNode {
         visibility: None,
         kind: UseKind::Unnested(UseRootNode {
-          ident: UseRootIdent::Ident(IdentNode {
+          ident: UseRootIdentKind::Ident(IdentNode {
             raw: "foo".to_owned()
           }),
-          extra: UseKind::Unnested(UseExtra::Extra(
+          extra: UseKind::Unnested(UseExtraKind::Extra(
             IdentNode {
               raw: "bar".to_owned()
             },
-            Box::new(UseKind::Unnested(UseExtra::Ident(
+            Box::new(UseKind::Unnested(UseExtraKind::Ident(
               IdentNode {
                 raw: "baz".to_owned()
               },
@@ -140,8 +140,8 @@ mod tests {
       UseNode {
         visibility: None,
         kind: UseKind::Nested(vec![UseRootNode {
-          ident: UseRootIdent::Current,
-          extra: UseKind::Unnested(UseExtra::Ident(
+          ident: UseRootIdentKind::Current,
+          extra: UseKind::Unnested(UseExtraKind::Ident(
             IdentNode {
               raw: "bar".to_owned()
             },
@@ -161,8 +161,8 @@ mod tests {
         visibility: None,
         kind: UseKind::Nested(vec![
           UseRootNode {
-            ident: UseRootIdent::Current,
-            extra: UseKind::Unnested(UseExtra::Ident(
+            ident: UseRootIdentKind::Current,
+            extra: UseKind::Unnested(UseExtraKind::Ident(
               IdentNode {
                 raw: "bar".to_owned()
               },
@@ -170,8 +170,8 @@ mod tests {
             ))
           },
           UseRootNode {
-            ident: UseRootIdent::Current,
-            extra: UseKind::Unnested(UseExtra::Ident(
+            ident: UseRootIdentKind::Current,
+            extra: UseKind::Unnested(UseExtraKind::Ident(
               IdentNode {
                 raw: "baz".to_owned()
               },
@@ -191,8 +191,8 @@ mod tests {
       UseNode {
         visibility: None,
         kind: UseKind::Nested(vec![UseRootNode {
-          ident: UseRootIdent::Current,
-          extra: UseKind::Unnested(UseExtra::Ident(
+          ident: UseRootIdentKind::Current,
+          extra: UseKind::Unnested(UseExtraKind::Ident(
             IdentNode {
               raw: "bar".to_owned()
             },

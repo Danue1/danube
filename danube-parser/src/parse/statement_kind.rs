@@ -1,15 +1,15 @@
 use super::*;
 
-pub(super) fn parse_statement_node(s: Tokens) -> ParseResult<StatementNode> {
+pub(super) fn parse_statement_kind(s: Tokens) -> ParseResult<StatementKind> {
   alt((
-    map(parse_item_node, |node| StatementNode::Item(Box::new(node))),
+    map(parse_item_kind, |node| StatementKind::Item(Box::new(node))),
     map(parse_compound_assign_node, |node| {
-      StatementNode::CompoundAssign(Box::new(node))
+      StatementKind::CompoundAssign(Box::new(node))
     }),
-    map(parse_let_node, |node| StatementNode::Let(Box::new(node))),
-    map(parse_expression_node, StatementNode::Expression),
+    map(parse_let_node, |node| StatementKind::Let(Box::new(node))),
+    map(parse_expression_kind, StatementKind::ExpressionKind),
     map(parse_symbol(Symbol::Semicolon), |_| {
-      StatementNode::Semicolon
+      StatementKind::Semicolon
     }),
   ))(s)
 }
@@ -18,9 +18,9 @@ pub(super) fn parse_statement_node(s: Tokens) -> ParseResult<StatementNode> {
 mod tests {
   use super::*;
 
-  fn compile(s: &str) -> StatementNode {
+  fn compile(s: &str) -> StatementKind {
     let (_, token_list) = lex(s).unwrap();
-    match parse_statement_node(Tokens::new(&token_list)) {
+    match parse_statement_kind(Tokens::new(&token_list)) {
       Ok((_, node)) => node,
       Err(error) => {
         dbg!(error);
@@ -34,20 +34,20 @@ mod tests {
     let source = "const FOO: Foo = true;";
     assert_eq!(
       compile(source),
-      StatementNode::Item(Box::new(ItemNode::Constant(ConstantNode {
+      StatementKind::Item(Box::new(ItemKind::Constant(ConstantNode {
         visibility: None,
         ident: IdentNode {
           raw: "FOO".to_owned(),
         },
-        ty: TypeNode::Path(
-          Immutablity::Yes,
+        ty: TypeKind::Path(
+          ImmutablityKind::Yes,
           PathNode {
             ident_list: vec![IdentNode {
               raw: "Foo".to_owned()
             }]
           }
         ),
-        value: ExpressionNode::Literal(LiteralValueNode::Bool(true))
+        value: ExpressionKind::Literal(LiteralValueKind::Bool(true))
       })))
     );
   }

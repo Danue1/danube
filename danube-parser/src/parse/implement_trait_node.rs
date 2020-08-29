@@ -3,7 +3,7 @@ use super::*;
 pub(super) fn parse_implement_trait_node(s: Tokens) -> ParseResult<ImplementTraitNode> {
   map(
     tuple((
-      opt(parse_visibility),
+      opt(parse_visibility_kind),
       parse_keyword(Keyword::Impl),
       parse_path_node,
       opt(parse_generic_node),
@@ -11,7 +11,7 @@ pub(super) fn parse_implement_trait_node(s: Tokens) -> ParseResult<ImplementTrai
       parse_path_node,
       opt(parse_generic_node),
       parse_symbol(Symbol::LeftBrace),
-      many1(parse_implement_item_node),
+      many1(parse_implement_item_kind),
       parse_symbol(Symbol::RightBrace),
     )),
     |(visibility, _, trait_ident, generic, _, target, target_generic, _, item_list, _)| {
@@ -63,20 +63,20 @@ mod tests {
           }]
         },
         generic: None,
-        item_list: vec![ImplementItemNode::Constant(ConstantNode {
+        item_list: vec![ImplementItemKind::Constant(ConstantNode {
           visibility: None,
           ident: IdentNode {
             raw: "BAZ".to_owned()
           },
-          ty: TypeNode::Path(
-            Immutablity::Yes,
+          ty: TypeKind::Path(
+            ImmutablityKind::Yes,
             PathNode {
               ident_list: vec![IdentNode {
                 raw: "Bax".to_owned()
               }]
             }
           ),
-          value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+          value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
         })]
       }
     );
@@ -103,7 +103,7 @@ mod tests {
           }]
         },
         generic: None,
-        item_list: vec![ImplementItemNode::Function(FunctionNode {
+        item_list: vec![ImplementItemKind::Function(FunctionNode {
           visibility: None,
           is_async: false,
           ident: IdentNode {

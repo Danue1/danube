@@ -1,5 +1,5 @@
 #[derive(Debug, PartialEq, Clone)]
-pub enum Visibility {
+pub enum VisibilityKind {
   Public,
   Super,
   Module,
@@ -14,11 +14,11 @@ pub struct IdentNode {
 #[derive(Debug, PartialEq)]
 pub struct ModuleNode {
   pub ident: Option<IdentNode>,
-  pub item_list: Vec<ItemNode>,
+  pub item_list: Vec<ItemKind>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum ItemNode {
+pub enum ItemKind {
   Use(UseNode),
   Struct(StructNode),
   Enum(EnumNode),
@@ -33,7 +33,7 @@ pub enum ItemNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct UseNode {
-  pub visibility: Option<Visibility>,
+  pub visibility: Option<VisibilityKind>,
   pub kind: UseKind<UseRootNode>,
 }
 
@@ -45,12 +45,12 @@ pub enum UseKind<T: Sized> {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct UseRootNode {
-  pub ident: UseRootIdent,
-  pub extra: UseKind<UseExtra>,
+  pub ident: UseRootIdentKind,
+  pub extra: UseKind<UseExtraKind>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum UseRootIdent {
+pub enum UseRootIdentKind {
   Current,
   Super,
   Module,
@@ -58,18 +58,18 @@ pub enum UseRootIdent {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum UseExtra {
+pub enum UseExtraKind {
   All,
   Ident(IdentNode, Option<IdentNode>),
-  Extra(IdentNode, Box<UseKind<UseExtra>>),
+  Extra(IdentNode, Box<UseKind<UseExtraKind>>),
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct StructNode {
-  pub visibility: Option<Visibility>,
+  pub visibility: Option<VisibilityKind>,
   pub ident: IdentNode,
   pub generic: Option<GenericNode>,
-  pub fields: StructFieldsNode,
+  pub fields: StructFieldsKind,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -80,7 +80,7 @@ pub struct GenericNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct EnumNode {
-  pub visibility: Option<Visibility>,
+  pub visibility: Option<VisibilityKind>,
   pub ident: IdentNode,
   pub generic: Option<GenericNode>,
   pub variant_list: Vec<EnumVariantNode>,
@@ -88,51 +88,51 @@ pub struct EnumNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct FunctionNode {
-  pub visibility: Option<Visibility>,
+  pub visibility: Option<VisibilityKind>,
   pub is_async: bool,
   pub ident: IdentNode,
   pub generic: Option<GenericNode>,
   pub argument_list: Vec<FunctionArgumentNode>,
-  pub return_type: Option<TypeNode>,
+  pub return_type: Option<TypeKind>,
   pub block: BlockNode,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct TypeAliasNode {
-  pub visibility: Option<Visibility>,
+  pub visibility: Option<VisibilityKind>,
   pub ident: IdentNode,
-  pub ty: TypeNode,
+  pub ty: TypeKind,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct TraitNode {
-  pub visibility: Option<Visibility>,
+  pub visibility: Option<VisibilityKind>,
   pub ident: IdentNode,
   pub generic: Option<GenericNode>,
-  pub item_list: Vec<TraitItemNode>,
+  pub item_list: Vec<TraitItemKind>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ConstantNode {
-  pub visibility: Option<Visibility>,
+  pub visibility: Option<VisibilityKind>,
   pub ident: IdentNode,
-  pub ty: TypeNode,
-  pub value: ExpressionNode,
+  pub ty: TypeKind,
+  pub value: ExpressionKind,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct StaticNode {
-  pub visibility: Option<Visibility>,
+  pub visibility: Option<VisibilityKind>,
   pub ident: IdentNode,
-  pub ty: TypeNode,
-  pub value: LiteralValueNode,
+  pub ty: TypeKind,
+  pub value: LiteralValueKind,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct CompoundAssignNode {
   pub kind: CompoundAssignKind,
-  pub lhs: ExpressionNode,
-  pub rhs: ExpressionNode,
+  pub lhs: ExpressionKind,
+  pub rhs: ExpressionKind,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -155,24 +155,24 @@ pub enum CompoundAssignKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ImplementNode {
-  pub visibility: Option<Visibility>,
+  pub visibility: Option<VisibilityKind>,
   pub generic: Option<GenericNode>,
   pub target: PathNode,
-  pub item_list: Vec<ImplementItemNode>,
+  pub item_list: Vec<ImplementItemKind>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ImplementTraitNode {
-  pub visibility: Option<Visibility>,
+  pub visibility: Option<VisibilityKind>,
   pub target: PathNode,
   pub target_generic: Option<GenericNode>,
   pub trait_ident: PathNode,
   pub generic: Option<GenericNode>,
-  pub item_list: Vec<ImplementItemNode>,
+  pub item_list: Vec<ImplementItemKind>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum LiteralValueNode {
+pub enum LiteralValueKind {
   Bool(bool),
   Char(char),
   Int(i64),
@@ -181,36 +181,36 @@ pub enum LiteralValueNode {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum StructFieldsNode {
+pub enum StructFieldsKind {
   Unnamed(StructUnnamedFieldsNode),
   Named(StructNamedFieldsNode),
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct StructUnnamedFieldsNode {
-  pub node_list: Vec<TypeNode>,
+  pub node_list: Vec<TypeKind>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct StructNamedFieldsNode {
-  pub node_list: Vec<(IdentNode, TypeNode)>,
+  pub node_list: Vec<(IdentNode, TypeKind)>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct EnumVariantNode {
   pub ident: IdentNode,
-  pub ty: Option<TypeNode>,
+  pub ty: Option<TypeKind>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct FunctionArgumentNode {
   pub ident: IdentNode,
-  pub immutablity: Immutablity,
-  pub ty: TypeNode,
+  pub immutablity: ImmutablityKind,
+  pub ty: TypeKind,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum TraitItemNode {
+pub enum TraitItemKind {
   Constant(TraitItemConstantNode),
   Function(TraitItemFunctionNode),
 }
@@ -218,8 +218,8 @@ pub enum TraitItemNode {
 #[derive(Debug, PartialEq, Clone)]
 pub struct TraitItemConstantNode {
   pub ident: IdentNode,
-  pub ty: TypeNode,
-  pub default_value: Option<LiteralValueNode>,
+  pub ty: TypeKind,
+  pub default_value: Option<LiteralValueKind>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -228,48 +228,48 @@ pub struct TraitItemFunctionNode {
   pub ident: IdentNode,
   pub generic: Option<GenericNode>,
   pub argument_list: Vec<FunctionArgumentNode>,
-  pub return_type: Option<TypeNode>,
+  pub return_type: Option<TypeKind>,
   pub block: Option<BlockNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum TypeNode {
-  Array(Immutablity, TypeArrayNode),
-  Tuple(Immutablity, Vec<TypeNode>),
-  Path(Immutablity, PathNode),
+pub enum TypeKind {
+  Array(ImmutablityKind, TypeArrayNode),
+  Tuple(ImmutablityKind, Vec<TypeKind>),
+  Path(ImmutablityKind, PathNode),
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct TypeArrayNode {
-  pub ty: Box<TypeNode>,
+  pub ty: Box<TypeKind>,
   pub size: usize,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum Immutablity {
+pub enum ImmutablityKind {
   Yes,
   Nope,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum StatementNode {
-  Item(Box<ItemNode>),
+pub enum StatementKind {
+  Item(Box<ItemKind>),
   CompoundAssign(Box<CompoundAssignNode>),
   Let(Box<LetNode>),
-  Expression(ExpressionNode),
+  ExpressionKind(ExpressionKind),
   Semicolon,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct LetNode {
-  pub immutablity: Immutablity,
-  pub pattern: PatternNode,
-  pub ty: Option<TypeNode>,
-  pub value: ExpressionNode,
+  pub immutablity: ImmutablityKind,
+  pub pattern: PatternKind,
+  pub ty: Option<TypeKind>,
+  pub value: ExpressionKind,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum ExpressionNode {
+pub enum ExpressionKind {
   Path(PathNode),
   Conditional(ConditionalNode),
   Loop(LoopNode),
@@ -279,23 +279,23 @@ pub enum ExpressionNode {
   Break,
   Continue,
   Return(ReturnNode),
-  Literal(LiteralValueNode),
-  Array(Vec<ExpressionNode>),
+  Literal(LiteralValueKind),
+  Array(Vec<ExpressionKind>),
   Tuple(TupleNode),
   Index(IndexNode),
   UnaryOperator(UnaryOperatorNode),
   InfixOperator(InfixOperatorNode),
-  Await(Box<ExpressionNode>),
-  Try(Box<ExpressionNode>),
-  Field(ExpressionFieldNode),
-  Struct(ExpressionStructNode),
+  Await(Box<ExpressionKind>),
+  Try(Box<ExpressionKind>),
+  Field(ExpressionKindFieldNode),
+  Struct(ExpressionKindStructNode),
   Block(BlockNode),
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ConditionNode {
-  pub pattern: Option<(Immutablity, PatternNode)>,
-  pub value: Box<ExpressionNode>,
+  pub pattern: Option<(ImmutablityKind, PatternKind)>,
+  pub value: Box<ExpressionKind>,
 }
 
 pub type ConditionalBranch = (ConditionNode, BlockNode);
@@ -320,57 +320,57 @@ pub struct WhileNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ForNode {
-  pub immutablity: Immutablity,
-  pub pattern: PatternNode,
-  pub iteration: Box<ExpressionNode>,
+  pub immutablity: ImmutablityKind,
+  pub pattern: PatternKind,
+  pub iteration: Box<ExpressionKind>,
   pub block: BlockNode,
 }
 
-pub type PatternBranch = (Vec<PatternNode>, BlockNode);
+pub type PatternBranch = (Vec<PatternKind>, BlockNode);
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct PatternMatchNode {
-  pub condition: Box<ExpressionNode>,
+  pub condition: Box<ExpressionKind>,
   pub branch_list: Vec<PatternBranch>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ReturnNode {
-  pub value: Option<Box<ExpressionNode>>,
+  pub value: Option<Box<ExpressionKind>>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum PatternNode {
+pub enum PatternKind {
   Placeholder,
   UnnamedStruct(UnnamedStructNode),
   NamedStruct(NamedStructNode),
-  Literal(LiteralValueNode),
+  Literal(LiteralValueKind),
   Path(PathNode),
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct TupleNode {
-  pub field: Option<Box<ExpressionNode>>,
+  pub field: Option<Box<ExpressionKind>>,
   pub argument_list: Vec<TupleArgument>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct TupleArgument {
   pub name: Option<IdentNode>,
-  pub value: ExpressionNode,
+  pub value: ExpressionKind,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct IndexNode {
-  pub array: Box<ExpressionNode>,
-  pub index: Box<ExpressionNode>,
+  pub array: Box<ExpressionKind>,
+  pub index: Box<ExpressionKind>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct InfixOperatorNode {
   pub kind: InfixOperatorKind,
-  pub lhs: Box<ExpressionNode>,
-  pub rhs: Box<ExpressionNode>,
+  pub lhs: Box<ExpressionKind>,
+  pub rhs: Box<ExpressionKind>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -402,7 +402,7 @@ pub enum InfixOperatorKind {
 #[derive(Debug, PartialEq, Clone)]
 pub struct UnaryOperatorNode {
   pub kind: UnaryOperatorKind,
-  pub value: Box<ExpressionNode>,
+  pub value: Box<ExpressionKind>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -412,27 +412,27 @@ pub enum UnaryOperatorKind {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct ExpressionFieldNode {
-  pub lhs: Box<ExpressionNode>,
+pub struct ExpressionKindFieldNode {
+  pub lhs: Box<ExpressionKind>,
   pub rhs: Box<IdentNode>,
 }
 
-pub type ExpressionStructField = (IdentNode, Option<ExpressionNode>);
+pub type ExpressionKindStructField = (IdentNode, Option<ExpressionKind>);
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct ExpressionStructNode {
+pub struct ExpressionKindStructNode {
   pub path: Option<PathNode>,
-  pub field_list: Vec<ExpressionStructField>,
-  pub rest: Option<Box<ExpressionNode>>,
+  pub field_list: Vec<ExpressionKindStructField>,
+  pub rest: Option<Box<ExpressionKind>>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct BlockNode {
-  pub statement_list: Vec<StatementNode>,
+  pub statement_list: Vec<StatementKind>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum ImplementItemNode {
+pub enum ImplementItemKind {
   Constant(ConstantNode),
   Function(FunctionNode),
 }
@@ -445,7 +445,7 @@ pub struct PathNode {
 #[derive(Debug, PartialEq, Clone)]
 pub struct UnnamedStructNode {
   pub path: Option<PathNode>,
-  pub field_list: Vec<PatternNode>,
+  pub field_list: Vec<PatternKind>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -457,5 +457,5 @@ pub struct NamedStructNode {
 #[derive(Debug, PartialEq, Clone)]
 pub struct FieldNode {
   pub ident: IdentNode,
-  pub pattern: Option<PatternNode>,
+  pub pattern: Option<PatternKind>,
 }

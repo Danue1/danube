@@ -4,7 +4,7 @@ pub(super) fn parse_struct_unnamed_fields_node(s: Tokens) -> ParseResult<StructU
   map(
     tuple((
       parse_symbol(Symbol::LeftParens),
-      separated_nonempty_list(parse_symbol(Symbol::Comma), parse_type_node),
+      separated_nonempty_list(parse_symbol(Symbol::Comma), parse_type_kind),
       opt(parse_symbol(Symbol::Comma)),
       parse_symbol(Symbol::RightParens),
       parse_symbol(Symbol::Semicolon),

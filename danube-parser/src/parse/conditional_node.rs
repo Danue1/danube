@@ -52,7 +52,7 @@ mod tests {
         main_branch: (
           ConditionNode {
             pattern: None,
-            value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+            value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
           },
           BlockNode {
             statement_list: vec![]
@@ -73,7 +73,7 @@ mod tests {
         main_branch: (
           ConditionNode {
             pattern: None,
-            value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+            value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
           },
           BlockNode {
             statement_list: vec![]
@@ -96,7 +96,7 @@ mod tests {
         main_branch: (
           ConditionNode {
             pattern: None,
-            value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+            value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
           },
           BlockNode {
             statement_list: vec![]
@@ -105,7 +105,7 @@ mod tests {
         branch_list: vec![(
           ConditionNode {
             pattern: None,
-            value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+            value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
           },
           BlockNode {
             statement_list: vec![]
@@ -125,7 +125,7 @@ mod tests {
         main_branch: (
           ConditionNode {
             pattern: None,
-            value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+            value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
           },
           BlockNode {
             statement_list: vec![]
@@ -134,7 +134,7 @@ mod tests {
         branch_list: vec![(
           ConditionNode {
             pattern: None,
-            value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+            value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
           },
           BlockNode {
             statement_list: vec![]
@@ -156,14 +156,14 @@ mod tests {
         main_branch: (
           ConditionNode {
             pattern: Some((
-              Immutablity::Yes,
-              PatternNode::Path(PathNode {
+              ImmutablityKind::Yes,
+              PatternKind::Path(PathNode {
                 ident_list: vec![IdentNode {
                   raw: "foo".to_owned()
                 }]
               })
             )),
-            value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+            value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
           },
           BlockNode {
             statement_list: vec![]
@@ -184,14 +184,14 @@ mod tests {
         main_branch: (
           ConditionNode {
             pattern: Some((
-              Immutablity::Nope,
-              PatternNode::Path(PathNode {
+              ImmutablityKind::Nope,
+              PatternKind::Path(PathNode {
                 ident_list: vec![IdentNode {
                   raw: "foo".to_owned()
                 }]
               })
             )),
-            value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+            value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
           },
           BlockNode {
             statement_list: vec![]

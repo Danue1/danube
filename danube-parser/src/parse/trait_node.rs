@@ -3,12 +3,12 @@ use super::*;
 pub(super) fn parse_trait_node(s: Tokens) -> ParseResult<TraitNode> {
   map(
     tuple((
-      opt(parse_visibility),
+      opt(parse_visibility_kind),
       parse_keyword(Keyword::Trait),
       parse_ident_node,
       opt(parse_generic_node),
       parse_symbol(Symbol::LeftBrace),
-      many1(parse_trait_item_node),
+      many1(parse_trait_item_kind),
       parse_symbol(Symbol::RightBrace),
     )),
     |(visibility, _, ident, generic, _, item_list, _)| TraitNode {
@@ -48,12 +48,12 @@ mod test_constant {
           raw: "Foo".to_owned()
         },
         generic: None,
-        item_list: vec![TraitItemNode::Constant(TraitItemConstantNode {
+        item_list: vec![TraitItemKind::Constant(TraitItemConstantNode {
           ident: IdentNode {
             raw: "FOO".to_owned()
           },
-          ty: TypeNode::Path(
-            Immutablity::Yes,
+          ty: TypeKind::Path(
+            ImmutablityKind::Yes,
             PathNode {
               ident_list: vec![IdentNode {
                 raw: "Bar".to_owned()
@@ -79,19 +79,19 @@ mod test_constant {
           raw: "Foo".to_owned()
         },
         generic: None,
-        item_list: vec![TraitItemNode::Constant(TraitItemConstantNode {
+        item_list: vec![TraitItemKind::Constant(TraitItemConstantNode {
           ident: IdentNode {
             raw: "FOO".to_owned()
           },
-          ty: TypeNode::Path(
-            Immutablity::Yes,
+          ty: TypeKind::Path(
+            ImmutablityKind::Yes,
             PathNode {
               ident_list: vec![IdentNode {
                 raw: "Bar".to_owned()
               }]
             }
           ),
-          default_value: Some(LiteralValueNode::Bool(true)),
+          default_value: Some(LiteralValueKind::Bool(true)),
         })]
       }
     );
@@ -126,7 +126,7 @@ mod test_function {
           raw: "Foo".to_owned()
         },
         generic: None,
-        item_list: vec![TraitItemNode::Function(TraitItemFunctionNode {
+        item_list: vec![TraitItemKind::Function(TraitItemFunctionNode {
           is_async: false,
           ident: IdentNode {
             raw: "foo".to_owned()
@@ -153,19 +153,19 @@ mod test_function {
           raw: "Foo".to_owned()
         },
         generic: None,
-        item_list: vec![TraitItemNode::Function(TraitItemFunctionNode {
+        item_list: vec![TraitItemKind::Function(TraitItemFunctionNode {
           is_async: false,
           ident: IdentNode {
             raw: "foo".to_owned()
           },
           generic: None,
           argument_list: vec![FunctionArgumentNode {
-            immutablity: Immutablity::Yes,
+            immutablity: ImmutablityKind::Yes,
             ident: IdentNode {
               raw: "bar".to_owned()
             },
-            ty: TypeNode::Path(
-              Immutablity::Yes,
+            ty: TypeKind::Path(
+              ImmutablityKind::Yes,
               PathNode {
                 ident_list: vec![IdentNode {
                   raw: "Bar".to_owned()
@@ -193,7 +193,7 @@ mod test_function {
           raw: "Foo".to_owned()
         },
         generic: None,
-        item_list: vec![TraitItemNode::Function(TraitItemFunctionNode {
+        item_list: vec![TraitItemKind::Function(TraitItemFunctionNode {
           is_async: false,
           ident: IdentNode {
             raw: "foo".to_owned()
@@ -201,12 +201,12 @@ mod test_function {
           generic: None,
           argument_list: vec![
             FunctionArgumentNode {
-              immutablity: Immutablity::Yes,
+              immutablity: ImmutablityKind::Yes,
               ident: IdentNode {
                 raw: "bar".to_owned()
               },
-              ty: TypeNode::Path(
-                Immutablity::Yes,
+              ty: TypeKind::Path(
+                ImmutablityKind::Yes,
                 PathNode {
                   ident_list: vec![IdentNode {
                     raw: "Bar".to_owned()
@@ -215,12 +215,12 @@ mod test_function {
               )
             },
             FunctionArgumentNode {
-              immutablity: Immutablity::Yes,
+              immutablity: ImmutablityKind::Yes,
               ident: IdentNode {
                 raw: "baz".to_owned()
               },
-              ty: TypeNode::Path(
-                Immutablity::Yes,
+              ty: TypeKind::Path(
+                ImmutablityKind::Yes,
                 PathNode {
                   ident_list: vec![IdentNode {
                     raw: "Baz".to_owned()
@@ -251,7 +251,7 @@ mod test_function {
           raw: "Foo".to_owned()
         },
         generic: None,
-        item_list: vec![TraitItemNode::Function(TraitItemFunctionNode {
+        item_list: vec![TraitItemKind::Function(TraitItemFunctionNode {
           is_async: false,
           ident: IdentNode {
             raw: "foo".to_owned()
@@ -260,21 +260,21 @@ mod test_function {
           argument_list: vec![],
           return_type: None,
           block: Some(BlockNode {
-            statement_list: vec![StatementNode::Item(Box::new(ItemNode::Constant(
+            statement_list: vec![StatementKind::Item(Box::new(ItemKind::Constant(
               ConstantNode {
                 visibility: None,
                 ident: IdentNode {
                   raw: "FOO".to_owned(),
                 },
-                ty: TypeNode::Path(
-                  Immutablity::Yes,
+                ty: TypeKind::Path(
+                  ImmutablityKind::Yes,
                   PathNode {
                     ident_list: vec![IdentNode {
                       raw: "bool".to_owned(),
                     }]
                   }
                 ),
-                value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+                value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
               }
             )))]
           }),
@@ -298,19 +298,19 @@ mod test_function {
           raw: "Foo".to_owned()
         },
         generic: None,
-        item_list: vec![TraitItemNode::Function(TraitItemFunctionNode {
+        item_list: vec![TraitItemKind::Function(TraitItemFunctionNode {
           is_async: false,
           ident: IdentNode {
             raw: "foo".to_owned()
           },
           generic: None,
           argument_list: vec![FunctionArgumentNode {
-            immutablity: Immutablity::Yes,
+            immutablity: ImmutablityKind::Yes,
             ident: IdentNode {
               raw: "bar".to_owned()
             },
-            ty: TypeNode::Path(
-              Immutablity::Yes,
+            ty: TypeKind::Path(
+              ImmutablityKind::Yes,
               PathNode {
                 ident_list: vec![IdentNode {
                   raw: "Bar".to_owned()
@@ -320,21 +320,21 @@ mod test_function {
           }],
           return_type: None,
           block: Some(BlockNode {
-            statement_list: vec![StatementNode::Item(Box::new(ItemNode::Constant(
+            statement_list: vec![StatementKind::Item(Box::new(ItemKind::Constant(
               ConstantNode {
                 visibility: None,
                 ident: IdentNode {
                   raw: "FOO".to_owned(),
                 },
-                ty: TypeNode::Path(
-                  Immutablity::Yes,
+                ty: TypeKind::Path(
+                  ImmutablityKind::Yes,
                   PathNode {
                     ident_list: vec![IdentNode {
                       raw: "bool".to_owned(),
                     }]
                   }
                 ),
-                value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+                value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
               }
             )))]
           }),
@@ -358,7 +358,7 @@ mod test_function {
           raw: "Foo".to_owned()
         },
         generic: None,
-        item_list: vec![TraitItemNode::Function(TraitItemFunctionNode {
+        item_list: vec![TraitItemKind::Function(TraitItemFunctionNode {
           is_async: false,
           ident: IdentNode {
             raw: "foo".to_owned()
@@ -366,12 +366,12 @@ mod test_function {
           generic: None,
           argument_list: vec![
             FunctionArgumentNode {
-              immutablity: Immutablity::Yes,
+              immutablity: ImmutablityKind::Yes,
               ident: IdentNode {
                 raw: "bar".to_owned()
               },
-              ty: TypeNode::Path(
-                Immutablity::Yes,
+              ty: TypeKind::Path(
+                ImmutablityKind::Yes,
                 PathNode {
                   ident_list: vec![IdentNode {
                     raw: "Bar".to_owned()
@@ -380,12 +380,12 @@ mod test_function {
               )
             },
             FunctionArgumentNode {
-              immutablity: Immutablity::Yes,
+              immutablity: ImmutablityKind::Yes,
               ident: IdentNode {
                 raw: "baz".to_owned()
               },
-              ty: TypeNode::Path(
-                Immutablity::Yes,
+              ty: TypeKind::Path(
+                ImmutablityKind::Yes,
                 PathNode {
                   ident_list: vec![IdentNode {
                     raw: "Baz".to_owned()
@@ -396,21 +396,21 @@ mod test_function {
           ],
           return_type: None,
           block: Some(BlockNode {
-            statement_list: vec![StatementNode::Item(Box::new(ItemNode::Constant(
+            statement_list: vec![StatementKind::Item(Box::new(ItemKind::Constant(
               ConstantNode {
                 visibility: None,
                 ident: IdentNode {
                   raw: "FOO".to_owned(),
                 },
-                ty: TypeNode::Path(
-                  Immutablity::Yes,
+                ty: TypeKind::Path(
+                  ImmutablityKind::Yes,
                   PathNode {
                     ident_list: vec![IdentNode {
                       raw: "bool".to_owned(),
                     }]
                   }
                 ),
-                value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+                value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
               }
             )))]
           }),

@@ -12,12 +12,12 @@ pub(super) fn parse_struct_named_fields_node(s: Tokens) -> ParseResult<StructNam
   )(s)
 }
 
-fn parse_node(s: Tokens) -> ParseResult<(IdentNode, TypeNode)> {
+fn parse_node(s: Tokens) -> ParseResult<(IdentNode, TypeKind)> {
   map(
     tuple((
       parse_ident_node,
       parse_symbol(Symbol::Colon),
-      parse_type_node,
+      parse_type_kind,
     )),
     |(ident, _, ty)| (ident, ty),
   )(s)

@@ -5,7 +5,7 @@ pub(super) fn parse_field_node(s: Tokens) -> ParseResult<FieldNode> {
     tuple((
       parse_ident_node,
       opt(map(
-        tuple((parse_symbol(Symbol::Colon), parse_pattern_node)),
+        tuple((parse_symbol(Symbol::Colon), parse_pattern_kind)),
         |(_, pattern)| pattern,
       )),
     )),

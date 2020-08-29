@@ -4,14 +4,14 @@ pub(super) fn parse_let_node(s: Tokens) -> ParseResult<LetNode> {
   map(
     tuple((
       parse_keyword(Keyword::Let),
-      parse_immutablity,
-      parse_pattern_node,
+      parse_immutablity_kind,
+      parse_pattern_kind,
       opt(map(
-        tuple((parse_symbol(Symbol::Colon), parse_type_node)),
+        tuple((parse_symbol(Symbol::Colon), parse_type_kind)),
         |(_, ty)| ty,
       )),
       parse_symbol(Symbol::Assign),
-      parse_expression_node,
+      parse_expression_kind,
       parse_symbol(Symbol::Semicolon),
     )),
     |(_, immutablity, pattern, ty, _, value, _)| LetNode {
@@ -44,14 +44,14 @@ mod immutable_tests {
     assert_eq!(
       compile(source),
       LetNode {
-        immutablity: Immutablity::Yes,
-        pattern: PatternNode::Path(PathNode {
+        immutablity: ImmutablityKind::Yes,
+        pattern: PatternKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         }),
         ty: None,
-        value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
       }
     );
   }
@@ -62,21 +62,21 @@ mod immutable_tests {
     assert_eq!(
       compile(source),
       LetNode {
-        immutablity: Immutablity::Yes,
-        pattern: PatternNode::Path(PathNode {
+        immutablity: ImmutablityKind::Yes,
+        pattern: PatternKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         }),
-        ty: Some(TypeNode::Path(
-          Immutablity::Yes,
+        ty: Some(TypeKind::Path(
+          ImmutablityKind::Yes,
           PathNode {
             ident_list: vec![IdentNode {
               raw: "bool".to_owned()
             }]
           }
         )),
-        value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
       }
     );
   }
@@ -87,17 +87,17 @@ mod immutable_tests {
     assert_eq!(
       compile(source),
       LetNode {
-        immutablity: Immutablity::Yes,
-        pattern: PatternNode::UnnamedStruct(UnnamedStructNode {
+        immutablity: ImmutablityKind::Yes,
+        pattern: PatternKind::UnnamedStruct(UnnamedStructNode {
           path: None,
-          field_list: vec![PatternNode::Path(PathNode {
+          field_list: vec![PatternKind::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "foo".to_owned()
             }]
           })]
         }),
         ty: None,
-        value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
       }
     );
   }
@@ -108,21 +108,21 @@ mod immutable_tests {
     assert_eq!(
       compile(source),
       LetNode {
-        immutablity: Immutablity::Yes,
-        pattern: PatternNode::UnnamedStruct(UnnamedStructNode {
+        immutablity: ImmutablityKind::Yes,
+        pattern: PatternKind::UnnamedStruct(UnnamedStructNode {
           path: Some(PathNode {
             ident_list: vec![IdentNode {
               raw: "Foo".to_owned()
             }]
           }),
-          field_list: vec![PatternNode::Path(PathNode {
+          field_list: vec![PatternKind::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "foo".to_owned()
             }]
           })]
         }),
         ty: None,
-        value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
       }
     );
   }
@@ -133,20 +133,20 @@ mod immutable_tests {
     assert_eq!(
       compile(source),
       LetNode {
-        immutablity: Immutablity::Yes,
-        pattern: PatternNode::UnnamedStruct(UnnamedStructNode {
+        immutablity: ImmutablityKind::Yes,
+        pattern: PatternKind::UnnamedStruct(UnnamedStructNode {
           path: Some(PathNode {
             ident_list: vec![IdentNode {
               raw: "Foo".to_owned()
             }]
           }),
           field_list: vec![
-            PatternNode::Path(PathNode {
+            PatternKind::Path(PathNode {
               ident_list: vec![IdentNode {
                 raw: "foo".to_owned()
               }]
             }),
-            PatternNode::Path(PathNode {
+            PatternKind::Path(PathNode {
               ident_list: vec![IdentNode {
                 raw: "bar".to_owned()
               }]
@@ -154,7 +154,7 @@ mod immutable_tests {
           ]
         }),
         ty: None,
-        value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
       }
     );
   }
@@ -165,8 +165,8 @@ mod immutable_tests {
     assert_eq!(
       compile(source),
       LetNode {
-        immutablity: Immutablity::Yes,
-        pattern: PatternNode::NamedStruct(NamedStructNode {
+        immutablity: ImmutablityKind::Yes,
+        pattern: PatternKind::NamedStruct(NamedStructNode {
           path: None,
           field_list: vec![FieldNode {
             ident: IdentNode {
@@ -176,7 +176,7 @@ mod immutable_tests {
           }]
         }),
         ty: None,
-        value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
       }
     );
   }
@@ -187,8 +187,8 @@ mod immutable_tests {
     assert_eq!(
       compile(source),
       LetNode {
-        immutablity: Immutablity::Yes,
-        pattern: PatternNode::NamedStruct(NamedStructNode {
+        immutablity: ImmutablityKind::Yes,
+        pattern: PatternKind::NamedStruct(NamedStructNode {
           path: Some(PathNode {
             ident_list: vec![IdentNode {
               raw: "Foo".to_owned()
@@ -202,7 +202,7 @@ mod immutable_tests {
           }]
         }),
         ty: None,
-        value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
       }
     );
   }
@@ -213,8 +213,8 @@ mod immutable_tests {
     assert_eq!(
       compile(source),
       LetNode {
-        immutablity: Immutablity::Yes,
-        pattern: PatternNode::NamedStruct(NamedStructNode {
+        immutablity: ImmutablityKind::Yes,
+        pattern: PatternKind::NamedStruct(NamedStructNode {
           path: Some(PathNode {
             ident_list: vec![IdentNode {
               raw: "Foo".to_owned()
@@ -236,7 +236,7 @@ mod immutable_tests {
           ]
         }),
         ty: None,
-        value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
       }
     );
   }
@@ -263,14 +263,14 @@ mod mutable_tests {
     assert_eq!(
       compile(source),
       LetNode {
-        immutablity: Immutablity::Nope,
-        pattern: PatternNode::Path(PathNode {
+        immutablity: ImmutablityKind::Nope,
+        pattern: PatternKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         }),
         ty: None,
-        value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
       }
     );
   }
@@ -281,21 +281,21 @@ mod mutable_tests {
     assert_eq!(
       compile(source),
       LetNode {
-        immutablity: Immutablity::Nope,
-        pattern: PatternNode::Path(PathNode {
+        immutablity: ImmutablityKind::Nope,
+        pattern: PatternKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         }),
-        ty: Some(TypeNode::Path(
-          Immutablity::Yes,
+        ty: Some(TypeKind::Path(
+          ImmutablityKind::Yes,
           PathNode {
             ident_list: vec![IdentNode {
               raw: "bool".to_owned()
             }]
           }
         )),
-        value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
       }
     );
   }
@@ -306,8 +306,8 @@ mod mutable_tests {
     assert_eq!(
       compile(source),
       LetNode {
-        immutablity: Immutablity::Nope,
-        pattern: PatternNode::Path(PathNode {
+        immutablity: ImmutablityKind::Nope,
+        pattern: PatternKind::Path(PathNode {
           ident_list: vec![
             IdentNode {
               raw: "Foo".to_owned()
@@ -318,7 +318,7 @@ mod mutable_tests {
           ]
         }),
         ty: None,
-        value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
       }
     );
   }

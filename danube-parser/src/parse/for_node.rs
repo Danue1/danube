@@ -4,10 +4,10 @@ pub(super) fn parse_for_node(s: Tokens) -> ParseResult<ForNode> {
   map(
     tuple((
       parse_keyword(Keyword::For),
-      parse_immutablity,
-      parse_pattern_node,
+      parse_immutablity_kind,
+      parse_pattern_kind,
       parse_keyword(Keyword::In),
-      parse_expression_node,
+      parse_expression_kind,
       parse_block_node,
     )),
     |(_, immutablity, pattern, _, iteration, block)| ForNode {
@@ -40,16 +40,16 @@ mod tests {
     assert_eq!(
       compile(source),
       ForNode {
-        immutablity: Immutablity::Yes,
-        pattern: PatternNode::Path(PathNode {
+        immutablity: ImmutablityKind::Yes,
+        pattern: PatternKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned()
           }]
         }),
-        iteration: Box::new(ExpressionNode::Array(vec![
-          ExpressionNode::Literal(LiteralValueNode::Int(1)),
-          ExpressionNode::Literal(LiteralValueNode::Int(2)),
-          ExpressionNode::Literal(LiteralValueNode::Int(3)),
+        iteration: Box::new(ExpressionKind::Array(vec![
+          ExpressionKind::Literal(LiteralValueKind::Int(1)),
+          ExpressionKind::Literal(LiteralValueKind::Int(2)),
+          ExpressionKind::Literal(LiteralValueKind::Int(3)),
         ])),
         block: BlockNode {
           statement_list: vec![],

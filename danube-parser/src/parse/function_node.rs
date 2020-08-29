@@ -3,7 +3,7 @@ use super::*;
 pub(super) fn parse_function_node(s: Tokens) -> ParseResult<FunctionNode> {
   map(
     tuple((
-      opt(parse_visibility),
+      opt(parse_visibility_kind),
       opt(parse_keyword(Keyword::Async)),
       parse_keyword(Keyword::Function),
       parse_ident_node,
@@ -36,9 +36,9 @@ fn parse_function_argument_list(s: Tokens) -> ParseResult<Vec<FunctionArgumentNo
   )(s)
 }
 
-fn parse_function_type(s: Tokens) -> ParseResult<TypeNode> {
+fn parse_function_type(s: Tokens) -> ParseResult<TypeKind> {
   map(
-    tuple((parse_symbol(Symbol::ReturnArrow), parse_type_node)),
+    tuple((parse_symbol(Symbol::ReturnArrow), parse_type_kind)),
     |(_, ty)| ty,
   )(s)
 }
@@ -51,11 +51,11 @@ fn parse_function_body_shortcut(s: Tokens) -> ParseResult<BlockNode> {
   map(
     tuple((
       parse_symbol(Symbol::Assign),
-      parse_expression_node,
+      parse_expression_kind,
       parse_symbol(Symbol::Semicolon),
     )),
     |(_, expression, _)| BlockNode {
-      statement_list: vec![StatementNode::Expression(expression)],
+      statement_list: vec![StatementKind::ExpressionKind(expression)],
     },
   )(s)
 }
@@ -109,12 +109,12 @@ mod tests {
         },
         generic: None,
         argument_list: vec![FunctionArgumentNode {
-          immutablity: Immutablity::Yes,
+          immutablity: ImmutablityKind::Yes,
           ident: IdentNode {
             raw: "bar".to_owned()
           },
-          ty: TypeNode::Path(
-            Immutablity::Yes,
+          ty: TypeKind::Path(
+            ImmutablityKind::Yes,
             PathNode {
               ident_list: vec![IdentNode {
                 raw: "Bar".to_owned()
@@ -144,12 +144,12 @@ mod tests {
         generic: None,
         argument_list: vec![
           FunctionArgumentNode {
-            immutablity: Immutablity::Yes,
+            immutablity: ImmutablityKind::Yes,
             ident: IdentNode {
               raw: "bar".to_owned()
             },
-            ty: TypeNode::Path(
-              Immutablity::Yes,
+            ty: TypeKind::Path(
+              ImmutablityKind::Yes,
               PathNode {
                 ident_list: vec![IdentNode {
                   raw: "Bar".to_owned()
@@ -158,12 +158,12 @@ mod tests {
             )
           },
           FunctionArgumentNode {
-            immutablity: Immutablity::Yes,
+            immutablity: ImmutablityKind::Yes,
             ident: IdentNode {
               raw: "baz".to_owned()
             },
-            ty: TypeNode::Path(
-              Immutablity::Yes,
+            ty: TypeKind::Path(
+              ImmutablityKind::Yes,
               PathNode {
                 ident_list: vec![IdentNode {
                   raw: "Baz".to_owned()
@@ -193,12 +193,12 @@ mod tests {
         },
         generic: None,
         argument_list: vec![FunctionArgumentNode {
-          immutablity: Immutablity::Nope,
+          immutablity: ImmutablityKind::Nope,
           ident: IdentNode {
             raw: "bar".to_owned()
           },
-          ty: TypeNode::Path(
-            Immutablity::Yes,
+          ty: TypeKind::Path(
+            ImmutablityKind::Yes,
             PathNode {
               ident_list: vec![IdentNode {
                 raw: "Bar".to_owned()
@@ -227,12 +227,12 @@ mod tests {
         },
         generic: None,
         argument_list: vec![FunctionArgumentNode {
-          immutablity: Immutablity::Yes,
+          immutablity: ImmutablityKind::Yes,
           ident: IdentNode {
             raw: "bar".to_owned()
           },
-          ty: TypeNode::Path(
-            Immutablity::Nope,
+          ty: TypeKind::Path(
+            ImmutablityKind::Nope,
             PathNode {
               ident_list: vec![IdentNode {
                 raw: "Bar".to_owned()
@@ -265,12 +265,12 @@ mod tests {
         argument_list: vec![],
         return_type: None,
         block: BlockNode {
-          statement_list: vec![StatementNode::Expression(ExpressionNode::Conditional(
+          statement_list: vec![StatementKind::ExpressionKind(ExpressionKind::Conditional(
             ConditionalNode {
               main_branch: (
                 ConditionNode {
                   pattern: None,
-                  value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true))),
+                  value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
                 },
                 BlockNode {
                   statement_list: vec![]
@@ -302,12 +302,12 @@ mod tests {
         argument_list: vec![],
         return_type: None,
         block: BlockNode {
-          statement_list: vec![StatementNode::Expression(ExpressionNode::Conditional(
+          statement_list: vec![StatementKind::ExpressionKind(ExpressionKind::Conditional(
             ConditionalNode {
               main_branch: (
                 ConditionNode {
                   pattern: None,
-                  value: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true)))
+                  value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
                 },
                 BlockNode {
                   statement_list: vec![]
@@ -343,11 +343,11 @@ mod tests {
         argument_list: vec![],
         return_type: None,
         block: BlockNode {
-          statement_list: vec![StatementNode::Expression(ExpressionNode::PatternMatch(
+          statement_list: vec![StatementKind::ExpressionKind(ExpressionKind::PatternMatch(
             PatternMatchNode {
-              condition: Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(true))),
+              condition: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
               branch_list: vec![(
-                vec![PatternNode::Literal(LiteralValueNode::Bool(true))],
+                vec![PatternKind::Literal(LiteralValueKind::Bool(true))],
                 BlockNode {
                   statement_list: vec![]
                 },
@@ -376,9 +376,9 @@ mod tests {
         argument_list: vec![],
         return_type: None,
         block: BlockNode {
-          statement_list: vec![StatementNode::Let(Box::new(LetNode {
-            immutablity: Immutablity::Nope,
-            pattern: PatternNode::Path(PathNode {
+          statement_list: vec![StatementKind::Let(Box::new(LetNode {
+            immutablity: ImmutablityKind::Nope,
+            pattern: PatternKind::Path(PathNode {
               ident_list: vec![
                 IdentNode {
                   raw: "Foo".to_owned()
@@ -389,7 +389,7 @@ mod tests {
               ]
             }),
             ty: None,
-            value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
+            value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
           }))]
         },
       }
@@ -432,8 +432,8 @@ mod tests {
         argument_list: vec![],
         return_type: None,
         block: BlockNode {
-          statement_list: vec![StatementNode::Expression(ExpressionNode::Literal(
-            LiteralValueNode::Int(1)
+          statement_list: vec![StatementKind::ExpressionKind(ExpressionKind::Literal(
+            LiteralValueKind::Int(1)
           ))]
         },
       }

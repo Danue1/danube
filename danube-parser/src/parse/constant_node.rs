@@ -3,13 +3,13 @@ use super::*;
 pub(super) fn parse_constant_node(s: Tokens) -> ParseResult<ConstantNode> {
   map(
     tuple((
-      opt(parse_visibility),
+      opt(parse_visibility_kind),
       parse_keyword(Keyword::Const),
       parse_ident_node,
       parse_symbol(Symbol::Colon),
-      parse_type_node,
+      parse_type_kind,
       parse_symbol(Symbol::Assign),
-      parse_expression_node,
+      parse_expression_kind,
       parse_symbol(Symbol::Semicolon),
     )),
     |(visibility, _, ident, _, ty, _, value, _)| ConstantNode {
@@ -42,15 +42,15 @@ mod tests {
         ident: IdentNode {
           raw: "FOO".to_owned()
         },
-        ty: TypeNode::Path(
-          Immutablity::Yes,
+        ty: TypeKind::Path(
+          ImmutablityKind::Yes,
           PathNode {
             ident_list: vec![IdentNode {
               raw: "bool".to_owned()
             }]
           }
         ),
-        value: ExpressionNode::Literal(LiteralValueNode::Bool(true))
+        value: ExpressionKind::Literal(LiteralValueKind::Bool(true))
       }
     );
   }
@@ -65,11 +65,11 @@ mod tests {
         ident: IdentNode {
           raw: "FOO".to_owned()
         },
-        ty: TypeNode::Array(
-          Immutablity::Yes,
+        ty: TypeKind::Array(
+          ImmutablityKind::Yes,
           TypeArrayNode {
-            ty: Box::new(TypeNode::Path(
-              Immutablity::Yes,
+            ty: Box::new(TypeKind::Path(
+              ImmutablityKind::Yes,
               PathNode {
                 ident_list: vec![IdentNode {
                   raw: "bool".to_owned()
@@ -79,7 +79,7 @@ mod tests {
             size: 0
           }
         ),
-        value: ExpressionNode::Literal(LiteralValueNode::Bool(true))
+        value: ExpressionKind::Literal(LiteralValueKind::Bool(true))
       }
     );
   }
@@ -94,15 +94,15 @@ mod tests {
         ident: IdentNode {
           raw: "FOO".to_owned()
         },
-        ty: TypeNode::Path(
-          Immutablity::Yes,
+        ty: TypeKind::Path(
+          ImmutablityKind::Yes,
           PathNode {
             ident_list: vec![IdentNode {
               raw: "bool".to_owned()
             }]
           }
         ),
-        value: ExpressionNode::Array(vec![])
+        value: ExpressionKind::Array(vec![])
       }
     );
   }
@@ -117,15 +117,15 @@ mod tests {
         ident: IdentNode {
           raw: "FOO".to_owned()
         },
-        ty: TypeNode::Path(
-          Immutablity::Yes,
+        ty: TypeKind::Path(
+          ImmutablityKind::Yes,
           PathNode {
             ident_list: vec![IdentNode {
               raw: "bool".to_owned()
             }]
           }
         ),
-        value: ExpressionNode::Array(vec![ExpressionNode::Literal(LiteralValueNode::Bool(true))])
+        value: ExpressionKind::Array(vec![ExpressionKind::Literal(LiteralValueKind::Bool(true))])
       }
     );
   }

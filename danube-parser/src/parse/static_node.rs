@@ -3,13 +3,13 @@ use super::*;
 pub(super) fn parse_static_node(s: Tokens) -> ParseResult<StaticNode> {
   map(
     tuple((
-      opt(parse_visibility),
+      opt(parse_visibility_kind),
       parse_keyword(Keyword::Static),
       parse_ident_node,
       parse_symbol(Symbol::Colon),
-      parse_type_node,
+      parse_type_kind,
       parse_symbol(Symbol::Assign),
-      parse_literal_value_node,
+      parse_literal_value_kind,
       parse_symbol(Symbol::Semicolon),
     )),
     |(visibility, _, ident, _, ty, _, value, _)| StaticNode {
@@ -42,15 +42,15 @@ mod tests {
         ident: IdentNode {
           raw: "FOO".to_owned()
         },
-        ty: TypeNode::Path(
-          Immutablity::Yes,
+        ty: TypeKind::Path(
+          ImmutablityKind::Yes,
           PathNode {
             ident_list: vec![IdentNode {
               raw: "bool".to_owned()
             }]
           }
         ),
-        value: LiteralValueNode::Bool(true)
+        value: LiteralValueKind::Bool(true)
       }
     );
   }

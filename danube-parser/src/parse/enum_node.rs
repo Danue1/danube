@@ -3,7 +3,7 @@ use super::*;
 pub(super) fn parse_enum_node(s: Tokens) -> ParseResult<EnumNode> {
   map(
     tuple((
-      opt(parse_visibility),
+      opt(parse_visibility_kind),
       parse_keyword(Keyword::Enum),
       parse_ident_node,
       opt(parse_generic_node),

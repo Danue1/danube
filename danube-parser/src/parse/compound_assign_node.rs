@@ -3,9 +3,9 @@ use super::*;
 pub(super) fn parse_compound_assign_node(s: Tokens) -> ParseResult<CompoundAssignNode> {
   map(
     tuple((
-      parse_expression_node,
+      parse_expression_kind,
       parse_compound_assign_kind,
-      parse_expression_node,
+      parse_expression_kind,
       parse_symbol(Symbol::Semicolon),
     )),
     |(lhs, kind, rhs, _)| CompoundAssignNode { kind, lhs, rhs },
@@ -30,12 +30,12 @@ mod tests {
       compile(source),
       CompoundAssignNode {
         kind: CompoundAssignKind::AddAssign,
-        lhs: ExpressionNode::Path(PathNode {
+        lhs: ExpressionKind::Path(PathNode {
           ident_list: vec![IdentNode {
             raw: "foo".to_owned(),
           }]
         }),
-        rhs: ExpressionNode::Literal(LiteralValueNode::Int(1))
+        rhs: ExpressionKind::Literal(LiteralValueKind::Int(1))
       }
     );
   }
@@ -47,8 +47,8 @@ mod tests {
       compile(source),
       CompoundAssignNode {
         kind: CompoundAssignKind::AddAssign,
-        lhs: ExpressionNode::Field(ExpressionFieldNode {
-          lhs: Box::new(ExpressionNode::Path(PathNode {
+        lhs: ExpressionKind::Field(ExpressionKindFieldNode {
+          lhs: Box::new(ExpressionKind::Path(PathNode {
             ident_list: vec![IdentNode {
               raw: "foo".to_owned(),
             }]
@@ -57,7 +57,7 @@ mod tests {
             raw: "bar".to_owned()
           }),
         }),
-        rhs: ExpressionNode::Literal(LiteralValueNode::Int(1))
+        rhs: ExpressionKind::Literal(LiteralValueKind::Int(1))
       }
     );
   }

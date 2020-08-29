@@ -7,7 +7,7 @@ pub(super) fn parse_enum_variant_node(s: Tokens) -> ParseResult<EnumVariantNode>
       opt(map(
         tuple((
           parse_symbol(Symbol::LeftParens),
-          parse_type_node,
+          parse_type_kind,
           parse_symbol(Symbol::RightParens),
         )),
         |(_, ident, _)| ident,

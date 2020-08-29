@@ -4,7 +4,7 @@ pub(super) fn parse_return_node(s: Tokens) -> ParseResult<ReturnNode> {
   map(
     tuple((
       parse_keyword(Keyword::Return),
-      opt(parse_expression_node),
+      opt(parse_expression_kind),
       opt(parse_symbol(Symbol::Semicolon)),
     )),
     |(_, expression, _)| ReturnNode {
@@ -42,7 +42,7 @@ mod tests {
     assert_eq!(
       compile(source),
       ReturnNode {
-        value: Some(Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(
+        value: Some(Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(
           true
         ))))
       }
@@ -55,7 +55,7 @@ mod tests {
     assert_eq!(
       compile(source),
       ReturnNode {
-        value: Some(Box::new(ExpressionNode::Literal(LiteralValueNode::Bool(
+        value: Some(Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(
           true
         ))))
       }

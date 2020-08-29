@@ -34,9 +34,9 @@ fn parse_function_argument_list(s: Tokens) -> ParseResult<Vec<FunctionArgumentNo
   )(s)
 }
 
-fn parse_function_type(s: Tokens) -> ParseResult<TypeNode> {
+fn parse_function_type(s: Tokens) -> ParseResult<TypeKind> {
   map(
-    tuple((parse_symbol(Symbol::ReturnArrow), parse_type_node)),
+    tuple((parse_symbol(Symbol::ReturnArrow), parse_type_kind)),
     |(_, ty)| ty,
   )(s)
 }
@@ -53,11 +53,11 @@ fn parse_function_body_shrotcut(s: Tokens) -> ParseResult<BlockNode> {
   map(
     tuple((
       parse_symbol(Symbol::Assign),
-      parse_expression_node,
+      parse_expression_kind,
       parse_symbol(Symbol::Semicolon),
     )),
     |(_, expression, _)| BlockNode {
-      statement_list: vec![StatementNode::Expression(expression)],
+      statement_list: vec![StatementKind::ExpressionKind(expression)],
     },
   )(s)
 }
