@@ -1,3 +1,8 @@
+#[derive(Debug)]
+pub struct ProgramNode {
+  pub module: ModuleNode,
+}
+
 #[derive(Debug, PartialEq, Clone)]
 pub enum VisibilityKind {
   Public,

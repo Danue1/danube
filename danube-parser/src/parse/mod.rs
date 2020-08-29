@@ -31,6 +31,7 @@ mod named_struct_node;
 mod path_node;
 mod pattern_kind;
 mod pattern_match_node;
+mod program_node;
 mod return_node;
 mod statement_kind;
 mod static_node;
@@ -91,6 +92,7 @@ use nom::{branch::*, bytes::complete::*, combinator::*, multi::*, sequence::*};
 use path_node::parse_path_node;
 use pattern_kind::parse_pattern_kind;
 use pattern_match_node::parse_pattern_match_node;
+use program_node::parse_program_node;
 use return_node::parse_return_node;
 use statement_kind::parse_statement_kind;
 use static_node::parse_static_node;
@@ -118,8 +120,8 @@ use while_node::parse_while_node;
 
 type ParseResult<'a, T> = nom::IResult<Tokens<'a>, T, Error<'a>>;
 
-pub fn parse(s: Tokens) -> ParseResult<ModuleNode> {
-  all_consuming(parse_module_node)(s)
+pub fn parse(s: Tokens) -> ParseResult<ProgramNode> {
+  parse_program_node(s)
 }
 
 #[cfg(test)]
