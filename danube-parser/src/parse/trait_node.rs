@@ -260,8 +260,9 @@ mod test_function {
           argument_list: vec![],
           return_type: None,
           block: Some(BlockNode {
-            statement_list: vec![StatementKind::Item(Box::new(ItemKind::Constant(
-              ConstantNode {
+            statement_list: vec![StatementKind::Item(Box::new(ItemNode {
+              attribute_list: vec![],
+              kind: ItemKind::Constant(ConstantNode {
                 visibility: None,
                 ident: IdentNode {
                   raw: "FOO".to_owned(),
@@ -275,8 +276,8 @@ mod test_function {
                   }
                 ),
                 value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
-              }
-            )))]
+              })
+            }))]
           }),
         })]
       }
@@ -320,8 +321,9 @@ mod test_function {
           }],
           return_type: None,
           block: Some(BlockNode {
-            statement_list: vec![StatementKind::Item(Box::new(ItemKind::Constant(
-              ConstantNode {
+            statement_list: vec![StatementKind::Item(Box::new(ItemNode {
+              attribute_list: vec![],
+              kind: ItemKind::Constant(ConstantNode {
                 visibility: None,
                 ident: IdentNode {
                   raw: "FOO".to_owned(),
@@ -335,8 +337,8 @@ mod test_function {
                   }
                 ),
                 value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
-              }
-            )))]
+              })
+            }))]
           }),
         })]
       }
@@ -396,8 +398,9 @@ mod test_function {
           ],
           return_type: None,
           block: Some(BlockNode {
-            statement_list: vec![StatementKind::Item(Box::new(ItemKind::Constant(
-              ConstantNode {
+            statement_list: vec![StatementKind::Item(Box::new(ItemNode {
+              attribute_list: vec![],
+              kind: ItemKind::Constant(ConstantNode {
                 visibility: None,
                 ident: IdentNode {
                   raw: "FOO".to_owned(),
@@ -411,8 +414,8 @@ mod test_function {
                   }
                 ),
                 value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
-              }
-            )))]
+              })
+            }))]
           }),
         })]
       }

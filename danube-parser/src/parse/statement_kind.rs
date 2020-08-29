@@ -2,7 +2,7 @@ use super::*;
 
 pub(super) fn parse_statement_kind(s: Tokens) -> ParseResult<StatementKind> {
   alt((
-    map(parse_item_kind, |node| StatementKind::Item(Box::new(node))),
+    map(parse_item_node, |node| StatementKind::Item(Box::new(node))),
     map(parse_compound_assign_node, |node| {
       StatementKind::CompoundAssign(Box::new(node))
     }),
@@ -34,21 +34,24 @@ mod tests {
     let source = "const FOO: Foo = true;";
     assert_eq!(
       compile(source),
-      StatementKind::Item(Box::new(ItemKind::Constant(ConstantNode {
-        visibility: None,
-        ident: IdentNode {
-          raw: "FOO".to_owned(),
-        },
-        ty: TypeKind::Path(
-          ImmutablityKind::Yes,
-          PathNode {
-            ident_list: vec![IdentNode {
-              raw: "Foo".to_owned()
-            }]
-          }
-        ),
-        value: ExpressionKind::Literal(LiteralValueKind::Bool(true))
-      })))
+      StatementKind::Item(Box::new(ItemNode {
+        attribute_list: vec![],
+        kind: ItemKind::Constant(ConstantNode {
+          visibility: None,
+          ident: IdentNode {
+            raw: "FOO".to_owned(),
+          },
+          ty: TypeKind::Path(
+            ImmutablityKind::Yes,
+            PathNode {
+              ident_list: vec![IdentNode {
+                raw: "Foo".to_owned()
+              }]
+            }
+          ),
+          value: ExpressionKind::Literal(LiteralValueKind::Bool(true))
+        })
+      }))
     );
   }
 }

@@ -14,7 +14,18 @@ pub struct IdentNode {
 #[derive(Debug, PartialEq)]
 pub struct ModuleNode {
   pub ident: Option<IdentNode>,
-  pub item_list: Vec<ItemKind>,
+  pub item_list: Vec<ItemNode>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct ItemNode {
+  pub attribute_list: Vec<AttributeNode>,
+  pub kind: ItemKind,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct AttributeNode {
+  pub path: PathNode,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -253,7 +264,7 @@ pub enum ImmutablityKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum StatementKind {
-  Item(Box<ItemKind>),
+  Item(Box<ItemNode>),
   CompoundAssign(Box<CompoundAssignNode>),
   Let(Box<LetNode>),
   ExpressionKind(ExpressionKind),

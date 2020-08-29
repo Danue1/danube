@@ -1,3 +1,4 @@
+mod attribute_node;
 mod block_node;
 mod compound_assign_kind;
 mod compound_assign_node;
@@ -20,10 +21,12 @@ mod implement_node;
 mod implement_trait_node;
 mod infix_operator_kind;
 mod item_kind;
+mod item_node;
 mod keyword;
 mod let_node;
 mod literal_value_kind;
 mod loop_node;
+mod module_node;
 mod named_struct_node;
 mod path_node;
 mod pattern_kind;
@@ -54,6 +57,7 @@ mod visibility_kind;
 mod while_node;
 
 use crate::*;
+use attribute_node::parse_attribute_node;
 use block_node::parse_block_node;
 use compound_assign_kind::parse_compound_assign_kind;
 use compound_assign_node::parse_compound_assign_node;
@@ -76,10 +80,12 @@ use implement_node::parse_implement_node;
 use implement_trait_node::parse_implement_trait_node;
 use infix_operator_kind::parse_infix_operator_kind;
 use item_kind::parse_item_kind;
+use item_node::parse_item_node;
 use keyword::parse_keyword;
 use let_node::parse_let_node;
 use literal_value_kind::{parse_int, parse_literal_value_kind};
 use loop_node::parse_loop_node;
+use module_node::parse_module_node;
 use named_struct_node::parse_named_struct_node;
 use nom::{branch::*, bytes::complete::*, combinator::*, multi::*, sequence::*};
 use path_node::parse_path_node;
@@ -113,10 +119,7 @@ use while_node::parse_while_node;
 type ParseResult<'a, T> = nom::IResult<Tokens<'a>, T, Error<'a>>;
 
 pub fn parse(s: Tokens) -> ParseResult<ModuleNode> {
-  all_consuming(map(many0(parse_item_kind), |item_list| ModuleNode {
-    ident: None,
-    item_list,
-  }))(s)
+  all_consuming(parse_module_node)(s)
 }
 
 #[cfg(test)]
