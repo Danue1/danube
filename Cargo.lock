@@ -23,6 +23,31 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "danube"
 version = "0.1.0"
+dependencies = [
+ "danube-compiler 0.1.0",
+ "danube-ir 0.1.0",
+ "danube-parser 0.1.0",
+]
+
+[[package]]
+name = "danube-cli"
+version = "0.1.0"
+
+[[package]]
+name = "danube-compiler"
+version = "0.1.0"
+dependencies = [
+ "bitflags 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "danube-parser 0.1.0",
+]
+
+[[package]]
+name = "danube-ir"
+version = "0.1.0"
+
+[[package]]
+name = "danube-macro"
+version = "0.1.0"
 
 [[package]]
 name = "danube-parser"
@@ -33,11 +58,24 @@ dependencies = [
 ]
 
 [[package]]
-name = "danube-runtime"
+name = "danube-runtime-ir"
 version = "0.1.0"
-dependencies = [
- "danube-parser 0.1.0",
-]
+
+[[package]]
+name = "danube-runtime-jvm"
+version = "0.1.0"
+
+[[package]]
+name = "danube-runtime-wasm"
+version = "0.1.0"
+
+[[package]]
+name = "danube-std"
+version = "0.1.0"
+
+[[package]]
+name = "danube-vm"
+version = "0.1.0"
 
 [[package]]
 name = "lexical-core"

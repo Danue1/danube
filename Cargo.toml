@@ -10,6 +10,19 @@ include = ["LICENSE", "Cargo.toml", "src/**/*.rs"]
 
 [workspace]
 members = [
+  "danube-cli",
+  "danube-compiler",
+  "danube-ir",
+  "danube-macro",
   "danube-parser",
-  "danube-runtime",
+  "danube-runtime-ir",
+  "danube-runtime-jvm",
+  "danube-runtime-wasm",
+  "danube-std",
+  "danube-vm",
 ]
+
+[dependencies]
+danube-parser = { path = "./danube-parser" }
+danube-compiler = { path = "./danube-compiler" }
+danube-ir = { path = "./danube-ir" }
