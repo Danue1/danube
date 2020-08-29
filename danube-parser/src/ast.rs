@@ -254,8 +254,8 @@ pub enum Immutablity {
 #[derive(Debug, PartialEq, Clone)]
 pub enum StatementNode {
   Item(Box<ItemNode>),
-  CompoundAssign(CompoundAssignNode),
-  Let(LetNode),
+  CompoundAssign(Box<CompoundAssignNode>),
+  Let(Box<LetNode>),
   Expression(ExpressionNode),
   Semicolon,
 }

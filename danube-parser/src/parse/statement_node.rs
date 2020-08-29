@@ -3,8 +3,10 @@ use super::*;
 pub(super) fn parse_statement_node(s: Tokens) -> ParseResult<StatementNode> {
   alt((
     map(parse_item_node, |node| StatementNode::Item(Box::new(node))),
-    map(parse_compound_assign_node, StatementNode::CompoundAssign),
-    map(parse_let_node, StatementNode::Let),
+    map(parse_compound_assign_node, |node| {
+      StatementNode::CompoundAssign(Box::new(node))
+    }),
+    map(parse_let_node, |node| StatementNode::Let(Box::new(node))),
     map(parse_expression_node, StatementNode::Expression),
     map(parse_symbol(Symbol::Semicolon), |_| {
       StatementNode::Semicolon

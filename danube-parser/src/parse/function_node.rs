@@ -376,7 +376,7 @@ mod tests {
         argument_list: vec![],
         return_type: None,
         block: BlockNode {
-          statement_list: vec![StatementNode::Let(LetNode {
+          statement_list: vec![StatementNode::Let(Box::new(LetNode {
             immutablity: Immutablity::Nope,
             pattern: PatternNode::Path(PathNode {
               ident_list: vec![
@@ -390,7 +390,7 @@ mod tests {
             }),
             ty: None,
             value: ExpressionNode::Literal(LiteralValueNode::Bool(true)),
-          })]
+          }))]
         },
       }
     );
@@ -412,6 +412,29 @@ mod tests {
         return_type: None,
         block: BlockNode {
           statement_list: vec![]
+        },
+      }
+    );
+  }
+
+  #[test]
+  fn shorthand_function() {
+    let source = "fn foo() = 1;";
+    assert_eq!(
+      compile(source),
+      FunctionNode {
+        visibility: None,
+        is_async: false,
+        ident: IdentNode {
+          raw: "foo".to_owned()
+        },
+        generic: None,
+        argument_list: vec![],
+        return_type: None,
+        block: BlockNode {
+          statement_list: vec![StatementNode::Expression(ExpressionNode::Literal(
+            LiteralValueNode::Int(1)
+          ))]
         },
       }
     );
