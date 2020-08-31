@@ -1,6 +1,12 @@
 #[derive(Debug)]
 pub struct ProgramNode {
+  pub feature_list: Vec<FeatureNode>,
   pub module: ModuleNode,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct FeatureNode {
+  pub name: IdentNode,
 }
 
 #[derive(Debug, PartialEq, Clone)]
