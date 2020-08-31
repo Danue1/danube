@@ -389,7 +389,7 @@ mod tests {
               ]
             }),
             ty: None,
-            value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
+            value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
           }))]
         },
       }

@@ -281,7 +281,7 @@ pub struct LetNode {
   pub immutablity: ImmutablityKind,
   pub pattern: PatternKind,
   pub ty: Option<TypeKind>,
-  pub value: ExpressionKind,
+  pub value: Option<ExpressionKind>,
 }
 
 #[derive(Debug, PartialEq, Clone)]

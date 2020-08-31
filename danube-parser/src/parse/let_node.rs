@@ -10,11 +10,13 @@ pub(super) fn parse_let_node(s: Tokens) -> ParseResult<LetNode> {
         tuple((parse_symbol(Symbol::Colon), parse_type_kind)),
         |(_, ty)| ty,
       )),
-      parse_symbol(Symbol::Assign),
-      parse_expression_kind,
+      opt(map(
+        tuple((parse_symbol(Symbol::Assign), parse_expression_kind)),
+        |(_, expression)| expression,
+      )),
       parse_symbol(Symbol::Semicolon),
     )),
-    |(_, immutablity, pattern, ty, _, value, _)| LetNode {
+    |(_, immutablity, pattern, ty, value, _)| LetNode {
       immutablity,
       pattern,
       ty,
@@ -39,6 +41,42 @@ mod immutable_tests {
   }
 
   #[test]
+  fn let_unassigned() {
+    let source = "let foo;";
+    assert_eq!(
+      compile(source),
+      LetNode {
+        immutablity: ImmutablityKind::Yes,
+        pattern: PatternKind::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "foo".to_owned()
+          }]
+        }),
+        ty: None,
+        value: None,
+      }
+    );
+  }
+
+  #[test]
+  fn let_mut_unassigned() {
+    let source = "let mut foo;";
+    assert_eq!(
+      compile(source),
+      LetNode {
+        immutablity: ImmutablityKind::Nope,
+        pattern: PatternKind::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "foo".to_owned()
+          }]
+        }),
+        ty: None,
+        value: None,
+      }
+    );
+  }
+
+  #[test]
   fn untyped() {
     let source = "let foo = true;";
     assert_eq!(
@@ -51,7 +89,7 @@ mod immutable_tests {
           }]
         }),
         ty: None,
-        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
+        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
       }
     );
   }
@@ -76,7 +114,7 @@ mod immutable_tests {
             }]
           }
         )),
-        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
+        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
       }
     );
   }
@@ -97,7 +135,7 @@ mod immutable_tests {
           })]
         }),
         ty: None,
-        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
+        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
       }
     );
   }
@@ -122,7 +160,7 @@ mod immutable_tests {
           })]
         }),
         ty: None,
-        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
+        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
       }
     );
   }
@@ -154,7 +192,7 @@ mod immutable_tests {
           ]
         }),
         ty: None,
-        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
+        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
       }
     );
   }
@@ -176,7 +214,7 @@ mod immutable_tests {
           }]
         }),
         ty: None,
-        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
+        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
       }
     );
   }
@@ -202,7 +240,7 @@ mod immutable_tests {
           }]
         }),
         ty: None,
-        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
+        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
       }
     );
   }
@@ -236,7 +274,7 @@ mod immutable_tests {
           ]
         }),
         ty: None,
-        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
+        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
       }
     );
   }
@@ -270,7 +308,7 @@ mod mutable_tests {
           }]
         }),
         ty: None,
-        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
+        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
       }
     );
   }
@@ -295,7 +333,7 @@ mod mutable_tests {
             }]
           }
         )),
-        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
+        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
       }
     );
   }
@@ -318,7 +356,7 @@ mod mutable_tests {
           ]
         }),
         ty: None,
-        value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
+        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
       }
     );
   }
