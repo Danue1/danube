@@ -36,10 +36,6 @@ version = "0.1.0"
 [[package]]
 name = "danube-compiler"
 version = "0.1.0"
-dependencies = [
- "bitflags 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "danube-parser 0.1.0",
-]
 
 [[package]]
 name = "danube-ir"
@@ -58,11 +54,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "danube-runtime-ir"
+name = "danube-runtime-javascript"
 version = "0.1.0"
 
 [[package]]
 name = "danube-runtime-jvm"
+version = "0.1.0"
+
+[[package]]
+name = "danube-runtime-native"
 version = "0.1.0"
 
 [[package]]
