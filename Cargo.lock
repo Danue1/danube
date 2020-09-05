@@ -36,6 +36,9 @@ version = "0.1.0"
 [[package]]
 name = "danube-compiler"
 version = "0.1.0"
+dependencies = [
+ "danube-parser 0.1.0",
+]
 
 [[package]]
 name = "danube-ir"
