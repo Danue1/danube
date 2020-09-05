@@ -2,10 +2,10 @@ use super::*;
 
 pub(super) fn parse_program_node(s: Tokens) -> ParseResult<ProgramNode> {
   map(
-    all_consuming(tuple((many0(parse_feature_node), parse_module_node))),
-    |(feature_list, module)| ProgramNode {
+    all_consuming(tuple((many0(parse_feature_node), many0(parse_item_node)))),
+    |(feature_list, item_list)| ProgramNode {
       feature_list,
-      module,
+      item_list,
     },
   )(s)
 }

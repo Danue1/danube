@@ -3,6 +3,7 @@ use super::*;
 pub(super) fn parse_item_kind(s: Tokens) -> ParseResult<ItemKind> {
   alt((
     map(parse_use_node, ItemKind::Use),
+    map(parse_module_node, ItemKind::Module),
     map(parse_struct_node, ItemKind::Struct),
     map(parse_enum_node, ItemKind::Enum),
     map(parse_function_node, ItemKind::Function),

@@ -1,7 +1,7 @@
 #[derive(Debug)]
 pub struct ProgramNode {
   pub feature_list: Vec<FeatureNode>,
-  pub module: ModuleNode,
+  pub item_list: Vec<ItemNode>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -22,9 +22,9 @@ pub struct IdentNode {
   pub raw: String,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct ModuleNode {
-  pub ident: Option<IdentNode>,
+  pub ident: IdentNode,
   pub item_list: Vec<ItemNode>,
 }
 
@@ -42,6 +42,7 @@ pub struct AttributeNode {
 #[derive(Debug, PartialEq, Clone)]
 pub enum ItemKind {
   Use(UseNode),
+  Module(ModuleNode),
   Struct(StructNode),
   Enum(EnumNode),
   Function(FunctionNode),
