@@ -1,5 +1,7 @@
 mod attribute_node;
 mod block_node;
+mod closure_argument_node;
+mod closure_node;
 mod compound_assign_kind;
 mod compound_assign_node;
 mod condition_node;
@@ -61,6 +63,8 @@ mod while_node;
 use crate::*;
 use attribute_node::parse_attribute_node;
 use block_node::parse_block_node;
+use closure_argument_node::parse_closure_argument_node;
+use closure_node::parse_closure_node;
 use compound_assign_kind::parse_compound_assign_kind;
 use compound_assign_node::parse_compound_assign_node;
 use condition_node::parse_condition_node;

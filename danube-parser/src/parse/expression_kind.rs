@@ -20,6 +20,7 @@ fn parse_atomic_expression_node(s: Tokens) -> ParseResult<ExpressionKind> {
     map(parse_while_node, ExpressionKind::While),
     map(parse_for_node, ExpressionKind::For),
     map(parse_pattern_match_node, ExpressionKind::PatternMatch),
+    map(parse_closure_node, ExpressionKind::Closure),
     map(parse_literal_value_kind, ExpressionKind::Literal),
     map(parse_break, |_| ExpressionKind::Break),
     map(parse_continue, |_| ExpressionKind::Continue),
@@ -809,6 +810,23 @@ mod tests {
             statement_list: vec![]
           }
         ))]
+      }),
+    );
+  }
+
+  #[test]
+  fn closure() {
+    let source = "|| 1";
+    assert_eq!(
+      compile(source),
+      ExpressionKind::Closure(ClosureNode {
+        argument_list: vec![],
+        return_type: None,
+        block: BlockNode {
+          statement_list: vec![StatementKind::ExpressionKind(ExpressionKind::Literal(
+            LiteralValueKind::Int(1)
+          ))]
+        }
       }),
     );
   }
