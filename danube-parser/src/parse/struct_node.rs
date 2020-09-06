@@ -185,6 +185,7 @@ mod tests {
             }]
           },
           trait_list: vec![],
+          default_trait_list: vec![],
         }),
         fields: StructFieldsKind::Unnamed(StructUnnamedFieldsNode {
           node_list: vec![TypeKind::Path(
@@ -221,6 +222,7 @@ mod tests {
               raw: "Foo".to_owned()
             }]
           }],
+          default_trait_list: vec![],
         }),
         fields: StructFieldsKind::Unnamed(StructUnnamedFieldsNode {
           node_list: vec![TypeKind::Path(
@@ -264,6 +266,7 @@ mod tests {
               }]
             }
           ],
+          default_trait_list: vec![],
         }),
         fields: StructFieldsKind::Unnamed(StructUnnamedFieldsNode {
           node_list: vec![TypeKind::Path(

@@ -50,21 +50,24 @@ mod tests {
           }]
         },
         generic: None,
-        item_list: vec![ImplementItemKind::Constant(ConstantNode {
-          visibility: None,
-          ident: IdentNode {
-            raw: "BAR".to_owned()
-          },
-          ty: TypeKind::Path(
-            ImmutablityKind::Yes,
-            PathNode {
-              ident_list: vec![IdentNode {
-                raw: "Baz".to_owned()
-              }]
-            }
-          ),
-          value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
-        })]
+        item_list: vec![ImplementItemKind::Constant(
+          vec![],
+          ConstantNode {
+            visibility: None,
+            ident: IdentNode {
+              raw: "BAR".to_owned()
+            },
+            ty: TypeKind::Path(
+              ImmutablityKind::Yes,
+              PathNode {
+                ident_list: vec![IdentNode {
+                  raw: "Baz".to_owned()
+                }]
+              }
+            ),
+            value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
+          }
+        )]
       }
     );
   }
@@ -84,20 +87,23 @@ mod tests {
           }]
         },
         generic: None,
-        item_list: vec![ImplementItemKind::Function(FunctionNode {
-          visibility: None,
-          is_async: false,
-          ident: IdentNode {
-            raw: "bar".to_owned()
-          },
-          generic: None,
-          self_type: None,
-          argument_list: vec![],
-          return_type: None,
-          block: BlockNode {
-            statement_list: vec![]
-          },
-        })]
+        item_list: vec![ImplementItemKind::Function(
+          vec![],
+          FunctionNode {
+            visibility: None,
+            is_async: false,
+            ident: IdentNode {
+              raw: "bar".to_owned()
+            },
+            generic: None,
+            self_type: None,
+            argument_list: vec![],
+            return_type: None,
+            block: BlockNode {
+              statement_list: vec![]
+            },
+          }
+        )]
       }
     );
   }

@@ -12,11 +12,16 @@ pub(super) fn parse_generic_node(s: Tokens) -> ParseResult<GenericNode> {
         )),
         |(_, path)| path,
       )),
+      opt(preceded(
+        parse_symbol(Symbol::Assign),
+        separated_nonempty_list(parse_symbol(Symbol::Add), parse_path_node),
+      )),
       parse_symbol(Symbol::GreaterThan),
     )),
-    |(_, path, trait_list, _)| GenericNode {
+    |(_, path, trait_list, default_trait_list, _)| GenericNode {
       path,
       trait_list: trait_list.unwrap_or_else(Vec::new),
+      default_trait_list: default_trait_list.unwrap_or_else(Vec::new),
     },
   )(s)
 }

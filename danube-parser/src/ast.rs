@@ -99,6 +99,7 @@ pub struct StructNode {
 pub struct GenericNode {
   pub path: PathNode,
   pub trait_list: Vec<PathNode>,
+  pub default_trait_list: Vec<PathNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -495,9 +496,9 @@ pub struct BlockNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum ImplementItemKind {
-  OutputType(ImplementOutputTypeNode),
-  Constant(ConstantNode),
-  Function(FunctionNode),
+  OutputType(Vec<AttributeNode>, ImplementOutputTypeNode),
+  Constant(Vec<AttributeNode>, ConstantNode),
+  Function(Vec<AttributeNode>, FunctionNode),
 }
 
 #[derive(Debug, PartialEq, Clone)]

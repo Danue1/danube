@@ -63,21 +63,24 @@ mod tests {
           }]
         },
         generic: None,
-        item_list: vec![ImplementItemKind::Constant(ConstantNode {
-          visibility: None,
-          ident: IdentNode {
-            raw: "BAZ".to_owned()
-          },
-          ty: TypeKind::Path(
-            ImmutablityKind::Yes,
-            PathNode {
-              ident_list: vec![IdentNode {
-                raw: "Bax".to_owned()
-              }]
-            }
-          ),
-          value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
-        })]
+        item_list: vec![ImplementItemKind::Constant(
+          vec![],
+          ConstantNode {
+            visibility: None,
+            ident: IdentNode {
+              raw: "BAZ".to_owned()
+            },
+            ty: TypeKind::Path(
+              ImmutablityKind::Yes,
+              PathNode {
+                ident_list: vec![IdentNode {
+                  raw: "Bax".to_owned()
+                }]
+              }
+            ),
+            value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
+          }
+        )]
       }
     );
   }
@@ -103,20 +106,65 @@ mod tests {
           }]
         },
         generic: None,
-        item_list: vec![ImplementItemKind::Function(FunctionNode {
-          visibility: None,
-          is_async: false,
-          ident: IdentNode {
-            raw: "baz".to_owned()
-          },
-          generic: None,
-          self_type: None,
-          argument_list: vec![],
-          return_type: None,
-          block: BlockNode {
-            statement_list: vec![]
-          },
-        })]
+        item_list: vec![ImplementItemKind::Function(
+          vec![],
+          FunctionNode {
+            visibility: None,
+            is_async: false,
+            ident: IdentNode {
+              raw: "baz".to_owned()
+            },
+            generic: None,
+            self_type: None,
+            argument_list: vec![],
+            return_type: None,
+            block: BlockNode {
+              statement_list: vec![]
+            },
+          }
+        )]
+      }
+    );
+  }
+
+  #[test]
+  fn method() {
+    let source = "impl Foo for Bar {
+      fn baz(self) { }
+    }";
+    assert_eq!(
+      compile(source),
+      ImplementTraitNode {
+        visibility: None,
+        target: PathNode {
+          ident_list: vec![IdentNode {
+            raw: "Bar".to_owned()
+          }]
+        },
+        target_generic: None,
+        trait_ident: PathNode {
+          ident_list: vec![IdentNode {
+            raw: "Foo".to_owned(),
+          }]
+        },
+        generic: None,
+        item_list: vec![ImplementItemKind::Function(
+          vec![],
+          FunctionNode {
+            visibility: None,
+            is_async: false,
+            ident: IdentNode {
+              raw: "baz".to_owned()
+            },
+            generic: None,
+            self_type: Some(ImmutablityKind::Yes),
+            argument_list: vec![],
+            return_type: None,
+            block: BlockNode {
+              statement_list: vec![]
+            },
+          }
+        )]
       }
     );
   }

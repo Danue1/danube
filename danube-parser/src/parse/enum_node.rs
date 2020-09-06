@@ -152,7 +152,8 @@ mod tests {
               raw: "T".to_owned()
             }]
           },
-          trait_list: vec![]
+          trait_list: vec![],
+          default_trait_list: vec![],
         }),
         variant_list: vec![EnumVariantNode {
           ident: IdentNode {
