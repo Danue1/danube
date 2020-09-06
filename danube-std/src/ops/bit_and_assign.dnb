@@ -1,0 +1,5 @@
+pub trait BitAndAssign<Rhs = Self> {
+  fn bit_and_assign(mut self, rhs: Rhs) {
+    self = self & rhs;
+  }
+}

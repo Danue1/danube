@@ -1,0 +1,5 @@
+pub trait Exp<Rhs = Self> {
+  type Output;
+
+  fn exp(self, rhs: Rhs) -> Self::Output;
+}

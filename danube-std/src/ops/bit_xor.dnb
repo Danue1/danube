@@ -1,0 +1,5 @@
+pub trait BitXor<Rhs = Self> {
+  type Output;
+
+  fn bit_xor(self, rhs: Rhs) -> Self::Output;
+}

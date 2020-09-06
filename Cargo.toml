@@ -19,7 +19,6 @@ members = [
   "danube-runtime-jvm",
   "danube-runtime-native",
   "danube-runtime-wasm",
-  "danube-std",
   "danube-vm",
 ]
 

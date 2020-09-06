@@ -73,10 +73,6 @@ name = "danube-runtime-wasm"
 version = "0.1.0"
 
 [[package]]
-name = "danube-std"
-version = "0.1.0"
-
-[[package]]
 name = "danube-vm"
 version = "0.1.0"
 

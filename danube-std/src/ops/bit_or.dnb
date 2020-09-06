@@ -1,0 +1,5 @@
+pub trait BitOr<Rhs = Self> {
+  type Output;
+
+  fn bit_or(self, rhs: Rhs) -> Self::Output;
+}

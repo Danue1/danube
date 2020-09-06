@@ -1,0 +1,5 @@
+pub trait ExpAssign<Rhs = Self> {
+  fn exp_assign(mut self, rhs: Rhs) {
+    self = self * *rhs;
+  }
+}

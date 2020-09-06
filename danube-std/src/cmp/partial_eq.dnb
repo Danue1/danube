@@ -1,0 +1,7 @@
+pub trait PartialEq<Rhs = Self> {
+  fn eq(self, rhs: Rhs) -> bool;
+
+  fn ne(self, rhs: Rhs) -> bool {
+    !self.eq(rhs)
+  }
+}

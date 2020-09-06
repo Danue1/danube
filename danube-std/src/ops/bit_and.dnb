@@ -1,0 +1,5 @@
+pub trait BitAnd<Rhs = Self> {
+  type Output;
+
+  fn bit_and(self, rhs: Rhs) -> Self::Output;
+}
