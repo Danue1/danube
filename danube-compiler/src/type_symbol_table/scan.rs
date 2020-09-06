@@ -1,88 +1,32 @@
-use crate::ErrorKind;
-use danube_parser::*;
+use super::*;
 use std::collections::HashMap;
 
-pub fn create_type_symbol_table(node: &ProgramNode) -> TypeSymbolResult<TypeSymbolTable> {
-  let mut type_symbol_table = TypeSymbolTable::new("root");
-  type_symbol_table.scan_program_node(node)?;
-
-  Ok(type_symbol_table)
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct TypeSymbolTable {
-  pub name: String,
-  pub symbol_tables: HashMap<String, TypeSymbolKind>,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub enum TypeSymbolKind {
-  NamedStruct(NamedStruct),
-  UnnamedStruct(UnnamedStruct),
-  Enum(Enum),
-  TypeAlias(TypeAlias),
-  Function(Function),
-  Trait(Trait),
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct NamedStruct {
-  pub fields: HashMap<String, TypeKind>,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct UnnamedStruct {
-  pub fields: Vec<TypeKind>,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct Enum {
-  pub variants: HashMap<String, Option<TypeKind>>,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct TypeAlias {
-  pub kind: TypeKind,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct Function {
-  pub argument_list: Vec<(String, TypeKind)>,
-  pub return_type: Option<TypeKind>,
-  pub items: HashMap<String, TypeSymbolKind>,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct Trait {
-  pub items: HashMap<String, TraitFunction>,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct TraitFunction {
-  pub argument_list: Vec<(String, TypeKind)>,
-  pub return_type: Option<TypeKind>,
-  pub items: HashMap<String, TypeSymbolKind>,
-}
-
 impl TypeSymbolTable {
-  fn new(name: &str) -> Self {
-    TypeSymbolTable {
-      name: name.to_owned(),
-      symbol_tables: Default::default(),
+  pub(super) fn scan_program_node(&mut self, node: &ProgramNode) -> TypeSymbolResult {
+    macro_rules! add_symbol {
+      ($($name:expr,)+) => {
+        $(let _ = self.add_symbol($name, TypeSymbolKind::Primitive); )+
+      };
     }
-  }
-}
 
-type TypeSymbolResult<T = ()> = Result<T, ErrorKind>;
+    add_symbol!["bool", "int", "float", "str",];
 
-impl TypeSymbolTable {
-  fn scan_program_node(&mut self, node: &ProgramNode) -> TypeSymbolResult {
+    let mut type_symbol_table = TypeSymbolTable::new("Entry");
+
     for feature in node.feature_list.iter() {
-      self.scan_feature_node(feature)?;
+      type_symbol_table.scan_feature_node(feature)?;
     }
+
     for item in node.item_list.iter() {
-      self.scan_item_node(item)?;
+      type_symbol_table.scan_item_node(item)?;
     }
+
+    self.symbol_tables.insert(
+      "Entry".to_owned(),
+      TypeSymbolKind::Module(Module {
+        fields: type_symbol_table.symbol_tables,
+      }),
+    );
 
     Ok(())
   }
