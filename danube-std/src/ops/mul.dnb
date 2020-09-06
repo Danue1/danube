@@ -8,12 +8,12 @@ impl Mul for int {
   type Output = int;
 
   #[native]
-  fn mul(self, rhs: Rhs) -> Self::Output;
+  fn mul(self, rhs: Rhs) -> Self::Output { }
 }
 
 impl Mul for int {
   type Output = int;
 
   #[native]
-  fn mul(self, rhs: Rhs) -> Self::Output;
+  fn mul(self, rhs: Rhs) -> Self::Output { }
 }

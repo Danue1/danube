@@ -8,12 +8,12 @@ impl Div for int {
   type Output = int;
 
   #[native]
-  fn div(self, rhs: Rhs) -> Self::Output;
+  fn div(self, rhs: Rhs) -> Self::Output { }
 }
 
 impl Div for int {
   type Output = int;
 
   #[native]
-  fn div(self, rhs: Rhs) -> Self::Output;
+  fn div(self, rhs: Rhs) -> Self::Output { }
 }

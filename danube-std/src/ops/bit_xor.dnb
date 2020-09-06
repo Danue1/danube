@@ -8,12 +8,12 @@ impl BitXor for int {
   type Output = int;
 
   #[native]
-  fn bit_xor(self, rhs: Rhs) -> Self::Output;
+  fn bit_xor(self, rhs: Rhs) -> Self::Output { }
 }
 
 impl BitXor for int {
   type Output = int;
 
   #[native]
-  fn bit_xor(self, rhs: Rhs) -> Self::Output;
+  fn bit_xor(self, rhs: Rhs) -> Self::Output { }
 }

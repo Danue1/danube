@@ -8,19 +8,19 @@ impl Add for int {
   type Output = int;
 
   #[native]
-  fn add(self, rhs: Rhs) -> Self::Output;
+  fn add(self, rhs: Rhs) -> Self::Output { }
 }
 
 impl Add for float {
   type Output = float;
 
   #[native]
-  fn add(self, rhs: Rhs) -> Self::Output;
+  fn add(self, rhs: Rhs) -> Self::Output { }
 }
 
 impl Add for str {
   type Output = str;
 
   #[native]
-  fn add(self, rhs: Rhs) -> Self::Output;
+  fn add(self, rhs: Rhs) -> Self::Output { }
 }

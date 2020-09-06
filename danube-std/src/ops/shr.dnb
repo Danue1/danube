@@ -8,12 +8,12 @@ impl Shr for int {
   type Output = int;
 
   #[native]
-  fn shr(self, rhs: Rhs) -> Self::Output;
+  fn shr(self, rhs: Rhs) -> Self::Output { }
 }
 
 impl Shr for int {
   type Output = int;
 
   #[native]
-  fn shr(self, rhs: Rhs) -> Self::Output;
+  fn shr(self, rhs: Rhs) -> Self::Output { }
 }

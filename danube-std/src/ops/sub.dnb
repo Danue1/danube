@@ -8,12 +8,12 @@ impl Sub for int {
   type Output = int;
 
   #[native]
-  fn sub(self, rhs: Rhs) -> Self::Output;
+  fn sub(self, rhs: Rhs) -> Self::Output { }
 }
 
 impl Sub for int {
   type Output = int;
 
   #[native]
-  fn sub(self, rhs: Rhs) -> Self::Output;
+  fn sub(self, rhs: Rhs) -> Self::Output { }
 }

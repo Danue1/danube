@@ -8,12 +8,12 @@ impl Exp for int {
   type Output = int;
 
   #[native]
-  fn exp(self, rhs: Rhs) -> Self::Output;
+  fn exp(self, rhs: Rhs) -> Self::Output { }
 }
 
 impl Exp for int {
   type Output = int;
 
   #[native]
-  fn exp(self, rhs: Rhs) -> Self::Output;
+  fn exp(self, rhs: Rhs) -> Self::Output { }
 }

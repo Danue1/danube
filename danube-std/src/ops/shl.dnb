@@ -8,12 +8,12 @@ impl Shl for int {
   type Output = int;
 
   #[native]
-  fn shl(self, rhs: Rhs) -> Self::Output;
+  fn shl(self, rhs: Rhs) -> Self::Output { }
 }
 
 impl Shl for int {
   type Output = int;
 
   #[native]
-  fn shl(self, rhs: Rhs) -> Self::Output;
+  fn shl(self, rhs: Rhs) -> Self::Output { }
 }

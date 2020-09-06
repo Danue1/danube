@@ -8,7 +8,7 @@ pub(super) fn parse_implement_node(s: Tokens) -> ParseResult<ImplementNode> {
       parse_path_node,
       opt(parse_generic_node),
       parse_symbol(Symbol::LeftBrace),
-      many1(parse_implement_item_kind),
+      many0(parse_implement_item_kind),
       parse_symbol(Symbol::RightBrace),
     )),
     |(visibility, _, target, generic, _, item_list, _)| ImplementNode {

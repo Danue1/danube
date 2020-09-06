@@ -8,12 +8,12 @@ impl BitAnd for int {
   type Output = int;
 
   #[native]
-  fn bit_and(self, rhs: Rhs) -> Self::Output;
+  fn bit_and(self, rhs: Rhs) -> Self::Output { }
 }
 
 impl BitAnd for int {
   type Output = int;
 
   #[native]
-  fn bit_and(self, rhs: Rhs) -> Self::Output;
+  fn bit_and(self, rhs: Rhs) -> Self::Output { }
 }
