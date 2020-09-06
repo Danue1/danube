@@ -132,6 +132,7 @@ pub struct TraitNode {
   pub visibility: Option<VisibilityKind>,
   pub ident: IdentNode,
   pub generic: Option<GenericNode>,
+  pub inheritances: Vec<(PathNode, Vec<PathNode>)>,
   pub item_list: Vec<TraitItemKind>,
 }
 
@@ -234,8 +235,15 @@ pub struct FunctionArgumentNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum TraitItemKind {
+  Type(TraitItemTypeNode),
   Constant(TraitItemConstantNode),
   Function(TraitItemFunctionNode),
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct TraitItemTypeNode {
+  pub ident: IdentNode,
+  pub ty: Option<TypeKind>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -260,6 +268,7 @@ pub enum TypeKind {
   Array(ImmutablityKind, TypeArrayNode),
   Tuple(ImmutablityKind, Vec<TypeKind>),
   Path(ImmutablityKind, PathNode),
+  Generic(ImmutablityKind, PathNode, Vec<PathNode>),
 }
 
 #[derive(Debug, PartialEq, Clone)]

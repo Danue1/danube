@@ -7,17 +7,285 @@ pub(super) fn parse_trait_node(s: Tokens) -> ParseResult<TraitNode> {
       parse_keyword(Keyword::Trait),
       parse_ident_node,
       opt(parse_generic_node),
+      parse_inheritance,
       parse_symbol(Symbol::LeftBrace),
       many1(parse_trait_item_kind),
       parse_symbol(Symbol::RightBrace),
     )),
-    |(visibility, _, ident, generic, _, item_list, _)| TraitNode {
+    |(visibility, _, ident, generic, inheritances, _, item_list, _)| TraitNode {
       visibility,
       ident,
       generic,
+      inheritances,
       item_list,
     },
   )(s)
+}
+
+fn parse_inheritance(s: Tokens) -> ParseResult<Vec<(PathNode, Vec<PathNode>)>> {
+  alt((
+    preceded(
+      parse_symbol(Symbol::Colon),
+      separated_list(
+        parse_symbol(Symbol::Comma),
+        tuple((
+          parse_path_node,
+          alt((
+            map(
+              tuple((
+                parse_symbol(Symbol::LessThan),
+                separated_nonempty_list(parse_symbol(Symbol::Comma), parse_path_node),
+                parse_symbol(Symbol::GreaterThan),
+              )),
+              |(_, path_list, _)| path_list,
+            ),
+            |s| Ok((s, vec![])),
+          )),
+        )),
+      ),
+    ),
+    |s| Ok((s, vec![])),
+  ))(s)
+}
+
+#[cfg(test)]
+mod test_inheritance {
+  use super::*;
+
+  fn compile(s: &str) -> TraitNode {
+    let (_, token_list) = lex(s).unwrap();
+    match parse_trait_node(Tokens::new(&token_list)) {
+      Ok((_, node)) => node,
+      Err(error) => {
+        dbg!(error);
+        panic!()
+      }
+    }
+  }
+
+  #[test]
+  fn a_inheritance() {
+    let source = "trait Foo: Sized {
+      type Foo;
+    }";
+    assert_eq!(
+      compile(source),
+      TraitNode {
+        visibility: None,
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        generic: None,
+        inheritances: vec![(
+          PathNode {
+            ident_list: vec![IdentNode {
+              raw: "Sized".to_owned()
+            }]
+          },
+          vec![]
+        )],
+        item_list: vec![TraitItemKind::Type(TraitItemTypeNode {
+          ident: IdentNode {
+            raw: "Foo".to_owned()
+          },
+          ty: None
+        })],
+      }
+    );
+  }
+
+  #[test]
+  fn two_inheritance() {
+    let source = "trait Foo: Sized, ops::Add<T> {
+      type Foo;
+    }";
+    assert_eq!(
+      compile(source),
+      TraitNode {
+        visibility: None,
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        generic: None,
+        inheritances: vec![
+          (
+            PathNode {
+              ident_list: vec![IdentNode {
+                raw: "Sized".to_owned()
+              }]
+            },
+            vec![]
+          ),
+          (
+            PathNode {
+              ident_list: vec![
+                IdentNode {
+                  raw: "ops".to_owned()
+                },
+                IdentNode {
+                  raw: "Add".to_owned()
+                }
+              ]
+            },
+            vec![PathNode {
+              ident_list: vec![IdentNode {
+                raw: "T".to_owned()
+              }]
+            }]
+          )
+        ],
+        item_list: vec![TraitItemKind::Type(TraitItemTypeNode {
+          ident: IdentNode {
+            raw: "Foo".to_owned()
+          },
+          ty: None
+        })],
+      }
+    );
+  }
+}
+
+#[cfg(test)]
+mod test_type {
+  use super::*;
+
+  fn compile(s: &str) -> TraitNode {
+    let (_, token_list) = lex(s).unwrap();
+    match parse_trait_node(Tokens::new(&token_list)) {
+      Ok((_, node)) => node,
+      Err(error) => {
+        dbg!(error);
+        panic!()
+      }
+    }
+  }
+
+  #[test]
+  fn no_type() {
+    let source = "trait Foo {
+        type Foo;
+      }";
+    assert_eq!(
+      compile(source),
+      TraitNode {
+        visibility: None,
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        generic: None,
+        inheritances: vec![],
+        item_list: vec![TraitItemKind::Type(TraitItemTypeNode {
+          ident: IdentNode {
+            raw: "Foo".to_owned()
+          },
+          ty: None
+        })],
+      }
+    );
+  }
+
+  #[test]
+  fn typed() {
+    let source = "trait Foo {
+      type Foo = Bar;
+    }";
+    assert_eq!(
+      compile(source),
+      TraitNode {
+        visibility: None,
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        generic: None,
+        inheritances: vec![],
+        item_list: vec![TraitItemKind::Type(TraitItemTypeNode {
+          ident: IdentNode {
+            raw: "Foo".to_owned()
+          },
+          ty: Some(TypeKind::Path(
+            ImmutablityKind::Yes,
+            PathNode {
+              ident_list: vec![IdentNode {
+                raw: "Bar".to_owned()
+              }]
+            }
+          ))
+        })],
+      }
+    );
+  }
+
+  #[test]
+  fn type_self() {
+    let source = "trait Foo {
+      type Bar = Self;
+    }";
+    assert_eq!(
+      compile(source),
+      TraitNode {
+        visibility: None,
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        generic: None,
+        inheritances: vec![],
+        item_list: vec![TraitItemKind::Type(TraitItemTypeNode {
+          ident: IdentNode {
+            raw: "Bar".to_owned()
+          },
+          ty: Some(TypeKind::Path(
+            ImmutablityKind::Yes,
+            PathNode {
+              ident_list: vec![IdentNode {
+                raw: "Self".to_owned()
+              }]
+            }
+          ))
+        })],
+      }
+    );
+  }
+
+  #[test]
+  fn generic() {
+    let source = "trait Foo {
+      type Foo = Foo::Bar<Baz>;
+    }";
+    assert_eq!(
+      compile(source),
+      TraitNode {
+        visibility: None,
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        generic: None,
+        inheritances: vec![],
+        item_list: vec![TraitItemKind::Type(TraitItemTypeNode {
+          ident: IdentNode {
+            raw: "Foo".to_owned()
+          },
+          ty: Some(TypeKind::Generic(
+            ImmutablityKind::Yes,
+            PathNode {
+              ident_list: vec![
+                IdentNode {
+                  raw: "Foo".to_owned()
+                },
+                IdentNode {
+                  raw: "Bar".to_owned()
+                }
+              ]
+            },
+            vec![PathNode {
+              ident_list: vec![IdentNode {
+                raw: "Baz".to_owned()
+              }]
+            }]
+          ))
+        })],
+      }
+    );
+  }
 }
 
 #[cfg(test)]
@@ -48,6 +316,7 @@ mod test_constant {
           raw: "Foo".to_owned()
         },
         generic: None,
+        inheritances: vec![],
         item_list: vec![TraitItemKind::Constant(TraitItemConstantNode {
           ident: IdentNode {
             raw: "FOO".to_owned()
@@ -79,6 +348,7 @@ mod test_constant {
           raw: "Foo".to_owned()
         },
         generic: None,
+        inheritances: vec![],
         item_list: vec![TraitItemKind::Constant(TraitItemConstantNode {
           ident: IdentNode {
             raw: "FOO".to_owned()
@@ -126,6 +396,7 @@ mod test_function {
           raw: "Foo".to_owned()
         },
         generic: None,
+        inheritances: vec![],
         item_list: vec![TraitItemKind::Function(TraitItemFunctionNode {
           is_async: false,
           ident: IdentNode {
@@ -153,6 +424,7 @@ mod test_function {
           raw: "Foo".to_owned()
         },
         generic: None,
+        inheritances: vec![],
         item_list: vec![TraitItemKind::Function(TraitItemFunctionNode {
           is_async: false,
           ident: IdentNode {
@@ -193,6 +465,7 @@ mod test_function {
           raw: "Foo".to_owned()
         },
         generic: None,
+        inheritances: vec![],
         item_list: vec![TraitItemKind::Function(TraitItemFunctionNode {
           is_async: false,
           ident: IdentNode {
@@ -251,6 +524,7 @@ mod test_function {
           raw: "Foo".to_owned()
         },
         generic: None,
+        inheritances: vec![],
         item_list: vec![TraitItemKind::Function(TraitItemFunctionNode {
           is_async: false,
           ident: IdentNode {
@@ -299,6 +573,7 @@ mod test_function {
           raw: "Foo".to_owned()
         },
         generic: None,
+        inheritances: vec![],
         item_list: vec![TraitItemKind::Function(TraitItemFunctionNode {
           is_async: false,
           ident: IdentNode {
@@ -360,6 +635,7 @@ mod test_function {
           raw: "Foo".to_owned()
         },
         generic: None,
+        inheritances: vec![],
         item_list: vec![TraitItemKind::Function(TraitItemFunctionNode {
           is_async: false,
           ident: IdentNode {
