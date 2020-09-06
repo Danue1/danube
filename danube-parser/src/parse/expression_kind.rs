@@ -101,6 +101,14 @@ fn parse_postfix_expression_node(
 
       parse_postfix_expression_node(s, precedence, node)
     }
+    Ok((s, OperatorKind::Generic(generic_list))) => {
+      let node = ExpressionKind::Generic(ExpressionGenericNode {
+        expression: Box::new(lhs),
+        generic_list,
+      });
+
+      parse_postfix_expression_node(s, precedence, node)
+    }
     Ok((s, OperatorKind::Field(rhs))) => {
       let node = ExpressionKind::Field(ExpressionKindFieldNode {
         lhs: Box::new(lhs),
@@ -182,6 +190,7 @@ enum OperatorKind {
   Try,
   Tuple(Vec<TupleArgument>),
   Index(ExpressionKind),
+  Generic(Vec<ExpressionGenericKind>),
   Field(IdentNode),
   InfixOperator(InfixOperatorKind),
 }
@@ -192,6 +201,7 @@ fn parse_operator_kind(s: Tokens) -> ParseResult<OperatorKind> {
     map(parse_try_operator, |_| OperatorKind::Try),
     map(parse_tuple_operator, OperatorKind::Tuple),
     map(parse_index_operator, OperatorKind::Index),
+    map(parse_generic_kind, OperatorKind::Generic),
     map(parse_field_operator, OperatorKind::Field),
     map(parse_infix_operator_kind, OperatorKind::InfixOperator),
   ))(s)
@@ -229,6 +239,30 @@ fn parse_index_operator(s: Tokens) -> ParseResult<ExpressionKind> {
       parse_symbol(Symbol::RightBracket),
     )),
     |(_, expression, _)| expression,
+  )(s)
+}
+
+fn parse_generic_kind(s: Tokens) -> ParseResult<Vec<ExpressionGenericKind>> {
+  map(
+    tuple((
+      parse_symbol(Symbol::LessThan),
+      separated_nonempty_list(
+        parse_symbol(Symbol::Comma),
+        alt((
+          map(
+            tuple((
+              parse_ident_node,
+              parse_symbol(Symbol::Assign),
+              parse_type_kind,
+            )),
+            |(ident, _, type_kind)| ExpressionGenericKind::Output(ident, type_kind),
+          ),
+          map(parse_type_kind, ExpressionGenericKind::Input),
+        )),
+      ),
+      parse_symbol(Symbol::GreaterThan),
+    )),
+    |(_, generic_list, _)| generic_list,
   )(s)
 }
 
@@ -372,6 +406,57 @@ mod tests {
           }]
         })),
         index: Box::new(ExpressionKind::Literal(LiteralValueKind::Int(1)))
+      })
+    );
+  }
+
+  #[test]
+  fn input_generic() {
+    let source = "foo<bar>";
+    assert_eq!(
+      compile(source),
+      ExpressionKind::Generic(ExpressionGenericNode {
+        expression: Box::new(ExpressionKind::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "foo".to_owned()
+          }]
+        })),
+        generic_list: vec![ExpressionGenericKind::Input(TypeKind::Path(
+          ImmutablityKind::Yes,
+          PathNode {
+            ident_list: vec![IdentNode {
+              raw: "bar".to_owned()
+            }]
+          }
+        ))]
+      })
+    );
+  }
+
+  #[test]
+  fn output_generic() {
+    let source = "foo<output = bar>";
+    assert_eq!(
+      compile(source),
+      ExpressionKind::Generic(ExpressionGenericNode {
+        expression: Box::new(ExpressionKind::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "foo".to_owned()
+          }]
+        })),
+        generic_list: vec![ExpressionGenericKind::Output(
+          IdentNode {
+            raw: "output".to_owned()
+          },
+          TypeKind::Path(
+            ImmutablityKind::Yes,
+            PathNode {
+              ident_list: vec![IdentNode {
+                raw: "bar".to_owned()
+              }]
+            }
+          )
+        )]
       })
     );
   }

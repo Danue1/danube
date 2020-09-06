@@ -316,6 +316,7 @@ pub enum ExpressionKind {
   Array(Vec<ExpressionKind>),
   Tuple(TupleNode),
   Index(IndexNode),
+  Generic(ExpressionGenericNode),
   UnaryOperator(UnaryOperatorNode),
   InfixOperator(InfixOperatorNode),
   Await(Box<ExpressionKind>),
@@ -410,6 +411,18 @@ pub struct TupleArgument {
 pub struct IndexNode {
   pub array: Box<ExpressionKind>,
   pub index: Box<ExpressionKind>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct ExpressionGenericNode {
+  pub expression: Box<ExpressionKind>,
+  pub generic_list: Vec<ExpressionGenericKind>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum ExpressionGenericKind {
+  Output(IdentNode, TypeKind),
+  Input(TypeKind),
 }
 
 #[derive(Debug, PartialEq, Clone)]
