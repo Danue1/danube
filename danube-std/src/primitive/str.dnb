@@ -1,2 +1,2 @@
 #[native]
-pub struct str;
+pub type str = ();

@@ -1,2 +1,2 @@
 #[native]
-pub struct int;
+pub type int = ();

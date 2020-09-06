@@ -1,2 +1,2 @@
 #[native]
-pub struct bool;
+pub type bool = ();

@@ -1,2 +1,2 @@
 #[native]
-pub struct float;
+pub type float = ();
