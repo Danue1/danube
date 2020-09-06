@@ -30,7 +30,7 @@ mod tests {
   }
 
   #[test]
-  fn test() {
+  fn path() {
     let source = "type Foo = bool;";
     assert_eq!(
       compile(source),
@@ -47,6 +47,21 @@ mod tests {
             }]
           }
         )
+      }
+    );
+  }
+
+  #[test]
+  fn tuple() {
+    let source = "type Foo = ();";
+    assert_eq!(
+      compile(source),
+      TypeAliasNode {
+        visibility: None,
+        ident: IdentNode {
+          raw: "Foo".to_owned()
+        },
+        ty: TypeKind::Tuple(ImmutablityKind::Yes, vec![])
       }
     );
   }

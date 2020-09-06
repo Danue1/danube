@@ -31,7 +31,7 @@ fn parse_type_tuple_node(s: Tokens) -> ParseResult<Vec<TypeKind>> {
   map(
     tuple((
       parse_symbol(Symbol::LeftParens),
-      separated_nonempty_list(parse_symbol(Symbol::Comma), parse_type_kind),
+      separated_list(parse_symbol(Symbol::Comma), parse_type_kind),
       opt(parse_symbol(Symbol::Comma)),
       parse_symbol(Symbol::RightParens),
     )),
