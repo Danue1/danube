@@ -84,7 +84,7 @@ mod test_inheritance {
           },
           vec![]
         )],
-        item_list: vec![TraitItemKind::Type(TraitItemTypeNode {
+        item_list: vec![TraitItemKind::OutputType(OutputTypeNode {
           ident: IdentNode {
             raw: "Foo".to_owned()
           },
@@ -134,7 +134,7 @@ mod test_inheritance {
             }]
           )
         ],
-        item_list: vec![TraitItemKind::Type(TraitItemTypeNode {
+        item_list: vec![TraitItemKind::OutputType(OutputTypeNode {
           ident: IdentNode {
             raw: "Foo".to_owned()
           },
@@ -174,7 +174,7 @@ mod test_type {
         },
         generic: None,
         inheritances: vec![],
-        item_list: vec![TraitItemKind::Type(TraitItemTypeNode {
+        item_list: vec![TraitItemKind::OutputType(OutputTypeNode {
           ident: IdentNode {
             raw: "Foo".to_owned()
           },
@@ -198,7 +198,7 @@ mod test_type {
         },
         generic: None,
         inheritances: vec![],
-        item_list: vec![TraitItemKind::Type(TraitItemTypeNode {
+        item_list: vec![TraitItemKind::OutputType(OutputTypeNode {
           ident: IdentNode {
             raw: "Foo".to_owned()
           },
@@ -229,7 +229,7 @@ mod test_type {
         },
         generic: None,
         inheritances: vec![],
-        item_list: vec![TraitItemKind::Type(TraitItemTypeNode {
+        item_list: vec![TraitItemKind::OutputType(OutputTypeNode {
           ident: IdentNode {
             raw: "Bar".to_owned()
           },
@@ -260,7 +260,7 @@ mod test_type {
         },
         generic: None,
         inheritances: vec![],
-        item_list: vec![TraitItemKind::Type(TraitItemTypeNode {
+        item_list: vec![TraitItemKind::OutputType(OutputTypeNode {
           ident: IdentNode {
             raw: "Foo".to_owned()
           },
@@ -403,6 +403,7 @@ mod test_function {
             raw: "foo".to_owned()
           },
           generic: None,
+          self_type: None,
           argument_list: vec![],
           return_type: None,
           block: None,
@@ -431,6 +432,7 @@ mod test_function {
             raw: "foo".to_owned()
           },
           generic: None,
+          self_type: None,
           argument_list: vec![FunctionArgumentNode {
             immutablity: ImmutablityKind::Yes,
             ident: IdentNode {
@@ -472,6 +474,7 @@ mod test_function {
             raw: "foo".to_owned()
           },
           generic: None,
+          self_type: None,
           argument_list: vec![
             FunctionArgumentNode {
               immutablity: ImmutablityKind::Yes,
@@ -531,6 +534,7 @@ mod test_function {
             raw: "foo".to_owned()
           },
           generic: None,
+          self_type: None,
           argument_list: vec![],
           return_type: None,
           block: Some(BlockNode {
@@ -580,6 +584,7 @@ mod test_function {
             raw: "foo".to_owned()
           },
           generic: None,
+          self_type: None,
           argument_list: vec![FunctionArgumentNode {
             immutablity: ImmutablityKind::Yes,
             ident: IdentNode {
@@ -642,6 +647,7 @@ mod test_function {
             raw: "foo".to_owned()
           },
           generic: None,
+          self_type: None,
           argument_list: vec![
             FunctionArgumentNode {
               immutablity: ImmutablityKind::Yes,

@@ -1,6 +1,6 @@
 use super::*;
 
-pub(super) fn parse_trait_item_type_node(s: Tokens) -> ParseResult<TraitItemTypeNode> {
+pub(super) fn parse_output_type_node(s: Tokens) -> ParseResult<OutputTypeNode> {
   map(
     tuple((
       parse_keyword(Keyword::Type),
@@ -8,6 +8,6 @@ pub(super) fn parse_trait_item_type_node(s: Tokens) -> ParseResult<TraitItemType
       opt(preceded(parse_symbol(Symbol::Assign), parse_type_kind)),
       parse_symbol(Symbol::Semicolon),
     )),
-    |(_, ident, ty, _)| TraitItemTypeNode { ident, ty },
+    |(_, ident, ty, _)| OutputTypeNode { ident, ty },
   )(s)
 }

@@ -115,6 +115,7 @@ pub struct FunctionNode {
   pub is_async: bool,
   pub ident: IdentNode,
   pub generic: Option<GenericNode>,
+  pub self_type: Option<ImmutablityKind>,
   pub argument_list: Vec<FunctionArgumentNode>,
   pub return_type: Option<TypeKind>,
   pub block: BlockNode,
@@ -235,13 +236,13 @@ pub struct FunctionArgumentNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum TraitItemKind {
-  Type(TraitItemTypeNode),
+  OutputType(OutputTypeNode),
   Constant(TraitItemConstantNode),
   Function(TraitItemFunctionNode),
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct TraitItemTypeNode {
+pub struct OutputTypeNode {
   pub ident: IdentNode,
   pub ty: Option<TypeKind>,
 }
@@ -258,6 +259,7 @@ pub struct TraitItemFunctionNode {
   pub is_async: bool,
   pub ident: IdentNode,
   pub generic: Option<GenericNode>,
+  pub self_type: Option<ImmutablityKind>,
   pub argument_list: Vec<FunctionArgumentNode>,
   pub return_type: Option<TypeKind>,
   pub block: Option<BlockNode>,
@@ -265,6 +267,7 @@ pub struct TraitItemFunctionNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum TypeKind {
+  TypeSelf(ImmutablityKind),
   Array(ImmutablityKind, TypeArrayNode),
   Tuple(ImmutablityKind, Vec<TypeKind>),
   Path(ImmutablityKind, PathNode),
@@ -492,8 +495,15 @@ pub struct BlockNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum ImplementItemKind {
+  OutputType(ImplementOutputTypeNode),
   Constant(ConstantNode),
   Function(FunctionNode),
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct ImplementOutputTypeNode {
+  pub ident: IdentNode,
+  pub ty: TypeKind,
 }
 
 #[derive(Debug, PartialEq, Clone)]

@@ -110,6 +110,7 @@ mod tests {
             raw: "baz".to_owned()
           },
           generic: None,
+          self_type: None,
           argument_list: vec![],
           return_type: None,
           block: BlockNode {
