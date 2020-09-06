@@ -141,18 +141,18 @@ mod tests {
   #[test]
   fn testcases() {
     let path_list = [
-      "tests/const",
-      "tests/control_flow",
-      "tests/enum",
-      "tests/expression",
-      "tests/function",
-      "tests/impl",
-      "tests/static",
-      "tests/struct",
-      "tests/trait",
-      "tests/type_alias",
-      "tests/use",
-      "tests/value",
+      "fixtures/const",
+      "fixtures/control_flow",
+      "fixtures/enum",
+      "fixtures/expression",
+      "fixtures/function",
+      "fixtures/impl",
+      "fixtures/static",
+      "fixtures/struct",
+      "fixtures/trait",
+      "fixtures/type_alias",
+      "fixtures/use",
+      "fixtures/value",
     ];
 
     for path in path_list.iter() {
