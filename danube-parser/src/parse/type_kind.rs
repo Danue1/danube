@@ -7,14 +7,7 @@ pub(super) fn parse_type_kind(s: Tokens) -> ParseResult<TypeKind> {
   } else if let Ok((s, node)) = parse_type_tuple_node(s.clone()) {
     Ok((s, TypeKind::Tuple(immutablitity, node)))
   } else {
-    let (s, node) = alt((
-      map(parse_keyword(Keyword::TypeSelf), |_| PathNode {
-        ident_list: vec![IdentNode {
-          raw: "Self".to_owned(),
-        }],
-      }),
-      parse_path_node,
-    ))(s.clone())?;
+    let (s, node) = parse_path_node(s.clone())?;
     match tuple((
       parse_symbol(Symbol::LessThan),
       separated_nonempty_list(parse_symbol(Symbol::Comma), parse_path_node),
