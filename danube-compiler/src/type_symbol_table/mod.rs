@@ -36,7 +36,13 @@ mod tests {
 
   #[test]
   fn unnamed_struct() {
-    let source = "struct Foo(string);";
+    "
+      type Bool = bool;
+      type Int = int;
+      type Float = float;
+      type String = str;
+    ";
+    let source = "struct Foo(str);";
     assert_eq!(
       compile(source),
       TypeSymbolTable {
@@ -56,7 +62,7 @@ mod tests {
                     ImmutablityKind::Yes,
                     PathNode {
                       ident_list: vec![IdentNode {
-                        raw: "string".to_owned()
+                        raw: "str".to_owned()
                       }]
                     }
                   )]
