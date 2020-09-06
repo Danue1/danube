@@ -3,3 +3,7 @@ pub trait MulAssign<Rhs = Self> {
     self = self * rhs;
   }
 }
+
+impl MulAssign for int { }
+
+impl MulAssign for float { }

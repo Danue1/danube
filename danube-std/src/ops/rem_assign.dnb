@@ -3,3 +3,7 @@ pub trait RemAssign<Rhs = Self> {
     self = self % rhs;
   }
 }
+
+impl RemAssign for int { }
+
+impl RemAssign for float { }

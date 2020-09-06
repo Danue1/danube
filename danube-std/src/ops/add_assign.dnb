@@ -3,3 +3,7 @@ pub trait AddAssign<Rhs = Self> {
     self = self + rhs;
   }
 }
+
+impl AddAssign for int { }
+
+impl AddAssign for float { }

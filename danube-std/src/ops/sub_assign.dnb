@@ -3,3 +3,7 @@ pub trait SubAssign<Rhs = Self> {
     self = self - rhs;
   }
 }
+
+impl SubAssign for int { }
+
+impl SubAssign for float { }

@@ -3,3 +3,17 @@ pub trait BitOr<Rhs = Self> {
 
   fn bit_or(self, rhs: Rhs) -> Self::Output;
 }
+
+impl BitOr for int {
+  type Output = int;
+
+  #[native]
+  fn bit_or(self, rhs: Rhs) -> Self::Output;
+}
+
+impl BitOr for int {
+  type Output = int;
+
+  #[native]
+  fn bit_or(self, rhs: Rhs) -> Self::Output;
+}

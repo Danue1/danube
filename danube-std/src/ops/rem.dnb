@@ -3,3 +3,17 @@ pub trait Rem<Rhs = Self> {
 
   fn rem(self, rhs: Rhs) -> Self::Output;
 }
+
+impl Rem for int {
+  type Output = int;
+
+  #[native]
+  fn rem(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Rem for int {
+  type Output = int;
+
+  #[native]
+  fn rem(self, rhs: Rhs) -> Self::Output;
+}

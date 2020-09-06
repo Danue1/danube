@@ -3,3 +3,7 @@ pub trait ExpAssign<Rhs = Self> {
     self = self * *rhs;
   }
 }
+
+impl ExpAssign for int { }
+
+impl ExpAssign for float { }

@@ -3,3 +3,17 @@ pub trait Shl<Rhs = Self> {
 
   fn shl(self, rhs: Rhs) -> Self::Output;
 }
+
+impl Shl for int {
+  type Output = int;
+
+  #[native]
+  fn shl(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Shl for int {
+  type Output = int;
+
+  #[native]
+  fn shl(self, rhs: Rhs) -> Self::Output;
+}

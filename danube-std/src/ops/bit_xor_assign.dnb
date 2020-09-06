@@ -3,3 +3,7 @@ pub trait BitXorAssign<Rhs = Self> {
     self = self ^ rhs;
   }
 }
+
+impl BitXorAssign for int { }
+
+impl BitXorAssign for float { }

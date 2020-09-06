@@ -3,3 +3,17 @@ pub trait BitXor<Rhs = Self> {
 
   fn bit_xor(self, rhs: Rhs) -> Self::Output;
 }
+
+impl BitXor for int {
+  type Output = int;
+
+  #[native]
+  fn bit_xor(self, rhs: Rhs) -> Self::Output;
+}
+
+impl BitXor for int {
+  type Output = int;
+
+  #[native]
+  fn bit_xor(self, rhs: Rhs) -> Self::Output;
+}

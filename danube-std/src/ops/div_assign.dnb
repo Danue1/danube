@@ -3,3 +3,7 @@ pub trait DivAssign<Rhs = Self> {
     self = self / rhs;
   }
 }
+
+impl DivAssign for int { }
+
+impl DivAssign for float { }

@@ -3,3 +3,7 @@ pub trait ShrAssign<Rhs = Self> {
     self = self >> rhs;
   }
 }
+
+impl ShrAssign for int { }
+
+impl ShrAssign for float { }

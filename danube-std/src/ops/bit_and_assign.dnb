@@ -3,3 +3,7 @@ pub trait BitAndAssign<Rhs = Self> {
     self = self & rhs;
   }
 }
+
+impl BitAndAssign for int { }
+
+impl BitAndAssign for float { }

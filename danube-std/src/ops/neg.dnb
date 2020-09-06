@@ -3,3 +3,17 @@ pub trait Neg {
 
   fn neg(self) -> Self::Output;
 }
+
+impl Neg for int {
+  type Output = int;
+
+  #[native]
+  fn neg(self) -> Self::Output;
+}
+
+impl Neg for float {
+  type Output = float;
+
+  #[native]
+  fn neg(self) -> Self::Output;
+}
