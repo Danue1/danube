@@ -36,12 +36,6 @@ mod tests {
 
   #[test]
   fn unnamed_struct() {
-    "
-      type Bool = bool;
-      type Int = int;
-      type Float = float;
-      type String = str;
-    ";
     let source = "struct Foo(str);";
     assert_eq!(
       compile(source),

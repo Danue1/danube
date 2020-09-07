@@ -59,6 +59,9 @@ dependencies = [
 [[package]]
 name = "danube-runtime-javascript"
 version = "0.1.0"
+dependencies = [
+ "danube-parser 0.1.0",
+]
 
 [[package]]
 name = "danube-runtime-jvm"

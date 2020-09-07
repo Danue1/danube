@@ -188,7 +188,7 @@ fn infix_binding_power(kind: InfixOperatorKind) -> Precedence {
 enum OperatorKind {
   Await,
   Try,
-  Tuple(Vec<TupleArgument>),
+  Tuple(Vec<TupleArgumentNode>),
   Index(ExpressionKind),
   Generic(Vec<ExpressionGenericKind>),
   Field(IdentNode),
@@ -207,7 +207,7 @@ fn parse_operator_kind(s: Tokens) -> ParseResult<OperatorKind> {
   ))(s)
 }
 
-fn parse_tuple_operator(s: Tokens) -> ParseResult<Vec<TupleArgument>> {
+fn parse_tuple_operator(s: Tokens) -> ParseResult<Vec<TupleArgumentNode>> {
   map(
     tuple((
       parse_symbol(Symbol::LeftParens),
@@ -221,7 +221,7 @@ fn parse_tuple_operator(s: Tokens) -> ParseResult<Vec<TupleArgument>> {
             )),
             parse_expression_kind,
           )),
-          |(name, value)| TupleArgument { name, value },
+          |(name, value)| TupleArgumentNode { name, value },
         ),
       ),
       opt(parse_symbol(Symbol::Comma)),

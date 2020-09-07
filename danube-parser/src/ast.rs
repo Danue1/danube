@@ -200,7 +200,6 @@ pub struct ImplementTraitNode {
 #[derive(Debug, PartialEq, Clone)]
 pub enum LiteralValueKind {
   Bool(bool),
-  Char(char),
   Int(i64),
   Float(f64),
   String(String),
@@ -402,11 +401,11 @@ pub enum PatternKind {
 #[derive(Debug, PartialEq, Clone)]
 pub struct TupleNode {
   pub field: Option<Box<ExpressionKind>>,
-  pub argument_list: Vec<TupleArgument>,
+  pub argument_list: Vec<TupleArgumentNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct TupleArgument {
+pub struct TupleArgumentNode {
   pub name: Option<IdentNode>,
   pub value: ExpressionKind,
 }
