@@ -1,11 +1,11 @@
 use super::*;
 
-pub(super) fn parse_literal_value_kind(s: Tokens) -> ParseResult<LiteralValueKind> {
+pub(super) fn parse_literal_kind(s: Tokens) -> ParseResult<LiteralKind> {
   alt((
-    map(parse_boolean, LiteralValueKind::Bool),
-    map(parse_int, LiteralValueKind::Int),
-    map(parse_float, LiteralValueKind::Float),
-    map(parse_string, LiteralValueKind::String),
+    map(parse_boolean, LiteralKind::Bool),
+    map(parse_int, LiteralKind::Int),
+    map(parse_float, LiteralKind::Float),
+    map(parse_string, LiteralKind::String),
   ))(s)
 }
 

@@ -151,7 +151,7 @@ pub struct StaticNode {
   pub visibility: Option<VisibilityKind>,
   pub ident: IdentNode,
   pub ty: TypeKind,
-  pub value: LiteralValueKind,
+  pub value: LiteralKind,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -198,7 +198,7 @@ pub struct ImplementTraitNode {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum LiteralValueKind {
+pub enum LiteralKind {
   Bool(bool),
   Int(i64),
   Float(f64),
@@ -251,7 +251,7 @@ pub struct OutputTypeNode {
 pub struct TraitItemConstantNode {
   pub ident: IdentNode,
   pub ty: TypeKind,
-  pub default_value: Option<LiteralValueKind>,
+  pub default_value: Option<LiteralKind>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -315,7 +315,7 @@ pub enum ExpressionKind {
   Break,
   Continue,
   Return(ReturnNode),
-  Literal(LiteralValueKind),
+  Literal(LiteralKind),
   Array(Vec<ExpressionKind>),
   Tuple(TupleNode),
   Index(IndexNode),
@@ -394,7 +394,7 @@ pub enum PatternKind {
   Placeholder,
   UnnamedStruct(UnnamedStructNode),
   NamedStruct(NamedStructNode),
-  Literal(LiteralValueKind),
+  Literal(LiteralKind),
   Path(PathNode),
 }
 

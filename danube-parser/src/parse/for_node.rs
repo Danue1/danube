@@ -47,9 +47,9 @@ mod tests {
           }]
         }),
         iteration: Box::new(ExpressionKind::Array(vec![
-          ExpressionKind::Literal(LiteralValueKind::Int(1)),
-          ExpressionKind::Literal(LiteralValueKind::Int(2)),
-          ExpressionKind::Literal(LiteralValueKind::Int(3)),
+          ExpressionKind::Literal(LiteralKind::Int(1)),
+          ExpressionKind::Literal(LiteralKind::Int(2)),
+          ExpressionKind::Literal(LiteralKind::Int(3)),
         ])),
         block: BlockNode {
           statement_list: vec![],

@@ -89,7 +89,7 @@ mod immutable_tests {
           }]
         }),
         ty: None,
-        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
+        value: Some(ExpressionKind::Literal(LiteralKind::Bool(true))),
       }
     );
   }
@@ -114,7 +114,7 @@ mod immutable_tests {
             }]
           }
         )),
-        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
+        value: Some(ExpressionKind::Literal(LiteralKind::Bool(true))),
       }
     );
   }
@@ -135,7 +135,7 @@ mod immutable_tests {
           })]
         }),
         ty: None,
-        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
+        value: Some(ExpressionKind::Literal(LiteralKind::Bool(true))),
       }
     );
   }
@@ -160,7 +160,7 @@ mod immutable_tests {
           })]
         }),
         ty: None,
-        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
+        value: Some(ExpressionKind::Literal(LiteralKind::Bool(true))),
       }
     );
   }
@@ -192,7 +192,7 @@ mod immutable_tests {
           ]
         }),
         ty: None,
-        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
+        value: Some(ExpressionKind::Literal(LiteralKind::Bool(true))),
       }
     );
   }
@@ -214,7 +214,7 @@ mod immutable_tests {
           }]
         }),
         ty: None,
-        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
+        value: Some(ExpressionKind::Literal(LiteralKind::Bool(true))),
       }
     );
   }
@@ -240,7 +240,7 @@ mod immutable_tests {
           }]
         }),
         ty: None,
-        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
+        value: Some(ExpressionKind::Literal(LiteralKind::Bool(true))),
       }
     );
   }
@@ -274,7 +274,7 @@ mod immutable_tests {
           ]
         }),
         ty: None,
-        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
+        value: Some(ExpressionKind::Literal(LiteralKind::Bool(true))),
       }
     );
   }
@@ -308,7 +308,7 @@ mod mutable_tests {
           }]
         }),
         ty: None,
-        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
+        value: Some(ExpressionKind::Literal(LiteralKind::Bool(true))),
       }
     );
   }
@@ -333,7 +333,7 @@ mod mutable_tests {
             }]
           }
         )),
-        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
+        value: Some(ExpressionKind::Literal(LiteralKind::Bool(true))),
       }
     );
   }
@@ -356,7 +356,7 @@ mod mutable_tests {
           ]
         }),
         ty: None,
-        value: Some(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
+        value: Some(ExpressionKind::Literal(LiteralKind::Bool(true))),
       }
     );
   }

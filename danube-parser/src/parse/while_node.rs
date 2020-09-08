@@ -34,7 +34,7 @@ mod tests {
       WhileNode {
         condition: ConditionNode {
           pattern: None,
-          value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
+          value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
         },
         block: BlockNode {
           statement_list: vec![]
@@ -58,7 +58,7 @@ mod tests {
               }]
             })
           )),
-          value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
+          value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
         },
         block: BlockNode {
           statement_list: vec![]
@@ -82,7 +82,7 @@ mod tests {
               }]
             })
           )),
-          value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
+          value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
         },
         block: BlockNode {
           statement_list: vec![]

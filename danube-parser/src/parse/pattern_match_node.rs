@@ -60,12 +60,12 @@ mod tests {
     assert_eq!(
       compile(source),
       PatternMatchNode {
-        condition: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
+        condition: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true))),
         branch_list: vec![(
-          vec![PatternKind::Literal(LiteralValueKind::Bool(true))],
+          vec![PatternKind::Literal(LiteralKind::Bool(true))],
           BlockNode {
             statement_list: vec![StatementKind::ExpressionKind(ExpressionKind::Literal(
-              LiteralValueKind::Bool(true)
+              LiteralKind::Bool(true)
             ))]
           },
         )],
@@ -82,21 +82,21 @@ mod tests {
     assert_eq!(
       compile(source),
       PatternMatchNode {
-        condition: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
+        condition: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true))),
         branch_list: vec![
           (
-            vec![PatternKind::Literal(LiteralValueKind::Bool(true))],
+            vec![PatternKind::Literal(LiteralKind::Bool(true))],
             BlockNode {
               statement_list: vec![StatementKind::ExpressionKind(ExpressionKind::Literal(
-                LiteralValueKind::Bool(true)
+                LiteralKind::Bool(true)
               ))]
             }
           ),
           (
-            vec![PatternKind::Literal(LiteralValueKind::Bool(false))],
+            vec![PatternKind::Literal(LiteralKind::Bool(false))],
             BlockNode {
               statement_list: vec![StatementKind::ExpressionKind(ExpressionKind::Literal(
-                LiteralValueKind::Bool(false)
+                LiteralKind::Bool(false)
               ))]
             },
           )
@@ -113,9 +113,9 @@ mod tests {
     assert_eq!(
       compile(source),
       PatternMatchNode {
-        condition: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
+        condition: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true))),
         branch_list: vec![(
-          vec![PatternKind::Literal(LiteralValueKind::Bool(true))],
+          vec![PatternKind::Literal(LiteralKind::Bool(true))],
           BlockNode {
             statement_list: vec![]
           },
@@ -133,16 +133,16 @@ mod tests {
     assert_eq!(
       compile(source),
       PatternMatchNode {
-        condition: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
+        condition: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true))),
         branch_list: vec![
           (
-            vec![PatternKind::Literal(LiteralValueKind::Bool(true))],
+            vec![PatternKind::Literal(LiteralKind::Bool(true))],
             BlockNode {
               statement_list: vec![]
             },
           ),
           (
-            vec![PatternKind::Literal(LiteralValueKind::Bool(false))],
+            vec![PatternKind::Literal(LiteralKind::Bool(false))],
             BlockNode {
               statement_list: vec![]
             },
@@ -160,11 +160,11 @@ mod tests {
     assert_eq!(
       compile(source),
       PatternMatchNode {
-        condition: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true))),
+        condition: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true))),
         branch_list: vec![(
           vec![
-            PatternKind::Literal(LiteralValueKind::Bool(true)),
-            PatternKind::Literal(LiteralValueKind::Bool(false))
+            PatternKind::Literal(LiteralKind::Bool(true)),
+            PatternKind::Literal(LiteralKind::Bool(false))
           ],
           BlockNode {
             statement_list: vec![]

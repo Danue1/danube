@@ -50,7 +50,7 @@ mod tests {
             }]
           }
         ),
-        value: ExpressionKind::Literal(LiteralValueKind::Bool(true))
+        value: ExpressionKind::Literal(LiteralKind::Bool(true))
       }
     );
   }
@@ -79,7 +79,7 @@ mod tests {
             size: 0
           }
         ),
-        value: ExpressionKind::Literal(LiteralValueKind::Bool(true))
+        value: ExpressionKind::Literal(LiteralKind::Bool(true))
       }
     );
   }
@@ -125,7 +125,7 @@ mod tests {
             }]
           }
         ),
-        value: ExpressionKind::Array(vec![ExpressionKind::Literal(LiteralValueKind::Bool(true))])
+        value: ExpressionKind::Array(vec![ExpressionKind::Literal(LiteralKind::Bool(true))])
       }
     );
   }

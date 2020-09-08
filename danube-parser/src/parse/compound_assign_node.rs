@@ -35,7 +35,7 @@ mod tests {
             raw: "foo".to_owned(),
           }]
         }),
-        rhs: ExpressionKind::Literal(LiteralValueKind::Int(1))
+        rhs: ExpressionKind::Literal(LiteralKind::Int(1))
       }
     );
   }
@@ -57,7 +57,7 @@ mod tests {
             raw: "bar".to_owned()
           }),
         }),
-        rhs: ExpressionKind::Literal(LiteralValueKind::Int(1))
+        rhs: ExpressionKind::Literal(LiteralKind::Int(1))
       }
     );
   }

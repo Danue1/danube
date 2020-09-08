@@ -52,7 +52,7 @@ mod tests {
         main_branch: (
           ConditionNode {
             pattern: None,
-            value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
+            value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
           },
           BlockNode {
             statement_list: vec![]
@@ -73,7 +73,7 @@ mod tests {
         main_branch: (
           ConditionNode {
             pattern: None,
-            value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
+            value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
           },
           BlockNode {
             statement_list: vec![]
@@ -96,7 +96,7 @@ mod tests {
         main_branch: (
           ConditionNode {
             pattern: None,
-            value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
+            value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
           },
           BlockNode {
             statement_list: vec![]
@@ -105,7 +105,7 @@ mod tests {
         branch_list: vec![(
           ConditionNode {
             pattern: None,
-            value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
+            value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
           },
           BlockNode {
             statement_list: vec![]
@@ -125,7 +125,7 @@ mod tests {
         main_branch: (
           ConditionNode {
             pattern: None,
-            value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
+            value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
           },
           BlockNode {
             statement_list: vec![]
@@ -134,7 +134,7 @@ mod tests {
         branch_list: vec![(
           ConditionNode {
             pattern: None,
-            value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
+            value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
           },
           BlockNode {
             statement_list: vec![]
@@ -163,7 +163,7 @@ mod tests {
                 }]
               })
             )),
-            value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
+            value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
           },
           BlockNode {
             statement_list: vec![]
@@ -191,7 +191,7 @@ mod tests {
                 }]
               })
             )),
-            value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
+            value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
           },
           BlockNode {
             statement_list: vec![]

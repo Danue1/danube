@@ -42,9 +42,7 @@ mod tests {
     assert_eq!(
       compile(source),
       ReturnNode {
-        value: Some(Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(
-          true
-        ))))
+        value: Some(Box::new(ExpressionKind::Literal(LiteralKind::Bool(true))))
       }
     );
   }
@@ -55,9 +53,7 @@ mod tests {
     assert_eq!(
       compile(source),
       ReturnNode {
-        value: Some(Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(
-          true
-        ))))
+        value: Some(Box::new(ExpressionKind::Literal(LiteralKind::Bool(true))))
       }
     );
   }

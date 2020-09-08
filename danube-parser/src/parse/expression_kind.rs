@@ -21,7 +21,7 @@ fn parse_atomic_expression_node(s: Tokens) -> ParseResult<ExpressionKind> {
     map(parse_for_node, ExpressionKind::For),
     map(parse_pattern_match_node, ExpressionKind::PatternMatch),
     map(parse_closure_node, ExpressionKind::Closure),
-    map(parse_literal_value_kind, ExpressionKind::Literal),
+    map(parse_literal_kind, ExpressionKind::Literal),
     map(parse_break, |_| ExpressionKind::Break),
     map(parse_continue, |_| ExpressionKind::Continue),
     map(parse_return_node, ExpressionKind::Return),
@@ -350,7 +350,7 @@ mod tests {
       compile(source),
       ExpressionKind::UnaryOperator(UnaryOperatorNode {
         kind: UnaryOperatorKind::Not,
-        value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
+        value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
       })
     );
   }
@@ -362,7 +362,7 @@ mod tests {
       compile(source),
       ExpressionKind::UnaryOperator(UnaryOperatorNode {
         kind: UnaryOperatorKind::Negative,
-        value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
+        value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
       })
     );
   }
@@ -376,7 +376,7 @@ mod tests {
         kind: UnaryOperatorKind::Negative,
         value: Box::new(ExpressionKind::UnaryOperator(UnaryOperatorNode {
           kind: UnaryOperatorKind::Negative,
-          value: Box::new(ExpressionKind::Literal(LiteralValueKind::Bool(true)))
+          value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
         }))
       })
     );
@@ -389,7 +389,7 @@ mod tests {
       compile(source),
       ExpressionKind::UnaryOperator(UnaryOperatorNode {
         kind: UnaryOperatorKind::Negative,
-        value: Box::new(ExpressionKind::Literal(LiteralValueKind::Int(1)))
+        value: Box::new(ExpressionKind::Literal(LiteralKind::Int(1)))
       })
     );
   }
@@ -405,7 +405,7 @@ mod tests {
             raw: "foo".to_owned()
           }]
         })),
-        index: Box::new(ExpressionKind::Literal(LiteralValueKind::Int(1)))
+        index: Box::new(ExpressionKind::Literal(LiteralKind::Int(1)))
       })
     );
   }
@@ -501,7 +501,7 @@ mod tests {
             raw: "foo".to_owned()
           }]
         }))),
-        argument_list: vec![TupleArgument {
+        argument_list: vec![TupleArgumentNode {
           name: None,
           value: ExpressionKind::Path(PathNode {
             ident_list: vec![IdentNode {
@@ -524,7 +524,7 @@ mod tests {
             raw: "foo".to_owned()
           }]
         }))),
-        argument_list: vec![TupleArgument {
+        argument_list: vec![TupleArgumentNode {
           name: Some(IdentNode {
             raw: "bar".to_owned()
           }),
@@ -730,7 +730,7 @@ mod tests {
               raw: "foo".to_owned()
             }]
           }))),
-          argument_list: vec![TupleArgument {
+          argument_list: vec![TupleArgumentNode {
             name: None,
             value: ExpressionKind::Path(PathNode {
               ident_list: vec![IdentNode {
@@ -745,7 +745,7 @@ mod tests {
               raw: "baz".to_owned()
             }]
           }))),
-          argument_list: vec![TupleArgument {
+          argument_list: vec![TupleArgumentNode {
             name: None,
             value: ExpressionKind::Path(PathNode {
               ident_list: vec![IdentNode {
@@ -909,7 +909,7 @@ mod tests {
         return_type: None,
         block: BlockNode {
           statement_list: vec![StatementKind::ExpressionKind(ExpressionKind::Literal(
-            LiteralValueKind::Int(1)
+            LiteralKind::Int(1)
           ))]
         }
       }),

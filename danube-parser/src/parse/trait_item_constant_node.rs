@@ -8,7 +8,7 @@ pub(super) fn parse_trait_item_constant_node(s: Tokens) -> ParseResult<TraitItem
       parse_symbol(Symbol::Colon),
       parse_type_kind,
       opt(map(
-        tuple((parse_symbol(Symbol::Assign), parse_literal_value_kind)),
+        tuple((parse_symbol(Symbol::Assign), parse_literal_kind)),
         |(_, value)| value,
       )),
       parse_symbol(Symbol::Semicolon),

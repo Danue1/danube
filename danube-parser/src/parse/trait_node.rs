@@ -361,7 +361,7 @@ mod test_constant {
               }]
             }
           ),
-          default_value: Some(LiteralValueKind::Bool(true)),
+          default_value: Some(LiteralKind::Bool(true)),
         })]
       }
     );
@@ -553,7 +553,7 @@ mod test_function {
                     }]
                   }
                 ),
-                value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
+                value: ExpressionKind::Literal(LiteralKind::Bool(true)),
               })
             }))]
           }),
@@ -616,7 +616,7 @@ mod test_function {
                     }]
                   }
                 ),
-                value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
+                value: ExpressionKind::Literal(LiteralKind::Bool(true)),
               })
             }))]
           }),
@@ -695,7 +695,7 @@ mod test_function {
                     }]
                   }
                 ),
-                value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
+                value: ExpressionKind::Literal(LiteralKind::Bool(true)),
               })
             }))]
           }),

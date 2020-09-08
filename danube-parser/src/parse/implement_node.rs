@@ -65,7 +65,7 @@ mod tests {
                 }]
               }
             ),
-            value: ExpressionKind::Literal(LiteralValueKind::Bool(true)),
+            value: ExpressionKind::Literal(LiteralKind::Bool(true)),
           }
         )]
       }
