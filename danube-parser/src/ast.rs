@@ -236,13 +236,13 @@ pub struct FunctionArgumentNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum TraitItemKind {
-  OutputType(OutputTypeNode),
+  OutputType(TraitItemOutputTypeNode),
   Constant(TraitItemConstantNode),
   Function(TraitItemFunctionNode),
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct OutputTypeNode {
+pub struct TraitItemOutputTypeNode {
   pub ident: IdentNode,
   pub ty: Option<TypeKind>,
 }

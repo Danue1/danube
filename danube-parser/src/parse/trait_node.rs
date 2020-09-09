@@ -84,7 +84,7 @@ mod test_inheritance {
           },
           vec![]
         )],
-        item_list: vec![TraitItemKind::OutputType(OutputTypeNode {
+        item_list: vec![TraitItemKind::OutputType(TraitItemOutputTypeNode {
           ident: IdentNode {
             raw: "Foo".to_owned()
           },
@@ -134,7 +134,7 @@ mod test_inheritance {
             }]
           )
         ],
-        item_list: vec![TraitItemKind::OutputType(OutputTypeNode {
+        item_list: vec![TraitItemKind::OutputType(TraitItemOutputTypeNode {
           ident: IdentNode {
             raw: "Foo".to_owned()
           },
@@ -174,7 +174,7 @@ mod test_type {
         },
         generic: None,
         inheritances: vec![],
-        item_list: vec![TraitItemKind::OutputType(OutputTypeNode {
+        item_list: vec![TraitItemKind::OutputType(TraitItemOutputTypeNode {
           ident: IdentNode {
             raw: "Foo".to_owned()
           },
@@ -198,7 +198,7 @@ mod test_type {
         },
         generic: None,
         inheritances: vec![],
-        item_list: vec![TraitItemKind::OutputType(OutputTypeNode {
+        item_list: vec![TraitItemKind::OutputType(TraitItemOutputTypeNode {
           ident: IdentNode {
             raw: "Foo".to_owned()
           },
@@ -229,7 +229,7 @@ mod test_type {
         },
         generic: None,
         inheritances: vec![],
-        item_list: vec![TraitItemKind::OutputType(OutputTypeNode {
+        item_list: vec![TraitItemKind::OutputType(TraitItemOutputTypeNode {
           ident: IdentNode {
             raw: "Bar".to_owned()
           },
@@ -260,7 +260,7 @@ mod test_type {
         },
         generic: None,
         inheritances: vec![],
-        item_list: vec![TraitItemKind::OutputType(OutputTypeNode {
+        item_list: vec![TraitItemKind::OutputType(TraitItemOutputTypeNode {
           ident: IdentNode {
             raw: "Foo".to_owned()
           },
