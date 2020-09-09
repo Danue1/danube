@@ -6,10 +6,10 @@ use crate::ErrorKind;
 use danube_parser::*;
 pub use definition::*;
 
-type TypeSymbolResult<T = ()> = Result<T, ErrorKind>;
+type SymbolTableResult<T = ()> = Result<T, ErrorKind>;
 
-pub fn create_type_symbol_table(node: &ProgramNode) -> TypeSymbolResult<TypeSymbolTable> {
-  let mut type_symbol_table = TypeSymbolTable::new("Root");
+pub fn create_type_symbol_table(node: &ProgramNode) -> SymbolTableResult<SymbolTable> {
+  let mut type_symbol_table = SymbolTable::new("Root");
   type_symbol_table.scan_program_node(node)?;
   type_symbol_table.analyze()?;
 
@@ -22,7 +22,7 @@ mod tests {
   use std::collections::HashMap;
   use std::iter::FromIterator;
 
-  fn compile(s: &str) -> TypeSymbolTable {
+  fn compile(s: &str) -> SymbolTable {
     let (_, token_list) = lex(s).unwrap();
     let (_, program_node) = parse(Tokens::new(&token_list)).unwrap();
     match create_type_symbol_table(&program_node) {
@@ -39,19 +39,19 @@ mod tests {
     let source = "struct Foo(str);";
     assert_eq!(
       compile(source),
-      TypeSymbolTable {
+      SymbolTable {
         name: "Root".to_owned(),
-        symbol_tables: HashMap::from_iter(vec![
+        types: HashMap::from_iter(vec![
           ("bool".to_owned(), TypeSymbolKind::Primitive),
           ("int".to_owned(), TypeSymbolKind::Primitive),
           ("float".to_owned(), TypeSymbolKind::Primitive),
           ("str".to_owned(), TypeSymbolKind::Primitive),
           (
             "Entry".to_owned(),
-            TypeSymbolKind::Module(Module {
+            TypeSymbolKind::Module(ModuleSymbol {
               fields: HashMap::from_iter(vec![(
                 "Foo".to_owned(),
-                TypeSymbolKind::UnnamedStruct(UnnamedStruct {
+                TypeSymbolKind::UnnamedStruct(UnnamedStructSymbol {
                   fields: vec![TypeKind::Path(
                     ImmutablityKind::Yes,
                     PathNode {
@@ -64,8 +64,9 @@ mod tests {
               )])
             })
           )
-        ])
-      }
+        ]),
+        variables: HashMap::from_iter(vec![]),
+      },
     );
   }
 }
