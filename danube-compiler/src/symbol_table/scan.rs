@@ -29,26 +29,27 @@ impl SymbolTable {
   pub(super) fn scan_program_node(&mut self, node: &ProgramNode) -> SymbolTableResult {
     macro_rules! add_type {
       ($($name:expr,)+) => {
-        $(let _ = self.add_type($name, TypeSymbolKind::Primitive); )+
+        $(self.add_type($name, TypeSymbolKind::Primitive)?;)+
       };
     }
 
     add_type!["bool", "int", "float", "str",];
 
-    let mut type_symbol_table = SymbolTable::new("Entry");
+    let mut symbol_table = SymbolTable::new("Entry");
 
     for feature in node.feature_list.iter() {
-      type_symbol_table.scan_feature_node(feature)?;
+      symbol_table.scan_feature_node(feature)?;
     }
 
     for item in node.item_list.iter() {
-      type_symbol_table.scan_item_node(item)?;
+      symbol_table.scan_item_node(item)?;
     }
 
     self.add_type(
       "Entry",
       TypeSymbolKind::Module(ModuleSymbol {
-        fields: type_symbol_table.types,
+        types: symbol_table.types,
+        variables: symbol_table.variables,
       }),
     )?;
 
@@ -124,28 +125,50 @@ impl SymbolTable {
   }
 
   fn scan_function_node(&mut self, node: &FunctionNode) -> SymbolTableResult {
-    let arguments: HashMap<String, TypeKind> = Default::default();
+    let mut argument_list: Vec<(String, FunctionArgumentSymbol)> = Default::default();
     for argument in node.argument_list.iter() {
-      if arguments.contains_key(&argument.ident.raw) {
+      if argument_list
+        .iter()
+        .any(|(name, _)| name == &argument.ident.raw)
+      {
         return Err(ErrorKind::Message(
           "Can not declare duplicated argument name.".to_owned(),
         ));
       }
+      let symbol = self.scan_function_argument_node(argument)?;
+      argument_list.push((argument.ident.raw.to_owned(), symbol));
     }
 
-    let mut type_symbol_table = SymbolTable::new(&node.ident.raw);
+    let mut symbol_table = SymbolTable::new(&node.ident.raw);
     for kind in node.block.statement_list.iter() {
-      type_symbol_table.scan_statement_kind(kind)?;
+      symbol_table.scan_statement_kind(kind)?;
     }
 
     let kind = VariableSymbolKind::Function(FunctionSymbol {
-      argument_list: arguments.into_iter().collect(),
+      argument_list,
       return_type: node.return_type.clone(),
-      items: type_symbol_table.types,
+      types: symbol_table.types,
+      variables: symbol_table.variables,
     });
     self.add_variable(&node.ident.raw, kind)?;
 
     Ok(())
+  }
+
+  fn scan_function_argument_node(
+    &self,
+    node: &FunctionArgumentNode,
+  ) -> SymbolTableResult<FunctionArgumentSymbol> {
+    let symbol = FunctionArgumentSymbol {
+      is_mutable: if node.immutablity == ImmutablityKind::Yes {
+        false
+      } else {
+        true
+      },
+      ty: node.ty.clone(),
+    };
+
+    Ok(symbol)
   }
 
   fn scan_type_alias_node(&mut self, node: &TypeAliasNode) -> SymbolTableResult {
@@ -223,31 +246,51 @@ impl TraitSymbol {
   }
 
   fn scan_function_node(&mut self, node: &TraitItemFunctionNode) -> SymbolTableResult {
-    let mut arguments: HashMap<String, TypeKind> = Default::default();
+    let mut argument_list: Vec<(String, TraitItemFunctionArgumentSymbol)> = Default::default();
     for argument in node.argument_list.iter() {
-      if arguments.contains_key(&argument.ident.raw) {
+      if argument_list
+        .iter()
+        .any(|(name, _)| name == &argument.ident.raw)
+      {
         return Err(ErrorKind::Message(
           "Can not declare duplicated argument name.".to_owned(),
         ));
       }
-      arguments.insert(argument.ident.raw.to_owned(), argument.ty.clone());
+      let symbol = self.scan_function_argument_node(argument)?;
+      argument_list.push((argument.ident.raw.to_owned(), symbol));
     }
 
-    let mut type_symbol_table = SymbolTable::new(&node.ident.raw);
+    let mut symbol_table = SymbolTable::new(&node.ident.raw);
     if let Some(block) = &node.block {
       for kind in block.statement_list.iter() {
-        type_symbol_table.scan_statement_kind(kind)?;
+        symbol_table.scan_statement_kind(kind)?;
       }
     }
 
     let trait_function = TraitItemFunctionSymbol {
-      arguments,
+      argument_list,
       return_type: node.return_type.clone(),
-      items: type_symbol_table.types,
+      items: symbol_table.types,
     };
     self.add_variable(
       &node.ident.raw,
       TraitItemSymbolKind::Function(trait_function),
     )
+  }
+
+  fn scan_function_argument_node(
+    &self,
+    node: &FunctionArgumentNode,
+  ) -> SymbolTableResult<TraitItemFunctionArgumentSymbol> {
+    let symbol = TraitItemFunctionArgumentSymbol {
+      is_mutable: if node.immutablity == ImmutablityKind::Yes {
+        false
+      } else {
+        true
+      },
+      ty: node.ty.clone(),
+    };
+
+    Ok(symbol)
   }
 }

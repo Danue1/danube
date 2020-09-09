@@ -31,7 +31,8 @@ pub enum TypeSymbolKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ModuleSymbol {
-  pub fields: HashMap<String, TypeSymbolKind>,
+  pub types: HashMap<String, TypeSymbolKind>,
+  pub variables: HashMap<String, VariableSymbolKind>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -84,9 +85,15 @@ pub struct TraitItemConstantSymbol {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct TraitItemFunctionSymbol {
-  pub arguments: HashMap<String, TypeKind>,
+  pub argument_list: Vec<(String, TraitItemFunctionArgumentSymbol)>,
   pub return_type: Option<TypeKind>,
   pub items: HashMap<String, TypeSymbolKind>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct TraitItemFunctionArgumentSymbol {
+  pub is_mutable: bool,
+  pub ty: TypeKind,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -120,7 +127,14 @@ pub struct LetSymbol {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct FunctionSymbol {
-  pub argument_list: Vec<(String, TypeKind)>,
+  pub argument_list: Vec<(String, FunctionArgumentSymbol)>,
   pub return_type: Option<TypeKind>,
-  pub items: HashMap<String, TypeSymbolKind>,
+  pub types: HashMap<String, TypeSymbolKind>,
+  pub variables: HashMap<String, VariableSymbolKind>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct FunctionArgumentSymbol {
+  pub is_mutable: bool,
+  pub ty: TypeKind,
 }

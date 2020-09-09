@@ -36,7 +36,7 @@ mod tests {
 
   #[test]
   fn unnamed_struct() {
-    let source = "struct Foo(str);";
+    let source = "fn foo(bar: int, baz: int) -> int { }";
     assert_eq!(
       compile(source),
       SymbolTable {
@@ -49,7 +49,7 @@ mod tests {
           (
             "Entry".to_owned(),
             TypeSymbolKind::Module(ModuleSymbol {
-              fields: HashMap::from_iter(vec![(
+              types: HashMap::from_iter(vec![(
                 "Foo".to_owned(),
                 TypeSymbolKind::UnnamedStruct(UnnamedStructSymbol {
                   fields: vec![TypeKind::Path(
@@ -59,9 +59,10 @@ mod tests {
                         raw: "str".to_owned()
                       }]
                     }
-                  )]
+                  )],
                 })
-              )])
+              )]),
+              variables: Default::default(),
             })
           )
         ]),
