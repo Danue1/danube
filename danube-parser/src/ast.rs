@@ -37,6 +37,7 @@ pub struct ItemNode {
 #[derive(Debug, PartialEq, Clone)]
 pub struct AttributeNode {
   pub path: PathNode,
+  pub args: std::collections::HashMap<String, Option<LiteralKind>>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
