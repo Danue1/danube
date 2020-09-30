@@ -1,2 +1,2 @@
-#[primitive]
+#[primitive(name = "Size")]
 pub type Size = ();

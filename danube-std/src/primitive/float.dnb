@@ -1,2 +1,2 @@
-#[primitive]
+#[primitive(name = "Float")]
 pub type Float = ();

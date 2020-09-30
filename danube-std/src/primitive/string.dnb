@@ -1,2 +1,2 @@
-#[primitive]
+#[primitive(name = "String")]
 pub type String = ();

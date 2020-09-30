@@ -1,2 +1,2 @@
-#[primitive]
+#[primitive(name = "Int")]
 pub type Int = ();
