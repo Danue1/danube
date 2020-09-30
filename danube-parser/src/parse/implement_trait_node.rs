@@ -78,7 +78,11 @@ mod tests {
                 }]
               }
             ),
-            value: ExpressionKind::Literal(LiteralKind::Bool(true)),
+            value: ExpressionKind::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "true".to_owned()
+              }]
+            }),
           }
         )]
       }

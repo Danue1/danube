@@ -59,6 +59,7 @@ mod use_kind;
 mod use_node;
 mod use_root_ident_kind;
 mod use_root_node;
+mod value_kind;
 mod visibility_kind;
 mod while_node;
 
@@ -125,6 +126,7 @@ use use_kind::parse_use_kind;
 use use_node::parse_use_node;
 use use_root_ident_kind::parse_use_root_ident_kind;
 use use_root_node::parse_use_root_node;
+use value_kind::parse_value_kind;
 use visibility_kind::parse_visibility_kind;
 use while_node::parse_while_node;
 

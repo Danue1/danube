@@ -50,7 +50,11 @@ mod tests {
             }]
           }
         ),
-        value: ExpressionKind::Literal(LiteralKind::Bool(true))
+        value: ExpressionKind::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "true".to_owned()
+          }]
+        })
       }
     );
   }
@@ -79,7 +83,11 @@ mod tests {
             size: 0
           }
         ),
-        value: ExpressionKind::Literal(LiteralKind::Bool(true))
+        value: ExpressionKind::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "true".to_owned()
+          }]
+        })
       }
     );
   }
@@ -125,7 +133,11 @@ mod tests {
             }]
           }
         ),
-        value: ExpressionKind::Array(vec![ExpressionKind::Literal(LiteralKind::Bool(true))])
+        value: ExpressionKind::Array(vec![ExpressionKind::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "true".to_owned()
+          }]
+        })])
       }
     );
   }

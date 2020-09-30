@@ -151,7 +151,7 @@ pub struct StaticNode {
   pub visibility: Option<VisibilityKind>,
   pub ident: IdentNode,
   pub ty: TypeKind,
-  pub value: LiteralKind,
+  pub value: ValueKind,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -199,7 +199,6 @@ pub struct ImplementTraitNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum LiteralKind {
-  Bool(bool),
   Int(i64),
   Float(f64),
   String(String),
@@ -251,7 +250,13 @@ pub struct TraitItemOutputTypeNode {
 pub struct TraitItemConstantNode {
   pub ident: IdentNode,
   pub ty: TypeKind,
-  pub default_value: Option<LiteralKind>,
+  pub default_value: Option<ValueKind>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum ValueKind {
+  Literal(LiteralKind),
+  Path(PathNode),
 }
 
 #[derive(Debug, PartialEq, Clone)]

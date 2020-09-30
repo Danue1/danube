@@ -289,7 +289,11 @@ mod tests {
               main_branch: (
                 ConditionNode {
                   pattern: None,
-                  value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true))),
+                  value: Box::new(ExpressionKind::Path(PathNode {
+                    ident_list: vec![IdentNode {
+                      raw: "true".to_owned()
+                    }]
+                  })),
                 },
                 BlockNode {
                   statement_list: vec![]
@@ -327,7 +331,11 @@ mod tests {
               main_branch: (
                 ConditionNode {
                   pattern: None,
-                  value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
+                  value: Box::new(ExpressionKind::Path(PathNode {
+                    ident_list: vec![IdentNode {
+                      raw: "true".to_owned()
+                    }]
+                  }))
                 },
                 BlockNode {
                   statement_list: vec![]
@@ -366,9 +374,17 @@ mod tests {
         block: BlockNode {
           statement_list: vec![StatementKind::ExpressionKind(ExpressionKind::PatternMatch(
             PatternMatchNode {
-              condition: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true))),
+              condition: Box::new(ExpressionKind::Path(PathNode {
+                ident_list: vec![IdentNode {
+                  raw: "true".to_owned()
+                }]
+              })),
               branch_list: vec![(
-                vec![PatternKind::Literal(LiteralKind::Bool(true))],
+                vec![PatternKind::Path(PathNode {
+                  ident_list: vec![IdentNode {
+                    raw: "true".to_owned()
+                  }]
+                })],
                 BlockNode {
                   statement_list: vec![]
                 },
@@ -411,7 +427,11 @@ mod tests {
               ]
             }),
             ty: None,
-            value: Some(ExpressionKind::Literal(LiteralKind::Bool(true))),
+            value: Some(ExpressionKind::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "true".to_owned()
+              }]
+            })),
           }))]
         },
       }

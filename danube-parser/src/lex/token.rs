@@ -129,7 +129,6 @@ impl<'a> nom::InputIter for Tokens<'a> {
 pub enum Token {
   Keyword(Keyword),
   Symbol(Symbol),
-  BooleanLiteral(bool),
   IntLiteral(i64),
   FloatLiteral(f64),
   StringLiteral(String),

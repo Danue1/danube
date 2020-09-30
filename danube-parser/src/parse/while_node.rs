@@ -34,7 +34,11 @@ mod tests {
       WhileNode {
         condition: ConditionNode {
           pattern: None,
-          value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
+          value: Box::new(ExpressionKind::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "true".to_owned()
+            }]
+          }))
         },
         block: BlockNode {
           statement_list: vec![]
@@ -58,7 +62,11 @@ mod tests {
               }]
             })
           )),
-          value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
+          value: Box::new(ExpressionKind::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "true".to_owned()
+            }]
+          }))
         },
         block: BlockNode {
           statement_list: vec![]
@@ -82,7 +90,11 @@ mod tests {
               }]
             })
           )),
-          value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
+          value: Box::new(ExpressionKind::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "true".to_owned()
+            }]
+          }))
         },
         block: BlockNode {
           statement_list: vec![]

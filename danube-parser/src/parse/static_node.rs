@@ -9,7 +9,7 @@ pub(super) fn parse_static_node(s: Tokens) -> ParseResult<StaticNode> {
       parse_symbol(Symbol::Colon),
       parse_type_kind,
       parse_symbol(Symbol::Assign),
-      parse_literal_kind,
+      parse_value_kind,
       parse_symbol(Symbol::Semicolon),
     )),
     |(visibility, _, ident, _, ty, _, value, _)| StaticNode {
@@ -50,7 +50,11 @@ mod tests {
             }]
           }
         ),
-        value: LiteralKind::Bool(true)
+        value: ValueKind::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "true".to_owned()
+          }]
+        })
       }
     );
   }

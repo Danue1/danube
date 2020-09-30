@@ -64,7 +64,6 @@ fn parse_token(s: LexSpan) -> LexResult<Token> {
     map(parse_identifier, |identifier| match identifier {
       Identifier::Unreserved(i) => Token::Identifier(i),
       Identifier::Reserved(i) => Token::Keyword(i),
-      Identifier::BooleanLiteral(i) => Token::BooleanLiteral(i),
     }),
     map(parse_symbol, Token::Symbol),
     map(parse_illegal, |_| Token::Illegal),
@@ -156,7 +155,6 @@ fn parse_numeric(s: LexSpan) -> LexResult<Numeric> {
 
 #[derive(Debug, PartialEq)]
 enum Identifier {
-  BooleanLiteral(bool),
   Unreserved(String),
   Reserved(Keyword),
 }
@@ -205,9 +203,6 @@ fn parse_identifier(s: LexSpan) -> LexResult<Identifier> {
     "super" => Identifier::Reserved(Keyword::Super),
     "as" => Identifier::Reserved(Keyword::As),
     "_" => Identifier::Reserved(Keyword::Placeholder),
-
-    "true" => Identifier::BooleanLiteral(true),
-    "false" => Identifier::BooleanLiteral(false),
 
     _ => Identifier::Unreserved(string),
   };

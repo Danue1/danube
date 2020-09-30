@@ -42,7 +42,11 @@ mod tests {
     assert_eq!(
       compile(source),
       ReturnNode {
-        value: Some(Box::new(ExpressionKind::Literal(LiteralKind::Bool(true))))
+        value: Some(Box::new(ExpressionKind::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "true".to_owned()
+          }]
+        })))
       }
     );
   }
@@ -53,7 +57,11 @@ mod tests {
     assert_eq!(
       compile(source),
       ReturnNode {
-        value: Some(Box::new(ExpressionKind::Literal(LiteralKind::Bool(true))))
+        value: Some(Box::new(ExpressionKind::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "true".to_owned()
+          }]
+        })))
       }
     );
   }

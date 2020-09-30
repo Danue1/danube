@@ -350,7 +350,11 @@ mod tests {
       compile(source),
       ExpressionKind::UnaryOperator(UnaryOperatorNode {
         kind: UnaryOperatorKind::Not,
-        value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
+        value: Box::new(ExpressionKind::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "true".to_owned()
+          }]
+        }))
       })
     );
   }
@@ -362,7 +366,11 @@ mod tests {
       compile(source),
       ExpressionKind::UnaryOperator(UnaryOperatorNode {
         kind: UnaryOperatorKind::Negative,
-        value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
+        value: Box::new(ExpressionKind::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "true".to_owned()
+          }]
+        }))
       })
     );
   }
@@ -376,7 +384,11 @@ mod tests {
         kind: UnaryOperatorKind::Negative,
         value: Box::new(ExpressionKind::UnaryOperator(UnaryOperatorNode {
           kind: UnaryOperatorKind::Negative,
-          value: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true)))
+          value: Box::new(ExpressionKind::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "true".to_owned()
+            }]
+          }))
         }))
       })
     );

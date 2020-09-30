@@ -60,12 +60,24 @@ mod tests {
     assert_eq!(
       compile(source),
       PatternMatchNode {
-        condition: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true))),
+        condition: Box::new(ExpressionKind::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "true".to_owned()
+          }]
+        })),
         branch_list: vec![(
-          vec![PatternKind::Literal(LiteralKind::Bool(true))],
+          vec![PatternKind::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "true".to_owned()
+            }]
+          })],
           BlockNode {
-            statement_list: vec![StatementKind::ExpressionKind(ExpressionKind::Literal(
-              LiteralKind::Bool(true)
+            statement_list: vec![StatementKind::ExpressionKind(ExpressionKind::Path(
+              PathNode {
+                ident_list: vec![IdentNode {
+                  raw: "true".to_owned()
+                }]
+              }
             ))]
           },
         )],
@@ -82,21 +94,41 @@ mod tests {
     assert_eq!(
       compile(source),
       PatternMatchNode {
-        condition: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true))),
+        condition: Box::new(ExpressionKind::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "true".to_owned()
+          }]
+        })),
         branch_list: vec![
           (
-            vec![PatternKind::Literal(LiteralKind::Bool(true))],
+            vec![PatternKind::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "true".to_owned()
+              }]
+            })],
             BlockNode {
-              statement_list: vec![StatementKind::ExpressionKind(ExpressionKind::Literal(
-                LiteralKind::Bool(true)
+              statement_list: vec![StatementKind::ExpressionKind(ExpressionKind::Path(
+                PathNode {
+                  ident_list: vec![IdentNode {
+                    raw: "true".to_owned()
+                  }]
+                }
               ))]
             }
           ),
           (
-            vec![PatternKind::Literal(LiteralKind::Bool(false))],
+            vec![PatternKind::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "false".to_owned()
+              }]
+            })],
             BlockNode {
-              statement_list: vec![StatementKind::ExpressionKind(ExpressionKind::Literal(
-                LiteralKind::Bool(false)
+              statement_list: vec![StatementKind::ExpressionKind(ExpressionKind::Path(
+                PathNode {
+                  ident_list: vec![IdentNode {
+                    raw: "false".to_owned()
+                  }]
+                }
               ))]
             },
           )
@@ -113,9 +145,17 @@ mod tests {
     assert_eq!(
       compile(source),
       PatternMatchNode {
-        condition: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true))),
+        condition: Box::new(ExpressionKind::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "true".to_owned()
+          }]
+        })),
         branch_list: vec![(
-          vec![PatternKind::Literal(LiteralKind::Bool(true))],
+          vec![PatternKind::Path(PathNode {
+            ident_list: vec![IdentNode {
+              raw: "true".to_owned()
+            }]
+          })],
           BlockNode {
             statement_list: vec![]
           },
@@ -133,16 +173,28 @@ mod tests {
     assert_eq!(
       compile(source),
       PatternMatchNode {
-        condition: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true))),
+        condition: Box::new(ExpressionKind::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "true".to_owned()
+          }]
+        })),
         branch_list: vec![
           (
-            vec![PatternKind::Literal(LiteralKind::Bool(true))],
+            vec![PatternKind::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "true".to_owned()
+              }]
+            })],
             BlockNode {
               statement_list: vec![]
             },
           ),
           (
-            vec![PatternKind::Literal(LiteralKind::Bool(false))],
+            vec![PatternKind::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "false".to_owned()
+              }]
+            })],
             BlockNode {
               statement_list: vec![]
             },
@@ -160,11 +212,23 @@ mod tests {
     assert_eq!(
       compile(source),
       PatternMatchNode {
-        condition: Box::new(ExpressionKind::Literal(LiteralKind::Bool(true))),
+        condition: Box::new(ExpressionKind::Path(PathNode {
+          ident_list: vec![IdentNode {
+            raw: "true".to_owned()
+          }]
+        })),
         branch_list: vec![(
           vec![
-            PatternKind::Literal(LiteralKind::Bool(true)),
-            PatternKind::Literal(LiteralKind::Bool(false))
+            PatternKind::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "true".to_owned()
+              }]
+            }),
+            PatternKind::Path(PathNode {
+              ident_list: vec![IdentNode {
+                raw: "false".to_owned()
+              }]
+            })
           ],
           BlockNode {
             statement_list: vec![]
