@@ -1,0 +1,33 @@
+use crate::primitive::*;
+
+pub trait From<T> {
+  fn from(t: T) -> Self;
+}
+
+impl From<Bool> for Bool {
+  fn from(t: Bool) -> Self = t;
+}
+
+impl From<Float> for Bool {
+  fn from(t: Float) -> Self = t != 0;
+}
+
+impl From<Int> for Bool {
+  fn from(t: Int) -> Self = t != 0;
+}
+
+impl From<Size> for Bool {
+  fn from(t: Size) -> Self = t != 0;
+}
+
+impl From<String> for Bool {
+  fn from(t: String) -> Self = t != "";
+}
+
+impl From<Uint> for Bool {
+  fn from(t: Uint) -> Self = t != 0;
+}
+
+impl From<Usize> for Bool {
+  fn from(t: Usize) -> Self = t != 0;
+}

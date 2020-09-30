@@ -1,9 +1,20 @@
+use crate::primitive::*;
+use super::add::Add;
+
 pub trait AddAssign<Rhs = Self> {
   fn add_assign(mut self, rhs: Rhs) {
-    self = self + rhs;
+    self = Add::add(self, rhs);
   }
 }
 
-impl AddAssign for int { }
+impl AddAssign for Float { }
 
-impl AddAssign for float { }
+impl AddAssign for Int { }
+
+impl AddAssign for Size { }
+
+impl AddAssign for String { }
+
+impl AddAssign for Uint { }
+
+impl AddAssign for Usize { }

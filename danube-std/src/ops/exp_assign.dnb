@@ -1,9 +1,18 @@
+use crate::primitive::*;
+use super::exp::Exp;
+
 pub trait ExpAssign<Rhs = Self> {
   fn exp_assign(mut self, rhs: Rhs) {
-    self = self * *rhs;
+    self = Exp::exp(self, rhs);
   }
 }
 
-impl ExpAssign for int { }
+impl DivAssign for Float { }
 
-impl ExpAssign for float { }
+impl DivAssign for Int { }
+
+impl DivAssign for Size { }
+
+impl DivAssign for Uint { }
+
+impl DivAssign for Usize { }

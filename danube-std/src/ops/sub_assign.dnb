@@ -1,9 +1,18 @@
+use crate::primitive::*;
+use super::sub::Sub;
+
 pub trait SubAssign<Rhs = Self> {
   fn sub_assign(mut self, rhs: Rhs) {
-    self = self - rhs;
+    self = Sub::sub(self, rhs);
   }
 }
 
-impl SubAssign for int { }
+impl SubAssign for Float { }
 
-impl SubAssign for float { }
+impl SubAssign for Int { }
+
+impl SubAssign for Size { }
+
+impl SubAssign for Uint { }
+
+impl SubAssign for Usize { }

@@ -1,9 +1,15 @@
-mod bool;
-mod int;
-mod float;
-mod str;
+pub mod bool;
+pub mod float;
+pub mod int;
+pub mod size;
+pub mod string;
+pub mod uint;
+pub mod usize;
 
-pub use bool::bool;
-pub use int::int;
-pub use float::float;
-pub use str::str;
+pub use bool::Bool;
+pub use float::Float;
+pub use int::Int;
+pub use size::Size;
+pub use string::String;
+pub use uint::Uint;
+pub use usize::Usize;

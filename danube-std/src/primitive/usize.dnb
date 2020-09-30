@@ -1,0 +1,2 @@
+#[primitive]
+pub type Usize = ();

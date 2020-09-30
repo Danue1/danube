@@ -4,16 +4,47 @@ pub trait Rem<Rhs = Self> {
   fn rem(self, rhs: Rhs) -> Self::Output;
 }
 
-impl Rem for int {
-  type Output = int;
+impl Rem for Float {
+  type Output = Float;
 
-  #[native]
-  fn rem(self, rhs: Rhs) -> Self::Output { }
+  fn rem(self, rhs: Rhs) -> Self::Output = rem_float_to_float(self, rhs);
 }
 
-impl Rem for int {
-  type Output = int;
+#[native]
+pub fn rem_float_to_float(lhs: Float, rhs: Float) -> Float { }
 
-  #[native]
-  fn rem(self, rhs: Rhs) -> Self::Output { }
+impl Rem for Int {
+  type Output = Int;
+
+  fn rem(self, rhs: Rhs) -> Self::Output = rem_int_to_int(self, rhs);
 }
+
+#[native]
+pub fn rem_int_to_int(lhs: Int, rhs: Int) -> Int { }
+
+impl Rem for Size {
+  type Output = Size;
+
+  fn rem(self, rhs: Rhs) -> Self::Output = rem_size_to_size(self, rhs);
+}
+
+#[native]
+pub fn rem_size_to_size(lhs: Size, rhs: Size) -> Size { }
+
+impl Rem for Uint {
+  type Output = Uint;
+
+  fn rem(self, rhs: Rhs) -> Self::Output = rem_uint_to_uint(self, rhs);
+}
+
+#[native]
+pub fn rem_uint_to_uint(lhs: Uint, rhs: Uint) -> Uint { }
+
+impl Rem for Usize {
+  type Output = Usize;
+
+  fn rem(self, rhs: Rhs) -> Self::Output = rem_usize_to_usize(self, rhs);
+}
+
+#[native]
+pub fn rem_usize_to_usize(lhs: Usize, rhs: Usize) -> Usize { }

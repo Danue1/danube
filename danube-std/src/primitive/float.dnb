@@ -1,2 +1,2 @@
-#[native]
-pub type float = ();
+#[primitive]
+pub type Float = ();

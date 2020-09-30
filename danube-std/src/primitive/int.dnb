@@ -1,2 +1,2 @@
-#[native]
-pub type int = ();
+#[primitive]
+pub type Int = ();

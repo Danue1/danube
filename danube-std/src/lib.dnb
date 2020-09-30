@@ -1,3 +1,9 @@
 pub mod cmp;
+pub mod convert;
+pub mod default;
+pub mod either;
 pub mod ops;
+pub mod option;
+pub mod prelude;
 pub mod primitive;
+pub mod result;

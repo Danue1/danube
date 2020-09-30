@@ -4,16 +4,47 @@ pub trait BitAnd<Rhs = Self> {
   fn bit_and(self, rhs: Rhs) -> Self::Output;
 }
 
-impl BitAnd for int {
-  type Output = int;
+impl BitAnd for Float {
+  type Output = Float;
 
-  #[native]
-  fn bit_and(self, rhs: Rhs) -> Self::Output { }
+  fn bit_and(self, rhs: Rhs) -> Self::Output = bit_and_float_to_float(self, rhs);
 }
 
-impl BitAnd for int {
-  type Output = int;
+#[native]
+pub fn bit_and_float_to_float(lhs: Float, rhs: Float) -> Float { }
 
-  #[native]
-  fn bit_and(self, rhs: Rhs) -> Self::Output { }
+impl BitAnd for Int {
+  type Output = Int;
+
+  fn bit_and(self, rhs: Rhs) -> Self::Output = bit_and_int_to_int(self, rhs);
 }
+
+#[native]
+pub fn bit_and_int_to_int(lhs: Int, rhs: Int) -> Int { }
+
+impl BitAnd for Size {
+  type Output = Size;
+
+  fn bit_and(self, rhs: Rhs) -> Self::Output = bit_and_size_to_size(self, rhs);
+}
+
+#[native]
+pub fn bit_and_size_to_size(lhs: Size, rhs: Size) -> Size { }
+
+impl BitAnd for Uint {
+  type Output = Uint;
+
+  fn bit_and(self, rhs: Rhs) -> Self::Output = bit_and_uint_to_uint(self, rhs);
+}
+
+#[native]
+pub fn bit_and_uint_to_uint(lhs: Uint, rhs: Uint) -> Uint { }
+
+impl BitAnd for Usize {
+  type Output = Usize;
+
+  fn bit_and(self, rhs: Rhs) -> Self::Output = bit_and_usize_to_usize(self, rhs);
+}
+
+#[native]
+pub fn bit_and_usize_to_usize(lhs: Usize, rhs: Usize) -> Usize { }

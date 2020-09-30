@@ -1,2 +1,1 @@
-#[native]
-pub type bool = ();
+enum Bool = False | True;

@@ -1,9 +1,18 @@
+use crate::primitive::*;
+use super::shr::Shr;
+
 pub trait ShrAssign<Rhs = Self> {
   fn shr_assign(mut self, rhs: Rhs) {
-    self = self >> rhs;
+    self = Shr::shr(self, rhs);
   }
 }
 
-impl ShrAssign for int { }
+impl ShrAssign for Float { }
 
-impl ShrAssign for float { }
+impl ShrAssign for Int { }
+
+impl ShrAssign for Size { }
+
+impl ShrAssign for Uint { }
+
+impl ShrAssign for Usize { }

@@ -1,5 +1,5 @@
-mod eq;
-mod partial_eq;
+pub mod eq;
+pub mod partial_eq;
 
 pub use eq::eq;
 pub use partial_eq::partial_eq;

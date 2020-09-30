@@ -1,9 +1,18 @@
+use crate::primitive::*;
+use super::div::Div;
+
 pub trait DivAssign<Rhs = Self> {
   fn div_assign(mut self, rhs: Rhs) {
-    self = self / rhs;
+    self = Div::div(self, rhs);
   }
 }
 
-impl DivAssign for int { }
+impl DivAssign for Float { }
 
-impl DivAssign for float { }
+impl DivAssign for Int { }
+
+impl DivAssign for Size { }
+
+impl DivAssign for Uint { }
+
+impl DivAssign for Usize { }

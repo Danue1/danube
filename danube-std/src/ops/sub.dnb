@@ -4,16 +4,47 @@ pub trait Sub<Rhs = Self> {
   fn sub(self, rhs: Rhs) -> Self::Output;
 }
 
-impl Sub for int {
-  type Output = int;
+impl Sub for Float {
+  type Output = Float;
 
-  #[native]
-  fn sub(self, rhs: Rhs) -> Self::Output { }
+  fn sub(self, rhs: Rhs) -> Self::Output = sub_float_to_float(self, rhs);
 }
 
-impl Sub for int {
-  type Output = int;
+#[native]
+pub fn sub_float_to_float(lhs: Float, rhs: Float) -> Float { }
 
-  #[native]
-  fn sub(self, rhs: Rhs) -> Self::Output { }
+impl Sub for Int {
+  type Output = Int;
+
+  fn sub(self, rhs: Rhs) -> Self::Output = sub_int_to_int(self, rhs);
 }
+
+#[native]
+pub fn sub_int_to_int(lhs: Int, rhs: Int) -> Int { }
+
+impl Sub for Size {
+  type Output = Size;
+
+  fn sub(self, rhs: Rhs) -> Self::Output = sub_size_to_size(self, rhs);
+}
+
+#[native]
+pub fn sub_size_to_size(lhs: Size, rhs: Size) -> Size { }
+
+impl Sub for Uint {
+  type Output = Uint;
+
+  fn sub(self, rhs: Rhs) -> Self::Output = sub_uint_to_uint(self, rhs);
+}
+
+#[native]
+pub fn sub_uint_to_uint(lhs: Uint, rhs: Uint) -> Uint { }
+
+impl Sub for Usize {
+  type Output = Usize;
+
+  fn sub(self, rhs: Rhs) -> Self::Output = sub_usize_to_usize(self, rhs);
+}
+
+#[native]
+pub fn sub_usize_to_usize(lhs: Usize, rhs: Usize) -> Usize { }

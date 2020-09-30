@@ -4,16 +4,47 @@ pub trait Div<Rhs = Self> {
   fn div(self, rhs: Rhs) -> Self::Output;
 }
 
-impl Div for int {
-  type Output = int;
+impl Div for Float {
+  type Output = Float;
 
-  #[native]
-  fn div(self, rhs: Rhs) -> Self::Output { }
+  fn div(self, rhs: Rhs) -> Self::Output = div_float_to_float(self, rhs);
 }
 
-impl Div for int {
-  type Output = int;
+#[native]
+pub fn div_float_to_float(lhs: Float, rhs: Float) -> Float { }
 
-  #[native]
-  fn div(self, rhs: Rhs) -> Self::Output { }
+impl Div for Int {
+  type Output = Int;
+
+  fn div(self, rhs: Rhs) -> Self::Output = div_int_to_int(self, rhs);
 }
+
+#[native]
+pub fn div_int_to_int(lhs: Int, rhs: Int) -> Int { }
+
+impl Div for Size {
+  type Output = Size;
+
+  fn div(self, rhs: Rhs) -> Self::Output = div_size_to_size(self, rhs);
+}
+
+#[native]
+pub fn div_size_to_size(lhs: Size, rhs: Size) -> Size { }
+
+impl Div for Uint {
+  type Output = Uint;
+
+  fn div(self, rhs: Rhs) -> Self::Output = div_uint_to_uint(self, rhs);
+}
+
+#[native]
+pub fn div_uint_to_uint(lhs: Uint, rhs: Uint) -> Uint { }
+
+impl Div for Usize {
+  type Output = Usize;
+
+  fn div(self, rhs: Rhs) -> Self::Output = div_usize_to_usize(self, rhs);
+}
+
+#[native]
+pub fn div_usize_to_usize(lhs: Usize, rhs: Usize) -> Usize { }

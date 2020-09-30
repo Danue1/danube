@@ -1,1 +1,3 @@
+use super::PartialEq;
+
 pub trait Eq: PartialEq<Self> { }

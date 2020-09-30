@@ -1,9 +1,18 @@
+use crate::primitive::*;
+use super::bit_and::BitAnd;
+
 pub trait BitAndAssign<Rhs = Self> {
   fn bit_and_assign(mut self, rhs: Rhs) {
-    self = self & rhs;
+    self = BitAnd::bit_and(self, rhs);
   }
 }
 
-impl BitAndAssign for int { }
+impl BitAndAssign for Float { }
 
-impl BitAndAssign for float { }
+impl BitAndAssign for Int { }
+
+impl BitAndAssign for Size { }
+
+impl BitAndAssign for Uint { }
+
+impl BitAndAssign for Usize { }
