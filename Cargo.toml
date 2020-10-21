@@ -13,6 +13,7 @@ members = [
   "danube-cli",
   "danube-compiler",
   "danube-ir",
+  "danube-lex",
   "danube-macro",
   "danube-parser",
   "danube-runtime-javascript",
