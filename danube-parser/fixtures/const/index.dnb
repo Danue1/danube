@@ -1,2 +1,0 @@
-const FOO: Foo = false;
-const FOO: (bool, bool) = (true, false);

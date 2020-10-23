@@ -1,9 +1,0 @@
-fn foo() {
-  if true { }
-  if true { } else { }
-  if true { } else if true { }
-  if true { } else if true { } else { }
-
-  let foo = if true { } else { };
-  let foo = if true { } else if true { } else { };
-}

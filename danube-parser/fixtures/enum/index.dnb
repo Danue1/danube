@@ -1,5 +1,0 @@
-enum Foo = Bar;
-enum Foo = Bar | Baz;
-enum Foo = Bar(Bar);
-enum Foo = | Bar;
-enum Foo = | Bar | Baz;

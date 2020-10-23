@@ -5,4 +5,4 @@ authors = ["Danuel <public.danuel@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-danube-compiler = { path = "../danube-compiler" }
+danube-compile = { path = "../danube-compile" }
