@@ -1,82 +1,92 @@
 use super::*;
 
 pub(super) fn parse_symbol(s: LexSpan) -> LexResult<Symbol> {
-    parse_symbol0(s)
+    alt((parse_symbol3, parse_symbol2, parse_symbol1))(s)
 }
 
-fn parse_symbol0(s: LexSpan) -> LexResult<Symbol> {
-    let (s3, char3) = take(3usize)(s)?;
-    match char3.fragment().to_owned() {
-        "..=" => Ok((s3, Symbol::RangeOpen)),
-        "**=" => Ok((s3, Symbol::ExpAssign)),
-        "&&=" => Ok((s3, Symbol::AndAssign)),
-        "||=" => Ok((s3, Symbol::OrAssign)),
-        "<<=" => Ok((s3, Symbol::BitLeftAssign)),
-        ">>=" => Ok((s3, Symbol::BitRightAssign)),
+fn parse_symbol3(s: LexSpan) -> LexResult<Symbol> {
+    let (ss, c) = take(3usize)(s)?;
+    match c.fragment().to_owned() {
+        "..=" => Ok((ss, Symbol::RangeOpen)),
+        "**=" => Ok((ss, Symbol::ExpAssign)),
+        "&&=" => Ok((ss, Symbol::AndAssign)),
+        "||=" => Ok((ss, Symbol::OrAssign)),
+        "<<=" => Ok((ss, Symbol::BitLeftAssign)),
+        ">>=" => Ok((ss, Symbol::BitRightAssign)),
 
-        _ => {
-            let (s1, char2) = take(2usize)(s)?;
-            match char2.fragment().to_owned() {
-                "|>" => Ok((s1, Symbol::ChainArrow)),
-                "->" => Ok((s1, Symbol::ReturnArrow)),
-                "=>" => Ok((s1, Symbol::BranchArrow)),
-                ".." => Ok((s1, Symbol::RangeClose)),
-                "::" => Ok((s1, Symbol::DoubleColon)),
-                "==" => Ok((s1, Symbol::Equal)),
-                "!=" => Ok((s1, Symbol::NotEqual)),
-                "+=" => Ok((s1, Symbol::AddAssign)),
-                "-=" => Ok((s1, Symbol::SubAssign)),
-                "*=" => Ok((s1, Symbol::MulAssign)),
-                "/=" => Ok((s1, Symbol::DivAssign)),
-                "%=" => Ok((s1, Symbol::ModAssign)),
-                "**" => Ok((s1, Symbol::Exp)),
-                "&&" => Ok((s1, Symbol::And)),
-                "||" => Ok((s1, Symbol::Or)),
-                "&=" => Ok((s1, Symbol::BitAndAssign)),
-                "|=" => Ok((s1, Symbol::BitOrAssign)),
-                "^=" => Ok((s1, Symbol::BitXorAssign)),
-                "<<" => Ok((s1, Symbol::BitLeft)),
-                ">>" => Ok((s1, Symbol::BitRight)),
-                ">=" => Ok((s1, Symbol::GreaterThanOrEqual)),
-                "<=" => Ok((s1, Symbol::LessThanOrEqual)),
+        _ => Err(nom::Err::Error(nom::error_position!(
+            s,
+            nom::error::ErrorKind::Count
+        ))),
+    }
+}
 
-                _ => {
-                    let (s, char1) = take(1usize)(s)?;
-                    match char1.fragment().to_owned() {
-                        "(" => Ok((s, Symbol::LeftParens)),
-                        ")" => Ok((s, Symbol::RightParens)),
-                        "[" => Ok((s, Symbol::LeftBracket)),
-                        "]" => Ok((s, Symbol::RightBracket)),
-                        "{" => Ok((s, Symbol::LeftBrace)),
-                        "}" => Ok((s, Symbol::RightBrace)),
-                        "#" => Ok((s, Symbol::Hashtag)),
-                        "." => Ok((s, Symbol::Dot)),
-                        "," => Ok((s, Symbol::Comma)),
-                        ":" => Ok((s, Symbol::Colon)),
-                        ";" => Ok((s, Symbol::Semicolon)),
-                        "=" => Ok((s, Symbol::Assign)),
-                        "+" => Ok((s, Symbol::Add)),
-                        "-" => Ok((s, Symbol::Sub)),
-                        "*" => Ok((s, Symbol::Mul)),
-                        "/" => Ok((s, Symbol::Div)),
-                        "%" => Ok((s, Symbol::Mod)),
-                        "!" => Ok((s, Symbol::Not)),
-                        "?" => Ok((s, Symbol::Question)),
-                        "&" => Ok((s, Symbol::BitAnd)),
-                        "|" => Ok((s, Symbol::BitOr)),
-                        "~" => Ok((s, Symbol::BitNot)),
-                        "^" => Ok((s, Symbol::BitXor)),
-                        ">" => Ok((s, Symbol::GreaterThan)),
-                        "<" => Ok((s, Symbol::LessThan)),
+fn parse_symbol2(s: LexSpan) -> LexResult<Symbol> {
+    let (ss, c) = take(2usize)(s)?;
+    match c.fragment().to_owned() {
+        "|>" => Ok((ss, Symbol::ChainArrow)),
+        "->" => Ok((ss, Symbol::ReturnArrow)),
+        "=>" => Ok((ss, Symbol::BranchArrow)),
+        ".." => Ok((ss, Symbol::RangeClose)),
+        "::" => Ok((ss, Symbol::DoubleColon)),
+        "==" => Ok((ss, Symbol::Equal)),
+        "!=" => Ok((ss, Symbol::NotEqual)),
+        "+=" => Ok((ss, Symbol::AddAssign)),
+        "-=" => Ok((ss, Symbol::SubAssign)),
+        "*=" => Ok((ss, Symbol::MulAssign)),
+        "/=" => Ok((ss, Symbol::DivAssign)),
+        "%=" => Ok((ss, Symbol::ModAssign)),
+        "**" => Ok((ss, Symbol::Exp)),
+        "&&" => Ok((ss, Symbol::And)),
+        "||" => Ok((ss, Symbol::Or)),
+        "&=" => Ok((ss, Symbol::BitAndAssign)),
+        "|=" => Ok((ss, Symbol::BitOrAssign)),
+        "^=" => Ok((ss, Symbol::BitXorAssign)),
+        "<<" => Ok((ss, Symbol::BitLeft)),
+        ">>" => Ok((ss, Symbol::BitRight)),
+        ">=" => Ok((ss, Symbol::GreaterThanOrEqual)),
+        "<=" => Ok((ss, Symbol::LessThanOrEqual)),
 
-                        _ => Err(nom::Err::Error(nom::error_position!(
-                            s,
-                            nom::error::ErrorKind::Count
-                        ))),
-                    }
-                }
-            }
-        }
+        _ => Err(nom::Err::Error(nom::error_position!(
+            s,
+            nom::error::ErrorKind::Count
+        ))),
+    }
+}
+
+fn parse_symbol1(s: LexSpan) -> LexResult<Symbol> {
+    let (ss, c) = take(1usize)(s)?;
+    match c.fragment().to_owned() {
+        "(" => Ok((ss, Symbol::LeftParens)),
+        ")" => Ok((ss, Symbol::RightParens)),
+        "[" => Ok((ss, Symbol::LeftBracket)),
+        "]" => Ok((ss, Symbol::RightBracket)),
+        "{" => Ok((ss, Symbol::LeftBrace)),
+        "}" => Ok((ss, Symbol::RightBrace)),
+        "#" => Ok((ss, Symbol::Hashtag)),
+        "." => Ok((ss, Symbol::Dot)),
+        "," => Ok((ss, Symbol::Comma)),
+        ":" => Ok((ss, Symbol::Colon)),
+        ";" => Ok((ss, Symbol::Semicolon)),
+        "=" => Ok((ss, Symbol::Assign)),
+        "+" => Ok((ss, Symbol::Add)),
+        "-" => Ok((ss, Symbol::Sub)),
+        "*" => Ok((ss, Symbol::Mul)),
+        "/" => Ok((ss, Symbol::Div)),
+        "%" => Ok((ss, Symbol::Mod)),
+        "!" => Ok((ss, Symbol::Not)),
+        "?" => Ok((ss, Symbol::Question)),
+        "&" => Ok((ss, Symbol::BitAnd)),
+        "|" => Ok((ss, Symbol::BitOr)),
+        "~" => Ok((ss, Symbol::BitNot)),
+        "^" => Ok((ss, Symbol::BitXor)),
+        ">" => Ok((ss, Symbol::GreaterThan)),
+        "<" => Ok((ss, Symbol::LessThan)),
+
+        _ => Err(nom::Err::Error(nom::error_position!(
+            s,
+            nom::error::ErrorKind::Count
+        ))),
     }
 }
 
