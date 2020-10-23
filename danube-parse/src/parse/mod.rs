@@ -74,6 +74,8 @@ mod parse_visibility_kind;
 mod parse_while_node;
 
 use crate::*;
+#[cfg(test)]
+use danube_lex::lex;
 use danube_lex::{Keyword, Symbol, Token, Tokens};
 use nom::{branch::*, bytes::complete::*, combinator::*, multi::*, sequence::*};
 use parse_attribute_node::parse_attribute_node;
