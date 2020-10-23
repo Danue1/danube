@@ -7,11 +7,11 @@ pub struct Tokens<'a> {
     pub end: usize,
 }
 
-impl <'a> Tokens<'a> {
+impl<'a> Tokens<'a> {
     pub fn new(list: &'a [Token]) -> Self {
         Tokens {
             list,
-            start:0,
+            start: 0,
             end: list.len(),
         }
     }

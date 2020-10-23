@@ -80,7 +80,7 @@ pub enum OperatorSymbol {
 }
 
 impl From<OperatorSymbol> for Symbol {
-    fn from (operator: OperatorSymbol) -> Self {
+    fn from(operator: OperatorSymbol) -> Self {
         macro_rules! operator_to_symbol {
             ($($variant:ident,)+) => {
                 match operator {

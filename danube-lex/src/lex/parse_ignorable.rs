@@ -1,7 +1,6 @@
 use super::*;
 
-pub(super)
-fn parse_ignorable(s: LexSpan) -> LexResult<()> {
+pub(super) fn parse_ignorable(s: LexSpan) -> LexResult<()> {
     alt((parse_whitespace, parse_comment_line, parse_comment_block))(s)
 }
 

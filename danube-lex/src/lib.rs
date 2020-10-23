@@ -1,3 +1,5 @@
+#![warn(clippy::all)]
+
 pub mod error;
 pub mod keyword;
 pub mod lex;

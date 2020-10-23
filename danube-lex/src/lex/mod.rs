@@ -7,12 +7,12 @@ mod parse_symbol;
 
 use crate::*;
 use nom::{
-  branch::*, bytes::complete::*, character::complete::*, combinator::*, multi::*, sequence::*,
+    branch::*, bytes::complete::*, character::complete::*, combinator::*, multi::*, sequence::*,
 };
-use parse_identifier::{Identifier, parse_identifier};
+use parse_identifier::{parse_identifier, Identifier};
 use parse_ignorable::parse_ignorable;
 use parse_illegal::parse_illegal;
-use parse_numeric::{Numeric, parse_numeric};
+use parse_numeric::{parse_numeric, Numeric};
 use parse_string::parse_string;
 use parse_symbol::parse_symbol;
 pub use token::*;

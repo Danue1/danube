@@ -72,28 +72,27 @@ fn parse_symbol0(s: LexSpan) -> LexResult<Symbol> {
                         _ => Err(nom::Err::Error(nom::error_position!(
                             s,
                             nom::error::ErrorKind::Count
-                        )))
+                        ))),
                     }
                 }
             }
         }
-
     }
 }
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn symbol() {
-    macro_rules! tokens {
+    #[test]
+    fn symbol() {
+        macro_rules! tokens {
         ($($variant:ident,)+) => {
             vec![$(Token::Symbol(Symbol::$variant),)+]
         };
     }
 
-    let source = "
+        let source = "
     ( ) [ ] { }
     # |> -> =>
     ..= .. . , :: : ; == = !=
@@ -102,63 +101,63 @@ mod tests {
     & | ~ ^
     << >> >= <= > <
     ";
-    assert_eq!(
-      lex(source).map(|(_, token_list)| token_list),
-      Ok(tokens![
-        LeftParens,
-        RightParens,
-        LeftBracket,
-        RightBracket,
-        LeftBrace,
-        RightBrace,
-        Hashtag,
-        ChainArrow,
-        ReturnArrow,
-        BranchArrow,
-        RangeOpen,
-        RangeClose,
-        Dot,
-        Comma,
-        DoubleColon,
-        Colon,
-        Semicolon,
-        Equal,
-        Assign,
-        NotEqual,
-        AddAssign,
-        SubAssign,
-        ExpAssign,
-        MulAssign,
-        DivAssign,
-        ModAssign,
-        AndAssign,
-        OrAssign,
-        BitAndAssign,
-        BitOrAssign,
-        BitXorAssign,
-        BitLeftAssign,
-        BitRightAssign,
-        Add,
-        Sub,
-        Exp,
-        Mul,
-        Div,
-        Mod,
-        And,
-        Or,
-        Not,
-        Question,
-        BitAnd,
-        BitOr,
-        BitNot,
-        BitXor,
-        BitLeft,
-        BitRight,
-        GreaterThanOrEqual,
-        LessThanOrEqual,
-        GreaterThan,
-        LessThan,
-      ])
-    );
-  }
+        assert_eq!(
+            lex(source).map(|(_, token_list)| token_list),
+            Ok(tokens![
+                LeftParens,
+                RightParens,
+                LeftBracket,
+                RightBracket,
+                LeftBrace,
+                RightBrace,
+                Hashtag,
+                ChainArrow,
+                ReturnArrow,
+                BranchArrow,
+                RangeOpen,
+                RangeClose,
+                Dot,
+                Comma,
+                DoubleColon,
+                Colon,
+                Semicolon,
+                Equal,
+                Assign,
+                NotEqual,
+                AddAssign,
+                SubAssign,
+                ExpAssign,
+                MulAssign,
+                DivAssign,
+                ModAssign,
+                AndAssign,
+                OrAssign,
+                BitAndAssign,
+                BitOrAssign,
+                BitXorAssign,
+                BitLeftAssign,
+                BitRightAssign,
+                Add,
+                Sub,
+                Exp,
+                Mul,
+                Div,
+                Mod,
+                And,
+                Or,
+                Not,
+                Question,
+                BitAnd,
+                BitOr,
+                BitNot,
+                BitXor,
+                BitLeft,
+                BitRight,
+                GreaterThanOrEqual,
+                LessThanOrEqual,
+                GreaterThan,
+                LessThan,
+            ])
+        );
+    }
 }
