@@ -12,9 +12,11 @@ include = ["LICENSE", "Cargo.toml", "src/**/*.rs"]
 members = [
   "danube-cli",
   "danube-compiler",
+  "danube-hir",
   "danube-ir",
   "danube-lex",
   "danube-macro",
+  "danube-parse",
   "danube-parser",
   "danube-runtime-javascript",
   "danube-runtime-jvm",

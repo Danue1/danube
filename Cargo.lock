@@ -37,16 +37,43 @@ version = "0.1.0"
 name = "danube-compiler"
 version = "0.1.0"
 dependencies = [
- "danube-parser 0.1.0",
+ "danube-ir 0.1.0",
+]
+
+[[package]]
+name = "danube-hir"
+version = "0.1.0"
+dependencies = [
+ "danube-parse 0.1.0",
 ]
 
 [[package]]
 name = "danube-ir"
 version = "0.1.0"
+dependencies = [
+ "danube-hir 0.1.0",
+]
+
+[[package]]
+name = "danube-lex"
+version = "0.1.0"
+dependencies = [
+ "nom 5.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "nom_locate 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
 [[package]]
 name = "danube-macro"
 version = "0.1.0"
+
+[[package]]
+name = "danube-parse"
+version = "0.1.0"
+dependencies = [
+ "danube-lex 0.1.0",
+ "nom 5.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "nom_locate 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
 [[package]]
 name = "danube-parser"
@@ -60,20 +87,29 @@ dependencies = [
 name = "danube-runtime-javascript"
 version = "0.1.0"
 dependencies = [
- "danube-parser 0.1.0",
+ "danube-compiler 0.1.0",
 ]
 
 [[package]]
 name = "danube-runtime-jvm"
 version = "0.1.0"
+dependencies = [
+ "danube-compiler 0.1.0",
+]
 
 [[package]]
 name = "danube-runtime-native"
 version = "0.1.0"
+dependencies = [
+ "danube-compiler 0.1.0",
+]
 
 [[package]]
 name = "danube-runtime-wasm"
 version = "0.1.0"
+dependencies = [
+ "danube-compiler 0.1.0",
+]
 
 [[package]]
 name = "danube-vm"

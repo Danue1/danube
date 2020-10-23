@@ -1,9 +1,9 @@
 [package]
-name = "danube-ir"
+name = "danube-hir"
 version = "0.1.0"
 authors = ["Danuel <public.danuel@gmail.com>"]
 edition = "2018"
 
 
 [dependencies]
-danube-hir = { path = "../danube-hir" }
+danube-parse = { path = "../danube-parse" }
