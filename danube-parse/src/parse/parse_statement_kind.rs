@@ -2,7 +2,9 @@ use super::*;
 
 pub(super) fn parse_statement_kind(t: Tokens) -> ParseResult<StatementKind> {
     alt((
-        map(parse_item_kind, |node| StatementKind::Item(Box::new(node))),
+        map(parse_attributed(parse_item_kind), |node| {
+            StatementKind::Item(Box::new(node))
+        }),
         map(parse_compound_assign_node, |node| {
             StatementKind::CompoundAssign(Box::new(node))
         }),

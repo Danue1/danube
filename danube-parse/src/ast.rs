@@ -33,16 +33,18 @@ pub enum LiteralKind {
 
 #[derive(Debug, PartialEq)]
 pub struct ProgramNode {
-    pub item_list: Vec<Attributed<ItemKind>>,
+    pub item_list: Vec<Item>,
 }
+
+pub type Item = Attributed<ItemKind>;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum ItemKind {
     Use(UseNode),
-    Module(Module),
-    Struct(Struct),
-    Enum(Enum),
-    Function(Function),
+    Module(ModuleNode),
+    Struct(StructNode),
+    Enum(EnumNode),
+    Function(FunctionNode),
     TypeAlias(TypeAliasNode),
     Trait(TraitNode),
     Constant(ConstantNode),
@@ -93,15 +95,11 @@ pub enum UseExtraKind {
     Extra(IdentNode, Box<UseKind<UseExtraKind>>),
 }
 
-pub type Module = Attributed<ModuleNode>;
-
 #[derive(Debug, PartialEq, Clone)]
 pub struct ModuleNode {
     pub ident: IdentNode,
-    pub item_list: Option<Vec<ItemKind>>,
+    pub item_list: Option<Vec<Item>>,
 }
-
-pub type Struct = Attributed<StructNode>;
 
 pub type GenericNodeList = Vec<GenericNode>;
 
@@ -157,8 +155,6 @@ pub struct TypeArrayNode {
     pub size: usize,
 }
 
-pub type Enum = Attributed<EnumNode>;
-
 #[derive(Debug, PartialEq, Clone)]
 pub struct EnumNode {
     pub visibility: VisibilityKind,
@@ -182,8 +178,6 @@ pub struct EnumUnnamedVariantNode {
 pub struct EnumNamedVariantNode {
     pub node_list: Vec<(IdentNode, TypeKind)>,
 }
-
-pub type Function = Attributed<FunctionNode>;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct FunctionNode {
@@ -210,7 +204,7 @@ pub struct BlockNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum StatementKind {
-    Item(Box<ItemKind>),
+    Item(Box<Item>),
     CompoundAssign(Box<CompoundAssignNode>),
     Let(Box<LetNode>),
     Expression(ExpressionKind),
