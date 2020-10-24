@@ -7,7 +7,7 @@ pub(super) fn parse_struct_named_field_node(t: Tokens) -> ParseResult<StructName
             separated_nonempty_list(
                 parse_symbol(Symbol::Colon),
                 tuple((
-                    parse_immutablity_kind,
+                    parse_visibility_kind,
                     parse_ident_node,
                     preceded(parse_symbol(Symbol::Colon), parse_type_kind),
                 )),

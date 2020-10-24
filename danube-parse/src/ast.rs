@@ -126,7 +126,7 @@ pub enum StructFieldKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct StructUnnamedFieldNode {
-    pub node_list: Vec<(ImmutablityKind, TypeKind)>,
+    pub node_list: Vec<(VisibilityKind, TypeKind)>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -137,7 +137,7 @@ pub enum ImmutablityKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct StructNamedFieldNode {
-    pub node_list: Vec<(ImmutablityKind, IdentNode, TypeKind)>,
+    pub node_list: Vec<(VisibilityKind, IdentNode, TypeKind)>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
