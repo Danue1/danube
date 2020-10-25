@@ -20,8 +20,8 @@ pub use token::*;
 type LexSpan<'a> = nom_locate::LocatedSpan<&'a str>;
 type LexResult<'a, T> = nom::IResult<LexSpan<'a>, T, LexError>;
 
-pub fn lex(s: &str) -> LexResult<Vec<Token>> {
-    fold_many0(
+pub fn lex(s: &str) -> Result<Vec<Token>, LexError> {
+    match fold_many0(
         alt((map(parse_ignorable, |_| None), map(parse_token, Some))),
         vec![],
         |mut token_list, token| {
@@ -31,6 +31,10 @@ pub fn lex(s: &str) -> LexResult<Vec<Token>> {
             token_list
         },
     )(nom_locate::LocatedSpan::new(s))
+    {
+        Ok((_, token_list)) => Ok(token_list),
+        Err(error) => Err(error.into()),
+    }
 }
 
 fn parse_token(s: LexSpan) -> LexResult<Token> {

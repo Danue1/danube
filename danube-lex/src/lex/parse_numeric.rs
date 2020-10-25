@@ -60,47 +60,35 @@ mod tests {
     #[test]
     fn int() {
         let source = r#"1"#;
-        assert_eq!(
-            lex(source).map(|(_, token_list)| token_list),
-            Ok(vec![Token::IntLiteral(1)])
-        );
+        assert_eq!(lex(source), Ok(vec![Token::IntLiteral(1)]));
     }
 
     #[test]
     fn float() {
         let source = r#"1.0"#;
-        assert_eq!(
-            lex(source).map(|(_, token_list)| token_list),
-            Ok(vec![Token::FloatLiteral(1.0)])
-        );
+        assert_eq!(lex(source), Ok(vec![Token::FloatLiteral(1.0)]));
 
         let source = r#"-1.0"#;
         assert_eq!(
-            lex(source).map(|(_, token_list)| token_list),
+            lex(source),
             Ok(vec![Token::Symbol(Symbol::Sub), Token::FloatLiteral(1.0)])
         );
 
         let source = r#"1e0"#;
-        assert_eq!(
-            lex(source).map(|(_, token_list)| token_list),
-            Ok(vec![Token::FloatLiteral(1e0)])
-        );
+        assert_eq!(lex(source), Ok(vec![Token::FloatLiteral(1e0)]));
 
         let source = r#"-1e0"#;
         assert_eq!(
-            lex(source).map(|(_, token_list)| token_list),
+            lex(source),
             Ok(vec![Token::Symbol(Symbol::Sub), Token::FloatLiteral(1e0)])
         );
 
         let source = r#"1.0e0"#;
-        assert_eq!(
-            lex(source).map(|(_, token_list)| token_list),
-            Ok(vec![Token::FloatLiteral(1.0e0)])
-        );
+        assert_eq!(lex(source), Ok(vec![Token::FloatLiteral(1.0e0)]));
 
         let source = r#"-1.0e0"#;
         assert_eq!(
-            lex(source).map(|(_, token_list)| token_list),
+            lex(source),
             Ok(vec![Token::Symbol(Symbol::Sub), Token::FloatLiteral(1.0e0)])
         );
     }

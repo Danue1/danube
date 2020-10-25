@@ -5,6 +5,7 @@ use nom::error::ErrorKind;
 pub enum ParseError {
     Nom(usize, usize, ErrorKind),
     Needed(nom::Needed),
+    Lex(danube_lex::LexError),
     Parse(usize, usize, ErrorKind),
 }
 
@@ -25,6 +26,12 @@ impl<'a> nom::error::ParseError<Tokens<'a>> for ParseError {
 
     fn append(_: Tokens, _: ErrorKind, other: Self) -> Self {
         other
+    }
+}
+
+impl From<danube_lex::LexError> for ParseError {
+    fn from(e: danube_lex::LexError) -> ParseError {
+        ParseError::Lex(e)
     }
 }
 

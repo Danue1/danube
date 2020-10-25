@@ -146,7 +146,7 @@ impl std::str::FromStr for Program {
     type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (_, token_list) = lex(s).unwrap();
+        let token_list = lex(s)?;
 
         match parse_program(Tokens::new(&token_list)) {
             Ok((_, program)) => Ok(program),

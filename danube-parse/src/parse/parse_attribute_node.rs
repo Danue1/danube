@@ -42,7 +42,7 @@ mod tests {
     use super::*;
 
     fn parse(s: &str) -> AttributeNode {
-        let (_, token_list) = lex(s).unwrap();
+        let token_list = lex(s).unwrap();
         match parse_attribute_node(Tokens::new(&token_list)) {
             Ok((_, node)) => node,
             Err(error) => {

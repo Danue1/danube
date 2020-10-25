@@ -72,7 +72,7 @@ mod tests {
         let source = r#"if else for while loop in break continue match return yield where
 const static let mut fn trait struct type enum impl mod Self self pub async await use super as _"#;
         assert_eq!(
-            lex(source).map(|(_, token_list)| token_list),
+            lex(source),
             Ok(keywords![
                 If,
                 Else,

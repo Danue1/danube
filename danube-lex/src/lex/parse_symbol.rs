@@ -112,7 +112,7 @@ mod tests {
     << >> >= <= > <
     ";
         assert_eq!(
-            lex(source).map(|(_, token_list)| token_list),
+            lex(source),
             Ok(tokens![
                 LeftParens,
                 RightParens,

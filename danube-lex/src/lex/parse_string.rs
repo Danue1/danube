@@ -38,14 +38,14 @@ mod tests {
     fn string() {
         let source = "\"foo\"";
         assert_eq!(
-            lex(source).map(|(_, token_list)| token_list),
+            lex(source),
             Ok(vec![Token::StringLiteral("foo".to_owned())])
         );
 
         let source = "\"foo
 bar\"";
         assert_eq!(
-            lex(source).map(|(_, token_list)| token_list),
+            lex(source),
             Ok(vec![Token::StringLiteral("foo\nbar".to_owned())])
         );
     }
