@@ -48,9 +48,7 @@ mod parse_statement_kind;
 mod parse_static_node;
 mod parse_string;
 mod parse_struct_field_kind;
-mod parse_struct_named_field_node;
 mod parse_struct_node;
-mod parse_struct_unnamed_field_node;
 mod parse_symbol;
 mod parse_trait_item_constant_node;
 mod parse_trait_item_function_node;
@@ -70,7 +68,6 @@ mod parse_visibility_kind;
 mod parse_while_node;
 
 use crate::*;
-#[cfg(test)]
 use danube_lex::lex;
 use danube_lex::{Keyword, Symbol, Token, Tokens};
 use nom::{branch::*, bytes::complete::*, combinator::*, multi::*, sequence::*};
@@ -124,9 +121,7 @@ use parse_statement_kind::parse_statement_kind;
 use parse_static_node::parse_static_node;
 use parse_string::parse_string;
 use parse_struct_field_kind::parse_struct_field_kind;
-use parse_struct_named_field_node::parse_struct_named_field_node;
 use parse_struct_node::parse_struct_node;
-use parse_struct_unnamed_field_node::parse_struct_unnamed_field_node;
 use parse_symbol::parse_symbol;
 use parse_trait_item_constant_node::parse_trait_item_constant_node;
 use parse_trait_item_function_node::parse_trait_item_function_node;
@@ -145,8 +140,23 @@ use parse_value_kind::parse_value_kind;
 use parse_visibility_kind::parse_visibility_kind;
 use parse_while_node::parse_while_node;
 
-type ParseResult<'a, T> = nom::IResult<Tokens<'a>, T, ParseError<'a>>;
+type ParseResult<'a, T> = nom::IResult<Tokens<'a>, T, ParseError>;
 
-pub fn parse(t: Tokens) -> ParseResult<Program> {
-    parse_program(t)
+impl std::str::FromStr for Program {
+    type Err = ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let (_, token_list) = lex(s).unwrap();
+
+        match parse_program(Tokens::new(&token_list)) {
+            Ok((_, program)) => Ok(program),
+            Err(error) => Err(error.into()),
+        }
+    }
+}
+
+impl Program {
+    pub fn from_tokens(t: Tokens) -> ParseResult<Program> {
+        parse_program(t)
+    }
 }

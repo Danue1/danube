@@ -2,7 +2,7 @@ use crate::*;
 
 impl Default for VisibilityKind {
     fn default() -> Self {
-        VisibilityKind::TypeSelf
+        VisibilityKind::Current
     }
 }
 

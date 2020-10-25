@@ -1,6 +1,12 @@
 use super::*;
 
 pub(super) fn parse_visibility_kind(t: Tokens) -> ParseResult<VisibilityKind> {
+    alt((should_parse_visibility_kind, |t| {
+        Ok((t, VisibilityKind::Current))
+    }))(t)
+}
+
+fn should_parse_visibility_kind(t: Tokens) -> ParseResult<VisibilityKind> {
     let (s, _) = parse_keyword(Keyword::Public)(t)?;
 
     match tuple((

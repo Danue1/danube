@@ -8,7 +8,7 @@ pub(super) fn parse_function_node(t: Tokens) -> ParseResult<FunctionNode> {
             parse_ident_node,
             parse_generic_node_list,
             parse_function_argument_node_list,
-            parse_return_type,
+            opt(parse_return_type),
             parse_function_body,
         )),
         |(visibility, _, ident, generic_list, (self_type, argument_list), return_type, block)| {

@@ -10,6 +10,7 @@ pub(super) fn parse_function_argument_node_list(
                 parse_function_argument_node_list_0,
                 parse_function_argument_node_list_1,
                 parse_function_argument_node_list_2,
+                |t| Ok((t, Default::default())),
             )),
             parse_symbol(Symbol::RightParens),
         )),

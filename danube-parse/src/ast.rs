@@ -61,7 +61,7 @@ pub struct UseNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum VisibilityKind {
-    TypeSelf,
+    Current,
     Public,
     Super,
     Module,
@@ -120,24 +120,14 @@ pub struct GenericNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum StructFieldKind {
-    Unnamed(StructUnnamedFieldNode),
-    Named(StructNamedFieldNode),
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct StructUnnamedFieldNode {
-    pub node_list: Vec<(VisibilityKind, TypeKind)>,
+    Unnamed(Vec<(VisibilityKind, TypeKind)>),
+    Named(Vec<(VisibilityKind, IdentNode, TypeKind)>),
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum ImmutablityKind {
     Yes,
     Nope,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct StructNamedFieldNode {
-    pub node_list: Vec<(VisibilityKind, IdentNode, TypeKind)>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -186,7 +176,7 @@ pub struct FunctionNode {
     pub generic_list: GenericNodeList,
     pub self_type: Option<ImmutablityKind>,
     pub argument_list: Vec<FunctionArgumentNode>,
-    pub return_type: TypeKind,
+    pub return_type: Option<TypeKind>,
     pub block: BlockNode,
 }
 
