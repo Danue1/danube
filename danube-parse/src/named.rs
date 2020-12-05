@@ -40,12 +40,6 @@ impl Named for FunctionNode {
     }
 }
 
-impl Named for FunctionArgumentNode {
-    fn name(&self) -> &str {
-        self.ident.name()
-    }
-}
-
 impl Named for GenericNode {
     fn name(&self) -> &str {
         self.ident.name()

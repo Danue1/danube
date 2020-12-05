@@ -183,7 +183,7 @@ pub struct FunctionNode {
 #[derive(Debug, PartialEq, Clone)]
 pub struct FunctionArgumentNode {
     pub immutablity: ImmutablityKind,
-    pub ident: IdentNode,
+    pub pattern: PatternKind,
     pub ty: Option<TypeKind>,
 }
 
