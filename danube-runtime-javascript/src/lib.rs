@@ -1,6 +1,6 @@
 mod transpile;
 
-use danube_parser::*;
+use danube_parse::*;
 use transpile::*;
 
 pub fn create_runtime(source: &str, config: &Config) -> String {

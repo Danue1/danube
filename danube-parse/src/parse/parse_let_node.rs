@@ -1,10 +1,9 @@
 use super::*;
 
-pub(super) fn parse_let_node(t: Tokens) -> ParseResult<LetNode> {
+pub fn parse_let_node(t: Tokens) -> ParseResult<LetNode> {
     map(
         tuple((
             parse_keyword(Keyword::Let),
-            parse_immutablity_kind,
             parse_pattern_kind,
             opt(map(
                 tuple((parse_symbol(Symbol::Colon), parse_type_kind)),
@@ -16,11 +15,6 @@ pub(super) fn parse_let_node(t: Tokens) -> ParseResult<LetNode> {
             )),
             parse_symbol(Symbol::Semicolon),
         )),
-        |(_, immutablity, pattern, ty, value, _)| LetNode {
-            immutablity,
-            pattern,
-            ty,
-            value,
-        },
+        |(_, pattern, ty, value, _)| LetNode { pattern, ty, value },
     )(t)
 }

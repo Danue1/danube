@@ -44,7 +44,6 @@ pub(super) fn parse_identifier(s: LexSpan) -> LexResult<Identifier> {
         "Self" => Identifier::Reserved(Keyword::TypeSelf),
         "self" => Identifier::Reserved(Keyword::VariableSelf),
         "pub" => Identifier::Reserved(Keyword::Public),
-        "async" => Identifier::Reserved(Keyword::Async),
         "await" => Identifier::Reserved(Keyword::Await),
         "use" => Identifier::Reserved(Keyword::Use),
         "super" => Identifier::Reserved(Keyword::Super),
@@ -70,7 +69,7 @@ mod tests {
         }
 
         let source = r#"if else for while loop in break continue match return yield where
-const static let mut fn trait struct type enum impl mod Self self pub async await use super as _"#;
+const static let mut fn trait struct type enum impl mod Self self pub await use super as _"#;
         assert_eq!(
             lex(source),
             Ok(keywords![
@@ -100,7 +99,6 @@ const static let mut fn trait struct type enum impl mod Self self pub async awai
                 TypeSelf,
                 VariableSelf,
                 Public,
-                Async,
                 Await,
                 Use,
                 Super,

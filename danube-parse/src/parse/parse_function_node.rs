@@ -1,26 +1,19 @@
 use super::*;
 
-pub(super) fn parse_function_node(t: Tokens) -> ParseResult<FunctionNode> {
+pub fn parse_function_node(t: Tokens) -> ParseResult<FunctionNode> {
     map(
         tuple((
-            parse_visibility_kind,
             parse_keyword(Keyword::Function),
             parse_ident_node,
-            parse_generic_node_list,
-            parse_function_argument_node_list,
+            parse_function_parameter_node_list,
             opt(parse_return_type),
             parse_function_body,
         )),
-        |(visibility, _, ident, generic_list, (self_type, argument_list), return_type, block)| {
-            FunctionNode {
-                visibility,
-                ident,
-                generic_list,
-                self_type,
-                argument_list,
-                return_type,
-                block,
-            }
+        |(_, ident, parameter_list, return_type, block)| FunctionNode {
+            ident,
+            parameter_list,
+            return_type,
+            block,
         },
     )(t)
 }
@@ -40,8 +33,25 @@ fn parse_function_body_shortcut(t: Tokens) -> ParseResult<BlockNode> {
             parse_expression_kind,
             parse_symbol(Symbol::Semicolon),
         )),
-        |(_, expression, _)| BlockNode {
-            statement_list: vec![StatementKind::Expression(expression)],
-        },
+        |(_, expression, _)| block![StatementKind::Expression(expression)],
     )(t)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn empty() {
+        let source = r#"fn a() { }"#;
+        assert_eq!(
+            parse_by(source, parse_function_node),
+            FunctionNode {
+                ident: ident!("a".into()),
+                parameter_list: Default::default(),
+                return_type: None,
+                block: block![]
+            }
+        );
+    }
 }

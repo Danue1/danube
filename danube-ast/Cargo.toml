@@ -1,5 +1,5 @@
 [package]
-name = "danube-hir"
+name = "danube-ast"
 version = "0.1.0"
 authors = ["Danuel <public.danuel@gmail.com>"]
 edition = "2018"

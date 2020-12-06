@@ -1,13 +1,11 @@
 use super::*;
 
-pub(super) fn parse_path_node(t: Tokens) -> ParseResult<PathNode> {
+pub fn parse_path_node(t: Tokens) -> ParseResult<PathNode> {
     map(
         separated_nonempty_list(
             parse_symbol(Symbol::DoubleColon),
             alt((
-                map(parse_keyword(Keyword::TypeSelf), |_| IdentNode {
-                    raw: "Self".to_owned(),
-                }),
+                map(parse_keyword(Keyword::TypeSelf), |_| ident!("Self".into())),
                 parse_ident_node,
             )),
         ),

@@ -2,7 +2,7 @@ use super::*;
 use std::collections::HashMap;
 use std::iter::FromIterator;
 
-pub(super) fn parse_attribute_node(t: Tokens) -> ParseResult<AttributeNode> {
+pub fn parse_attribute_node(t: Tokens) -> ParseResult<AttributeNode> {
     map(
         tuple((
             parse_symbol(Symbol::Hashtag),
@@ -41,28 +41,13 @@ fn parse_attribute_argument_node(t: Tokens) -> ParseResult<(String, Option<Liter
 mod tests {
     use super::*;
 
-    fn parse(s: &str) -> AttributeNode {
-        let token_list = lex(s).unwrap();
-        match parse_attribute_node(Tokens::new(&token_list)) {
-            Ok((_, node)) => node,
-            Err(error) => {
-                dbg!(error);
-                panic!();
-            }
-        }
-    }
-
     #[test]
     fn base() {
         let source = r#"#[foo]"#;
         assert_eq!(
-            parse(source),
+            parse_by(source, parse_attribute_node),
             AttributeNode {
-                path: PathNode {
-                    ident_list: vec![IdentNode {
-                        raw: "foo".to_owned(),
-                    }],
-                },
+                path: path![ident!("foo".into())],
                 args: Default::default(),
             }
         );
@@ -72,13 +57,9 @@ mod tests {
     fn a_argument() {
         let source = r#"#[foo(bar)]"#;
         assert_eq!(
-            parse(source),
+            parse_by(source, parse_attribute_node),
             AttributeNode {
-                path: PathNode {
-                    ident_list: vec![IdentNode {
-                        raw: "foo".to_owned(),
-                    }],
-                },
+                path: path![ident!("foo".into())],
                 args: vec![("bar".to_owned(), None)].into_iter().collect(),
             }
         );
@@ -88,13 +69,9 @@ mod tests {
     fn a_argument_value() {
         let source = r#"#[foo(bar="baz")]"#;
         assert_eq!(
-            parse(source),
+            parse_by(source, parse_attribute_node),
             AttributeNode {
-                path: PathNode {
-                    ident_list: vec![IdentNode {
-                        raw: "foo".to_owned(),
-                    }],
-                },
+                path: path![ident!("foo".into())],
                 args: vec![(
                     "bar".to_owned(),
                     Some(LiteralKind::String("baz".to_owned()))
@@ -109,13 +86,9 @@ mod tests {
     fn two_arguments() {
         let source = r#"#[foo(bar, baz)]"#;
         assert_eq!(
-            parse(source),
+            parse_by(source, parse_attribute_node),
             AttributeNode {
-                path: PathNode {
-                    ident_list: vec![IdentNode {
-                        raw: "foo".to_owned(),
-                    }],
-                },
+                path: path![ident!("foo".into())],
                 args: vec![("bar".to_owned(), None), ("baz".to_owned(), None)]
                     .into_iter()
                     .collect(),

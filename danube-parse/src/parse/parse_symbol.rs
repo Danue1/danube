@@ -1,6 +1,6 @@
 use super::*;
 
-pub(super) fn parse_symbol(symbol: Symbol) -> impl Fn(Tokens) -> ParseResult<()> {
+pub fn parse_symbol(symbol: Symbol) -> impl Fn(Tokens) -> ParseResult<()> {
     move |t: Tokens| {
         let (t, token) = take(1usize)(t)?;
 

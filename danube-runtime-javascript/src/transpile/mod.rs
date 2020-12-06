@@ -22,7 +22,7 @@ use block_node::transpile_block_node;
 use compound_assign_kind::transpile_compound_assign_kind;
 use compound_assign_node::transpile_compound_assign_node;
 use constant_node::transpile_constant_node;
-use danube_parser::*;
+use danube_parse::*;
 use expression_kind::transpile_expression_kind;
 use function_argument_node::transpile_function_argument_node;
 use function_node::transpile_function_node;

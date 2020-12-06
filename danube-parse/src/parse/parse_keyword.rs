@@ -1,17 +1,17 @@
 use super::*;
 
-pub(super) fn parse_keyword(keyword: Keyword) -> impl Fn(Tokens) -> ParseResult<()> {
+pub fn parse_keyword(keyword: Keyword) -> impl Fn(Tokens) -> ParseResult<()> {
     move |t: Tokens| {
-        let (t, token) = take(1usize)(t)?;
-
-        if let Token::Keyword(ref k) = token.list[0] {
-            if k == &keyword {
-                return Ok((t, ()));
+        map_opt(take(1usize), |t: Tokens| {
+            if let Token::Keyword(ref k) = t.list[0] {
+                if k == &keyword {
+                    Some(())
+                } else {
+                    None
+                }
+            } else {
+                None
             }
-        }
-        Err(nom::Err::Error(nom::error_position!(
-            t,
-            nom::error::ErrorKind::Count
-        )))
+        })(t)
     }
 }

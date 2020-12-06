@@ -1,6 +1,6 @@
 use super::*;
 
-pub(super) fn parse_block_node(t: Tokens) -> ParseResult<BlockNode> {
+pub fn parse_block_node(t: Tokens) -> ParseResult<BlockNode> {
     map(
         tuple((
             parse_symbol(Symbol::LeftBrace),
@@ -9,4 +9,15 @@ pub(super) fn parse_block_node(t: Tokens) -> ParseResult<BlockNode> {
         )),
         |(_, statement_list, _)| BlockNode { statement_list },
     )(t)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn base() {
+        let source = r#"{}"#;
+        assert_eq!(parse_by(source, parse_block_node), block![],);
+    }
 }

@@ -18,9 +18,9 @@ use parse_symbol::parse_symbol;
 pub use token::*;
 
 type LexSpan<'a> = nom_locate::LocatedSpan<&'a str>;
-type LexResult<'a, T> = nom::IResult<LexSpan<'a>, T, LexError>;
+type LexResult<'a, T> = nom::IResult<LexSpan<'a>, T, Error>;
 
-pub fn lex(s: &str) -> Result<Vec<Token>, LexError> {
+pub fn lex(s: &str) -> Result<Vec<Token>, Error> {
     match fold_many0(
         alt((map(parse_ignorable, |_| None), map(parse_token, Some))),
         vec![],
