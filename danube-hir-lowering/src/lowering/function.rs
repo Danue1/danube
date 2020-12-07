@@ -1,6 +1,5 @@
-use danube_hir::{FunctionBody, FunctionDeclaration};
-
 use super::*;
+use danube_hir::*;
 use std::collections::HashSet;
 
 impl HirContext {
@@ -12,6 +11,9 @@ impl HirContext {
 
         let function_declaration = self.lower_function_declaration(function)?;
         let function_body = self.lower_function_body(function)?;
+
+        self.insert_function_declaration(function.ident.raw.as_ref(), function_declaration);
+        self.insert_function_body(function_body);
 
         Ok(())
     }
@@ -81,11 +83,64 @@ impl HirContext {
         Ok(())
     }
 
-    fn lower_function_declaration(&self, function: &danube_ast::FunctionNode) -> HirResult<()> {
-        Ok(())
+    fn lower_function_declaration(
+        &self,
+        function: &danube_ast::FunctionNode,
+    ) -> HirResult<FunctionDeclaration> {
+        Ok(FunctionDeclaration {
+            argument_list: function
+                .parameter_list
+                .iter()
+                .map(|parameter| FunctionArgument {
+                    ident: Ident {
+                        name: parameter.argument_label.raw.to_owned(),
+                    },
+                    ty: TypeKind::Path(Path {
+                        resolve: ResolveKind::Primitive(PrimitiveKind::Int),
+                    }),
+                })
+                .collect(),
+            return_type: FunctionReturnTypeKind::Unit,
+        })
     }
 
-    fn lower_function_body(&self, function: &danube_ast::FunctionNode) -> HirResult<()> {
-        Ok(())
+    fn lower_function_body(
+        &mut self,
+        function: &danube_ast::FunctionNode,
+    ) -> HirResult<FunctionBody> {
+        Ok(FunctionBody {
+            parameter_list: function
+                .parameter_list
+                .iter()
+                .map(|parameter| FunctionParameter {
+                    ident: Ident {
+                        name: parameter.label.raw.to_owned(),
+                    },
+                    ty: TypeKind::Path(Path {
+                        resolve: ResolveKind::Primitive(PrimitiveKind::Int),
+                    }),
+                })
+                .collect(),
+            value: ExpressionKind::Literal(LiteralKind::Int(0)),
+        })
+    }
+
+    pub fn insert_function_declaration(
+        &mut self,
+        name: &str,
+        function_declaration: FunctionDeclaration,
+    ) {
+        self.insert_item(Item {
+            ident: Ident {
+                name: name.to_owned(),
+            },
+            attribute_list: Default::default(),
+            kind: ItemKind::Function(function_declaration),
+        });
+    }
+
+    pub fn insert_function_body(&mut self, function_body: FunctionBody) {
+        let id = self.next_id().into();
+        self.function_bodies.insert(id, function_body);
     }
 }

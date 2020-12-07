@@ -1,4 +1,5 @@
 use super::*;
+use danube_hir::Item;
 use std::ops::Deref;
 
 impl HirContext {
@@ -15,5 +16,10 @@ impl HirContext {
         }
 
         Ok(())
+    }
+
+    pub fn insert_item(&mut self, item: Item) {
+        let id = self.next_id().into();
+        self.items.insert(id, item);
     }
 }

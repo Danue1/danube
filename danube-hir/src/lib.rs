@@ -22,7 +22,6 @@ pub struct Feature {
 
 #[derive(Debug, PartialEq)]
 pub struct Item {
-    pub id: Id,
     pub ident: Ident,
     pub attribute_list: Vec<Attribute>,
     pub kind: ItemKind,
