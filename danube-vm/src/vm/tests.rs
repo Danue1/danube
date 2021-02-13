@@ -22,7 +22,7 @@ fn opcode_halting() {
 #[test]
 fn opcode_jump() {
     let mut vm = vm! {
-        constint8 #0, [1];
+        consti8 #0, [1];
         jmp #0;
     };
     vm.run_once();
@@ -35,7 +35,7 @@ fn opcode_jump() {
 #[test]
 fn opcode_jump_back() {
     let mut vm = vm! {
-        constint8 #0, [5];
+        consti8 #0, [5];
         jmpb #0;
     };
     vm.run_once();
@@ -48,7 +48,7 @@ fn opcode_jump_back() {
 #[test]
 fn opcode_jump_front() {
     let mut vm = vm! {
-        constint8 #0, [5];
+        consti8 #0, [5];
         jmpf #0;
     };
     vm.run_once();
@@ -61,7 +61,7 @@ fn opcode_jump_front() {
 #[test]
 fn opcode_const_int8() {
     let mut vm = vm! {
-        constint8 #0, [244];
+        consti8 #0, [244];
     };
     vm.run();
     assert_eq!(vm.register_list[0], 244);
@@ -71,7 +71,7 @@ fn opcode_const_int8() {
 fn opcode_const_int16() {
     let mut vm = vm! {
         // CONST16 #0 500
-        constint16 #0, [1, 244];
+        consti16 #0, [1, 244];
     };
     vm.run();
     assert_eq!(vm.register_list[0], 500);
@@ -81,7 +81,7 @@ fn opcode_const_int16() {
 fn opcode_const_int32() {
     let mut vm = vm! {
         // CONST32 #0 500
-        constint32 #0, [0, 0, 1, 244];
+        consti32 #0, [0, 0, 1, 244];
     };
     vm.run();
     assert_eq!(vm.register_list[0], 500);
@@ -91,7 +91,7 @@ fn opcode_const_int32() {
 fn opcode_const_int64() {
     let mut vm = vm! {
         // CONST64 #0 500
-        constint64 #0, [0, 0, 0, 0, 0, 0, 1, 244];
+        consti64 #0, [0, 0, 0, 0, 0, 0, 1, 244];
     };
     vm.run();
     assert_eq!(vm.register_list[0], 500);
@@ -120,8 +120,8 @@ fn opcode_const_float64() {
 #[test]
 fn opcode_add_int() {
     let mut vm = vm! {
-        constint8 #0, [7];
-        constint8 #1, [14];
+        consti8 #0, [7];
+        consti8 #1, [14];
         addi #0, #1, #2;
     };
     vm.run();
@@ -133,8 +133,8 @@ fn opcode_add_int() {
 #[test]
 fn opcode_sub_int() {
     let mut vm = vm! {
-        constint8 #0, [244];
-        constint8 #1, [144];
+        consti8 #0, [244];
+        consti8 #1, [144];
         subi #0, #1, #2;
     };
     vm.run();
@@ -146,8 +146,8 @@ fn opcode_sub_int() {
 #[test]
 fn opcode_mul_int() {
     let mut vm = vm! {
-        constint8 #0, [3];
-        constint8 #1, [4];
+        consti8 #0, [3];
+        consti8 #1, [4];
         muli #0, #1, #2;
     };
     vm.run();
@@ -159,8 +159,8 @@ fn opcode_mul_int() {
 #[test]
 fn opcode_div_int() {
     let mut vm = vm! {
-        constint8 #0, [5];
-        constint8 #1, [4];
+        consti8 #0, [5];
+        consti8 #1, [4];
         divi #0, #1, #2;
     };
     vm.run();
