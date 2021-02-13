@@ -22,7 +22,7 @@ fn opcode_halting() {
 #[test]
 fn opcode_jump() {
     let mut vm = vm! {
-        load8 #0, [1];
+        constint8 #0, [1];
         jmp #0;
     };
     vm.run_once();
@@ -35,7 +35,7 @@ fn opcode_jump() {
 #[test]
 fn opcode_jump_back() {
     let mut vm = vm! {
-        load8 #0, [5];
+        constint8 #0, [5];
         jmpb #0;
     };
     vm.run_once();
@@ -48,7 +48,7 @@ fn opcode_jump_back() {
 #[test]
 fn opcode_jump_front() {
     let mut vm = vm! {
-        load8 #0, [5];
+        constint8 #0, [5];
         jmpf #0;
     };
     vm.run_once();
@@ -59,70 +59,70 @@ fn opcode_jump_front() {
 }
 
 #[test]
-fn opcode_load8() {
+fn opcode_const_int8() {
     let mut vm = vm! {
-        load8 #0, [244];
+        constint8 #0, [244];
     };
     vm.run();
     assert_eq!(vm.register_list[0], 244);
 }
 
 #[test]
-fn opcode_load16() {
+fn opcode_const_int16() {
     let mut vm = vm! {
-        // LOAD16 0 500
-        load16 #0, [1, 244];
+        // CONST16 #0 500
+        constint16 #0, [1, 244];
     };
     vm.run();
     assert_eq!(vm.register_list[0], 500);
 }
 
 #[test]
-fn opcode_load32() {
+fn opcode_const_int32() {
     let mut vm = vm! {
-        // LOAD32 0 500
-        load32 #0, [0, 0, 1, 244];
+        // CONST32 #0 500
+        constint32 #0, [0, 0, 1, 244];
     };
     vm.run();
     assert_eq!(vm.register_list[0], 500);
 }
 
 #[test]
-fn opcode_load64() {
+fn opcode_const_int64() {
     let mut vm = vm! {
-        // LOAD64 0 500
-        load64 #0, [0, 0, 0, 0, 0, 0, 1, 244];
+        // CONST64 #0 500
+        constint64 #0, [0, 0, 0, 0, 0, 0, 1, 244];
     };
     vm.run();
     assert_eq!(vm.register_list[0], 500);
 }
 
 #[test]
-fn opcode_load_float32() {
+fn opcode_const_float32() {
     let mut vm = vm! {
-        // LOADF32 0 1.5
-        loadf32 #0, [63, 192, 0, 0];
+        // CONSTF32 #0 1.5
+        constf32 #0, [63, 192, 0, 0];
     };
     vm.run();
     assert_eq!(vm.float_register_list[0], 1.5);
 }
 
 #[test]
-fn opcode_load_float64() {
+fn opcode_const_float64() {
     let mut vm = vm! {
-        // LOADF64 0 1.5
-        loadf64 #0, [63, 248, 0, 0, 0, 0, 0, 0];
+        // CONSTF64 #0 1.5
+        constf64 #0, [63, 248, 0, 0, 0, 0, 0, 0];
     };
     vm.run();
     assert_eq!(vm.float_register_list[0], 1.5);
 }
 
 #[test]
-fn opcode_add() {
+fn opcode_add_int() {
     let mut vm = vm! {
-        load8 #0, [7];
-        load8 #1, [14];
-        add #0, #1, #2;
+        constint8 #0, [7];
+        constint8 #1, [14];
+        addi #0, #1, #2;
     };
     vm.run();
     assert_eq!(vm.register_list[0], 7);
@@ -131,11 +131,11 @@ fn opcode_add() {
 }
 
 #[test]
-fn opcode_sub() {
+fn opcode_sub_int() {
     let mut vm = vm! {
-        load8 #0, [244];
-        load8 #1, [144];
-        sub #0, #1, #2;
+        constint8 #0, [244];
+        constint8 #1, [144];
+        subi #0, #1, #2;
     };
     vm.run();
     assert_eq!(vm.register_list[0], 244);
@@ -144,11 +144,11 @@ fn opcode_sub() {
 }
 
 #[test]
-fn opcode_mul() {
+fn opcode_mul_int() {
     let mut vm = vm! {
-        load8 #0, [3];
-        load8 #1, [4];
-        mul #0, #1, #2;
+        constint8 #0, [3];
+        constint8 #1, [4];
+        muli #0, #1, #2;
     };
     vm.run();
     assert_eq!(vm.register_list[0], 3);
@@ -157,11 +157,11 @@ fn opcode_mul() {
 }
 
 #[test]
-fn opcode_div() {
+fn opcode_div_int() {
     let mut vm = vm! {
-        load8 #0, [5];
-        load8 #1, [4];
-        div #0, #1, #2;
+        constint8 #0, [5];
+        constint8 #1, [4];
+        divi #0, #1, #2;
     };
     vm.run();
     assert_eq!(vm.register_list[0], 5);
@@ -170,11 +170,12 @@ fn opcode_div() {
 }
 
 #[test]
-fn opcode_float_add() {
+fn opcode_add_float() {
     let mut vm = vm! {
-        // LOADF32 0 1.5
-        loadf32 #0, [63, 192, 0, 0];
-        loadf32 #1, [64, 32, 0, 0];
+        // CONSTF32 #0 1.5
+        constf32 #0, [63, 192, 0, 0];
+        // CONSTF32 #1 2.5
+        constf32 #1, [64, 32, 0, 0];
         addf #0, #1, #2;
     };
     vm.run();
@@ -184,11 +185,12 @@ fn opcode_float_add() {
 }
 
 #[test]
-fn opcode_float_sub() {
+fn opcode_sub_float() {
     let mut vm = vm! {
-        // LOADF32 0 1.5
-        loadf32 #0, [63, 192, 0, 0];
-        loadf32 #1, [64, 32, 0, 0];
+        // CONSTF32 #0 1.5
+        constf32 #0, [63, 192, 0, 0];
+        // CONSTF32 #1 2.5
+        constf32 #1, [64, 32, 0, 0];
         subf #0, #1, #2;
     };
     vm.run();
@@ -198,11 +200,12 @@ fn opcode_float_sub() {
 }
 
 #[test]
-fn opcode_float_mul() {
+fn opcode_mul_float() {
     let mut vm = vm! {
-        // LOADF32 0 1.5
-        loadf32 #0, [63, 192, 0, 0];
-        loadf32 #1, [64, 32, 0, 0];
+        // CONSTF32 #0 1.5
+        constf32 #0, [63, 192, 0, 0];
+        // CONSTF32 #1 2.5
+        constf32 #1, [64, 32, 0, 0];
         mulf #0, #1, #2;
     };
     vm.run();
@@ -212,11 +215,12 @@ fn opcode_float_mul() {
 }
 
 #[test]
-fn opcode_float_div() {
+fn opcode_div_float() {
     let mut vm = vm! {
-        // LOADF32 0 1.5
-        loadf32 #0, [63, 192, 0, 0];
-        loadf32 #1, [64, 32, 0, 0];
+        // CONSTF32 #0 1.5
+        constf32 #0, [63, 192, 0, 0];
+        // CONSTF32 #1 2.5
+        constf32 #1, [64, 32, 0, 0];
         divf #0, #1, #2;
     };
     vm.run();

@@ -3,18 +3,18 @@
 pub enum Opcode {
     Halting,
 
-    Load8,
-    Load16,
-    Load32,
-    Load64,
+    ConstInt8,
+    ConstInt16,
+    ConstInt32,
+    ConstInt64,
 
-    LoadFloat32,
-    LoadFloat64,
+    ConstFloat32,
+    ConstFloat64,
 
-    Add,
-    Sub,
-    Mul,
-    Div,
+    AddInt,
+    SubInt,
+    MulInt,
+    DivInt,
 
     AddFloat,
     SubFloat,
@@ -34,18 +34,18 @@ pub const JUMP: u8 = Opcode::Jump as u8;
 pub const JUMP_BACK: u8 = Opcode::JumpBack as u8;
 pub const JUMP_FRONT: u8 = Opcode::JumpFront as u8;
 
-pub const LOAD8: u8 = Opcode::Load8 as u8;
-pub const LOAD16: u8 = Opcode::Load16 as u8;
-pub const LOAD32: u8 = Opcode::Load32 as u8;
-pub const LOAD64: u8 = Opcode::Load64 as u8;
+pub const CONST_INT8: u8 = Opcode::ConstInt8 as u8;
+pub const CONST_INT16: u8 = Opcode::ConstInt16 as u8;
+pub const CONST_INT32: u8 = Opcode::ConstInt32 as u8;
+pub const CONST_INT64: u8 = Opcode::ConstInt64 as u8;
 
-pub const LOAD_FLOAT32: u8 = Opcode::LoadFloat32 as u8;
-pub const LOAD_FLOAT64: u8 = Opcode::LoadFloat64 as u8;
+pub const CONST_FLOAT32: u8 = Opcode::ConstFloat32 as u8;
+pub const CONST_FLOAT64: u8 = Opcode::ConstFloat64 as u8;
 
-pub const ADD: u8 = Opcode::Add as u8;
-pub const SUB: u8 = Opcode::Sub as u8;
-pub const MUL: u8 = Opcode::Mul as u8;
-pub const DIV: u8 = Opcode::Div as u8;
+pub const ADD_INT: u8 = Opcode::AddInt as u8;
+pub const SUB_INT: u8 = Opcode::SubInt as u8;
+pub const MUL_INT: u8 = Opcode::MulInt as u8;
+pub const DIV_INT: u8 = Opcode::DivInt as u8;
 
 pub const ADD_FLOAT: u8 = Opcode::AddFloat as u8;
 pub const SUB_FLOAT: u8 = Opcode::SubFloat as u8;
@@ -63,18 +63,18 @@ impl From<u8> for Opcode {
             JUMP_BACK => Opcode::JumpBack,
             JUMP_FRONT => Opcode::JumpFront,
 
-            LOAD_FLOAT32 => Opcode::LoadFloat32,
-            LOAD_FLOAT64 => Opcode::LoadFloat64,
+            CONST_INT8 => Opcode::ConstInt8,
+            CONST_INT16 => Opcode::ConstInt16,
+            CONST_INT32 => Opcode::ConstInt32,
+            CONST_INT64 => Opcode::ConstInt64,
 
-            LOAD8 => Opcode::Load8,
-            LOAD16 => Opcode::Load16,
-            LOAD32 => Opcode::Load32,
-            LOAD64 => Opcode::Load64,
+            CONST_FLOAT32 => Opcode::ConstFloat32,
+            CONST_FLOAT64 => Opcode::ConstFloat64,
 
-            ADD => Opcode::Add,
-            SUB => Opcode::Sub,
-            MUL => Opcode::Mul,
-            DIV => Opcode::Div,
+            ADD_INT => Opcode::AddInt,
+            SUB_INT => Opcode::SubInt,
+            MUL_INT => Opcode::MulInt,
+            DIV_INT => Opcode::DivInt,
 
             ADD_FLOAT => Opcode::AddFloat,
             SUB_FLOAT => Opcode::SubFloat,
@@ -95,18 +95,18 @@ impl From<Opcode> for &'static str {
             Opcode::JumpBack => "JMPB",
             Opcode::JumpFront => "JMPF",
 
-            Opcode::LoadFloat32 => "LOADF32",
-            Opcode::LoadFloat64 => "LOADF64",
+            Opcode::ConstFloat32 => "CONSTF32",
+            Opcode::ConstFloat64 => "CONSTF64",
 
-            Opcode::Load8 => "LOAD8",
-            Opcode::Load16 => "LOAD16",
-            Opcode::Load32 => "LOAD32",
-            Opcode::Load64 => "LOAD64",
+            Opcode::ConstInt8 => "CONSTI8",
+            Opcode::ConstInt16 => "CONSTI16",
+            Opcode::ConstInt32 => "CONSTI32",
+            Opcode::ConstInt64 => "CONSTI64",
 
-            Opcode::Add => "ADD",
-            Opcode::Sub => "SUB",
-            Opcode::Mul => "MUL",
-            Opcode::Div => "DIV",
+            Opcode::AddInt => "ADDI",
+            Opcode::SubInt => "SUBI",
+            Opcode::MulInt => "MULI",
+            Opcode::DivInt => "DIVI",
 
             Opcode::AddFloat => "ADDF",
             Opcode::SubFloat => "SUBF",

@@ -80,48 +80,48 @@ impl VM {
                 self.program_counter += register1 as usize;
             }
 
-            Opcode::Load8 => {
+            Opcode::ConstInt8 => {
                 let register = self.next_1_byte() as usize;
                 self.register_list[register] = self.next_1_byte() as i64;
             }
-            Opcode::Load16 => {
+            Opcode::ConstInt16 => {
                 let register = self.next_1_byte() as usize;
                 self.register_list[register] = self.next_2_bytes() as i64;
             }
-            Opcode::Load32 => {
+            Opcode::ConstInt32 => {
                 let register = self.next_1_byte() as usize;
                 self.register_list[register] = self.next_4_bytes() as i64;
             }
-            Opcode::Load64 => {
+            Opcode::ConstInt64 => {
                 let register = self.next_1_byte() as usize;
                 self.register_list[register] = self.next_8_bytes() as i64;
             }
 
-            Opcode::LoadFloat32 => {
+            Opcode::ConstFloat32 => {
                 let register = self.next_1_byte() as usize;
                 self.float_register_list[register] = f32::from_bits(self.next_4_bytes()) as f64;
             }
-            Opcode::LoadFloat64 => {
+            Opcode::ConstFloat64 => {
                 let register = self.next_1_byte() as usize;
                 self.float_register_list[register] = f64::from_bits(self.next_8_bytes());
             }
 
-            Opcode::Add => {
+            Opcode::AddInt => {
                 let register1 = self.register_list[self.next_1_byte() as usize];
                 let register2 = self.register_list[self.next_1_byte() as usize];
                 self.register_list[self.next_1_byte() as usize] = register1 + register2;
             }
-            Opcode::Sub => {
+            Opcode::SubInt => {
                 let register1 = self.register_list[self.next_1_byte() as usize];
                 let register2 = self.register_list[self.next_1_byte() as usize];
                 self.register_list[self.next_1_byte() as usize] = register1 - register2;
             }
-            Opcode::Mul => {
+            Opcode::MulInt => {
                 let register1 = self.register_list[self.next_1_byte() as usize];
                 let register2 = self.register_list[self.next_1_byte() as usize];
                 self.register_list[self.next_1_byte() as usize] = register1 * register2;
             }
-            Opcode::Div => {
+            Opcode::DivInt => {
                 let register1 = self.register_list[self.next_1_byte() as usize];
                 let register2 = self.register_list[self.next_1_byte() as usize];
                 self.register_list[self.next_1_byte() as usize] = register1 / register2;

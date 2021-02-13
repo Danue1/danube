@@ -30,46 +30,46 @@ macro_rules! internal_vm {
         internal_vm!($vm $($t)*)
     };
 
-    ($vm:ident load8 #$register1:expr, [$operand1:expr]; $($t:tt)*) => {
-        $vm.append_program(&[LOAD8, $register1, $operand1]);
+    ($vm:ident constint8 #$register1:expr, [$operand1:expr]; $($t:tt)*) => {
+        $vm.append_program(&[CONST_INT8, $register1, $operand1]);
         internal_vm!($vm $($t)*)
     };
-    ($vm:ident load16 #$register1:expr, [$operand1:expr, $operand2:expr]; $($t:tt)*) => {
-        $vm.append_program(&[LOAD16, $register1, $operand1, $operand2]);
+    ($vm:ident constint16 #$register1:expr, [$operand1:expr, $operand2:expr]; $($t:tt)*) => {
+        $vm.append_program(&[CONST_INT16, $register1, $operand1, $operand2]);
         internal_vm!($vm $($t)*)
     };
-    ($vm:ident load32 #$register1:expr, [$operand1:expr, $operand2:expr, $operand3:expr, $operand4:expr]; $($t:tt)*) => {
-        $vm.append_program(&[LOAD32, $register1, $operand1, $operand2, $operand3, $operand4]);
+    ($vm:ident constint32 #$register1:expr, [$operand1:expr, $operand2:expr, $operand3:expr, $operand4:expr]; $($t:tt)*) => {
+        $vm.append_program(&[CONST_INT32, $register1, $operand1, $operand2, $operand3, $operand4]);
         internal_vm!($vm $($t)*)
     };
-    ($vm:ident load64 #$register1:expr, [$operand1:expr, $operand2:expr, $operand3:expr, $operand4:expr, $operand5:expr, $operand6:expr, $operand7:expr, $operand8:expr]; $($t:tt)*) => {
-        $vm.append_program(&[LOAD64, $register1, $operand1, $operand2, $operand3, $operand4, $operand5, $operand6, $operand7, $operand8]);
-        internal_vm!($vm $($t)*)
-    };
-
-    ($vm:ident loadf32 #$register1:expr, [$operand1:expr, $operand2:expr, $operand3:expr, $operand4:expr]; $($t:tt)*) => {
-        $vm.append_program(&[LOAD_FLOAT32, $register1, $operand1, $operand2, $operand3, $operand4]);
-        internal_vm!($vm $($t)*)
-    };
-    ($vm:ident loadf64 #$register1:expr, [$operand1:expr, $operand2:expr, $operand3:expr, $operand4:expr, $operand5:expr, $operand6:expr, $operand7:expr, $operand8:expr]; $($t:tt)*) => {
-        $vm.append_program(&[LOAD_FLOAT64, $register1, $operand1, $operand2, $operand3, $operand4, $operand5, $operand6, $operand7, $operand8]);
+    ($vm:ident constint64 #$register1:expr, [$operand1:expr, $operand2:expr, $operand3:expr, $operand4:expr, $operand5:expr, $operand6:expr, $operand7:expr, $operand8:expr]; $($t:tt)*) => {
+        $vm.append_program(&[CONST_INT64, $register1, $operand1, $operand2, $operand3, $operand4, $operand5, $operand6, $operand7, $operand8]);
         internal_vm!($vm $($t)*)
     };
 
-    ($vm:ident add #$register1:expr, #$register2:expr, #$register3:expr; $($t:tt)*) => {
-        $vm.append_program(&[ADD, $register1, $register2, $register3]);
+    ($vm:ident constf32 #$register1:expr, [$operand1:expr, $operand2:expr, $operand3:expr, $operand4:expr]; $($t:tt)*) => {
+        $vm.append_program(&[CONST_FLOAT32, $register1, $operand1, $operand2, $operand3, $operand4]);
         internal_vm!($vm $($t)*)
     };
-    ($vm:ident sub #$register1:expr, #$register2:expr, #$register3:expr; $($t:tt)*) => {
-        $vm.append_program(&[SUB, $register1, $register2, $register3]);
+    ($vm:ident constf64 #$register1:expr, [$operand1:expr, $operand2:expr, $operand3:expr, $operand4:expr, $operand5:expr, $operand6:expr, $operand7:expr, $operand8:expr]; $($t:tt)*) => {
+        $vm.append_program(&[CONST_FLOAT64, $register1, $operand1, $operand2, $operand3, $operand4, $operand5, $operand6, $operand7, $operand8]);
         internal_vm!($vm $($t)*)
     };
-    ($vm:ident mul #$register1:expr, #$register2:expr, #$register3:expr; $($t:tt)*) => {
-        $vm.append_program(&[MUL, $register1, $register2, $register3]);
+
+    ($vm:ident addi #$register1:expr, #$register2:expr, #$register3:expr; $($t:tt)*) => {
+        $vm.append_program(&[ADD_INT, $register1, $register2, $register3]);
         internal_vm!($vm $($t)*)
     };
-    ($vm:ident div #$register1:expr, #$register2:expr, #$register3:expr; $($t:tt)*) => {
-        $vm.append_program(&[DIV, $register1, $register2, $register3]);
+    ($vm:ident subi #$register1:expr, #$register2:expr, #$register3:expr; $($t:tt)*) => {
+        $vm.append_program(&[SUB_INT, $register1, $register2, $register3]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident muli #$register1:expr, #$register2:expr, #$register3:expr; $($t:tt)*) => {
+        $vm.append_program(&[MUL_INT, $register1, $register2, $register3]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident divi #$register1:expr, #$register2:expr, #$register3:expr; $($t:tt)*) => {
+        $vm.append_program(&[DIV_INT, $register1, $register2, $register3]);
         internal_vm!($vm $($t)*)
     };
 
