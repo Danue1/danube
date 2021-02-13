@@ -56,7 +56,7 @@ impl VM {
         self.execute_instruction()
     }
 
-    pub fn execute_instruction(&mut self) -> Option<u8> {
+    fn execute_instruction(&mut self) -> Option<u8> {
         if self.program_counter >= self.program.len() {
             return Some(1);
         }

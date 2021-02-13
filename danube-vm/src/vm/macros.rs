@@ -11,6 +11,9 @@ macro_rules! vm {
 #[macro_export]
 macro_rules! internal_vm {
     ($vm:ident) => { };
+    ($vm:ident run();) => {
+        $vm.run();
+    };
 
     ($vm:ident hlt; $($t:tt)*) => {
         $vm.append_program(&[HALTING]);
