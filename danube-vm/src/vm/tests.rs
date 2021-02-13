@@ -70,7 +70,7 @@ fn opcode_const_int8() {
 #[test]
 fn opcode_const_int16() {
     let vm = vm! {
-        // CONST16 #0 500
+        // CONSTI16 #0 500
         consti16 #0, [1, 244];
         run();
     };
@@ -80,7 +80,7 @@ fn opcode_const_int16() {
 #[test]
 fn opcode_const_int32() {
     let vm = vm! {
-        // CONST32 #0 500
+        // CONSTI32 #0 500
         consti32 #0, [0, 0, 1, 244];
         run();
     };
@@ -90,7 +90,7 @@ fn opcode_const_int32() {
 #[test]
 fn opcode_const_int64() {
     let vm = vm! {
-        // CONST64 #0 500
+        // CONSTI64 #0 500
         consti64 #0, [0, 0, 0, 0, 0, 0, 1, 244];
         run();
     };
