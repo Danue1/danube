@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[repr(u8)]
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Opcode {
@@ -25,95 +27,158 @@ pub enum Opcode {
     JumpBack,
     JumpFront,
 
-    Illegal = 255,
+    Illegal(u8),
 }
 
-pub const HALTING: u8 = Opcode::Halting as u8;
+pub const HALTING: u8 = 0;
 
-pub const JUMP: u8 = Opcode::Jump as u8;
-pub const JUMP_BACK: u8 = Opcode::JumpBack as u8;
-pub const JUMP_FRONT: u8 = Opcode::JumpFront as u8;
+pub const JUMP: u8 = 1;
+pub const JUMP_BACK: u8 = 2;
+pub const JUMP_FRONT: u8 = 3;
 
-pub const CONST_INT8: u8 = Opcode::ConstInt8 as u8;
-pub const CONST_INT16: u8 = Opcode::ConstInt16 as u8;
-pub const CONST_INT32: u8 = Opcode::ConstInt32 as u8;
-pub const CONST_INT64: u8 = Opcode::ConstInt64 as u8;
+pub const CONST_INT8: u8 = 4;
+pub const CONST_INT16: u8 = 5;
+pub const CONST_INT32: u8 = 6;
+pub const CONST_INT64: u8 = 7;
 
-pub const CONST_FLOAT32: u8 = Opcode::ConstFloat32 as u8;
-pub const CONST_FLOAT64: u8 = Opcode::ConstFloat64 as u8;
+pub const CONST_FLOAT32: u8 = 8;
+pub const CONST_FLOAT64: u8 = 9;
 
-pub const ADD_INT: u8 = Opcode::AddInt as u8;
-pub const SUB_INT: u8 = Opcode::SubInt as u8;
-pub const MUL_INT: u8 = Opcode::MulInt as u8;
-pub const DIV_INT: u8 = Opcode::DivInt as u8;
+pub const ADD_INT: u8 = 10;
+pub const SUB_INT: u8 = 11;
+pub const MUL_INT: u8 = 12;
+pub const DIV_INT: u8 = 13;
 
-pub const ADD_FLOAT: u8 = Opcode::AddFloat as u8;
-pub const SUB_FLOAT: u8 = Opcode::SubFloat as u8;
-pub const MUL_FLOAT: u8 = Opcode::MulFloat as u8;
-pub const DIV_FLOAT: u8 = Opcode::DivFloat as u8;
+pub const ADD_FLOAT: u8 = 14;
+pub const SUB_FLOAT: u8 = 15;
+pub const MUL_FLOAT: u8 = 16;
+pub const DIV_FLOAT: u8 = 17;
 
-pub const ILLEGAL: u8 = Opcode::Illegal as u8;
+pub const ILLEGAL: u8 = 255;
 
 impl From<u8> for Opcode {
     fn from(opcode: u8) -> Self {
+        use Opcode::*;
+
         match opcode {
-            HALTING => Opcode::Halting,
+            HALTING => Halting,
 
-            JUMP => Opcode::Jump,
-            JUMP_BACK => Opcode::JumpBack,
-            JUMP_FRONT => Opcode::JumpFront,
+            JUMP => Jump,
+            JUMP_BACK => JumpBack,
+            JUMP_FRONT => JumpFront,
 
-            CONST_INT8 => Opcode::ConstInt8,
-            CONST_INT16 => Opcode::ConstInt16,
-            CONST_INT32 => Opcode::ConstInt32,
-            CONST_INT64 => Opcode::ConstInt64,
+            CONST_INT8 => ConstInt8,
+            CONST_INT16 => ConstInt16,
+            CONST_INT32 => ConstInt32,
+            CONST_INT64 => ConstInt64,
 
-            CONST_FLOAT32 => Opcode::ConstFloat32,
-            CONST_FLOAT64 => Opcode::ConstFloat64,
+            CONST_FLOAT32 => ConstFloat32,
+            CONST_FLOAT64 => ConstFloat64,
 
-            ADD_INT => Opcode::AddInt,
-            SUB_INT => Opcode::SubInt,
-            MUL_INT => Opcode::MulInt,
-            DIV_INT => Opcode::DivInt,
+            ADD_INT => AddInt,
+            SUB_INT => SubInt,
+            MUL_INT => MulInt,
+            DIV_INT => DivInt,
 
-            ADD_FLOAT => Opcode::AddFloat,
-            SUB_FLOAT => Opcode::SubFloat,
-            MUL_FLOAT => Opcode::MulFloat,
-            DIV_FLOAT => Opcode::DivFloat,
+            ADD_FLOAT => AddFloat,
+            SUB_FLOAT => SubFloat,
+            MUL_FLOAT => MulFloat,
+            DIV_FLOAT => DivFloat,
 
-            _ => Opcode::Illegal,
+            _ => Illegal(opcode),
         }
     }
 }
 
-impl From<Opcode> for &'static str {
+impl From<Opcode> for u8 {
     fn from(opcode: Opcode) -> Self {
+        use Opcode::*;
+
         match opcode {
-            Opcode::Halting => "HLT",
+            Halting => HALTING,
 
-            Opcode::Jump => "JMP",
-            Opcode::JumpBack => "JMPB",
-            Opcode::JumpFront => "JMPF",
+            Jump => JUMP,
+            JumpBack => JUMP_BACK,
+            JumpFront => JUMP_FRONT,
 
-            Opcode::ConstFloat32 => "CONSTF32",
-            Opcode::ConstFloat64 => "CONSTF64",
+            ConstInt8 => CONST_INT8,
+            ConstInt16 => CONST_INT16,
+            ConstInt32 => CONST_INT32,
+            ConstInt64 => CONST_INT64,
 
-            Opcode::ConstInt8 => "CONSTI8",
-            Opcode::ConstInt16 => "CONSTI16",
-            Opcode::ConstInt32 => "CONSTI32",
-            Opcode::ConstInt64 => "CONSTI64",
+            ConstFloat32 => CONST_FLOAT32,
+            ConstFloat64 => CONST_FLOAT64,
 
-            Opcode::AddInt => "ADDI",
-            Opcode::SubInt => "SUBI",
-            Opcode::MulInt => "MULI",
-            Opcode::DivInt => "DIVI",
+            AddInt => ADD_INT,
+            SubInt => SUB_INT,
+            MulInt => MUL_INT,
+            DivInt => DIV_INT,
 
-            Opcode::AddFloat => "ADDF",
-            Opcode::SubFloat => "SUBF",
-            Opcode::MulFloat => "MULF",
-            Opcode::DivFloat => "DIVF",
+            AddFloat => ADD_FLOAT,
+            SubFloat => SUB_FLOAT,
+            MulFloat => MUL_FLOAT,
+            DivFloat => DIV_FLOAT,
 
-            Opcode::Illegal => "ILG",
+            Illegal(_) => ILLEGAL,
         }
+    }
+}
+
+pub const OPCODE_HALTING: &'static str = "HLT";
+
+pub const OPCODE_JUMP: &'static str = "JMP";
+pub const OPCODE_JUMP_BACK: &'static str = "JMPB";
+pub const OPCODE_JUMP_FRONT: &'static str = "JMPF";
+
+pub const OPCODE_CONST_INT8: &'static str = "CONSTF32";
+pub const OPCODE_CONST_INT16: &'static str = "CONSTF64";
+pub const OPCODE_CONST_INT32: &'static str = "CONSTI8";
+pub const OPCODE_CONST_INT64: &'static str = "CONSTI16";
+pub const OPCODE_CONST_FLOAT32: &'static str = "CONSTI32";
+pub const OPCODE_CONST_FLOAT64: &'static str = "CONSTI64";
+
+pub const OPCODE_ADD_INT: &'static str = "ADDI";
+pub const OPCODE_SUB_INT: &'static str = "SUBI";
+pub const OPCODE_MUL_INT: &'static str = "MULI";
+pub const OPCODE_DIV_INT: &'static str = "DIVI";
+
+pub const OPCODE_ADD_FLOAT: &'static str = "ADDF";
+pub const OPCODE_SUB_FLOAT: &'static str = "SUBF";
+pub const OPCODE_MUL_FLOAT: &'static str = "MULF";
+pub const OPCODE_DIV_FLOAT: &'static str = "DIVF";
+
+impl From<Opcode> for Cow<'static, str> {
+    fn from(opcode: Opcode) -> Self {
+        use Opcode::*;
+
+        let opcode = match opcode {
+            Halting => OPCODE_HALTING,
+
+            Jump => OPCODE_JUMP,
+            JumpBack => OPCODE_JUMP_BACK,
+            JumpFront => OPCODE_JUMP_FRONT,
+
+            ConstFloat32 => OPCODE_CONST_INT8,
+            ConstFloat64 => OPCODE_CONST_INT16,
+
+            ConstInt8 => OPCODE_CONST_INT32,
+            ConstInt16 => OPCODE_CONST_INT64,
+            ConstInt32 => OPCODE_CONST_FLOAT32,
+            ConstInt64 => OPCODE_CONST_FLOAT64,
+
+            AddInt => OPCODE_ADD_INT,
+            SubInt => OPCODE_SUB_INT,
+            MulInt => OPCODE_MUL_INT,
+            DivInt => OPCODE_DIV_INT,
+
+            AddFloat => OPCODE_ADD_FLOAT,
+            SubFloat => OPCODE_SUB_FLOAT,
+            MulFloat => OPCODE_MUL_FLOAT,
+            DivFloat => OPCODE_DIV_FLOAT,
+
+            Illegal(opcode) => return Cow::Owned(format!("ILG({})", opcode)),
+        };
+
+        Cow::Borrowed(opcode)
     }
 }

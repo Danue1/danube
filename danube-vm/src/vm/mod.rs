@@ -148,8 +148,8 @@ impl VM {
                 self.float_register_list[self.next_1_byte() as usize] = register1 / register2;
             }
 
-            Opcode::Illegal => {
-                error!("Unrecognized opcode found! Terminating!");
+            Opcode::Illegal(opcode) => {
+                error!("Unrecognized OPCODE({}) found! Terminating!", opcode);
                 return Some(1);
             }
         }
