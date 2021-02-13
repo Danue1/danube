@@ -1,9 +1,7 @@
 #[macro_export]
 macro_rules! vm {
-    () => {
-        VM::new();
-    };
     ($($t:tt)*) => {{
+        #[allow(unused_mut)]
         let mut vm = VM::new();
         $crate::internal_vm!(vm, $($t)*);
         vm

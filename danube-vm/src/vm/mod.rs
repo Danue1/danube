@@ -14,7 +14,7 @@ pub struct VM {
     program: Vec<u8>,
 }
 
-macro_rules! info {
+macro_rules! debug_info {
     ($($args:tt)*) => {
         if cfg!(debug_assertions) {
             println!($($args)*);
@@ -29,11 +29,8 @@ macro_rules! error {
 }
 
 macro_rules! program_counter {
-    ($self:ident) => {
-        $self.program[$self.program_counter]
-    };
-    ($self:ident, $counter:expr) => {
-        $self.program[$self.program_counter + $counter]
+    ($self:ident $(, $counter:expr)?) => {
+        $self.program[$self.program_counter $(+ $counter)?]
     };
 }
 
@@ -142,7 +139,7 @@ impl VM {
                 self.program_counter += register1 as usize;
             }
             Opcode::Halting => {
-                info!("Halting encountered.");
+                debug_info!("Halting encountered.");
                 return Some(0);
             }
             Opcode::Illegal => {
