@@ -134,6 +134,7 @@ pub const OPCODE_CONST_INT8: &'static str = "CONSTF32";
 pub const OPCODE_CONST_INT16: &'static str = "CONSTF64";
 pub const OPCODE_CONST_INT32: &'static str = "CONSTI8";
 pub const OPCODE_CONST_INT64: &'static str = "CONSTI16";
+
 pub const OPCODE_CONST_FLOAT32: &'static str = "CONSTI32";
 pub const OPCODE_CONST_FLOAT64: &'static str = "CONSTI64";
 
