@@ -4,8 +4,8 @@ use crate::*;
 #[test]
 fn create_vm() {
     let vm = vm!();
-    assert_eq!(vm.register_list, [0; BIT]);
-    assert_eq!(vm.float_register_list, [0.0; BIT]);
+    assert_eq!(vm.register_list, RegisterList::<i64>::new());
+    assert_eq!(vm.float_register_list, RegisterList::<f64>::new());
     assert_eq!(vm.program_counter, 0);
     assert_eq!(vm.program, vec![]);
 }

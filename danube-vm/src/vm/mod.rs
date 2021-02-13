@@ -2,14 +2,12 @@ mod macros;
 #[cfg(test)]
 mod tests;
 
-use crate::{Instruction, Opcode};
-
-const BIT: usize = 64;
+use crate::{Cursor, Instruction, Opcode, RegisterList};
 
 #[derive(Debug)]
 pub struct VM {
-    register_list: [i64; BIT],
-    float_register_list: [f64; BIT],
+    register_list: RegisterList<i64>,
+    float_register_list: RegisterList<f64>,
     program_counter: usize,
     program: Vec<u8>,
 }
@@ -38,13 +36,19 @@ impl VM {
     #[inline]
     pub const fn new() -> Self {
         VM {
-            register_list: [0; BIT],
-            float_register_list: [0.0; BIT],
+            register_list: RegisterList::<i64>::new(),
+            float_register_list: RegisterList::<f64>::new(),
             program_counter: 0,
             program: vec![],
         }
     }
 
+    #[inline]
+    pub fn append_program(&mut self, program: &[u8]) {
+        self.program.extend(program);
+    }
+
+    #[inline]
     pub fn run(&mut self) -> u8 {
         match self.execute_instruction() {
             Some(code) => code,
@@ -52,6 +56,7 @@ impl VM {
         }
     }
 
+    #[inline]
     pub fn run_once(&mut self) -> Option<u8> {
         self.execute_instruction()
     }
@@ -67,76 +72,76 @@ impl VM {
                 return Some(0);
             }
 
-            Instruction::Jump(register) => {
-                self.program_counter = *register;
+            Instruction::Jump(cursor) => {
+                self.program_counter = self.register_list[cursor] as usize;
             }
-            Instruction::JumpBack(register) => {
-                self.program_counter -= *register;
+            Instruction::JumpBack(cursor) => {
+                self.program_counter -= self.register_list[cursor] as usize;
             }
-            Instruction::JumpFront(register) => {
-                self.program_counter += *register;
-            }
-
-            Instruction::ConstInt8(register, constant) => {
-                self.register_list[*register] = constant.into();
-            }
-            Instruction::ConstInt16(register, constant) => {
-                self.register_list[*register] = constant.into();
-            }
-            Instruction::ConstInt32(register, constant) => {
-                self.register_list[*register] = constant.into();
-            }
-            Instruction::ConstInt64(register, constant) => {
-                self.register_list[*register] = constant.into();
+            Instruction::JumpFront(cursor) => {
+                self.program_counter += self.register_list[cursor] as usize;
             }
 
-            Instruction::ConstFloat32(register, constant) => {
-                self.float_register_list[*register] = constant as f64;
+            Instruction::ConstInt8(cursor, constant) => {
+                self.register_list[cursor] = constant.into();
             }
-            Instruction::ConstFloat64(register, constant) => {
-                self.float_register_list[*register] = constant as f64;
+            Instruction::ConstInt16(cursor, constant) => {
+                self.register_list[cursor] = constant.into();
             }
-
-            Instruction::AddInt(register1, register2, register3) => {
-                let register1 = self.register_list[*register1];
-                let register2 = self.register_list[*register2];
-                self.register_list[*register3] = register1 + register2;
+            Instruction::ConstInt32(cursor, constant) => {
+                self.register_list[cursor] = constant.into();
             }
-            Instruction::SubInt(register1, register2, register3) => {
-                let register1 = self.register_list[*register1];
-                let register2 = self.register_list[*register2];
-                self.register_list[*register3] = register1 - register2;
-            }
-            Instruction::MulInt(register1, register2, register3) => {
-                let register1 = self.register_list[*register1];
-                let register2 = self.register_list[*register2];
-                self.register_list[*register3] = register1 * register2;
-            }
-            Instruction::DivInt(register1, register2, register3) => {
-                let register1 = self.register_list[*register1];
-                let register2 = self.register_list[*register2];
-                self.register_list[*register3] = register1 / register2;
+            Instruction::ConstInt64(cursor, constant) => {
+                self.register_list[cursor] = constant.into();
             }
 
-            Instruction::AddFloat(register1, register2, register3) => {
-                let register1 = self.float_register_list[*register1];
-                let register2 = self.float_register_list[*register2];
-                self.float_register_list[*register3] = register1 + register2;
+            Instruction::ConstFloat32(cursor, constant) => {
+                self.float_register_list[cursor] = constant as f64;
             }
-            Instruction::SubFloat(register1, register2, register3) => {
-                let register1 = self.float_register_list[*register1];
-                let register2 = self.float_register_list[*register2];
-                self.float_register_list[*register3] = register1 - register2;
+            Instruction::ConstFloat64(cursor, constant) => {
+                self.float_register_list[cursor] = constant as f64;
             }
-            Instruction::MulFloat(register1, register2, register3) => {
-                let register1 = self.float_register_list[*register1];
-                let register2 = self.float_register_list[*register2];
-                self.float_register_list[*register3] = register1 * register2;
+
+            Instruction::AddInt(cursor1, cursor2, cursor3) => {
+                let register1 = self.register_list[cursor1];
+                let register2 = self.register_list[cursor2];
+                self.register_list[cursor3] = register1 + register2;
             }
-            Instruction::DivFloat(register1, register2, register3) => {
-                let register1 = self.float_register_list[*register1];
-                let register2 = self.float_register_list[*register2];
-                self.float_register_list[*register3] = register1 / register2;
+            Instruction::SubInt(cursor1, cursor2, cursor3) => {
+                let register1 = self.register_list[cursor1];
+                let register2 = self.register_list[cursor2];
+                self.register_list[cursor3] = register1 - register2;
+            }
+            Instruction::MulInt(cursor1, cursor2, cursor3) => {
+                let register1 = self.register_list[cursor1];
+                let register2 = self.register_list[cursor2];
+                self.register_list[cursor3] = register1 * register2;
+            }
+            Instruction::DivInt(cursor1, cursor2, cursor3) => {
+                let register1 = self.register_list[cursor1];
+                let register2 = self.register_list[cursor2];
+                self.register_list[cursor3] = register1 / register2;
+            }
+
+            Instruction::AddFloat(cursor1, cursor2, cursor3) => {
+                let register1 = self.float_register_list[cursor1];
+                let register2 = self.float_register_list[cursor2];
+                self.float_register_list[cursor3] = register1 + register2;
+            }
+            Instruction::SubFloat(cursor1, cursor2, cursor3) => {
+                let register1 = self.float_register_list[cursor1];
+                let register2 = self.float_register_list[cursor2];
+                self.float_register_list[cursor3] = register1 - register2;
+            }
+            Instruction::MulFloat(cursor1, cursor2, cursor3) => {
+                let register1 = self.float_register_list[cursor1];
+                let register2 = self.float_register_list[cursor2];
+                self.float_register_list[cursor3] = register1 * register2;
+            }
+            Instruction::DivFloat(cursor1, cursor2, cursor3) => {
+                let register1 = self.float_register_list[cursor1];
+                let register2 = self.float_register_list[cursor2];
+                self.float_register_list[cursor3] = register1 / register2;
             }
 
             Instruction::Illegal(opcode) => {
@@ -147,82 +152,74 @@ impl VM {
 
         None
     }
+}
 
-    pub fn append_program(&mut self, program: &[u8]) {
-        self.program.extend(program);
-    }
-
+impl VM {
     fn next_instruction(&mut self) -> Instruction {
         match self.next_opcode() {
             Opcode::Halting => Instruction::Halting,
-            Opcode::Jump => {
-                Instruction::Jump(self.register_list[self.next_1_byte() as usize].into())
-            }
-            Opcode::JumpBack => {
-                Instruction::JumpBack(self.register_list[self.next_1_byte() as usize].into())
-            }
-            Opcode::JumpFront => {
-                Instruction::JumpFront(self.register_list[self.next_1_byte() as usize].into())
-            }
+            Opcode::Jump => Instruction::Jump(self.next_int_cursor()),
+            Opcode::JumpBack => Instruction::JumpBack(self.next_int_cursor()),
+            Opcode::JumpFront => Instruction::JumpFront(self.next_int_cursor()),
             Opcode::ConstInt8 => {
-                Instruction::ConstInt8(self.next_1_byte().into(), self.next_1_byte() as i8)
+                Instruction::ConstInt8(self.next_int_cursor(), self.next_1_byte() as i8)
             }
             Opcode::ConstInt16 => {
-                Instruction::ConstInt16(self.next_1_byte().into(), self.next_2_bytes() as i16)
+                Instruction::ConstInt16(self.next_int_cursor(), self.next_2_bytes() as i16)
             }
             Opcode::ConstInt32 => {
-                Instruction::ConstInt32(self.next_1_byte().into(), self.next_4_bytes() as i32)
+                Instruction::ConstInt32(self.next_int_cursor(), self.next_4_bytes() as i32)
             }
             Opcode::ConstInt64 => {
-                Instruction::ConstInt64(self.next_1_byte().into(), self.next_8_bytes() as i64)
+                Instruction::ConstInt64(self.next_int_cursor(), self.next_8_bytes() as i64)
             }
             Opcode::ConstFloat32 => Instruction::ConstFloat32(
-                self.next_1_byte().into(),
+                self.next_float_cursor(),
                 f32::from_bits(self.next_4_bytes()),
             ),
             Opcode::ConstFloat64 => Instruction::ConstFloat64(
-                self.next_1_byte().into(),
+                self.next_float_cursor(),
                 f64::from_bits(self.next_8_bytes()),
             ),
             Opcode::AddInt => Instruction::AddInt(
-                self.next_1_byte().into(),
-                self.next_1_byte().into(),
-                self.next_1_byte().into(),
+                self.next_int_cursor(),
+                self.next_int_cursor(),
+                self.next_int_cursor(),
             ),
             Opcode::SubInt => Instruction::SubInt(
-                self.next_1_byte().into(),
-                self.next_1_byte().into(),
-                self.next_1_byte().into(),
+                self.next_int_cursor(),
+                self.next_int_cursor(),
+                self.next_int_cursor(),
             ),
             Opcode::MulInt => Instruction::MulInt(
-                self.next_1_byte().into(),
-                self.next_1_byte().into(),
-                self.next_1_byte().into(),
+                self.next_int_cursor(),
+                self.next_int_cursor(),
+                self.next_int_cursor(),
             ),
             Opcode::DivInt => Instruction::DivInt(
-                self.next_1_byte().into(),
-                self.next_1_byte().into(),
-                self.next_1_byte().into(),
+                self.next_int_cursor(),
+                self.next_int_cursor(),
+                self.next_int_cursor(),
             ),
             Opcode::AddFloat => Instruction::AddFloat(
-                self.next_1_byte().into(),
-                self.next_1_byte().into(),
-                self.next_1_byte().into(),
+                self.next_float_cursor(),
+                self.next_float_cursor(),
+                self.next_float_cursor(),
             ),
             Opcode::SubFloat => Instruction::SubFloat(
-                self.next_1_byte().into(),
-                self.next_1_byte().into(),
-                self.next_1_byte().into(),
+                self.next_float_cursor(),
+                self.next_float_cursor(),
+                self.next_float_cursor(),
             ),
             Opcode::MulFloat => Instruction::MulFloat(
-                self.next_1_byte().into(),
-                self.next_1_byte().into(),
-                self.next_1_byte().into(),
+                self.next_float_cursor(),
+                self.next_float_cursor(),
+                self.next_float_cursor(),
             ),
             Opcode::DivFloat => Instruction::DivFloat(
-                self.next_1_byte().into(),
-                self.next_1_byte().into(),
-                self.next_1_byte().into(),
+                self.next_float_cursor(),
+                self.next_float_cursor(),
+                self.next_float_cursor(),
             ),
             Opcode::Illegal(opcode) => Instruction::Illegal(opcode),
         }
@@ -232,6 +229,16 @@ impl VM {
         let opcode = Opcode::from(program_counter!(self));
         self.program_counter += 1;
         opcode
+    }
+
+    #[inline]
+    fn next_int_cursor(&mut self) -> Cursor<i64> {
+        Cursor::<i64>::new(self.next_1_byte())
+    }
+
+    #[inline]
+    fn next_float_cursor(&mut self) -> Cursor<f64> {
+        Cursor::<f64>::new(self.next_1_byte())
     }
 
     fn next_1_byte(&mut self) -> u8 {

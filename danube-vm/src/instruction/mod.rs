@@ -1,54 +1,30 @@
+use crate::Cursor;
+
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Instruction {
     Halting,
 
-    ConstInt8(Register, i8),
-    ConstInt16(Register, i16),
-    ConstInt32(Register, i32),
-    ConstInt64(Register, i64),
+    ConstInt8(Cursor<i64>, i8),
+    ConstInt16(Cursor<i64>, i16),
+    ConstInt32(Cursor<i64>, i32),
+    ConstInt64(Cursor<i64>, i64),
 
-    ConstFloat32(Register, f32),
-    ConstFloat64(Register, f64),
+    ConstFloat32(Cursor<f64>, f32),
+    ConstFloat64(Cursor<f64>, f64),
 
-    Jump(Register),
-    JumpBack(Register),
-    JumpFront(Register),
+    Jump(Cursor<i64>),
+    JumpBack(Cursor<i64>),
+    JumpFront(Cursor<i64>),
 
-    AddInt(Register, Register, Register),
-    SubInt(Register, Register, Register),
-    MulInt(Register, Register, Register),
-    DivInt(Register, Register, Register),
+    AddInt(Cursor<i64>, Cursor<i64>, Cursor<i64>),
+    SubInt(Cursor<i64>, Cursor<i64>, Cursor<i64>),
+    MulInt(Cursor<i64>, Cursor<i64>, Cursor<i64>),
+    DivInt(Cursor<i64>, Cursor<i64>, Cursor<i64>),
 
-    AddFloat(Register, Register, Register),
-    SubFloat(Register, Register, Register),
-    MulFloat(Register, Register, Register),
-    DivFloat(Register, Register, Register),
+    AddFloat(Cursor<f64>, Cursor<f64>, Cursor<f64>),
+    SubFloat(Cursor<f64>, Cursor<f64>, Cursor<f64>),
+    MulFloat(Cursor<f64>, Cursor<f64>, Cursor<f64>),
+    DivFloat(Cursor<f64>, Cursor<f64>, Cursor<f64>),
 
     Illegal(u8),
-}
-
-#[derive(Debug, PartialEq, Clone, Copy)]
-pub struct Register(usize);
-
-impl std::ops::Deref for Register {
-    type Target = usize;
-
-    #[inline]
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl From<i64> for Register {
-    #[inline]
-    fn from(register: i64) -> Self {
-        Register(register as usize)
-    }
-}
-
-impl From<u8> for Register {
-    #[inline]
-    fn from(register: u8) -> Self {
-        Register(register as usize)
-    }
 }
