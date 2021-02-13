@@ -61,10 +61,11 @@ fn opcode_jump_front() {
 #[test]
 fn opcode_const_int8() {
     let vm = vm! {
+        // CONSTI8 -12
         consti8 #0, [244];
         run();
     };
-    assert_eq!(vm.register_list[0], 244);
+    assert_eq!(vm.register_list[0], -12);
 }
 
 #[test]
@@ -133,13 +134,15 @@ fn opcode_add_int() {
 #[test]
 fn opcode_sub_int() {
     let vm = vm! {
+        // CONSTI8 -12
         consti8 #0, [244];
+        // CONSTI8 16
         consti8 #1, [144];
         subi #0, #1, #2;
         run();
     };
-    assert_eq!(vm.register_list[0], 244);
-    assert_eq!(vm.register_list[1], 144);
+    assert_eq!(vm.register_list[0], -12);
+    assert_eq!(vm.register_list[1], -112);
     assert_eq!(vm.register_list[2], 100);
 }
 

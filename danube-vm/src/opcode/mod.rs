@@ -5,6 +5,10 @@ use std::borrow::Cow;
 pub enum Opcode {
     Halting,
 
+    Jump,
+    JumpBack,
+    JumpFront,
+
     ConstInt8,
     ConstInt16,
     ConstInt32,
@@ -22,10 +26,6 @@ pub enum Opcode {
     SubFloat,
     MulFloat,
     DivFloat,
-
-    Jump,
-    JumpBack,
-    JumpFront,
 
     Illegal(u8),
 }

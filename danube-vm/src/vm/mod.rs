@@ -2,7 +2,7 @@ mod macros;
 #[cfg(test)]
 mod tests;
 
-use crate::Opcode;
+use crate::{Instruction, Opcode};
 
 const BIT: usize = 64;
 
@@ -61,94 +61,85 @@ impl VM {
             return Some(1);
         }
 
-        match self.decode_opcode() {
-            Opcode::Halting => {
+        match self.next_instruction() {
+            Instruction::Halting => {
                 debug_info!("Halting encountered.");
                 return Some(0);
             }
 
-            Opcode::Jump => {
-                let register1 = self.register_list[self.next_1_byte() as usize];
-                self.program_counter = register1 as usize;
+            Instruction::Jump(register) => {
+                self.program_counter = *register;
             }
-            Opcode::JumpBack => {
-                let register1 = self.register_list[self.next_1_byte() as usize];
-                self.program_counter -= register1 as usize;
+            Instruction::JumpBack(register) => {
+                self.program_counter -= *register;
             }
-            Opcode::JumpFront => {
-                let register1 = self.register_list[self.next_1_byte() as usize];
-                self.program_counter += register1 as usize;
+            Instruction::JumpFront(register) => {
+                self.program_counter += *register;
             }
 
-            Opcode::ConstInt8 => {
-                let register = self.next_1_byte() as usize;
-                self.register_list[register] = self.next_1_byte() as i64;
+            Instruction::ConstInt8(register, constant) => {
+                self.register_list[*register] = constant.into();
             }
-            Opcode::ConstInt16 => {
-                let register = self.next_1_byte() as usize;
-                self.register_list[register] = self.next_2_bytes() as i64;
+            Instruction::ConstInt16(register, constant) => {
+                self.register_list[*register] = constant.into();
             }
-            Opcode::ConstInt32 => {
-                let register = self.next_1_byte() as usize;
-                self.register_list[register] = self.next_4_bytes() as i64;
+            Instruction::ConstInt32(register, constant) => {
+                self.register_list[*register] = constant.into();
             }
-            Opcode::ConstInt64 => {
-                let register = self.next_1_byte() as usize;
-                self.register_list[register] = self.next_8_bytes() as i64;
+            Instruction::ConstInt64(register, constant) => {
+                self.register_list[*register] = constant.into();
             }
 
-            Opcode::ConstFloat32 => {
-                let register = self.next_1_byte() as usize;
-                self.float_register_list[register] = f32::from_bits(self.next_4_bytes()) as f64;
+            Instruction::ConstFloat32(register, constant) => {
+                self.float_register_list[*register] = constant as f64;
             }
-            Opcode::ConstFloat64 => {
-                let register = self.next_1_byte() as usize;
-                self.float_register_list[register] = f64::from_bits(self.next_8_bytes());
+            Instruction::ConstFloat64(register, constant) => {
+                self.float_register_list[*register] = constant as f64;
             }
 
-            Opcode::AddInt => {
-                let register1 = self.register_list[self.next_1_byte() as usize];
-                let register2 = self.register_list[self.next_1_byte() as usize];
-                self.register_list[self.next_1_byte() as usize] = register1 + register2;
+            Instruction::AddInt(register1, register2, register3) => {
+                let register1 = self.register_list[*register1];
+                let register2 = self.register_list[*register2];
+                self.register_list[*register3] = register1 + register2;
             }
-            Opcode::SubInt => {
-                let register1 = self.register_list[self.next_1_byte() as usize];
-                let register2 = self.register_list[self.next_1_byte() as usize];
-                self.register_list[self.next_1_byte() as usize] = register1 - register2;
+            Instruction::SubInt(register1, register2, register3) => {
+                let register1 = self.register_list[*register1];
+                let register2 = self.register_list[*register2];
+                self.register_list[*register3] = register1 - register2;
             }
-            Opcode::MulInt => {
-                let register1 = self.register_list[self.next_1_byte() as usize];
-                let register2 = self.register_list[self.next_1_byte() as usize];
-                self.register_list[self.next_1_byte() as usize] = register1 * register2;
+            Instruction::MulInt(register1, register2, register3) => {
+                let register1 = self.register_list[*register1];
+                let register2 = self.register_list[*register2];
+                self.register_list[*register3] = register1 * register2;
             }
-            Opcode::DivInt => {
-                let register1 = self.register_list[self.next_1_byte() as usize];
-                let register2 = self.register_list[self.next_1_byte() as usize];
-                self.register_list[self.next_1_byte() as usize] = register1 / register2;
-            }
-
-            Opcode::AddFloat => {
-                let register1 = self.float_register_list[self.next_1_byte() as usize];
-                let register2 = self.float_register_list[self.next_1_byte() as usize];
-                self.float_register_list[self.next_1_byte() as usize] = register1 + register2;
-            }
-            Opcode::SubFloat => {
-                let register1 = self.float_register_list[self.next_1_byte() as usize];
-                let register2 = self.float_register_list[self.next_1_byte() as usize];
-                self.float_register_list[self.next_1_byte() as usize] = register1 - register2;
-            }
-            Opcode::MulFloat => {
-                let register1 = self.float_register_list[self.next_1_byte() as usize];
-                let register2 = self.float_register_list[self.next_1_byte() as usize];
-                self.float_register_list[self.next_1_byte() as usize] = register1 * register2;
-            }
-            Opcode::DivFloat => {
-                let register1 = self.float_register_list[self.next_1_byte() as usize];
-                let register2 = self.float_register_list[self.next_1_byte() as usize];
-                self.float_register_list[self.next_1_byte() as usize] = register1 / register2;
+            Instruction::DivInt(register1, register2, register3) => {
+                let register1 = self.register_list[*register1];
+                let register2 = self.register_list[*register2];
+                self.register_list[*register3] = register1 / register2;
             }
 
-            Opcode::Illegal(opcode) => {
+            Instruction::AddFloat(register1, register2, register3) => {
+                let register1 = self.float_register_list[*register1];
+                let register2 = self.float_register_list[*register2];
+                self.float_register_list[*register3] = register1 + register2;
+            }
+            Instruction::SubFloat(register1, register2, register3) => {
+                let register1 = self.float_register_list[*register1];
+                let register2 = self.float_register_list[*register2];
+                self.float_register_list[*register3] = register1 - register2;
+            }
+            Instruction::MulFloat(register1, register2, register3) => {
+                let register1 = self.float_register_list[*register1];
+                let register2 = self.float_register_list[*register2];
+                self.float_register_list[*register3] = register1 * register2;
+            }
+            Instruction::DivFloat(register1, register2, register3) => {
+                let register1 = self.float_register_list[*register1];
+                let register2 = self.float_register_list[*register2];
+                self.float_register_list[*register3] = register1 / register2;
+            }
+
+            Instruction::Illegal(opcode) => {
                 error!("Unrecognized OPCODE({}) found! Terminating!", opcode);
                 return Some(1);
             }
@@ -161,25 +152,99 @@ impl VM {
         self.program.extend(program);
     }
 
-    fn decode_opcode(&mut self) -> Opcode {
+    fn next_instruction(&mut self) -> Instruction {
+        match self.next_opcode() {
+            Opcode::Halting => Instruction::Halting,
+            Opcode::Jump => {
+                Instruction::Jump(self.register_list[self.next_1_byte() as usize].into())
+            }
+            Opcode::JumpBack => {
+                Instruction::JumpBack(self.register_list[self.next_1_byte() as usize].into())
+            }
+            Opcode::JumpFront => {
+                Instruction::JumpFront(self.register_list[self.next_1_byte() as usize].into())
+            }
+            Opcode::ConstInt8 => {
+                Instruction::ConstInt8(self.next_1_byte().into(), self.next_1_byte() as i8)
+            }
+            Opcode::ConstInt16 => {
+                Instruction::ConstInt16(self.next_1_byte().into(), self.next_2_bytes() as i16)
+            }
+            Opcode::ConstInt32 => {
+                Instruction::ConstInt32(self.next_1_byte().into(), self.next_4_bytes() as i32)
+            }
+            Opcode::ConstInt64 => {
+                Instruction::ConstInt64(self.next_1_byte().into(), self.next_8_bytes() as i64)
+            }
+            Opcode::ConstFloat32 => Instruction::ConstFloat32(
+                self.next_1_byte().into(),
+                f32::from_bits(self.next_4_bytes()),
+            ),
+            Opcode::ConstFloat64 => Instruction::ConstFloat64(
+                self.next_1_byte().into(),
+                f64::from_bits(self.next_8_bytes()),
+            ),
+            Opcode::AddInt => Instruction::AddInt(
+                self.next_1_byte().into(),
+                self.next_1_byte().into(),
+                self.next_1_byte().into(),
+            ),
+            Opcode::SubInt => Instruction::SubInt(
+                self.next_1_byte().into(),
+                self.next_1_byte().into(),
+                self.next_1_byte().into(),
+            ),
+            Opcode::MulInt => Instruction::MulInt(
+                self.next_1_byte().into(),
+                self.next_1_byte().into(),
+                self.next_1_byte().into(),
+            ),
+            Opcode::DivInt => Instruction::DivInt(
+                self.next_1_byte().into(),
+                self.next_1_byte().into(),
+                self.next_1_byte().into(),
+            ),
+            Opcode::AddFloat => Instruction::AddFloat(
+                self.next_1_byte().into(),
+                self.next_1_byte().into(),
+                self.next_1_byte().into(),
+            ),
+            Opcode::SubFloat => Instruction::SubFloat(
+                self.next_1_byte().into(),
+                self.next_1_byte().into(),
+                self.next_1_byte().into(),
+            ),
+            Opcode::MulFloat => Instruction::MulFloat(
+                self.next_1_byte().into(),
+                self.next_1_byte().into(),
+                self.next_1_byte().into(),
+            ),
+            Opcode::DivFloat => Instruction::DivFloat(
+                self.next_1_byte().into(),
+                self.next_1_byte().into(),
+                self.next_1_byte().into(),
+            ),
+            Opcode::Illegal(opcode) => Instruction::Illegal(opcode),
+        }
+    }
+
+    fn next_opcode(&mut self) -> Opcode {
         let opcode = Opcode::from(program_counter!(self));
         self.program_counter += 1;
-        return opcode;
+        opcode
     }
-}
 
-impl VM {
     fn next_1_byte(&mut self) -> u8 {
         let result = program_counter!(self);
         self.program_counter += 1;
-        return result;
+        result
     }
 
     fn next_2_bytes(&mut self) -> u16 {
         let result = ((program_counter!(self) as u16) << 8)
             | ((program_counter!(self, 1) as u16) << (8 * 0));
         self.program_counter += 2;
-        return result;
+        result
     }
 
     fn next_4_bytes(&mut self) -> u32 {
@@ -188,7 +253,7 @@ impl VM {
             | ((program_counter!(self, 2) as u32) << (8 * 1))
             | ((program_counter!(self, 3) as u32) << (8 * 0));
         self.program_counter += 4;
-        return result;
+        result
     }
 
     fn next_8_bytes(&mut self) -> u64 {
@@ -201,6 +266,6 @@ impl VM {
             | ((program_counter!(self, 6) as u64) << (8 * 1))
             | ((program_counter!(self, 7) as u64) << (8 * 0));
         self.program_counter += 8;
-        return result;
+        result
     }
 }
