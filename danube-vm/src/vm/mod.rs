@@ -62,6 +62,24 @@ impl VM {
         }
 
         match self.decode_opcode() {
+            Opcode::Halting => {
+                debug_info!("Halting encountered.");
+                return Some(0);
+            }
+
+            Opcode::Jump => {
+                let register1 = self.register_list[self.next_1_byte() as usize];
+                self.program_counter = register1 as usize;
+            }
+            Opcode::JumpBack => {
+                let register1 = self.register_list[self.next_1_byte() as usize];
+                self.program_counter -= register1 as usize;
+            }
+            Opcode::JumpFront => {
+                let register1 = self.register_list[self.next_1_byte() as usize];
+                self.program_counter += register1 as usize;
+            }
+
             Opcode::Load8 => {
                 let register = self.next_1_byte() as usize;
                 self.register_list[register] = self.next_1_byte() as i64;
@@ -78,6 +96,16 @@ impl VM {
                 let register = self.next_1_byte() as usize;
                 self.register_list[register] = self.next_8_bytes() as i64;
             }
+
+            Opcode::LoadFloat32 => {
+                let register = self.next_1_byte() as usize;
+                self.float_register_list[register] = f32::from_bits(self.next_4_bytes()) as f64;
+            }
+            Opcode::LoadFloat64 => {
+                let register = self.next_1_byte() as usize;
+                self.float_register_list[register] = f64::from_bits(self.next_8_bytes());
+            }
+
             Opcode::Add => {
                 let register1 = self.register_list[self.next_1_byte() as usize];
                 let register2 = self.register_list[self.next_1_byte() as usize];
@@ -98,14 +126,7 @@ impl VM {
                 let register2 = self.register_list[self.next_1_byte() as usize];
                 self.register_list[self.next_1_byte() as usize] = register1 / register2;
             }
-            Opcode::LoadFloat32 => {
-                let register = self.next_1_byte() as usize;
-                self.float_register_list[register] = f32::from_bits(self.next_4_bytes()) as f64;
-            }
-            Opcode::LoadFloat64 => {
-                let register = self.next_1_byte() as usize;
-                self.float_register_list[register] = f64::from_bits(self.next_8_bytes());
-            }
+
             Opcode::AddFloat => {
                 let register1 = self.float_register_list[self.next_1_byte() as usize];
                 let register2 = self.float_register_list[self.next_1_byte() as usize];
@@ -126,22 +147,7 @@ impl VM {
                 let register2 = self.float_register_list[self.next_1_byte() as usize];
                 self.float_register_list[self.next_1_byte() as usize] = register1 / register2;
             }
-            Opcode::Jump => {
-                let register1 = self.register_list[self.next_1_byte() as usize];
-                self.program_counter = register1 as usize;
-            }
-            Opcode::JumpBack => {
-                let register1 = self.register_list[self.next_1_byte() as usize];
-                self.program_counter -= register1 as usize;
-            }
-            Opcode::JumpFront => {
-                let register1 = self.register_list[self.next_1_byte() as usize];
-                self.program_counter += register1 as usize;
-            }
-            Opcode::Halting => {
-                debug_info!("Halting encountered.");
-                return Some(0);
-            }
+
             Opcode::Illegal => {
                 error!("Unrecognized opcode found! Terminating!");
                 return Some(1);

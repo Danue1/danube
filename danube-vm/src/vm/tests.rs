@@ -11,6 +11,54 @@ fn create_vm() {
 }
 
 #[test]
+fn opcode_halting() {
+    let mut vm = vm! {
+        hlt;
+    };
+    vm.run();
+    assert_eq!(vm.program_counter, 1);
+}
+
+#[test]
+fn opcode_jump() {
+    let mut vm = vm! {
+        load8 #0, [1];
+        jmp #0;
+    };
+    vm.run_once();
+    assert_eq!(vm.register_list[0], 1);
+    assert_eq!(vm.program_counter, 3);
+    vm.run_once();
+    assert_eq!(vm.program_counter, 1);
+}
+
+#[test]
+fn opcode_jump_back() {
+    let mut vm = vm! {
+        load8 #0, [5];
+        jmpb #0;
+    };
+    vm.run_once();
+    assert_eq!(vm.register_list[0], 5);
+    assert_eq!(vm.program_counter, 3);
+    vm.run_once();
+    assert_eq!(vm.program_counter, 0);
+}
+
+#[test]
+fn opcode_jump_front() {
+    let mut vm = vm! {
+        load8 #0, [5];
+        jmpf #0;
+    };
+    vm.run_once();
+    assert_eq!(vm.register_list[0], 5);
+    assert_eq!(vm.program_counter, 3);
+    vm.run_once();
+    assert_eq!(vm.program_counter, 10);
+}
+
+#[test]
 fn opcode_load8() {
     let mut vm = vm! {
         load8 #0, [244];
@@ -47,6 +95,26 @@ fn opcode_load64() {
     };
     vm.run();
     assert_eq!(vm.register_list[0], 500);
+}
+
+#[test]
+fn opcode_load_float32() {
+    let mut vm = vm! {
+        // LOADF32 0 1.5
+        loadf32 #0, [63, 192, 0, 0];
+    };
+    vm.run();
+    assert_eq!(vm.float_register_list[0], 1.5);
+}
+
+#[test]
+fn opcode_load_float64() {
+    let mut vm = vm! {
+        // LOADF64 0 1.5
+        loadf64 #0, [63, 248, 0, 0, 0, 0, 0, 0];
+    };
+    vm.run();
+    assert_eq!(vm.float_register_list[0], 1.5);
 }
 
 #[test]
@@ -99,26 +167,6 @@ fn opcode_div() {
     assert_eq!(vm.register_list[0], 5);
     assert_eq!(vm.register_list[1], 4);
     assert_eq!(vm.register_list[2], 1);
-}
-
-#[test]
-fn opcode_load_float32() {
-    let mut vm = vm! {
-        // LOADF32 0 1.5
-        loadf32 #0, [63, 192, 0, 0];
-    };
-    vm.run();
-    assert_eq!(vm.float_register_list[0], 1.5);
-}
-
-#[test]
-fn opcode_load_float64() {
-    let mut vm = vm! {
-        // LOADF64 0 1.5
-        loadf64 #0, [63, 248, 0, 0, 0, 0, 0, 0];
-    };
-    vm.run();
-    assert_eq!(vm.float_register_list[0], 1.5);
 }
 
 #[test]
@@ -175,54 +223,6 @@ fn opcode_float_div() {
     assert_eq!(vm.float_register_list[0], 1.5);
     assert_eq!(vm.float_register_list[1], 2.5);
     assert_eq!(vm.float_register_list[2], 0.6);
-}
-
-#[test]
-fn opcode_jump() {
-    let mut vm = vm! {
-        load8 #0, [1];
-        jmp #0;
-    };
-    vm.run_once();
-    assert_eq!(vm.register_list[0], 1);
-    assert_eq!(vm.program_counter, 3);
-    vm.run_once();
-    assert_eq!(vm.program_counter, 1);
-}
-
-#[test]
-fn opcode_jump_back() {
-    let mut vm = vm! {
-        load8 #0, [5];
-        jmpb #0;
-    };
-    vm.run_once();
-    assert_eq!(vm.register_list[0], 5);
-    assert_eq!(vm.program_counter, 3);
-    vm.run_once();
-    assert_eq!(vm.program_counter, 0);
-}
-
-#[test]
-fn opcode_jump_front() {
-    let mut vm = vm! {
-        load8 #0, [5];
-        jmpf #0;
-    };
-    vm.run_once();
-    assert_eq!(vm.register_list[0], 5);
-    assert_eq!(vm.program_counter, 3);
-    vm.run_once();
-    assert_eq!(vm.program_counter, 10);
-}
-
-#[test]
-fn opcode_halting() {
-    let mut vm = vm! {
-        hlt;
-    };
-    vm.run();
-    assert_eq!(vm.program_counter, 1);
 }
 
 #[test]
