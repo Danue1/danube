@@ -1,3 +1,5 @@
-pub fn hello_world() {
-  std::unimplemented!()
-}
+pub mod opcode;
+pub mod vm;
+
+pub use opcode::*;
+pub use vm::*;
