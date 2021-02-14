@@ -60,7 +60,6 @@ fn instruction_jump_equal() {
     assert_eq!(vm.program_counter, 3);
 }
 
-#[ignore]
 #[test]
 fn instruction_jump_not_equal() {
     let mut vm = vm! {
