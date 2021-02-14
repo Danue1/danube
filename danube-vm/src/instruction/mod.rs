@@ -20,11 +20,15 @@ pub enum Instruction {
     SubInt(Cursor<i64>, Cursor<i64>, Cursor<i64>),
     MulInt(Cursor<i64>, Cursor<i64>, Cursor<i64>),
     DivInt(Cursor<i64>, Cursor<i64>, Cursor<i64>),
+    ModInt(Cursor<i64>, Cursor<i64>, Cursor<i64>),
+    ExpInt(Cursor<i64>, Cursor<i64>, Cursor<i64>),
 
     AddFloat(Cursor<f64>, Cursor<f64>, Cursor<f64>),
     SubFloat(Cursor<f64>, Cursor<f64>, Cursor<f64>),
     MulFloat(Cursor<f64>, Cursor<f64>, Cursor<f64>),
     DivFloat(Cursor<f64>, Cursor<f64>, Cursor<f64>),
+    ModFloat(Cursor<f64>, Cursor<f64>, Cursor<f64>),
+    ExpFloat(Cursor<f64>, Cursor<f64>, Cursor<f64>),
 
     Illegal(u8),
 }

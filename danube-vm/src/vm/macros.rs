@@ -75,6 +75,14 @@ macro_rules! internal_vm {
         $vm.append_program(&[DIV_INT, $register1, $register2, $register3]);
         internal_vm!($vm $($t)*)
     };
+    ($vm:ident modi #$register1:expr, #$register2:expr, #$register3:expr; $($t:tt)*) => {
+        $vm.append_program(&[MOD_INT, $register1, $register2, $register3]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident expi #$register1:expr, #$register2:expr, #$register3:expr; $($t:tt)*) => {
+        $vm.append_program(&[EXP_INT, $register1, $register2, $register3]);
+        internal_vm!($vm $($t)*)
+    };
 
     ($vm:ident addf #$register1:expr, #$register2:expr, #$register3:expr; $($t:tt)*) => {
         $vm.append_program(&[ADD_FLOAT, $register1, $register2, $register3]);
@@ -90,6 +98,14 @@ macro_rules! internal_vm {
     };
     ($vm:ident divf #$register1:expr, #$register2:expr, #$register3:expr; $($t:tt)*) => {
         $vm.append_program(&[DIV_FLOAT, $register1, $register2, $register3]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident modf #$register1:expr, #$register2:expr, #$register3:expr; $($t:tt)*) => {
+        $vm.append_program(&[MOD_FLOAT, $register1, $register2, $register3]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident expf #$register1:expr, #$register2:expr, #$register3:expr; $($t:tt)*) => {
+        $vm.append_program(&[EXP_FLOAT, $register1, $register2, $register3]);
         internal_vm!($vm $($t)*)
     };
 

@@ -172,6 +172,32 @@ fn opcode_div_int() {
 }
 
 #[test]
+fn opcode_mod_int() {
+    let vm = vm! {
+        consti8 #0, [5];
+        consti8 #1, [4];
+        modi #0, #1, #2;
+        run();
+    };
+    assert_eq!(vm.register_list[0], 5);
+    assert_eq!(vm.register_list[1], 4);
+    assert_eq!(vm.register_list[2], 1);
+}
+
+#[test]
+fn opcode_exp_int() {
+    let vm = vm! {
+        consti8 #0, [5];
+        consti8 #1, [4];
+        expi #0, #1, #2;
+        run();
+    };
+    assert_eq!(vm.register_list[0], 5);
+    assert_eq!(vm.register_list[1], 4);
+    assert_eq!(vm.register_list[2], 625);
+}
+
+#[test]
 fn opcode_add_float() {
     let vm = vm! {
         // CONSTF32 #0 1.5
@@ -229,6 +255,36 @@ fn opcode_div_float() {
     assert_eq!(vm.float_register_list[0], 1.5);
     assert_eq!(vm.float_register_list[1], 2.5);
     assert_eq!(vm.float_register_list[2], 0.6);
+}
+
+#[test]
+fn opcode_mod_float() {
+    let vm = vm! {
+        // CONSTF32 #0 1.5
+        constf32 #0, [63, 192, 0, 0];
+        // CONSTF32 #1 2.5
+        constf32 #1, [64, 32, 0, 0];
+        modf #0, #1, #2;
+        run();
+    };
+    assert_eq!(vm.float_register_list[0], 1.5);
+    assert_eq!(vm.float_register_list[1], 2.5);
+    assert_eq!(vm.float_register_list[2], 1.5);
+}
+
+#[test]
+fn opcode_exp_float() {
+    let vm = vm! {
+        // CONSTF32 #0 1.5
+        constf32 #0, [63, 192, 0, 0];
+        // CONSTF32 #1 2.5
+        constf32 #1, [64, 32, 0, 0];
+        expf #0, #1, #2;
+        run();
+    };
+    assert_eq!(vm.float_register_list[0], 1.5);
+    assert_eq!(vm.float_register_list[1], 2.5);
+    assert_eq!(vm.float_register_list[2], 2.7556759606310752);
 }
 
 #[test]

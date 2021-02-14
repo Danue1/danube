@@ -123,6 +123,18 @@ impl VM {
                 let register2 = self.register_list[cursor2];
                 self.register_list[cursor3] = register1 / register2;
             }
+            Instruction::ModInt(cursor1, cursor2, cursor3) => {
+                let register1 = self.register_list[cursor1];
+                let register2 = self.register_list[cursor2];
+                self.register_list[cursor3] = register1 % register2;
+            }
+            Instruction::ExpInt(cursor1, cursor2, cursor3) => {
+                use std::convert::TryInto;
+
+                let register1 = self.register_list[cursor1];
+                let register2 = self.register_list[cursor2];
+                self.register_list[cursor3] = register1.pow(register2.try_into().unwrap());
+            }
 
             Instruction::AddFloat(cursor1, cursor2, cursor3) => {
                 let register1 = self.float_register_list[cursor1];
@@ -144,6 +156,16 @@ impl VM {
                 let register2 = self.float_register_list[cursor2];
                 self.float_register_list[cursor3] = register1 / register2;
             }
+            Instruction::ModFloat(cursor1, cursor2, cursor3) => {
+                let register1 = self.float_register_list[cursor1];
+                let register2 = self.float_register_list[cursor2];
+                self.float_register_list[cursor3] = register1 % register2;
+            }
+            Instruction::ExpFloat(cursor1, cursor2, cursor3) => {
+                let register1 = self.float_register_list[cursor1];
+                let register2 = self.float_register_list[cursor2];
+                self.float_register_list[cursor3] = register1.powf(register2);
+            }
 
             Instruction::Illegal(opcode) => {
                 error!("Unrecognized OPCODE({}) found! Terminating!", opcode);
@@ -159,9 +181,11 @@ impl VM {
     fn next_instruction(&mut self) -> Instruction {
         match self.next_opcode() {
             Ok(Opcode::Halting) => Instruction::Halting,
+
             Ok(Opcode::Jump) => Instruction::Jump(self.next_int_cursor()),
             Ok(Opcode::JumpBack) => Instruction::JumpBack(self.next_int_cursor()),
             Ok(Opcode::JumpFront) => Instruction::JumpFront(self.next_int_cursor()),
+
             Ok(Opcode::ConstInt8) => {
                 Instruction::ConstInt8(self.next_int_cursor(), self.next_1_byte() as i8)
             }
@@ -174,6 +198,7 @@ impl VM {
             Ok(Opcode::ConstInt64) => {
                 Instruction::ConstInt64(self.next_int_cursor(), self.next_8_bytes() as i64)
             }
+
             Ok(Opcode::ConstFloat32) => Instruction::ConstFloat32(
                 self.next_float_cursor(),
                 f32::from_bits(self.next_4_bytes()),
@@ -182,6 +207,7 @@ impl VM {
                 self.next_float_cursor(),
                 f64::from_bits(self.next_8_bytes()),
             ),
+
             Ok(Opcode::AddInt) => Instruction::AddInt(
                 self.next_int_cursor(),
                 self.next_int_cursor(),
@@ -202,6 +228,17 @@ impl VM {
                 self.next_int_cursor(),
                 self.next_int_cursor(),
             ),
+            Ok(Opcode::ModInt) => Instruction::ModInt(
+                self.next_int_cursor(),
+                self.next_int_cursor(),
+                self.next_int_cursor(),
+            ),
+            Ok(Opcode::ExpInt) => Instruction::ExpInt(
+                self.next_int_cursor(),
+                self.next_int_cursor(),
+                self.next_int_cursor(),
+            ),
+
             Ok(Opcode::AddFloat) => Instruction::AddFloat(
                 self.next_float_cursor(),
                 self.next_float_cursor(),
@@ -222,6 +259,17 @@ impl VM {
                 self.next_float_cursor(),
                 self.next_float_cursor(),
             ),
+            Ok(Opcode::ModFloat) => Instruction::ModFloat(
+                self.next_float_cursor(),
+                self.next_float_cursor(),
+                self.next_float_cursor(),
+            ),
+            Ok(Opcode::ExpFloat) => Instruction::ExpFloat(
+                self.next_float_cursor(),
+                self.next_float_cursor(),
+                self.next_float_cursor(),
+            ),
+
             Err(opcode) => Instruction::Illegal(opcode),
         }
     }
