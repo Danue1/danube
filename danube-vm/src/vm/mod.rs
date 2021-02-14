@@ -50,9 +50,10 @@ impl VM {
 
     #[inline]
     pub fn run(&mut self) -> u8 {
-        match self.execute_instruction() {
-            Some(code) => code,
-            None => self.run(),
+        loop {
+            if let Some(code) = self.execute_instruction() {
+                return code;
+            }
         }
     }
 
