@@ -3,6 +3,7 @@ use crate::Cursor;
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Instruction {
     Halting,
+    NoOp,
 
     ConstInt8(Cursor<i64>, i8),
     ConstInt16(Cursor<i64>, i16),

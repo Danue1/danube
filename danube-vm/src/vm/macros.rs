@@ -24,6 +24,10 @@ macro_rules! internal_vm {
         $vm.append_program(&[HALTING]);
         internal_vm!($vm $($t)*)
     };
+    ($vm:ident noop; $($t:tt)*) => {
+        $vm.append_program(&[NO_OP]);
+        internal_vm!($vm $($t)*)
+    };
 
     ($vm:ident consti8 #$register1:expr, [$operand1:expr]; $($t:tt)*) => {
         $vm.append_program(&[CONST_INT8, $register1, $operand1]);

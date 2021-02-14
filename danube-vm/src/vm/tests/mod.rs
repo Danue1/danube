@@ -25,6 +25,15 @@ fn instruction_halting() {
 }
 
 #[test]
+fn instruction_no_op() {
+    let vm = vm! {
+        noop;
+        run();
+    };
+    assert_eq!(vm.program_counter, 1);
+}
+
+#[test]
 fn instruction_illegal() {
     let vm = vm! {
         ilg(200);

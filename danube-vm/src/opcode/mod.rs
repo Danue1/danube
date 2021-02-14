@@ -4,6 +4,7 @@ use Opcode::*;
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Opcode {
     Halting,
+    NoOp,
 
     ConstInt8,
     ConstInt16,
@@ -51,6 +52,7 @@ pub enum Opcode {
 }
 
 pub const HALTING: u8 = Halting as u8;
+pub const NO_OP: u8 = NoOp as u8;
 
 pub const CONST_INT8: u8 = ConstInt8 as u8;
 pub const CONST_INT16: u8 = ConstInt16 as u8;
@@ -102,6 +104,7 @@ impl std::convert::TryFrom<u8> for Opcode {
     fn try_from(opcode: u8) -> Result<Self, Self::Error> {
         match opcode {
             HALTING => Ok(Halting),
+            NO_OP => Ok(NoOp),
 
             CONST_INT8 => Ok(ConstInt8),
             CONST_INT16 => Ok(ConstInt16),

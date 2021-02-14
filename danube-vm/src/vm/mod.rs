@@ -74,6 +74,9 @@ impl VM {
                 debug_info!("Halting encountered.");
                 return Some(0);
             }
+            Instruction::NoOp => {
+                debug_info!("No Op!");
+            }
 
             Instruction::ConstInt8(cursor, constant) => {
                 self.register_list[cursor] = constant.into();
@@ -242,6 +245,7 @@ impl VM {
     fn next_instruction(&mut self) -> Instruction {
         match self.next_opcode() {
             Ok(Opcode::Halting) => Instruction::Halting,
+            Ok(Opcode::NoOp) => Instruction::NoOp,
 
             Ok(Opcode::ConstInt8) => {
                 Instruction::ConstInt8(self.next_int_cursor(), self.next_1_byte() as i8)
