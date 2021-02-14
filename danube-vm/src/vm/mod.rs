@@ -158,76 +158,78 @@ impl VM {
 impl VM {
     fn next_instruction(&mut self) -> Instruction {
         match self.next_opcode() {
-            Opcode::Halting => Instruction::Halting,
-            Opcode::Jump => Instruction::Jump(self.next_int_cursor()),
-            Opcode::JumpBack => Instruction::JumpBack(self.next_int_cursor()),
-            Opcode::JumpFront => Instruction::JumpFront(self.next_int_cursor()),
-            Opcode::ConstInt8 => {
+            Ok(Opcode::Halting) => Instruction::Halting,
+            Ok(Opcode::Jump) => Instruction::Jump(self.next_int_cursor()),
+            Ok(Opcode::JumpBack) => Instruction::JumpBack(self.next_int_cursor()),
+            Ok(Opcode::JumpFront) => Instruction::JumpFront(self.next_int_cursor()),
+            Ok(Opcode::ConstInt8) => {
                 Instruction::ConstInt8(self.next_int_cursor(), self.next_1_byte() as i8)
             }
-            Opcode::ConstInt16 => {
+            Ok(Opcode::ConstInt16) => {
                 Instruction::ConstInt16(self.next_int_cursor(), self.next_2_bytes() as i16)
             }
-            Opcode::ConstInt32 => {
+            Ok(Opcode::ConstInt32) => {
                 Instruction::ConstInt32(self.next_int_cursor(), self.next_4_bytes() as i32)
             }
-            Opcode::ConstInt64 => {
+            Ok(Opcode::ConstInt64) => {
                 Instruction::ConstInt64(self.next_int_cursor(), self.next_8_bytes() as i64)
             }
-            Opcode::ConstFloat32 => Instruction::ConstFloat32(
+            Ok(Opcode::ConstFloat32) => Instruction::ConstFloat32(
                 self.next_float_cursor(),
                 f32::from_bits(self.next_4_bytes()),
             ),
-            Opcode::ConstFloat64 => Instruction::ConstFloat64(
+            Ok(Opcode::ConstFloat64) => Instruction::ConstFloat64(
                 self.next_float_cursor(),
                 f64::from_bits(self.next_8_bytes()),
             ),
-            Opcode::AddInt => Instruction::AddInt(
+            Ok(Opcode::AddInt) => Instruction::AddInt(
                 self.next_int_cursor(),
                 self.next_int_cursor(),
                 self.next_int_cursor(),
             ),
-            Opcode::SubInt => Instruction::SubInt(
+            Ok(Opcode::SubInt) => Instruction::SubInt(
                 self.next_int_cursor(),
                 self.next_int_cursor(),
                 self.next_int_cursor(),
             ),
-            Opcode::MulInt => Instruction::MulInt(
+            Ok(Opcode::MulInt) => Instruction::MulInt(
                 self.next_int_cursor(),
                 self.next_int_cursor(),
                 self.next_int_cursor(),
             ),
-            Opcode::DivInt => Instruction::DivInt(
+            Ok(Opcode::DivInt) => Instruction::DivInt(
                 self.next_int_cursor(),
                 self.next_int_cursor(),
                 self.next_int_cursor(),
             ),
-            Opcode::AddFloat => Instruction::AddFloat(
+            Ok(Opcode::AddFloat) => Instruction::AddFloat(
                 self.next_float_cursor(),
                 self.next_float_cursor(),
                 self.next_float_cursor(),
             ),
-            Opcode::SubFloat => Instruction::SubFloat(
+            Ok(Opcode::SubFloat) => Instruction::SubFloat(
                 self.next_float_cursor(),
                 self.next_float_cursor(),
                 self.next_float_cursor(),
             ),
-            Opcode::MulFloat => Instruction::MulFloat(
+            Ok(Opcode::MulFloat) => Instruction::MulFloat(
                 self.next_float_cursor(),
                 self.next_float_cursor(),
                 self.next_float_cursor(),
             ),
-            Opcode::DivFloat => Instruction::DivFloat(
+            Ok(Opcode::DivFloat) => Instruction::DivFloat(
                 self.next_float_cursor(),
                 self.next_float_cursor(),
                 self.next_float_cursor(),
             ),
-            Opcode::Illegal(opcode) => Instruction::Illegal(opcode),
+            Err(opcode) => Instruction::Illegal(opcode),
         }
     }
 
-    fn next_opcode(&mut self) -> Opcode {
-        let opcode = Opcode::from(program_counter!(self));
+    fn next_opcode(&mut self) -> Result<Opcode, u8> {
+        use std::convert::TryInto;
+
+        let opcode = program_counter!(self).try_into();
         self.program_counter += 1;
         opcode
     }
