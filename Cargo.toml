@@ -19,6 +19,7 @@ members = [
   "danube-lex",
   "danube-macro",
   "danube-parse",
+  "danube-repl",
   "danube-runtime-javascript",
   "danube-runtime-jvm",
   "danube-runtime-native",
