@@ -10,6 +10,7 @@ pub struct VM {
     float_register_list: RegisterList<f64>,
     program_counter: usize,
     program: Vec<u8>,
+    equal_flag: bool,
 }
 
 macro_rules! debug_info {
@@ -40,6 +41,7 @@ impl VM {
             float_register_list: RegisterList::<f64>::new(),
             program_counter: 0,
             program: vec![],
+            equal_flag: false,
         }
     }
 
@@ -71,16 +73,6 @@ impl VM {
             Instruction::Halting => {
                 debug_info!("Halting encountered.");
                 return Some(0);
-            }
-
-            Instruction::Jump(cursor) => {
-                self.program_counter = self.register_list[cursor] as usize;
-            }
-            Instruction::JumpBack(cursor) => {
-                self.program_counter -= self.register_list[cursor] as usize;
-            }
-            Instruction::JumpFront(cursor) => {
-                self.program_counter += self.register_list[cursor] as usize;
             }
 
             Instruction::ConstInt8(cursor, constant) => {
@@ -167,6 +159,75 @@ impl VM {
                 self.float_register_list[cursor3] = register1.powf(register2);
             }
 
+            Instruction::CompareInt(cursor1, cursor2) => {
+                self.equal_flag = self.register_list[cursor1] == self.register_list[cursor2];
+            }
+            Instruction::CompareZeroInt(cursor) => {
+                self.equal_flag = self.register_list[cursor] == 0;
+            }
+            Instruction::CompareNotZeroInt(cursor) => {
+                self.equal_flag = self.register_list[cursor] != 0;
+            }
+            Instruction::GreaterThanInt(cursor1, cursor2) => {
+                self.equal_flag = self.register_list[cursor1] > self.register_list[cursor2];
+            }
+            Instruction::GreaterThanOrEqualInt(cursor1, cursor2) => {
+                self.equal_flag = self.register_list[cursor1] >= self.register_list[cursor2];
+            }
+            Instruction::LessThanInt(cursor1, cursor2) => {
+                self.equal_flag = self.register_list[cursor1] < self.register_list[cursor2];
+            }
+            Instruction::LessThanOrEqualInt(cursor1, cursor2) => {
+                self.equal_flag = self.register_list[cursor1] <= self.register_list[cursor2];
+            }
+
+            Instruction::CompareFloat(cursor1, cursor2) => {
+                self.equal_flag =
+                    self.float_register_list[cursor1] == self.float_register_list[cursor2];
+            }
+            Instruction::CompareZeroFloat(cursor) => {
+                self.equal_flag = self.float_register_list[cursor] == 0.0;
+            }
+            Instruction::CompareNotZeroFloat(cursor) => {
+                self.equal_flag = self.float_register_list[cursor] != 0.0;
+            }
+            Instruction::GreaterThanFloat(cursor1, cursor2) => {
+                self.equal_flag =
+                    self.float_register_list[cursor1] > self.float_register_list[cursor2];
+            }
+            Instruction::GreaterThanOrEqualFloat(cursor1, cursor2) => {
+                self.equal_flag =
+                    self.float_register_list[cursor1] >= self.float_register_list[cursor2];
+            }
+            Instruction::LessThanFloat(cursor1, cursor2) => {
+                self.equal_flag =
+                    self.float_register_list[cursor1] < self.float_register_list[cursor2];
+            }
+            Instruction::LessThanOrEqualFloat(cursor1, cursor2) => {
+                self.equal_flag =
+                    self.float_register_list[cursor1] <= self.float_register_list[cursor2];
+            }
+
+            Instruction::Jump(cursor) => {
+                self.program_counter = self.register_list[cursor] as usize;
+            }
+            Instruction::JumpBack(cursor) => {
+                self.program_counter -= self.register_list[cursor] as usize;
+            }
+            Instruction::JumpFront(cursor) => {
+                self.program_counter += self.register_list[cursor] as usize;
+            }
+            Instruction::JumpEqual(cursor) => {
+                if self.equal_flag {
+                    self.program_counter = self.register_list[cursor] as usize;
+                }
+            }
+            Instruction::JumpNotEqual(cursor) => {
+                if !self.equal_flag {
+                    self.program_counter = self.register_list[cursor] as usize;
+                }
+            }
+
             Instruction::Illegal(opcode) => {
                 error!("Unrecognized OPCODE({}) found! Terminating!", opcode);
                 return Some(1);
@@ -181,10 +242,6 @@ impl VM {
     fn next_instruction(&mut self) -> Instruction {
         match self.next_opcode() {
             Ok(Opcode::Halting) => Instruction::Halting,
-
-            Ok(Opcode::Jump) => Instruction::Jump(self.next_int_cursor()),
-            Ok(Opcode::JumpBack) => Instruction::JumpBack(self.next_int_cursor()),
-            Ok(Opcode::JumpFront) => Instruction::JumpFront(self.next_int_cursor()),
 
             Ok(Opcode::ConstInt8) => {
                 Instruction::ConstInt8(self.next_int_cursor(), self.next_1_byte() as i8)
@@ -269,6 +326,52 @@ impl VM {
                 self.next_float_cursor(),
                 self.next_float_cursor(),
             ),
+
+            Ok(Opcode::CompareInt) => {
+                Instruction::CompareInt(self.next_int_cursor(), self.next_int_cursor())
+            }
+            Ok(Opcode::CompareZeroInt) => Instruction::CompareZeroInt(self.next_int_cursor()),
+            Ok(Opcode::CompareNotZeroInt) => Instruction::CompareNotZeroInt(self.next_int_cursor()),
+            Ok(Opcode::GreaterThanInt) => {
+                Instruction::GreaterThanInt(self.next_int_cursor(), self.next_int_cursor())
+            }
+            Ok(Opcode::GreaterThanOrEqualInt) => {
+                Instruction::GreaterThanOrEqualInt(self.next_int_cursor(), self.next_int_cursor())
+            }
+            Ok(Opcode::LessThanInt) => {
+                Instruction::LessThanInt(self.next_int_cursor(), self.next_int_cursor())
+            }
+            Ok(Opcode::LessThanOrEqualInt) => {
+                Instruction::LessThanOrEqualInt(self.next_int_cursor(), self.next_int_cursor())
+            }
+
+            Ok(Opcode::CompareFloat) => {
+                Instruction::CompareFloat(self.next_float_cursor(), self.next_float_cursor())
+            }
+            Ok(Opcode::CompareZeroFloat) => Instruction::CompareZeroFloat(self.next_float_cursor()),
+            Ok(Opcode::CompareNotZeroFloat) => {
+                Instruction::CompareNotZeroFloat(self.next_float_cursor())
+            }
+            Ok(Opcode::GreaterThanFloat) => {
+                Instruction::GreaterThanFloat(self.next_float_cursor(), self.next_float_cursor())
+            }
+            Ok(Opcode::GreaterThanOrEqualFloat) => Instruction::GreaterThanOrEqualFloat(
+                self.next_float_cursor(),
+                self.next_float_cursor(),
+            ),
+            Ok(Opcode::LessThanFloat) => {
+                Instruction::LessThanFloat(self.next_float_cursor(), self.next_float_cursor())
+            }
+            Ok(Opcode::LessThanOrEqualFloat) => Instruction::LessThanOrEqualFloat(
+                self.next_float_cursor(),
+                self.next_float_cursor(),
+            ),
+
+            Ok(Opcode::Jump) => Instruction::Jump(self.next_int_cursor()),
+            Ok(Opcode::JumpBack) => Instruction::JumpBack(self.next_int_cursor()),
+            Ok(Opcode::JumpFront) => Instruction::JumpFront(self.next_int_cursor()),
+            Ok(Opcode::JumpEqual) => Instruction::JumpEqual(self.next_int_cursor()),
+            Ok(Opcode::JumpNotEqual) => Instruction::JumpNotEqual(self.next_int_cursor()),
 
             Err(opcode) => Instruction::Illegal(opcode),
         }

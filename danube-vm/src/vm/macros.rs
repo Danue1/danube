@@ -14,22 +14,14 @@ macro_rules! internal_vm {
     ($vm:ident run();) => {
         $vm.run();
     };
+    ($vm:ident run($count:expr);) => {
+        for _ in 0..$count {
+            $vm.run_once();
+        }
+    };
 
     ($vm:ident hlt; $($t:tt)*) => {
         $vm.append_program(&[HALTING]);
-        internal_vm!($vm $($t)*)
-    };
-
-    ($vm:ident jmp #$register1:expr; $($t:tt)*) => {
-        $vm.append_program(&[JUMP, $register1]);
-        internal_vm!($vm $($t)*)
-    };
-    ($vm:ident jmpb #$register1:expr; $($t:tt)*) => {
-        $vm.append_program(&[JUMP_BACK, $register1]);
-        internal_vm!($vm $($t)*)
-    };
-    ($vm:ident jmpf #$register1:expr; $($t:tt)*) => {
-        $vm.append_program(&[JUMP_FRONT, $register1]);
         internal_vm!($vm $($t)*)
     };
 
@@ -106,6 +98,85 @@ macro_rules! internal_vm {
     };
     ($vm:ident expf #$register1:expr, #$register2:expr, #$register3:expr; $($t:tt)*) => {
         $vm.append_program(&[EXP_FLOAT, $register1, $register2, $register3]);
+        internal_vm!($vm $($t)*)
+    };
+
+    ($vm:ident cmpi #$register1:expr, #$register2:expr; $($t:tt)*) => {
+        $vm.append_program(&[COMPARE_INT, $register1, $register2]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident cmpzi #$register1:expr; $($t:tt)*) => {
+        $vm.append_program(&[COMPARE_ZERO_INT, $register1]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident cmpnzi #$register1:expr; $($t:tt)*) => {
+        $vm.append_program(&[COMPARE_NOT_ZERO_INT, $register1]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident gti #$register1:expr, #$register2:expr; $($t:tt)*) => {
+        $vm.append_program(&[GREATER_THAN_INT, $register1, $register2]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident gtei #$register1:expr, #$register2:expr; $($t:tt)*) => {
+        $vm.append_program(&[GREATER_THAN_OR_EQUAL_INT, $register1, $register2]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident lti #$register1:expr, #$register2:expr; $($t:tt)*) => {
+        $vm.append_program(&[LESS_THAN_INT, $register1, $register2]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident ltei #$register1:expr, #$register2:expr; $($t:tt)*) => {
+        $vm.append_program(&[LESS_THAN_OR_EQUAL_INT, $register1, $register2]);
+        internal_vm!($vm $($t)*)
+    };
+
+    ($vm:ident cmpf #$register1:expr, #$register2:expr; $($t:tt)*) => {
+        $vm.append_program(&[COMPARE_FLOAT, $register1, $register2]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident cmpzf #$register1:expr; $($t:tt)*) => {
+        $vm.append_program(&[COMPARE_ZERO_FLOAT, $register1]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident cmpnzf #$register1:expr; $($t:tt)*) => {
+        $vm.append_program(&[COMPARE_NOT_ZERO_FLOAT, $register1]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident gtf #$register1:expr, #$register2:expr; $($t:tt)*) => {
+        $vm.append_program(&[GREATER_THAN_FLOAT, $register1, $register2]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident gtef #$register1:expr, #$register2:expr; $($t:tt)*) => {
+        $vm.append_program(&[GREATER_THAN_OR_EQUAL_FLOAT, $register1, $register2]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident ltf #$register1:expr, #$register2:expr; $($t:tt)*) => {
+        $vm.append_program(&[LESS_THAN_FLOAT, $register1, $register2]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident ltef #$register1:expr, #$register2:expr; $($t:tt)*) => {
+        $vm.append_program(&[LESS_THAN_OR_EQUAL_FLOAT, $register1, $register2]);
+        internal_vm!($vm $($t)*)
+    };
+
+    ($vm:ident jmp #$register1:expr; $($t:tt)*) => {
+        $vm.append_program(&[JUMP, $register1]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident jmpb #$register1:expr; $($t:tt)*) => {
+        $vm.append_program(&[JUMP_BACK, $register1]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident jmpf #$register1:expr; $($t:tt)*) => {
+        $vm.append_program(&[JUMP_FRONT, $register1]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident jmpe #$register1:expr; $($t:tt)*) => {
+        $vm.append_program(&[JUMP_EQUAL, $register1]);
+        internal_vm!($vm $($t)*)
+    };
+    ($vm:ident jmpne #$register1:expr; $($t:tt)*) => {
+        $vm.append_program(&[JUMP_NOT_EQUAL, $register1]);
         internal_vm!($vm $($t)*)
     };
 
