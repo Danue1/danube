@@ -18,7 +18,6 @@ pub enum Keyword {
     Mut,          // mut
     Function,     // fn
     Trait,        // trait
-    Struct,       // struct
     Type,         // type
     Enum,         // enum
     Impl,         // impl

@@ -76,8 +76,7 @@ dependencies = [
 name = "danube-lex"
 version = "0.1.0"
 dependencies = [
- "nom",
- "nom_locate",
+ "danube-token",
 ]
 
 [[package]]
@@ -128,6 +127,10 @@ version = "0.1.0"
 dependencies = [
  "danube-compile",
 ]
+
+[[package]]
+name = "danube-token"
+version = "0.1.0"
 
 [[package]]
 name = "danube-vm"
