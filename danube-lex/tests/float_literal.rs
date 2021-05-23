@@ -1,12 +1,12 @@
 use danube_lex::lex;
-use danube_token::{Position, Token, TokenKind};
+use danube_token::{Span, Token, TokenKind};
 
 macro_rules! float_literal {
     ($($expr:expr => $char:expr,)+) => {
         $(
             assert_eq!(
                 Ok(vec![Token {
-                    position: Position::new(0, $expr.len()),
+                    span: Span::new(0, $expr.len()),
                     kind: TokenKind::FloatLiteral($char)
                 }]),
                 lex($expr)

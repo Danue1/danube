@@ -1,12 +1,12 @@
 use danube_lex::lex;
-use danube_token::{Keyword, Position, Token, TokenKind};
+use danube_token::{Keyword, Span, Token, TokenKind};
 
 macro_rules! keyword {
     ($($expr:expr => $keyword:ident,)+) => {
         $(
             assert_eq!(
                 Ok(vec![Token {
-                    position: Position::new(0, $expr.len()),
+                    span: Span::new(0, $expr.len()),
                     kind: TokenKind::Keyword(Keyword::$keyword)
                 }]),
                 lex($expr)
@@ -31,9 +31,8 @@ fn simple() {
         "yield" => Yield,
         "where" => Where,
         "const" => Const,
-        "static" => Static,
         "let" => Let,
-        "mut" => Mut,
+        "mut" => Mutable,
         "fn" => Function,
         "trait" => Trait,
         "type" => Type,
@@ -47,6 +46,7 @@ fn simple() {
         "use" => Use,
         "super" => Super,
         "as" => As,
+        "package" => Package,
         "_" => Placeholder,
     };
 }
