@@ -25,6 +25,7 @@ macro_rules! token {
     };
 }
 
+#[inline]
 fn lex_token(cursor: &mut Cursor) -> LexResult<Option<Token>> {
     let token = match cursor.peek().unwrap() {
         '(' => consume_symbol(cursor, Symbol::LeftParens)?,
@@ -69,6 +70,7 @@ fn lex_token(cursor: &mut Cursor) -> LexResult<Option<Token>> {
     Ok(Some(token))
 }
 
+#[inline]
 fn lex_left_chevron(cursor: &mut Cursor) -> LexResult<Token> {
     let (span, symbol) = cursor.span_by(|cursor| {
         cursor.next();
@@ -94,6 +96,7 @@ fn lex_left_chevron(cursor: &mut Cursor) -> LexResult<Token> {
     Ok(token!(span, TokenKind::Symbol(symbol)))
 }
 
+#[inline]
 fn lex_right_chevron(cursor: &mut Cursor) -> LexResult<Token> {
     let (span, symbol) = cursor.span_by(|cursor| {
         cursor.next();
@@ -119,6 +122,7 @@ fn lex_right_chevron(cursor: &mut Cursor) -> LexResult<Token> {
     Ok(token!(span, TokenKind::Symbol(symbol)))
 }
 
+#[inline]
 fn lex_dot(cursor: &mut Cursor) -> LexResult<Token> {
     let (span, symbol) = cursor.span_by(|cursor| {
         cursor.next();
@@ -143,6 +147,7 @@ fn lex_dot(cursor: &mut Cursor) -> LexResult<Token> {
     }
 }
 
+#[inline]
 fn lex_colon(cursor: &mut Cursor) -> LexResult<Token> {
     let (span, symbol) = cursor.span_by(|cursor| {
         cursor.next();
@@ -158,6 +163,7 @@ fn lex_colon(cursor: &mut Cursor) -> LexResult<Token> {
     Ok(token!(span, TokenKind::Symbol(symbol)))
 }
 
+#[inline]
 fn lex_eq(cursor: &mut Cursor) -> LexResult<Token> {
     let (span, symbol) = cursor.span_by(|cursor| {
         cursor.next();
@@ -177,6 +183,7 @@ fn lex_eq(cursor: &mut Cursor) -> LexResult<Token> {
     Ok(token!(span, TokenKind::Symbol(symbol)))
 }
 
+#[inline]
 fn lex_plus(cursor: &mut Cursor) -> LexResult<Token> {
     let (span, symbol) = cursor.span_by(|cursor| {
         cursor.next();
@@ -192,6 +199,7 @@ fn lex_plus(cursor: &mut Cursor) -> LexResult<Token> {
     Ok(token!(span, TokenKind::Symbol(symbol)))
 }
 
+#[inline]
 fn lex_hyphen(cursor: &mut Cursor) -> LexResult<Token> {
     let (span, symbol) = cursor.span_by(|cursor| {
         cursor.next();
@@ -211,6 +219,7 @@ fn lex_hyphen(cursor: &mut Cursor) -> LexResult<Token> {
     Ok(token!(span, TokenKind::Symbol(symbol)))
 }
 
+#[inline]
 fn lex_asterisk(cursor: &mut Cursor) -> LexResult<Token> {
     let (span, symbol) = cursor.span_by(|cursor| {
         cursor.next();
@@ -236,6 +245,7 @@ fn lex_asterisk(cursor: &mut Cursor) -> LexResult<Token> {
     Ok(token!(span, TokenKind::Symbol(symbol)))
 }
 
+#[inline]
 fn lex_slash(cursor: &mut Cursor) -> LexResult<Option<Token>> {
     let (span, symbol) = cursor.span_by(|cursor| {
         cursor.next();
@@ -260,6 +270,7 @@ fn lex_slash(cursor: &mut Cursor) -> LexResult<Option<Token>> {
     }
 }
 
+#[inline]
 fn lex_percent(cursor: &mut Cursor) -> LexResult<Token> {
     let (span, symbol) = cursor.span_by(|cursor| {
         cursor.next();
@@ -275,6 +286,7 @@ fn lex_percent(cursor: &mut Cursor) -> LexResult<Token> {
     Ok(token!(span, TokenKind::Symbol(symbol)))
 }
 
+#[inline]
 fn lex_exclamation(cursor: &mut Cursor) -> LexResult<Token> {
     let (span, symbol) = cursor.span_by(|cursor| {
         cursor.next();
@@ -290,6 +302,7 @@ fn lex_exclamation(cursor: &mut Cursor) -> LexResult<Token> {
     Ok(token!(span, TokenKind::Symbol(symbol)))
 }
 
+#[inline]
 fn lex_ampersand(cursor: &mut Cursor) -> LexResult<Token> {
     let (span, symbol) = cursor.span_by(|cursor| {
         cursor.next();
@@ -315,6 +328,7 @@ fn lex_ampersand(cursor: &mut Cursor) -> LexResult<Token> {
     Ok(token!(span, TokenKind::Symbol(symbol)))
 }
 
+#[inline]
 fn lex_pipeline(cursor: &mut Cursor) -> LexResult<Token> {
     let (span, symbol) = cursor.span_by(|cursor| {
         cursor.next();
@@ -344,6 +358,7 @@ fn lex_pipeline(cursor: &mut Cursor) -> LexResult<Token> {
     Ok(token!(span, TokenKind::Symbol(symbol)))
 }
 
+#[inline]
 fn lex_tilde(cursor: &mut Cursor) -> LexResult<Token> {
     let (span, symbol) = cursor.span_by(|cursor| {
         cursor.next();
@@ -359,6 +374,7 @@ fn lex_tilde(cursor: &mut Cursor) -> LexResult<Token> {
     Ok(token!(span, TokenKind::Symbol(symbol)))
 }
 
+#[inline]
 fn lex_caret(cursor: &mut Cursor) -> LexResult<Token> {
     let (span, symbol) = cursor.span_by(|cursor| {
         cursor.next();
@@ -374,6 +390,7 @@ fn lex_caret(cursor: &mut Cursor) -> LexResult<Token> {
     Ok(token!(span, TokenKind::Symbol(symbol)))
 }
 
+#[inline]
 fn lex_string(cursor: &mut Cursor) -> LexResult<Token> {
     let (span, literal) = cursor.span_by(|cursor| {
         cursor.next();
@@ -396,6 +413,7 @@ fn lex_string(cursor: &mut Cursor) -> LexResult<Token> {
     Ok(token!(span, TokenKind::StringLiteral(literal)))
 }
 
+#[inline]
 fn lex_char(cursor: &mut Cursor) -> LexResult<Token> {
     let (span, literal) = cursor.span_by(|cursor| {
         cursor.next();
@@ -436,6 +454,7 @@ fn lex_char(cursor: &mut Cursor) -> LexResult<Token> {
     Ok(token!(span, TokenKind::CharLiteral(literal)))
 }
 
+#[inline]
 fn lex_numeric(cursor: &mut Cursor) -> LexResult<Token> {
     let (span, _) = cursor.span_by(|cursor| {
         cursor.consume_while(|c| matches!(c, '0'..='9'));
@@ -457,6 +476,7 @@ fn lex_numeric(cursor: &mut Cursor) -> LexResult<Token> {
     }
 }
 
+#[inline]
 fn lex_float(cursor: &mut Cursor, integer_position: Span) -> LexResult<Token> {
     let (fractional_position, _) = cursor.span_by(|cursor| {
         cursor.consume_while(|c| matches!(c, '0'..='9'));
@@ -478,6 +498,7 @@ fn lex_float(cursor: &mut Cursor, integer_position: Span) -> LexResult<Token> {
     ))
 }
 
+#[inline]
 fn lex_identifier(cursor: &mut Cursor) -> LexResult<Token> {
     let (span, _) = cursor.span_by(|cursor| {
         cursor.consume_while(|c| matches!(c, 'a'..='z' | 'A'..='Z' | '_'));
@@ -513,7 +534,7 @@ fn consume_symbol(cursor: &mut Cursor, symbol: Symbol) -> LexResult<Token> {
         Ok(TokenKind::Symbol(symbol))
     })?;
 
-    Ok(Token { span, kind })
+    Ok(token!(span, kind))
 }
 
 #[inline(always)]
