@@ -3,6 +3,7 @@ use danube_token::{Keyword, Span, Symbol, Token, TokenKind};
 
 pub type LexResult<T> = Result<T, Error>;
 
+#[derive(Clone)]
 pub struct LexIter<'lex> {
     cursor: Cursor<'lex>,
 }

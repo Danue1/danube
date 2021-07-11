@@ -2,6 +2,7 @@ use crate::Error;
 use danube_token::Span;
 use std::str::Chars;
 
+#[derive(Clone)]
 pub(crate) struct Cursor<'lex> {
     source: &'lex str,
     chars: Chars<'lex>,
