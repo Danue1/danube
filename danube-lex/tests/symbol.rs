@@ -1,15 +1,15 @@
-use danube_lex::lex;
+use danube_lex::LexIter;
 use danube_token::{Span, Symbol, Token, TokenKind};
 
 macro_rules! specific_size_symbol {
     ($count:expr, $($expr:expr => $ident:ident,)+) => {
         $(
             assert_eq!(
-                Ok(vec![Token {
+                Some(Ok(Token {
                     span: Span::new(0, $count),
                     kind: TokenKind::Symbol(Symbol::$ident)
-                }]),
-                lex($expr)
+                })),
+                LexIter::new($expr).next(),
             );
         )+
     };

@@ -1,9 +1,9 @@
-use danube_lex::lex;
+use danube_lex::LexIter;
 
 macro_rules! comment {
     ($($expr:expr,)+) => {
         $(
-            assert_eq!(Ok(vec![]), lex($expr));
+            assert_eq!(None, LexIter::new($expr).next());
         )+
     };
 }

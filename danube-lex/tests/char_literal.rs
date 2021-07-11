@@ -1,15 +1,15 @@
-use danube_lex::lex;
+use danube_lex::LexIter;
 use danube_token::{Span, Token, TokenKind};
 
 macro_rules! char_literal {
-    ($($expr:expr => ($char:expr, $count:expr),)+) => {
+    ($($expr:expr => ($expected:expr, $count:expr),)+) => {
         $(
             assert_eq!(
-                Ok(vec![Token {
-                    span: Span::new(0, $count + 2),
-                    kind: TokenKind::CharLiteral($char)
-                }]),
-                lex($expr)
+                Some(Ok(Token {
+                    span: Span::new(0, $count + 1),
+                    kind: TokenKind::CharLiteral($expected)
+                })),
+                LexIter::new($expr).next(),
             );
         )+
     };
@@ -18,9 +18,9 @@ macro_rules! char_literal {
 #[test]
 fn simple() {
     char_literal! {
-        "'a'" => ('a', 1),
-        "'\\r'" => ('\r', 2),
-        "'\\n'" => ('\n', 2),
-        "'\\t'" => ('\t', 2),
+        "'a'" => ('a', 2),
+        "'\\r'" => ('\r', 3),
+        "'\\n'" => ('\n', 3),
+        "'\\t'" => ('\t', 3),
     };
 }

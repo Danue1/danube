@@ -1,15 +1,15 @@
-use danube_lex::lex;
+use danube_lex::LexIter;
 use danube_token::{Span, Token, TokenKind};
 
 macro_rules! float_literal {
     ($($expr:expr => $char:expr,)+) => {
         $(
             assert_eq!(
-                Ok(vec![Token {
+                Some(Ok(Token {
                     span: Span::new(0, $expr.len()),
                     kind: TokenKind::FloatLiteral($char)
-                }]),
-                lex($expr)
+                })),
+                LexIter::new($expr).next(),
             );
         )+
     };

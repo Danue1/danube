@@ -3,17 +3,32 @@ use danube_token::{Keyword, Span, Symbol, Token, TokenKind};
 
 pub type LexResult<T> = Result<T, Error>;
 
-pub fn lex(source: &str) -> LexResult<Vec<Token>> {
-    let mut token_list = vec![];
-    let mut cursor = Cursor::new(source);
+pub struct LexIter<'lex> {
+    cursor: Cursor<'lex>,
+}
 
-    while cursor.peek().is_some() {
-        if let Some(token) = lex_token(&mut cursor)? {
-            token_list.push(token);
+impl<'lex> LexIter<'lex> {
+    pub fn new(source: &'lex str) -> Self {
+        LexIter {
+            cursor: Cursor::<'lex>::new(source),
         }
     }
+}
 
-    Ok(token_list)
+impl<'lex> std::iter::Iterator for LexIter<'lex> {
+    type Item = Result<Token, Error>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.cursor.peek().is_some() {
+            match lex_token(&mut self.cursor) {
+                Ok(None) => None,
+                Ok(Some(token)) => Some(Ok(token)),
+                Err(error) => Some(Err(error)),
+            }
+        } else {
+            None
+        }
+    }
 }
 
 macro_rules! token {
