@@ -1,7 +1,7 @@
-use crate::{Position, TokenKind};
+use crate::{Span, TokenKind};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Token {
-    pub position: Position,
+    pub span: Span,
     pub kind: TokenKind,
 }

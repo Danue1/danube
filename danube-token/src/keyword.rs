@@ -13,9 +13,8 @@ pub enum Keyword {
     Yield,        // yield
     Where,        // where
     Const,        // const
-    Static,       // static
     Let,          // let
-    Mut,          // mut
+    Mutable,      // mut
     Function,     // fn
     Trait,        // trait
     Type,         // type
@@ -29,5 +28,6 @@ pub enum Keyword {
     Use,          // use
     Super,        // super
     As,           // as
+    Package,      // package
     Placeholder,  // _
 }
