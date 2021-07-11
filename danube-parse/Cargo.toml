@@ -5,7 +5,6 @@ authors = ["Danuel <public.danuel@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-nom = "5.1.2"
-nom_locate = "2.0.0"
-danube-lex = { path = "../danube-lex" }
 danube-ast = { path = "../danube-ast" }
+danube-lex = { path = "../danube-lex" }
+danube-token = { path = "../danube-token" }
