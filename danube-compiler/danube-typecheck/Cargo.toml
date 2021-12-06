@@ -1,0 +1,5 @@
+[package]
+name = "danube-typecheck"
+version = "0.1.0"
+authors = ["Danuel <public.danuel@gmail.com>"]
+edition = "2018"

@@ -1,0 +1,19 @@
+use crate::primitive::*;
+use super::rem::Rem;
+
+pub trait RemAssign<Rhs = Self> {
+  fn rem_assign(mut self, rhs: Rhs) {
+    #[assign]
+    self = Rem::rem(self, rhs);
+  }
+}
+
+impl RemAssign for Float { }
+
+impl RemAssign for Int { }
+
+impl RemAssign for Size { }
+
+impl RemAssign for Uint { }
+
+impl RemAssign for Usize { }

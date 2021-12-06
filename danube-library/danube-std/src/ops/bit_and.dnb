@@ -1,0 +1,40 @@
+pub trait BitAnd<Rhs = Self> {
+  type Output;
+
+  fn bit_and(self, rhs: Rhs) -> Self::Output;
+}
+
+impl BitAnd for Float {
+  type Output = Float;
+
+  #[native]
+  fn bit_and(self, rhs: Rhs) -> Self::Output;
+}
+
+impl BitAnd for Int {
+  type Output = Int;
+
+  #[native]
+  fn bit_and(self, rhs: Rhs) -> Self::Output;
+}
+
+impl BitAnd for Size {
+  type Output = Size;
+
+  #[native]
+  fn bit_and(self, rhs: Rhs) -> Self::Output;
+}
+
+impl BitAnd for Uint {
+  type Output = Uint;
+
+  #[native]
+  fn bit_and(self, rhs: Rhs) -> Self::Output;
+}
+
+impl BitAnd for Usize {
+  type Output = Usize;
+
+  #[native]
+  fn bit_and(self, rhs: Rhs) -> Self::Output;
+}

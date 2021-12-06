@@ -1,0 +1,8 @@
+[package]
+name = "danube-runtime-javascript"
+version = "0.1.0"
+authors = ["Danuel <public.danuel@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+danube-compile = { path = "../../danube-compiler/danube-compile" }

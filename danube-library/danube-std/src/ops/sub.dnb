@@ -1,0 +1,40 @@
+pub trait Sub<Rhs = Self> {
+  type Output;
+
+  fn sub(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Sub for Float {
+  type Output = Float;
+
+  #[native]
+  fn sub(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Sub for Int {
+  type Output = Int;
+
+  #[native]
+  fn sub(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Sub for Size {
+  type Output = Size;
+
+  #[native]
+  fn sub(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Sub for Uint {
+  type Output = Uint;
+
+  #[native]
+  fn sub(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Sub for Usize {
+  type Output = Usize;
+
+  #[native]
+  fn sub(self, rhs: Rhs) -> Self::Output;
+}

@@ -1,0 +1,19 @@
+use crate::primitive::*;
+use super::shl::Shl;
+
+pub trait ShlAssign<Rhs = Self> {
+  fn shl_assign(mut self, rhs: Rhs) {
+    #[assign]
+    self = Shl::self(self, rhs);
+  }
+}
+
+impl ShlAssign for Float { }
+
+impl ShlAssign for Int { }
+
+impl ShlAssign for Size { }
+
+impl ShlAssign for Uint { }
+
+impl ShlAssign for Usize { }

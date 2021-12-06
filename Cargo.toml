@@ -1,36 +1,18 @@
-[package]
-name = "danube"
-version = "0.1.0"
-authors = ["Danue1"]
-edition = "2018"
-description = "Danube is a programming language strongly inspired by Rust, but it is an interpreter language without a lifetime and ownership model."
-repository = "https://github.com/Danue1/danube"
-license = "MIT"
-include = ["LICENSE", "Cargo.toml", "src/**/*.rs"]
-
 [workspace]
 members = [
-  "danube-ast",
-  "danube-cli",
-  "danube-compile",
-  "danube-hir",
-  "danube-hir-lowering",
-  "danube-ir",
-  "danube-lex",
-  "danube-macro",
-  "danube-parse",
-  "danube-repl",
-  "danube-runtime-javascript",
-  "danube-runtime-jvm",
-  "danube-runtime-native",
-  "danube-runtime-wasm",
-  "danube-vm",
+  "danube-compiler/danube-ast",
+  "danube-compiler/danube-compile",
+  "danube-compiler/danube-hir",
+  "danube-compiler/danube-hir-lowering",
+  "danube-compiler/danube-ir",
+  "danube-compiler/danube-lex",
+  "danube-compiler/danube-parse",
+  "danube-compiler/danube-token",
+  "danube-compiler/danube-typecheck",
+  "danube-runtime/danube-repl",
+  "danube-runtime/danube-runtime-javascript",
+  "danube-runtime/danube-runtime-jvm",
+  "danube-runtime/danube-runtime-native",
+  "danube-runtime/danube-runtime-wasm",
+  "danube-runtime/danube-vm",
 ]
-
-[dependencies]
-danube-compile = { path = "./danube-compile" }
-danube-hir = { path = "./danube-hir" }
-danube-hir-lowering = { path = "./danube-hir-lowering" }
-danube-ir = { path = "./danube-ir" }
-danube-lex = { path = "./danube-lex" }
-danube-parse = { path = "./danube-parse" }

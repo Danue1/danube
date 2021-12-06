@@ -1,0 +1,26 @@
+fn main() {
+  foo(load_name: @load_name);
+  react_dom.render(<JSXExample @load_name={load_name} />);
+}
+
+type LoadName = () -> String;
+
+fn load_name() -> Future<String> {
+  "Danuel".await;
+}
+
+fn foo() {
+  bar();
+}
+
+fn bar(@load_name: LoadName) {
+  println @load_name();
+}
+
+fn JSXExample() -> TagElement {
+  <Content />
+}
+
+fn Content(@load_name: LoadName) -> TagElement {
+  <div>{@load_name()}</div>
+}

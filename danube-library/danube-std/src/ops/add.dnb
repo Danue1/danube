@@ -1,0 +1,47 @@
+pub trait Add<Rhs = Self> {
+  type Output;
+
+  fn add(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Add for Float {
+  type Output = Float;
+
+  #[native]
+  fn add(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Add for Int {
+  type Output = Int;
+
+  #[native]
+  fn add(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Add for Size {
+  type Output = Size;
+
+  #[native]
+  fn add(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Add for String {
+  type Output = String;
+
+  #[native]
+  fn add(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Add for Uint {
+  type Output = Uint;
+
+  #[native]
+  fn add(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Add for Usize {
+  type Output = Usize;
+
+  #[native]
+  fn add(self, rhs: Rhs) -> Self::Output;
+}

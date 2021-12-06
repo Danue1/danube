@@ -5,6 +5,6 @@ pub use danube_lex::*;
 pub use danube_parse::*;
 
 fn main() {
-  println!("Danube is still in development.");
-  println!("If you are interested in developing a programming language, please contact us!");
+    println!("Danube is still in development.");
+    println!("If you are interested in developing a programming language, please contact us!");
 }

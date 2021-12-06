@@ -1,0 +1,40 @@
+pub trait Mul<Rhs = Self> {
+  type Output;
+
+  fn mul(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Mul for Float {
+  type Output = Float;
+
+  #[native]
+  fn mul(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Mul for Int {
+  type Output = Int;
+
+  #[native]
+  fn mul(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Mul for Size {
+  type Output = Size;
+
+  #[native]
+  fn mul(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Mul for Uint {
+  type Output = Uint;
+
+  #[native]
+  fn mul(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Mul for Usize {
+  type Output = Usize;
+
+  #[native]
+  fn mul(self, rhs: Rhs) -> Self::Output;
+}

@@ -1,0 +1,40 @@
+pub trait Neg {
+  type Output;
+
+  fn neg(self) -> Self::Output;
+}
+
+impl Neg for Float {
+  type Output = Float;
+
+  #[native]
+  fn neg(self) -> Self::Output;
+}
+
+impl Neg for Int {
+  type Output = Int;
+
+  #[native]
+  fn neg(self) -> Self::Output;
+}
+
+impl Neg for Size {
+  type Output = Size;
+
+  #[native]
+  fn neg(self) -> Self::Output;
+}
+
+impl Neg for Uint {
+  type Output = Uint;
+
+  #[native]
+  fn neg(self) -> Self::Output;
+}
+
+impl Neg for Usize {
+  type Output = Usize;
+
+  #[native]
+  fn neg(self) -> Self::Output;
+}

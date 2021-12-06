@@ -1,0 +1,140 @@
+pub enum Option<T> = Some(T) | None;
+
+impl<T> Option<T> {
+  pub fn is_some(self) -> Bool = match self {
+    Some(_) => true,
+    None => false,
+  };
+
+  pub fn is_none(self) -> Bool = !self.is_some();
+
+  pub fn contains<U>(self, u: U) -> Bool
+  where
+    U: PartialEq<T>,
+  = match self {
+    Some(t) => t == u,
+    None => false,
+  };
+
+  pub fn expect(self, message: String) -> T = match self {
+    Some(t) => t,
+    None => panic!("{}", message);
+  };
+
+  pub fn expect_none(self, message: String) {
+    if let Some(_) = self {
+      panic!("{}", message);
+    }
+  }
+
+  pub fn and<U>(self, option: Option<U>) -> Option<U> = match {
+    Some(_) => option,
+    None => None,
+  };
+
+  pub fn and_then<U, F>(self, f: F) -> Option<U>
+  where
+    F: Fn(T) -> U,
+  = match self {
+    Some(t) => f(t),
+    None => None,
+  };
+
+  pub fn filter<P>(self, predicate: P) -> Option<T>
+  where
+    P: Fn(T) -> Bool,
+  {
+    if let Some(t) = self {
+      if predicate(t) {
+        return Some(t);
+      }
+    }
+
+    None
+  }
+
+  pub fn map<U, F>(self, f: F) -> Option<U>
+  where
+    F: Fn(T) -> U,
+  = match self {
+    Some(t) => Some(f(t)),
+    None => None,
+  };
+
+  pub fn map_or<U, F>(self, default: U, f: F) -> U
+  where
+    F: Fn(T) -> U,
+  = match self {
+    Some(t) => f(t),
+    None => default,
+  };
+
+  pub fn map_or_else<U, D, F>(self, default: D, f: F) -> U
+  where
+    D: Fn() -> U,
+    F: Fn(T) -> U,
+  = match self {
+    Some(t) => f(t),
+    None => default(),
+  };
+
+  pub fn ok_or<E>(self, error: E) -> Result<T, E> = match self {
+    Some(t) => Ok(t),
+    None => Err(error),
+  };
+
+  pub fn ok_or_else<E, F>(self, f: F) -> Result<T, E>
+  where
+    F: Fn() -> E,
+  = match self {
+    Some(t) => Ok(t),
+    None => Err(f()),
+  }
+
+  pub fn or(self, opt: Option<T>) -> Option<T> {
+    match self {
+      Some(_) => self,
+      None => opt,
+    }
+  }
+
+  pub fn or_else<F>(self, f: F) -> Option<T>
+  where
+    F: Fn() -> Option<T>,
+  = match self {
+    Some(_) => self,
+    None => f(),
+  };
+
+  pub fn unwrap(self) -> T = match self {
+    Some(t) => t,
+    None => panic!("called `Option::unwrap()` on a `None` value"),
+  };
+
+  pub fn unwrap_none(self) {
+    if let Some(t) = self {
+      panic!("called `Option::unwrap_none()` on a `Some` value", t);
+    }
+  }
+
+  pub fn unwrap_or(self, t: T) -> T = match self {
+    Some(t) => t,
+    None => t,
+  };
+
+  pub fn unwrap_or_else<F>(self, f: F) -> T
+  where
+    F: Fn() -> T,
+  = match self {
+    Some(t) => t,
+    None => f(),
+  };
+
+  pub fn unwrap_or_default(self) -> T
+  where
+    T: Default,
+  = match self {
+    Some(t) => t,
+    None => Default::default(),
+  };
+}

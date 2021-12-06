@@ -1,0 +1,40 @@
+pub trait Shr<Rhs = Self> {
+  type Output;
+
+  fn shr(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Shr for Float {
+  type Output = Float;
+
+  #[native]
+  fn shr(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Shr for Int {
+  type Output = Int;
+
+  #[native]
+  fn shr(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Shr for Size {
+  type Output = Size;
+
+  #[native]
+  fn shr(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Shr for Uint {
+  type Output = Uint;
+
+  #[native]
+  fn shr(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Shr for Usize {
+  type Output = Usize;
+
+  #[native]
+  fn shr(self, rhs: Rhs) -> Self::Output;
+}

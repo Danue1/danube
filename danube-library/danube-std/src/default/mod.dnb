@@ -1,0 +1,35 @@
+pub trait Default {
+  fn default() -> Self;
+}
+
+impl<T> Default for Option<T> {
+  fn default() -> Self = None;
+}
+
+impl Default for Bool {
+  fn default() -> Self = false;
+}
+
+impl Default for Float {
+  fn default() -> Self = 0;
+}
+
+impl Default for Int {
+  fn default() -> Self = 0;
+}
+
+impl Default for Size {
+  fn default() -> Self = 0;
+}
+
+impl Default for String {
+  fn default() -> Self = "";
+}
+
+impl Default for Uint {
+  fn default() -> Self = 0;
+}
+
+impl Default for Usize {
+  fn default() -> Self = 0;
+}

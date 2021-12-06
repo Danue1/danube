@@ -1,0 +1,40 @@
+pub trait Div<Rhs = Self> {
+  type Output;
+
+  fn div(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Div for Float {
+  type Output = Float;
+
+  #[native]
+  fn div(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Div for Int {
+  type Output = Int;
+
+  #[native]
+  fn div(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Div for Size {
+  type Output = Size;
+
+  #[native]
+  fn div(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Div for Uint {
+  type Output = Uint;
+
+  #[native]
+  fn div(self, rhs: Rhs) -> Self::Output;
+}
+
+impl Div for Usize {
+  type Output = Usize;
+
+  #[native]
+  fn div(self, rhs: Rhs) -> Self::Output;
+}
