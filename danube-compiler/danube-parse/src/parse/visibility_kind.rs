@@ -3,7 +3,7 @@ use danube_ast::VisibilityKind;
 
 impl<'parse> Parse<'parse> {
     pub fn parse_visibility_kind(&mut self) -> Result<VisibilityKind, Error> {
-        if !keyword!(self.cursor => Public) {
+        if !identifier!(self.cursor => Pub) {
             return Ok(VisibilityKind::Current);
         }
         if !symbol!(self.cursor => LeftParens) {
@@ -25,7 +25,7 @@ mod tests {
     use crate::Parse;
     use danube_ast::{IdentNode, PathKind, PathNode, VisibilityKind};
     use danube_lex::Lex;
-    use danube_token::Token;
+    use danube_token::{SymbolInterner, Token};
 
     #[test]
     fn current() {
@@ -79,12 +79,13 @@ mod tests {
     fn public_restricted() {
         let source = "pub(foo)";
         let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+        let mut interner = SymbolInterner::default();
 
         assert_eq!(
             Parse::new(tokens.as_slice()).parse_visibility_kind(),
             Ok(VisibilityKind::Restricted(PathNode {
                 kinds: vec![PathKind::Ident(IdentNode {
-                    raw: "foo".to_string()
+                    symbol: interner.intern("foo")
                 })]
             }))
         );

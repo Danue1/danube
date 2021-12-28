@@ -1,5 +1,6 @@
 #![warn(clippy::all)]
 
+use danube_token::Symbol;
 use std::collections::HashMap;
 
 #[derive(Debug, PartialEq, Clone)]
@@ -28,7 +29,7 @@ pub enum PathKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct IdentNode {
-    pub raw: String,
+    pub symbol: Symbol,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -76,15 +77,15 @@ pub type GenericNodeList = Vec<GenericNode>;
 pub struct StructNode {
     pub visibility: VisibilityKind,
     pub ident: IdentNode,
-    pub generic_list: GenericNodeList,
+    pub generics: GenericNodeList,
     pub fields: StructFieldKind,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct GenericNode {
     pub ident: IdentNode,
-    pub trait_list: Vec<PathNode>,
-    pub default_trait_list: Vec<PathNode>,
+    pub traits: Vec<PathNode>,
+    pub default_traits: Vec<PathNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -115,10 +116,9 @@ pub enum TypeKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct EnumNode {
-    pub visibility: VisibilityKind,
     pub ident: IdentNode,
-    pub generic_list: GenericNodeList,
-    pub variant_list: Vec<EnumVariantNode>,
+    pub generics: GenericNodeList,
+    pub variants: Vec<EnumVariantNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -145,11 +145,10 @@ pub struct EnumNamedVariantNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct FunctionNode {
-    pub visibility: VisibilityKind,
     pub ident: IdentNode,
-    pub generic_list: GenericNodeList,
+    pub generics: GenericNodeList,
     pub self_type: Option<ImmutablityKind>,
-    pub parameter_list: Vec<FunctionParameterNode>,
+    pub parameters: Vec<FunctionParameterNode>,
     pub return_type: Option<TypeNode>,
     pub block: Option<BlockNode>,
 }
@@ -163,30 +162,25 @@ pub struct FunctionParameterNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct BlockNode {
-    pub statement_list: Vec<StatementNode>,
+    pub statements: Vec<StatementNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct StatementNode {
     pub id: StatementId,
-    pub attributes: Vec<AttributeNode>,
     pub kind: StatementKind,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum StatementKind {
+    Semicolon,
     Break,
     Continue,
-    Return(ReturnNode),
+    Return(Option<ExpressionKind>),
     Item(Box<ItemNode>),
     Let(Box<LetNode>),
     Assign(Box<AssignNode>),
     Expression(ExpressionKind),
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct ReturnNode {
-    pub value: Option<Box<ExpressionKind>>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -224,7 +218,7 @@ pub struct LetNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct PatternNode {
-    pub part_list: Vec<PatternPart>,
+    pub parts: Vec<PatternPart>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -245,18 +239,17 @@ pub enum PatternKind {
 #[derive(Debug, PartialEq, Clone)]
 pub struct ExpressionUnnamedStructNode {
     pub path: Option<PathNode>,
-    pub field_list: Vec<PatternNode>,
+    pub fields: Vec<PatternNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ExpressionNamedStructNode {
     pub path: Option<PathNode>,
-    pub field_list: Vec<(IdentNode, Option<PatternNode>)>,
+    pub fields: Vec<(IdentNode, Option<PatternNode>)>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct TypeAliasNode {
-    pub visibility: VisibilityKind,
     pub ident: IdentNode,
     pub ty: TypeNode,
 }
@@ -284,7 +277,7 @@ pub enum ExpressionKind {
     // Postfix
     Try(Box<ExpressionKind>),
     Await(Box<ExpressionKind>),
-    Path(PathExpressioNode),
+    Path(PathNode),
     Index(IndexNode),
     Field(FieldNode),
     FunctionCall(FunctionCallNode),
@@ -295,7 +288,7 @@ pub enum ExpressionKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ConditionNode {
-    pub branch_list: Vec<ConditionBranch>,
+    pub branchs: Vec<ConditionBranch>,
     pub other: Option<BlockNode>,
 }
 
@@ -326,7 +319,7 @@ pub struct ForNode {
 #[derive(Debug, PartialEq, Clone)]
 pub struct PatternMatchNode {
     pub expression: Box<ExpressionKind>,
-    pub branch_list: Vec<PatternBranch>,
+    pub branchs: Vec<PatternBranch>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -337,7 +330,7 @@ pub struct PatternBranch {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ClosureNode {
-    pub parameter_list: Option<ClosureArgumentListKind>,
+    pub parameters: Option<ClosureArgumentListKind>,
     pub return_type: Option<TypeNode>,
     pub block: BlockNode,
 }
@@ -350,13 +343,7 @@ pub enum ClosureArgumentListKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct TupleNode {
-    pub argument_list: Vec<ExpressionKind>,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct PathExpressioNode {
-    pub expression: Box<ExpressionKind>,
-    pub path: PathNode,
+    pub arguments: Vec<ExpressionKind>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -381,7 +368,7 @@ pub struct FieldNode {
 #[derive(Debug, PartialEq, Clone)]
 pub struct FunctionCallNode {
     pub expression: Box<ExpressionKind>,
-    pub argument_list: Vec<FunctionArgumentNode>,
+    pub arguments: Vec<FunctionArgumentNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -420,16 +407,14 @@ pub enum BinaryOperatorKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct TraitNode {
-    pub visibility: VisibilityKind,
     pub ident: IdentNode,
-    pub generic_list: GenericNodeList,
-    pub inheritance_list: Vec<(PathNode, Vec<PathNode>)>,
-    pub item_list: Vec<ImplementItemNode>,
+    pub generics: GenericNodeList,
+    pub inheritances: Vec<(PathNode, Vec<PathNode>)>,
+    pub items: Vec<ImplementItemNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ConstantNode {
-    pub visibility: VisibilityKind,
     pub pattern: PatternNode,
     pub ty: TypeNode,
     pub expression: Option<ExpressionKind>,
@@ -437,11 +422,11 @@ pub struct ConstantNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ImplementNode {
-    pub generic_list: GenericNodeList,
+    pub generics: GenericNodeList,
     pub trait_ident: Option<PathNode>,
     pub target: PathNode,
-    pub target_generic_list: GenericNodeList,
-    pub item_list: Vec<ImplementItemNode>,
+    pub target_generics: GenericNodeList,
+    pub items: Vec<ImplementItemNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]

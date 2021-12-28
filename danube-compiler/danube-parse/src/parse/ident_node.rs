@@ -1,17 +1,15 @@
-use crate::Parse;
+use crate::{Error, Parse};
 use danube_ast::IdentNode;
 
 impl<'parse> Parse<'parse> {
-    pub fn parse_ident_node(&mut self) -> Option<IdentNode> {
+    pub fn parse_ident_node(&mut self) -> Result<IdentNode, Error> {
         match identifier!(self.cursor) {
-            Some(identifier) => {
-                let raw = identifier.value.to_string();
-
+            Some(&symbol) => {
                 self.cursor.next();
 
-                Some(IdentNode { raw })
+                Ok(IdentNode { symbol })
             }
-            None => None,
+            None => Err(Error::Invalid),
         }
     }
 }
@@ -21,17 +19,18 @@ mod tests {
     use crate::Parse;
     use danube_ast::IdentNode;
     use danube_lex::Lex;
-    use danube_token::Token;
+    use danube_token::{SymbolInterner, Token};
 
     #[test]
     fn ident_node() {
         let source = "hello";
         let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+        let mut interner = SymbolInterner::default();
 
         assert_eq!(
             Parse::new(tokens.as_slice()).parse_ident_node(),
-            Some(IdentNode {
-                raw: "hello".to_string()
+            Ok(IdentNode {
+                symbol: interner.intern("hello")
             })
         );
     }

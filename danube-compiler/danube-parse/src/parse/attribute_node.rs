@@ -21,6 +21,7 @@ impl<'parse> Parse<'parse> {
         Ok(attributes)
     }
 
+    #[inline]
     fn parse_package_attribute(&mut self) -> Result<Option<AttributeNode>, Error> {
         if symbol!(self.cursor => Hash) {
             if symbol!(self.cursor => Exclamation) {
@@ -35,6 +36,7 @@ impl<'parse> Parse<'parse> {
         }
     }
 
+    #[inline]
     fn parse_item_attribute(&mut self) -> Result<Option<AttributeNode>, Error> {
         if symbol!(self.cursor => Hash) {
             let attribute = self.parse_attribute_inner()?;
@@ -68,20 +70,21 @@ mod tests {
     use crate::Parse;
     use danube_ast::{AttributeNode, IdentNode, PathKind, PathNode};
     use danube_lex::Lex;
-    use danube_token::Token;
+    use danube_token::{SymbolInterner, Token};
     use std::collections::HashMap;
 
     #[test]
     fn package_attribute() {
         let source = "#![hello]";
         let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+        let mut interner = SymbolInterner::default();
 
         assert_eq!(
             Parse::new(tokens.as_slice()).parse_package_attribute(),
             Ok(Some(AttributeNode {
                 path: PathNode {
                     kinds: vec![PathKind::Ident(IdentNode {
-                        raw: "hello".to_string()
+                        symbol: interner.intern("hello")
                     })]
                 },
                 args: HashMap::new(),
@@ -93,6 +96,7 @@ mod tests {
     fn package_attributes() {
         let source = "#![hello] #![hello]";
         let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+        let mut interner = SymbolInterner::default();
 
         assert_eq!(
             Parse::new(tokens.as_slice()).parse_package_attributes(),
@@ -100,7 +104,7 @@ mod tests {
                 AttributeNode {
                     path: PathNode {
                         kinds: vec![PathKind::Ident(IdentNode {
-                            raw: "hello".to_string()
+                            symbol: interner.intern("hello")
                         })]
                     },
                     args: HashMap::new(),
@@ -108,7 +112,7 @@ mod tests {
                 AttributeNode {
                     path: PathNode {
                         kinds: vec![PathKind::Ident(IdentNode {
-                            raw: "hello".to_string()
+                            symbol: interner.intern("hello")
                         })]
                     },
                     args: HashMap::new(),
@@ -121,13 +125,14 @@ mod tests {
     fn item_attribute() {
         let source = "#[hello]";
         let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+        let mut interner = SymbolInterner::default();
 
         assert_eq!(
             Parse::new(tokens.as_slice()).parse_item_attribute(),
             Ok(Some(AttributeNode {
                 path: PathNode {
                     kinds: vec![PathKind::Ident(IdentNode {
-                        raw: "hello".to_string()
+                        symbol: interner.intern("hello")
                     })]
                 },
                 args: HashMap::new(),
@@ -139,6 +144,7 @@ mod tests {
     fn item_attributes() {
         let source = "#[hello] #[hello]";
         let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+        let mut interner = SymbolInterner::default();
 
         assert_eq!(
             Parse::new(tokens.as_slice()).parse_item_attributes(),
@@ -146,7 +152,7 @@ mod tests {
                 AttributeNode {
                     path: PathNode {
                         kinds: vec![PathKind::Ident(IdentNode {
-                            raw: "hello".to_string()
+                            symbol: interner.intern("hello")
                         })]
                     },
                     args: HashMap::new(),
@@ -154,7 +160,7 @@ mod tests {
                 AttributeNode {
                     path: PathNode {
                         kinds: vec![PathKind::Ident(IdentNode {
-                            raw: "hello".to_string()
+                            symbol: interner.intern("hello")
                         })]
                     },
                     args: HashMap::new(),

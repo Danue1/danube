@@ -17,7 +17,7 @@ mod tests {
     use crate::Parse;
     use danube_ast::{IdentNode, PathKind, PathNode, UseNode};
     use danube_lex::Lex;
-    use danube_token::Token;
+    use danube_token::{SymbolInterner, Token};
 
     #[test]
     fn package() {
@@ -38,6 +38,7 @@ mod tests {
     fn package_with_ident() {
         let source = "package::world;";
         let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+        let mut interner = SymbolInterner::default();
 
         assert_eq!(
             Parse::new(tokens.as_slice()).parse_use_node(),
@@ -46,7 +47,7 @@ mod tests {
                     kinds: vec![
                         PathKind::Package,
                         PathKind::Ident(IdentNode {
-                            raw: "world".to_string()
+                            symbol: interner.intern("hello")
                         })
                     ]
                 },
@@ -73,6 +74,7 @@ mod tests {
     fn super_with_ident() {
         let source = "super::world;";
         let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+        let mut interner = SymbolInterner::default();
 
         assert_eq!(
             Parse::new(tokens.as_slice()).parse_use_node(),
@@ -81,7 +83,7 @@ mod tests {
                     kinds: vec![
                         PathKind::Super,
                         PathKind::Ident(IdentNode {
-                            raw: "world".to_string()
+                            symbol: interner.intern("world")
                         })
                     ]
                 },

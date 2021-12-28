@@ -15,13 +15,14 @@ mod tests {
     use crate::Parse;
     use danube_ast::{AttributeNode, IdentNode, PackageNode, PathKind, PathNode};
     use danube_lex::Lex;
-    use danube_token::Token;
+    use danube_token::{SymbolInterner, Token};
     use std::collections::HashMap;
 
     #[test]
     fn attribute() {
         let source = "#![hello]";
         let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+        let mut interner = SymbolInterner::default();
 
         assert_eq!(
             Parse::new(tokens.as_slice()).parse_package_node(),
@@ -29,7 +30,7 @@ mod tests {
                 attributes: vec![AttributeNode {
                     path: PathNode {
                         kinds: vec![PathKind::Ident(IdentNode {
-                            raw: "hello".to_string()
+                            symbol: interner.intern("hello")
                         })]
                     },
                     args: HashMap::new(),
@@ -44,6 +45,7 @@ mod tests {
         let source = "#![hello]\
         #![hello]";
         let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+        let mut interner = SymbolInterner::default();
 
         assert_eq!(
             Parse::new(tokens.as_slice()).parse_package_node(),
@@ -52,7 +54,7 @@ mod tests {
                     AttributeNode {
                         path: PathNode {
                             kinds: vec![PathKind::Ident(IdentNode {
-                                raw: "hello".to_string()
+                                symbol: interner.intern("hello")
                             })]
                         },
                         args: HashMap::new(),
@@ -60,7 +62,7 @@ mod tests {
                     AttributeNode {
                         path: PathNode {
                             kinds: vec![PathKind::Ident(IdentNode {
-                                raw: "hello".to_string()
+                                symbol: interner.intern("hello")
                             })]
                         },
                         args: HashMap::new(),

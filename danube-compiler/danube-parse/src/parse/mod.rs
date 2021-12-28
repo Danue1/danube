@@ -1,12 +1,15 @@
 mod attribute_node;
+mod block_node;
 mod constant_node;
 mod enum_node;
+mod expression_kind;
 mod function_node;
 mod ident_node;
 mod implement_node;
 mod item_node;
 mod package_node;
 mod path_node;
+mod statement_node;
 mod trait_node;
 mod type_alias_node;
 mod use_node;
@@ -44,7 +47,8 @@ mod tests {
     #[test]
     fn empty() {
         let source = "";
-        let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+        let lexer = Lex::new(source);
+        let tokens: Vec<Token> = lexer.filter_map(|token| token.ok()).collect();
 
         assert_eq!(
             Parse::new(tokens.as_slice()).parse(),

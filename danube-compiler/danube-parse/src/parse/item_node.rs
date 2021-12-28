@@ -1,6 +1,6 @@
 use crate::{Error, Parse};
 use danube_ast::{ItemKind, ItemNode};
-use danube_token::Keyword;
+use danube_token::keywords;
 
 impl<'parse> Parse<'parse> {
     pub fn parse_item_nodes(&mut self) -> Result<Vec<ItemNode>, Error> {
@@ -16,38 +16,38 @@ impl<'parse> Parse<'parse> {
         let attributes = self.parse_item_attributes()?;
         let visibility = self.parse_visibility_kind()?;
 
-        let kind = match keyword!(self.cursor) {
-            Some(Keyword::Use) => {
+        let kind = match identifier!(self.cursor) {
+            Some(&keywords::Use) => {
                 self.cursor.next();
 
                 ItemKind::Use(self.parse_use_node()?)
             }
-            Some(Keyword::Enum) => {
+            Some(&keywords::Enum) => {
                 self.cursor.next();
 
                 ItemKind::Enum(self.parse_enum_node()?)
             }
-            Some(Keyword::Fn) => {
+            Some(&keywords::Fn) => {
                 self.cursor.next();
 
                 ItemKind::Function(self.parse_function_node()?)
             }
-            Some(Keyword::Type) => {
+            Some(&keywords::Type) => {
                 self.cursor.next();
 
                 ItemKind::TypeAlias(self.parse_type_alias_node()?)
             }
-            Some(Keyword::Trait) => {
+            Some(&keywords::Trait) => {
                 self.cursor.next();
 
                 ItemKind::Trait(self.parse_trait_node()?)
             }
-            Some(Keyword::Const) => {
+            Some(&keywords::Const) => {
                 self.cursor.next();
 
                 ItemKind::Constant(self.parse_constant_node()?)
             }
-            Some(Keyword::Impl) => {
+            Some(&keywords::Impl) => {
                 self.cursor.next();
 
                 ItemKind::Implement(self.parse_implement_node()?)

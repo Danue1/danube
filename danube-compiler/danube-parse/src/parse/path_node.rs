@@ -1,6 +1,6 @@
 use crate::{Error, Parse};
 use danube_ast::{IdentNode, PathKind, PathNode};
-use danube_token::{Keyword, Token, TokenKind};
+use danube_token::{keywords, Token, TokenKind};
 
 impl<'parse> Parse<'parse> {
     pub fn parse_path_node(&mut self) -> Result<PathNode, Error> {
@@ -20,27 +20,27 @@ impl<'parse> Parse<'parse> {
         match self.cursor.peek() {
             Some(Token {
                 span: _,
-                kind: TokenKind::Keyword(Keyword::Package),
+                kind: TokenKind::Identifier(keywords::Package),
             }) => {
                 self.cursor.next();
                 Ok(PathKind::Package)
             }
             Some(Token {
                 span: _,
-                kind: TokenKind::Keyword(Keyword::Super),
+                kind: TokenKind::Identifier(keywords::Super),
             }) => {
                 self.cursor.next();
                 Ok(PathKind::Super)
             }
             Some(Token {
                 span: _,
-                kind: TokenKind::Identifier(identifier),
+                kind: TokenKind::Identifier(symbol),
             }) => {
-                let raw = identifier.value.to_string();
+                let symbol = symbol.clone();
 
                 self.cursor.next();
 
-                Ok(PathKind::Ident(IdentNode { raw }))
+                Ok(PathKind::Ident(IdentNode { symbol }))
             }
             _ => Err(Error::Invalid),
         }
@@ -52,7 +52,7 @@ mod tests {
     use crate::Parse;
     use danube_ast::{IdentNode, PathKind, PathNode};
     use danube_lex::Lex;
-    use danube_token::Token;
+    use danube_token::{SymbolInterner, Token};
 
     #[test]
     fn _super() {
@@ -84,6 +84,7 @@ mod tests {
     fn super_with_ident() {
         let source = "super::hello";
         let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+        let mut interner = SymbolInterner::default();
 
         assert_eq!(
             Parse::new(tokens.as_slice()).parse_path_node(),
@@ -91,7 +92,7 @@ mod tests {
                 kinds: vec![
                     PathKind::Super,
                     PathKind::Ident(IdentNode {
-                        raw: "hello".to_string()
+                        symbol: interner.intern("hello")
                     })
                 ]
             })
@@ -102,6 +103,7 @@ mod tests {
     fn package_with_ident() {
         let source = "package::hello";
         let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+        let mut interner = SymbolInterner::default();
 
         assert_eq!(
             Parse::new(tokens.as_slice()).parse_path_node(),
@@ -109,7 +111,7 @@ mod tests {
                 kinds: vec![
                     PathKind::Package,
                     PathKind::Ident(IdentNode {
-                        raw: "hello".to_string()
+                        symbol: interner.intern("hello")
                     })
                 ]
             })
@@ -120,12 +122,13 @@ mod tests {
     fn ident() {
         let source = "hello";
         let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+        let mut interner = SymbolInterner::default();
 
         assert_eq!(
             Parse::new(tokens.as_slice()).parse_path_node(),
             Ok(PathNode {
                 kinds: vec![PathKind::Ident(IdentNode {
-                    raw: "hello".to_string()
+                    symbol: interner.intern("hello")
                 }),]
             })
         );
@@ -135,16 +138,17 @@ mod tests {
     fn idents() {
         let source = "hello::world";
         let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+        let mut interner = SymbolInterner::default();
 
         assert_eq!(
             Parse::new(tokens.as_slice()).parse_path_node(),
             Ok(PathNode {
                 kinds: vec![
                     PathKind::Ident(IdentNode {
-                        raw: "hello".to_string()
+                        symbol: interner.intern("hello")
                     }),
                     PathKind::Ident(IdentNode {
-                        raw: "world".to_string()
+                        symbol: interner.intern("world")
                     }),
                 ]
             })
