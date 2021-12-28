@@ -32,6 +32,7 @@ version = "0.1.0"
 name = "danube-lex"
 version = "0.1.0"
 dependencies = [
+ "danube-span",
  "danube-token",
 ]
 
@@ -41,6 +42,7 @@ version = "0.1.0"
 dependencies = [
  "danube-ast",
  "danube-lex",
+ "danube-span",
  "danube-token",
 ]
 
@@ -80,8 +82,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "danube-span"
+version = "0.1.0"
+
+[[package]]
 name = "danube-token"
 version = "0.1.0"
+dependencies = [
+ "danube-span",
+]
 
 [[package]]
 name = "danube-typecheck"

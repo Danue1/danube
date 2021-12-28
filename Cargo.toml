@@ -7,6 +7,7 @@ members = [
   "danube-compiler/danube-ir",
   "danube-compiler/danube-lex",
   "danube-compiler/danube-parse",
+  "danube-compiler/danube-span",
   "danube-compiler/danube-token",
   "danube-compiler/danube-typecheck",
   "danube-runtime/danube-repl",
