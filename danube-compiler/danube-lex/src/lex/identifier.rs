@@ -1,29 +1,21 @@
 use crate::{Cursor, Error, Lex};
-use danube_token::{Identifier, Span, Token, TokenKind};
+use danube_span::Span;
+use danube_token::{Token, TokenKind};
 
 impl<'lex> Lex<'lex> {
     pub fn lex_identifier(&mut self) -> Result<Token, Error> {
         let span = lex_identifier_postfix(&mut self.cursor);
-        let identifier = self.cursor.slice(&span);
+        let symbol = self.interner.intern(self.cursor.slice(&span));
 
-        if let Ok(keyword) = identifier.try_into() {
-            Ok(Token::new(span, TokenKind::Keyword(keyword)))
-        } else {
-            Ok(Token::new(
-                span,
-                TokenKind::Identifier(Identifier::new(identifier)),
-            ))
-        }
+        Ok(Token::new(span, TokenKind::Identifier(symbol)))
     }
 
     pub fn lex_identifier_with_underscore(&mut self) -> Result<Token, Error> {
         let span = lex_identifier_postfix(&mut self.cursor);
         let span = Span::new(span.start - 1, span.end);
-        let identifier = self.cursor.slice(&span);
-        Ok(Token::new(
-            span,
-            TokenKind::Identifier(Identifier::new(identifier)),
-        ))
+        let symbol = self.interner.intern(self.cursor.slice(&span));
+
+        Ok(Token::new(span, TokenKind::Identifier(symbol)))
     }
 }
 

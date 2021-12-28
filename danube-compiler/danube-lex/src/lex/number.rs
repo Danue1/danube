@@ -1,5 +1,6 @@
 use crate::{Cursor, Error, Lex};
-use danube_token::{Literal, Span, Token, TokenKind};
+use danube_span::Span;
+use danube_token::{LiteralKind, Token, TokenKind};
 
 impl<'lex> Lex<'lex> {
     pub fn lex_number(&mut self) -> Result<Token, Error> {
@@ -10,39 +11,34 @@ impl<'lex> Lex<'lex> {
                 self.cursor.next();
                 match self.cursor.peek() {
                     Some('0'..='9') => {
-                        let float_span = Span::concat(integer_span, lex_numeric(&mut self.cursor));
-                        match self.cursor.slice(&float_span).parse() {
-                            Ok(float) => Ok(Token::new(
-                                float_span,
-                                TokenKind::Literal(Literal::Float(float)),
-                            )),
-                            Err(_) => Err(Error::MalformedFloating(float_span)),
-                        }
+                        let float_span = integer_span.concat(lex_numeric(&mut self.cursor));
+                        let string = self.cursor.slice(&float_span);
+                        let symbol = self.intern(string);
+                        let kind = TokenKind::Literal(symbol, LiteralKind::Float);
+
+                        Ok(Token::new(float_span, kind))
                     }
                     _ => Err(Error::Invalid(self.cursor.cursor())),
                 }
             }
-            _ => match self.cursor.slice(&integer_span).parse() {
-                Ok(integer) => Ok(Token::new(
-                    integer_span,
-                    TokenKind::Literal(Literal::Integer(integer)),
-                )),
-                Err(_) => Err(Error::MalformedInteger(integer_span)),
-            },
+            _ => {
+                let string = self.cursor.slice(&integer_span);
+                let symbol = self.intern(string);
+                let kind = TokenKind::Literal(symbol, LiteralKind::Integer);
+
+                Ok(Token::new(integer_span, kind))
+            }
         }
     }
 
     pub fn lex_number_without_integer(&mut self) -> Result<Token, Error> {
         let float_span = lex_numeric(&mut self.cursor);
         let float_span = Span::new(float_span.start - 1, float_span.end);
+        let string = self.cursor.slice(&float_span);
+        let symbol = self.intern(string);
+        let kind = TokenKind::Literal(symbol, LiteralKind::Float);
 
-        match self.cursor.slice(&float_span).parse() {
-            Ok(float) => Ok(Token::new(
-                float_span,
-                TokenKind::Literal(Literal::Float(float)),
-            )),
-            Err(_) => Err(Error::MalformedFloating(float_span)),
-        }
+        Ok(Token::new(float_span, kind))
     }
 }
 

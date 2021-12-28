@@ -1,5 +1,6 @@
 use crate::{Error, Lex};
-use danube_token::{Literal, Span, Token, TokenKind};
+use danube_span::Span;
+use danube_token::{LiteralKind, Token, TokenKind};
 
 impl<'lex> Lex<'lex> {
     pub fn lex_char(&mut self) -> Result<Token, Error> {
@@ -15,20 +16,23 @@ impl<'lex> Lex<'lex> {
                     None => return Err(Error::Invalid(self.cursor.cursor() - 1)),
                 };
                 match self.cursor.next() {
-                    Some('\'') => Ok(Token::new(
-                        Span::new(start - 1, start + 3),
-                        TokenKind::Literal(Literal::Char(c)),
-                    )),
+                    Some('\'') => {
+                        let span = Span::new(start - 1, start + 3);
+                        let symbol = self.intern(c.to_string().as_ref());
+                        let kind = TokenKind::Literal(symbol, LiteralKind::Char);
+
+                        Ok(Token::new(span, kind))
+                    }
                     _ => Err(Error::Invalid(start + 2)),
                 }
             }
-            Some(c) => match self.cursor.next() {
-                Some('\'') => Ok(Token::new(
-                    Span::new(start - 1, start + 2),
-                    TokenKind::Literal(Literal::Char(c)),
-                )),
-                _ => Err(Error::Invalid(start + 1)),
-            },
+            Some(c) => {
+                let span = Span::new(start - 1, start + 2);
+                let symbol = self.intern(c.to_string().as_ref());
+                let kind = TokenKind::Literal(symbol, LiteralKind::Char);
+
+                Ok(Token::new(span, kind))
+            }
             _ => Err(Error::Invalid(start)),
         }
     }

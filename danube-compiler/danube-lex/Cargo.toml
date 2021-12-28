@@ -4,4 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+danube-span = { path = "../danube-span" }
 danube-token = { path = "../danube-token" }

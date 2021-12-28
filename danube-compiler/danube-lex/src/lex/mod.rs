@@ -4,10 +4,18 @@ mod number;
 mod string;
 
 use crate::{Cursor, Error};
-use danube_token::{Comment, Span, Symbol, Token, TokenKind};
+use danube_span::Span;
+use danube_token::{Symbol, SymbolContainer, SymbolInterner, Token, TokenKind};
 
 pub struct Lex<'lex> {
+    interner: SymbolInterner,
     cursor: Cursor<'lex>,
+}
+
+impl<'lex> Lex<'lex> {
+    pub fn symbols(self) -> SymbolContainer {
+        self.interner.into()
+    }
 }
 
 impl<'lex> std::iter::Iterator for Lex<'lex> {
@@ -19,62 +27,67 @@ impl<'lex> std::iter::Iterator for Lex<'lex> {
                 Some(' ' | '\r' | '\n' | '\t') => {
                     self.cursor.next();
                 }
-                Some('0'..='9') => {
-                    return match self.lex_number() {
-                        Ok(token) => Some(Ok(token)),
-                        Err(error) => Some(Err(error)),
-                    }
-                }
-                Some('a'..='z' | 'A'..='Z') => {
-                    return match self.lex_identifier() {
-                        Ok(token) => Some(Ok(token)),
-                        Err(error) => Some(Err(error)),
-                    }
-                }
-                Some(_) => {
-                    return match self.lex() {
-                        Ok(token) => Some(Ok(token)),
-                        Err(error) => Some(Err(error)),
-                    }
-                }
-                _ => return None,
+                Some('0'..='9') => return Some(self.lex_number()),
+                Some('a'..='z' | 'A'..='Z') => return Some(self.lex_identifier()),
+                Some(_) => return Some(self.lex()),
+                None => return None,
             }
         }
     }
 }
 
+macro_rules! symbol {
+    ($cursor:expr => $kind:ident) => {{
+        let symbol = TokenKind::$kind;
+        let end = $cursor.cursor();
+        let count = match symbol.count() {
+            Some(count) => count,
+            None => return Err(Error::UnknownSymbol),
+        };
+        let span = Span::new(end - count, end);
+
+        Ok(Token::new(span, symbol))
+    }};
+}
+
 impl<'lex> Lex<'lex> {
     pub fn new(source: &'lex str) -> Self {
         Lex {
+            interner: Default::default(),
             cursor: Cursor::new(source),
         }
     }
 
     #[inline(always)]
+    fn intern(&mut self, string: &str) -> Symbol {
+        self.interner.intern(string)
+    }
+
+    #[inline(always)]
     fn lex(&mut self) -> Result<Token, Error> {
         match self.cursor.next().unwrap() {
-            '(' => Ok(symbol(&self.cursor, Symbol::LeftParens)),
-            ')' => Ok(symbol(&self.cursor, Symbol::RightParens)),
-            '[' => Ok(symbol(&self.cursor, Symbol::LeftBracket)),
-            ']' => Ok(symbol(&self.cursor, Symbol::RightBracket)),
-            '{' => Ok(symbol(&self.cursor, Symbol::LeftBrace)),
-            '}' => Ok(symbol(&self.cursor, Symbol::RightBrace)),
+            '(' => symbol!(self.cursor => LeftParens),
+            ')' => symbol!(self.cursor => RightParens),
+            '[' => symbol!(&self.cursor => LeftBracket),
+            ']' => symbol!(&self.cursor => RightBracket),
+            '{' => symbol!(&self.cursor => LeftBrace),
+            '}' => symbol!(&self.cursor => RightBrace),
             '<' => match self.cursor.peek() {
                 Some('<') => {
                     self.cursor.next();
                     match self.cursor.peek() {
                         Some('=') => {
                             self.cursor.next();
-                            Ok(symbol(&self.cursor, Symbol::LeftChevronLeftChevronEq))
+                            symbol!(self.cursor => LeftChevronLeftChevronEq)
                         }
-                        _ => Ok(symbol(&self.cursor, Symbol::LeftChevronLeftChevron)),
+                        _ => symbol!(self.cursor => LeftChevronLeftChevron),
                     }
                 }
                 Some('=') => {
                     self.cursor.next();
-                    Ok(symbol(&self.cursor, Symbol::LeftChevronEq))
+                    symbol!(self.cursor => LeftChevronEq)
                 }
-                _ => Ok(symbol(&self.cursor, Symbol::LeftChevron)),
+                _ => symbol!(self.cursor => LeftChevron),
             },
             '>' => match self.cursor.peek() {
                 Some('>') => {
@@ -82,69 +95,69 @@ impl<'lex> Lex<'lex> {
                     match self.cursor.peek() {
                         Some('=') => {
                             self.cursor.next();
-                            Ok(symbol(&self.cursor, Symbol::RightChevronRightChevronEq))
+                            symbol!(self.cursor => RightChevronRightChevronEq)
                         }
-                        _ => Ok(symbol(&self.cursor, Symbol::RightChevronRightChevron)),
+                        _ => symbol!(self.cursor => RightChevronRightChevron),
                     }
                 }
                 Some('=') => {
                     self.cursor.next();
-                    Ok(symbol(&self.cursor, Symbol::RightChevronEq))
+                    symbol!(self.cursor => RightChevronEq)
                 }
-                _ => Ok(symbol(&self.cursor, Symbol::RightChevron)),
+                _ => symbol!(self.cursor => RightChevron),
             },
-            '#' => Ok(symbol(&self.cursor, Symbol::Hash)),
+            '#' => symbol!(self.cursor => Hash),
             '.' => match self.cursor.peek() {
                 Some('.') => {
                     self.cursor.next();
                     match self.cursor.peek() {
                         Some('=') => {
                             self.cursor.next();
-                            Ok(symbol(&self.cursor, Symbol::DotDotEq))
+                            symbol!(self.cursor => DotDotEq)
                         }
-                        _ => Ok(symbol(&self.cursor, Symbol::DotDot)),
+                        _ => symbol!(self.cursor => DotDot),
                     }
                 }
                 Some('0'..='9') => self.lex_number_without_integer(),
-                _ => Ok(symbol(&self.cursor, Symbol::Dot)),
+                _ => symbol!(self.cursor => Dot),
             },
-            ',' => Ok(symbol(&self.cursor, Symbol::Comma)),
+            ',' => symbol!(self.cursor => Comma),
             ':' => match self.cursor.peek() {
                 Some(':') => {
                     self.cursor.next();
-                    Ok(symbol(&self.cursor, Symbol::ColonColon))
+                    symbol!(self.cursor => ColonColon)
                 }
-                _ => Ok(symbol(&self.cursor, Symbol::Colon)),
+                _ => symbol!(self.cursor => Colon),
             },
-            ';' => Ok(symbol(&self.cursor, Symbol::Semicolon)),
+            ';' => symbol!(self.cursor => Semicolon),
             '=' => match self.cursor.peek() {
                 Some('>') => {
                     self.cursor.next();
-                    Ok(symbol(&self.cursor, Symbol::EqRightChevron))
+                    symbol!(self.cursor => EqRightChevron)
                 }
                 Some('=') => {
                     self.cursor.next();
-                    Ok(symbol(&self.cursor, Symbol::EqEq))
+                    symbol!(self.cursor => EqEq)
                 }
-                _ => Ok(symbol(&self.cursor, Symbol::Eq)),
+                _ => symbol!(self.cursor => Eq),
             },
             '+' => match self.cursor.peek() {
                 Some('=') => {
                     self.cursor.next();
-                    Ok(symbol(&self.cursor, Symbol::PlusEq))
+                    symbol!(self.cursor => PlusEq)
                 }
-                _ => Ok(symbol(&self.cursor, Symbol::Plus)),
+                _ => symbol!(self.cursor => Plus),
             },
             '-' => match self.cursor.peek() {
                 Some('=') => {
                     self.cursor.next();
-                    Ok(symbol(&self.cursor, Symbol::HyphenEq))
+                    symbol!(self.cursor => HyphenEq)
                 }
                 Some('>') => {
                     self.cursor.next();
-                    Ok(symbol(&self.cursor, Symbol::HyphenRightChevron))
+                    symbol!(self.cursor => HyphenRightChevron)
                 }
-                _ => Ok(symbol(&self.cursor, Symbol::Hyphen)),
+                _ => symbol!(self.cursor => Hyphen),
             },
             '*' => match self.cursor.peek() {
                 Some('*') => {
@@ -152,16 +165,16 @@ impl<'lex> Lex<'lex> {
                     match self.cursor.peek() {
                         Some('=') => {
                             self.cursor.next();
-                            Ok(symbol(&self.cursor, Symbol::AsteriskAsteriskEq))
+                            symbol!(self.cursor => AsteriskAsteriskEq)
                         }
-                        _ => Ok(symbol(&self.cursor, Symbol::AsteriskAsterisk)),
+                        _ => symbol!(self.cursor => AsteriskAsterisk),
                     }
                 }
                 Some('=') => {
                     self.cursor.next();
-                    Ok(symbol(&self.cursor, Symbol::AsteriskEq))
+                    symbol!(self.cursor => AsteriskEq)
                 }
-                _ => Ok(symbol(&self.cursor, Symbol::Asterisk)),
+                _ => symbol!(self.cursor => Asterisk),
             },
             '/' => match self.cursor.peek() {
                 Some('/') => {
@@ -175,11 +188,10 @@ impl<'lex> Lex<'lex> {
                         self.cursor.next();
                     }
                     let end = self.cursor.cursor();
+                    let span = Span::new(start, end);
+                    let symbol = self.intern(self.cursor.slice(&span));
 
-                    Ok(Token::new(
-                        Span::new(start, end),
-                        TokenKind::Comment(Comment::new_singleline(is_document)),
-                    ))
+                    Ok(Token::new(span, TokenKind::Comment(symbol)))
                 }
                 Some('*') => {
                     self.cursor.next();
@@ -187,41 +199,41 @@ impl<'lex> Lex<'lex> {
                 }
                 Some('=') => {
                     self.cursor.next();
-                    Ok(symbol(&self.cursor, Symbol::SlashEq))
+                    symbol!(self.cursor => SlashEq)
                 }
-                _ => Ok(symbol(&self.cursor, Symbol::Slash)),
+                _ => symbol!(self.cursor => Slash),
             },
             '%' => match self.cursor.peek() {
                 Some('=') => {
                     self.cursor.next();
-                    Ok(symbol(&self.cursor, Symbol::PercentEq))
+                    symbol!(self.cursor => PercentEq)
                 }
-                _ => Ok(symbol(&self.cursor, Symbol::Percent)),
+                _ => symbol!(self.cursor => Percent),
             },
             '!' => match self.cursor.peek() {
                 Some('=') => {
                     self.cursor.next();
-                    Ok(symbol(&self.cursor, Symbol::ExclamationEq))
+                    symbol!(self.cursor => ExclamationEq)
                 }
-                _ => Ok(symbol(&self.cursor, Symbol::Exclamation)),
+                _ => symbol!(self.cursor => Exclamation),
             },
-            '?' => Ok(symbol(&self.cursor, Symbol::Question)),
+            '?' => symbol!(self.cursor => Question),
             '&' => match self.cursor.peek() {
                 Some('&') => {
                     self.cursor.next();
                     match self.cursor.peek() {
                         Some('=') => {
                             self.cursor.next();
-                            Ok(symbol(&self.cursor, Symbol::AmpersandAmpersandEq))
+                            symbol!(self.cursor => AmpersandAmpersandEq)
                         }
-                        _ => Ok(symbol(&self.cursor, Symbol::AmpersandAmpersand)),
+                        _ => symbol!(self.cursor => AmpersandAmpersand),
                     }
                 }
                 Some('=') => {
                     self.cursor.next();
-                    Ok(symbol(&self.cursor, Symbol::AmpersandEq))
+                    symbol!(self.cursor => AmpersandEq)
                 }
-                _ => Ok(symbol(&self.cursor, Symbol::Ampersand)),
+                _ => symbol!(self.cursor => Ampersand),
             },
             '|' => match self.cursor.peek() {
                 Some('|') => {
@@ -229,48 +241,40 @@ impl<'lex> Lex<'lex> {
                     match self.cursor.peek() {
                         Some('=') => {
                             self.cursor.next();
-                            Ok(symbol(&self.cursor, Symbol::PipelinePipelineEq))
+                            symbol!(self.cursor => PipelinePipelineEq)
                         }
-                        _ => Ok(symbol(&self.cursor, Symbol::PipelinePipeline)),
+                        _ => symbol!(self.cursor => PipelinePipeline),
                     }
                 }
                 Some('=') => {
                     self.cursor.next();
-                    Ok(symbol(&self.cursor, Symbol::PipelineEq))
+                    symbol!(self.cursor => PipelineEq)
                 }
-                _ => Ok(symbol(&self.cursor, Symbol::Pipeline)),
+                _ => symbol!(self.cursor => Pipeline),
             },
             '~' => match self.cursor.peek() {
                 Some('=') => {
                     self.cursor.next();
-                    Ok(symbol(&self.cursor, Symbol::TildeEq))
+                    symbol!(self.cursor => TildeEq)
                 }
-                _ => Ok(symbol(&self.cursor, Symbol::Tilde)),
+                _ => symbol!(self.cursor => Tilde),
             },
             '^' => match self.cursor.peek() {
                 Some('=') => {
                     self.cursor.next();
-                    Ok(symbol(&self.cursor, Symbol::CaretEq))
+                    symbol!(self.cursor => CaretEq)
                 }
-                _ => Ok(symbol(&self.cursor, Symbol::Caret)),
+                _ => symbol!(self.cursor => Caret),
             },
             '_' => match self.cursor.peek() {
                 Some('a'..='z' | 'A'..='Z' | '0'..='9') => self.lex_identifier_with_underscore(),
-                _ => Ok(symbol(&self.cursor, Symbol::Underscore)),
+                _ => symbol!(self.cursor => Underscore),
             },
             '"' => self.lex_string(),
             '\'' => self.lex_char(),
             _ => Err(Error::Invalid(self.cursor.cursor())),
         }
     }
-}
-
-fn symbol(cursor: &Cursor, symbol: Symbol) -> Token {
-    let end = cursor.cursor();
-    let span = Span::new(end - symbol.count(), end);
-    let kind = TokenKind::Symbol(symbol);
-
-    Token::new(span, kind)
 }
 
 #[test]
@@ -287,13 +291,16 @@ fn symbols() {
     macro_rules! assert_symbols {
         ($($symbol:expr => $expect:ident,)+) => {
             $(
-                assert_eq!(
-                    Lex::new($symbol).next(),
-                    Some(Ok(Token::new(
-                        Span::new(0, Symbol::$expect.count()),
-                        TokenKind::Symbol(Symbol::$expect)
-                    )))
-                );
+                let kind = TokenKind::$expect;
+                if let Some(count) = kind.count() {
+                    assert_eq!(
+                        Lex::new($symbol).next(),
+                        Some(Ok(Token::new(Span::new(0, count), kind)))
+                    );
+                } else {
+                    // assert with error message for preventing human-mistakes.
+                    std::todo!();
+                }
             )+
         };
     }
@@ -360,113 +367,101 @@ fn symbols() {
 
 #[test]
 fn integers() {
-    use danube_token::Literal;
+    use danube_token::{LiteralKind, SymbolInterner};
 
     macro_rules! assert_integers {
-        ($($integer:expr => $expect:expr,)+) => {
+        ($($integer:expr),+) => {
             $(
+                let mut interner = SymbolInterner::default();
+
                 assert_eq!(
                     Lex::new($integer).next(),
                     Some(Ok(Token::new(
                         Span::new(0, $integer.len()),
-                        TokenKind::Literal(Literal::Integer($expect)),
+                        TokenKind::Literal(interner.intern($integer), LiteralKind::Integer),
                     )))
                 );
             )+
         };
     }
 
-    assert_integers! {
-        "0" => 0,
-        "1" => 1,
-        "10" => 10,
-        "11" => 11,
-    };
+    assert_integers!["0", "1", "10", "11"];
 }
 
 #[test]
 fn floatings() {
-    use danube_token::Literal;
-
     macro_rules! assert_floatings {
-        ($($floating:expr => $expect:expr,)+) => {
+        ($($floating:expr),+) => {
+            use danube_token::{LiteralKind, SymbolInterner};
+
             $(
+                let mut interner = SymbolInterner::default();
+
                 assert_eq!(
                     Lex::new($floating).next(),
                     Some(Ok(Token::new(
                         Span::new(0, $floating.len()),
-                        TokenKind::Literal(Literal::Float($expect)),
+                        TokenKind::Literal(interner.intern($floating), LiteralKind::Float),
                     )))
                 );
             )+
         };
     }
 
-    assert_floatings! {
-        ".0" => 0.0,
-        ".1" => 0.1,
-        "0.0" => 0.0,
-        "0.1" => 0.1,
-        "1.23" => 1.23,
-    };
+    assert_floatings![".0", ".1", "0.0", "0.1", "1.23"];
 }
 
 #[test]
 fn chars() {
-    use danube_token::Literal;
-
     macro_rules! assert_chars {
-        ($($char:expr => $expect:expr,)+) => {
+        ($($char:expr),+) => {
+            use danube_token::{LiteralKind, SymbolInterner};
+
             $(
+                let mut interner = SymbolInterner::default();
+
                 assert_eq!(
                     Lex::new($char).next(),
                     Some(Ok(Token::new(
                         Span::new(0, $char.len()),
-                        TokenKind::Literal(Literal::Char($expect)),
+                        TokenKind::Literal(interner.intern($char), LiteralKind::Char),
                     )))
                 );
             )+
         };
     }
 
-    assert_chars! {
-        r#"'a'"# => 'a',
-        r#"'\r'"# => '\r',
-        r#"'\n'"# => '\n',
-        r#"'\t'"# => '\t',
-    };
+    assert_chars![r#"'a'"#, r#"'\r'"#, r#"'\n'"#, r#"'\t'"#];
 }
 
 #[test]
 fn strings() {
-    use danube_token::Literal;
-
     macro_rules! assert_strings {
-        ($($string:expr => $expect:expr,)+) => {
+        ($($string:expr),+) => {
+            use danube_token::{LiteralKind, SymbolInterner};
+
             $(
+                let mut interner = SymbolInterner::default();
+
                 assert_eq!(
                     Lex::new($string).next(),
                     Some(Ok(Token::new(
                         Span::new(0, $string.len()),
-                        TokenKind::Literal(Literal::String($expect.to_string())),
+                        TokenKind::Literal(interner.intern($string), LiteralKind::String),
                     )))
                 );
             )+
         };
     }
 
-    assert_strings! {
-        r#""Hello, World!""# => "Hello, World!",
-        r#""\r\t\n""# => "\r\t\n",
-    };
+    assert_strings![r#""Hello, World!""#, r#""\r\t\n""#];
 }
 
 #[test]
 fn identifiers() {
-    use danube_token::Identifier;
-
     macro_rules! tokens {
         ($($identifier:expr),+ $(,)?) => {{
+            let mut interner = SymbolInterner::default();
             let mut vec = Vec::new();
             let mut position = 0;
             $(
@@ -476,7 +471,7 @@ fn identifiers() {
                     position = span.end + 1;
                 }
 
-                let kind = TokenKind::Identifier(Identifier::new($identifier));
+                let kind = TokenKind::Identifier(interner.intern($identifier));
                 vec.push(Token::new(span, kind));
 
             )+
@@ -495,71 +490,43 @@ fn identifiers() {
 
 #[test]
 fn keywords() {
-    use danube_token::Keyword;
-
     macro_rules! assert_keywords {
-        ($($keyword:expr => $expect:ident,)+) => {
+        ($($keyword:expr),+) => {
             $(
+                let mut interner = SymbolInterner::default();
+
                 assert_eq!(
                     Lex::new($keyword).next(),
                     Some(Ok(Token::new(
                         Span::new(0, $keyword.len()),
-                        TokenKind::Keyword(Keyword::$expect),
+                        TokenKind::Identifier(interner.intern($keyword)),
                     )))
                 );
             )+
         };
     }
 
-    assert_keywords! {
-        "if" => If,
-        "else" => Else,
-        "for" => For,
-        "while" => While,
-        "loop" => Loop,
-        "in" => In,
-        "break" => Break,
-        "continue" => Continue,
-        "match" => Match,
-        "return" => Return,
-        "yield" => Yield,
-        "where" => Where,
-        "const" => Const,
-        "let" => Let,
-        "mut" => Mut,
-        "enum" => Enum,
-        "struct" => Struct,
-        "fn" => Fn,
-        "Self" => TypeSelf,
-        "self" => VariableSelf,
-        "use" => Use,
-        "super" => Super,
-        "pub" => Public,
-        "as" => As,
-        "package" => Package,
-        "type" => Type,
-        "trait" => Trait,
-        "impl" => Impl,
-    };
+    assert_keywords![
+        "if", "else", "for", "while", "loop", "in", "break", "continue", "match", "return",
+        "yield", "where", "const", "let", "mut", "enum", "struct", "fn", "Self", "self", "use",
+        "super", "pub", "as", "package", "type", "trait", "impl"
+    ];
 }
 
 #[test]
 fn singleline_comment() {
     macro_rules! assert_comments {
-        ($($comment:expr => $is_document:expr,)+) => {
+        ($($comment:expr),+) => {
             $(
+                let mut interner = SymbolInterner::default();
+
                 assert_eq!(Lex::new($comment).next(), Some(Ok(Token::new(
                     Span::new(0, $comment.len()),
-                    TokenKind::Comment(Comment::new_singleline($is_document))
+                    TokenKind::Comment(interner.intern($comment))
                 ))));
             )+
         };
     }
 
-    assert_comments! {
-        "//" => false,
-        "///" => true,
-        "//hello" => false,
-        "///hello" => true,
-    }
+    assert_comments!["//", "///", "//hello", "///hello"];
 }

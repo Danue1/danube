@@ -1,4 +1,4 @@
-use danube_token::Span;
+use danube_span::Span;
 use std::iter::Peekable;
 use std::str::Chars;
 
@@ -30,7 +30,7 @@ impl<'lex> Cursor<'lex> {
     }
 
     #[inline]
-    pub fn slice(&self, span: &Span) -> &str {
+    pub fn slice(&self, span: &Span) -> &'lex str {
         &self.source[span.start..span.end]
     }
 }
