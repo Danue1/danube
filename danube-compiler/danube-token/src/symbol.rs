@@ -1,127 +1,85 @@
-#[derive(Debug, PartialEq, Clone)]
-#[repr(u8)]
-pub enum Symbol {
-    // 1
-    LeftParens,   // (
-    RightParens,  // )
-    LeftBracket,  // [
-    RightBracket, // ]
-    LeftBrace,    // {
-    RightBrace,   // }
-    LeftChevron,  // <
-    RightChevron, // >
-    Hash,         // #
-    Dot,          // .
-    Comma,        // ,
-    Colon,        // :
-    Semicolon,    // ;
-    Eq,           // =
-    Plus,         // +
-    Hyphen,       // -
-    Asterisk,     // *
-    Slash,        // /
-    Percent,      // %
-    Exclamation,  // !
-    Question,     // ?
-    Ampersand,    // &
-    Pipeline,     // |
-    Tilde,        // ~
-    Caret,        // ^
-    Underscore,   // _
+use crate::keywords;
+use std::collections::HashMap;
+use std::ops::Index;
 
-    // 2
-    HyphenRightChevron,       // ->
-    EqRightChevron,           // =>
-    DotDot,                   // ..
-    ColonColon,               // ::
-    EqEq,                     // ==
-    ExclamationEq,            // !=
-    PlusEq,                   // +=
-    HyphenEq,                 // -=
-    AsteriskEq,               // *=
-    SlashEq,                  // /=
-    PercentEq,                // %=
-    AsteriskAsterisk,         // **
-    AmpersandAmpersand,       // &&
-    PipelinePipeline,         // ||
-    AmpersandEq,              // &=
-    PipelineEq,               // |=
-    TildeEq,                  // ~=
-    CaretEq,                  // ^=
-    LeftChevronLeftChevron,   // <<
-    RightChevronRightChevron, // >>
-    LeftChevronEq,            // <=
-    RightChevronEq,           // >=
+#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
+pub struct Symbol(pub(crate) SymbolIndex);
 
-    // 3
-    DotDotEq,                   // ..=
-    AsteriskAsteriskEq,         // **=
-    AmpersandAmpersandEq,       // &&=
-    PipelinePipelineEq,         // ||=
-    LeftChevronLeftChevronEq,   // <<=
-    RightChevronRightChevronEq, // >>=
+#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
+pub struct SymbolIndex {
+    pub(crate) index: usize,
+}
+
+#[derive(Debug)]
+pub struct SymbolInterner {
+    pub(crate) strings: Vec<String>,
+    pub(crate) symbols: HashMap<String, Symbol>,
+}
+
+#[derive(Debug, Default)]
+pub struct SymbolContainer {
+    strings: Vec<String>,
+}
+
+impl SymbolInterner {
+    pub fn intern(&mut self, string: &str) -> Symbol {
+        match self.symbols.get(string) {
+            Some(&name) => name,
+            None => {
+                let symbol = Symbol(SymbolIndex {
+                    index: self.strings.len(),
+                });
+
+                self.strings.push(string.to_owned());
+                self.symbols.insert(string.to_owned(), symbol);
+
+                symbol
+            }
+        }
+    }
 }
 
 impl Symbol {
-    #[inline(always)]
-    pub const fn count(&self) -> usize {
-        match self {
-            Symbol::LeftParens
-            | Symbol::RightParens
-            | Symbol::LeftBracket
-            | Symbol::RightBracket
-            | Symbol::LeftBrace
-            | Symbol::RightBrace
-            | Symbol::LeftChevron
-            | Symbol::RightChevron
-            | Symbol::Hash
-            | Symbol::Dot
-            | Symbol::Comma
-            | Symbol::Colon
-            | Symbol::Semicolon
-            | Symbol::Eq
-            | Symbol::Plus
-            | Symbol::Hyphen
-            | Symbol::Asterisk
-            | Symbol::Slash
-            | Symbol::Percent
-            | Symbol::Exclamation
-            | Symbol::Question
-            | Symbol::Ampersand
-            | Symbol::Pipeline
-            | Symbol::Tilde
-            | Symbol::Caret
-            | Symbol::Underscore => 1,
+    pub fn is_empty(self) -> bool {
+        self == keywords::Empty
+    }
 
-            Symbol::HyphenRightChevron
-            | Symbol::EqRightChevron
-            | Symbol::DotDot
-            | Symbol::ColonColon
-            | Symbol::EqEq
-            | Symbol::ExclamationEq
-            | Symbol::PlusEq
-            | Symbol::HyphenEq
-            | Symbol::AsteriskEq
-            | Symbol::SlashEq
-            | Symbol::PercentEq
-            | Symbol::AsteriskAsterisk
-            | Symbol::AmpersandAmpersand
-            | Symbol::PipelinePipeline
-            | Symbol::AmpersandEq
-            | Symbol::PipelineEq
-            | Symbol::TildeEq
-            | Symbol::CaretEq
-            | Symbol::LeftChevronLeftChevron
-            | Symbol::RightChevronRightChevron
-            | Symbol::LeftChevronEq
-            | Symbol::RightChevronEq => 2,
+    pub fn is_used_keyword_always(self) -> bool {
+        self <= keywords::As && self >= keywords::Yield
+    }
 
-            Symbol::DotDotEq
-            | Symbol::AsteriskAsteriskEq
-            | Symbol::AmpersandAmpersandEq
-            | Symbol::PipelinePipelineEq
-            | Symbol::LeftChevronLeftChevronEq
-            | Symbol::RightChevronRightChevronEq => 3,
+    pub fn is_unused_keyword_always(self) -> bool {
+        self == keywords::Yield
+    }
+
+    pub fn is_keyword(self) -> bool {
+        self <= keywords::Empty && self >= keywords::Default
+    }
+
+    pub fn is_path_segment_keyword(self) -> bool {
+        matches!(
+            self,
+            keywords::Super | keywords::SelfLower | keywords::SelfUpper | keywords::Package
+        )
+    }
+
+    pub fn is_bool_literal(self) -> bool {
+        matches!(self, keywords::True | keywords::False)
+    }
+}
+
+impl From<SymbolInterner> for SymbolContainer {
+    fn from(interner: SymbolInterner) -> Self {
+        SymbolContainer {
+            strings: interner.strings,
         }
+    }
+}
+
+impl Index<Symbol> for SymbolContainer {
+    type Output = str;
+
+    fn index(&self, symbol: Symbol) -> &Self::Output {
+        &self.strings[symbol.0.index]
     }
 }
