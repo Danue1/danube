@@ -17,37 +17,37 @@ impl<'parse> Parse<'parse> {
         let visibility = self.parse_visibility_kind()?;
 
         let kind = match identifier!(self.cursor) {
-            Some(&keywords::Use) => {
+            Some(keywords::Use) => {
                 self.cursor.next();
 
                 ItemKind::Use(self.parse_use_node()?)
             }
-            Some(&keywords::Enum) => {
+            Some(keywords::Enum) => {
                 self.cursor.next();
 
                 ItemKind::Enum(self.parse_enum_node()?)
             }
-            Some(&keywords::Fn) => {
+            Some(keywords::Fn) => {
                 self.cursor.next();
 
                 ItemKind::Function(self.parse_function_node()?)
             }
-            Some(&keywords::Type) => {
+            Some(keywords::Type) => {
                 self.cursor.next();
 
                 ItemKind::TypeAlias(self.parse_type_alias_node()?)
             }
-            Some(&keywords::Trait) => {
+            Some(keywords::Trait) => {
                 self.cursor.next();
 
                 ItemKind::Trait(self.parse_trait_node()?)
             }
-            Some(&keywords::Const) => {
+            Some(keywords::Const) => {
                 self.cursor.next();
 
                 ItemKind::Constant(self.parse_constant_node()?)
             }
-            Some(&keywords::Impl) => {
+            Some(keywords::Impl) => {
                 self.cursor.next();
 
                 ItemKind::Implement(self.parse_implement_node()?)

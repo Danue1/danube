@@ -46,11 +46,8 @@ impl<'parse> Parse<'parse> {
     }
 
     fn parse_atomic_expression_kind(&mut self) -> Result<ExpressionKind, Error> {
-        match self.cursor.peek() {
-            Some(Token {
-                kind: TokenKind::Literal(symbol, kind),
-                span: _,
-            }) => {
+        match &self.cursor.peek().kind {
+            TokenKind::Literal(symbol, kind) => {
                 let symbol = symbol.clone();
                 let kind = kind.clone();
 
@@ -59,16 +56,28 @@ impl<'parse> Parse<'parse> {
                 self.parse_postfix_expression_kind(ExpressionKind::Literal(symbol, kind))
             }
             // If
-            Some(Token {
-                kind: TokenKind::Identifier(keywords::If),
-                span: _,
-            }) => {
+            TokenKind::Identifier(keywords::If) => {
                 self.cursor.next();
 
-                let mut branches = vec![ConditionBranch {
-                    expression: Box::new(self.parse_expression_kind()?),
-                    block: self.parse_block_node()?,
-                }];
+                macro_rules! branch {
+                    () => {
+                        ConditionBranch {
+                            expression: if identifier!(self.cursor => Let) {
+                                let pattern = self.parse_pattern_node()?;
+                                if !symbol!(self.cursor => Eq) {
+                                    return Err(Error::Invalid);
+                                }
+                                let expression = self.parse_expression_kind()?;
+                                Box::new(ExpressionKind::Let(pattern, Box::new(expression)))
+                            } else {
+                                Box::new(self.parse_expression_kind()?)
+                            },
+                            block: self.parse_block_node()?,
+                        }
+                    };
+                }
+
+                let mut branches = vec![branch!()];
                 let mut other = None;
                 while identifier!(self.cursor => Else) {
                     if !identifier!(self.cursor => If) {
@@ -76,10 +85,7 @@ impl<'parse> Parse<'parse> {
                         break;
                     }
 
-                    branches.push(ConditionBranch {
-                        expression: Box::new(self.parse_expression_kind()?),
-                        block: self.parse_block_node()?,
-                    });
+                    branches.push(branch!());
                 }
 
                 self.parse_postfix_expression_kind(ExpressionKind::Conditional(ConditionNode {
@@ -88,10 +94,7 @@ impl<'parse> Parse<'parse> {
                 }))
             }
             // Loop
-            Some(Token {
-                kind: TokenKind::Identifier(keywords::Loop),
-                span: _,
-            }) => {
+            TokenKind::Identifier(keywords::Loop) => {
                 self.cursor.next();
 
                 let block = self.parse_block_node()?;
@@ -99,10 +102,7 @@ impl<'parse> Parse<'parse> {
                 self.parse_postfix_expression_kind(ExpressionKind::Loop(LoopNode { block }))
             }
             // While
-            Some(Token {
-                kind: TokenKind::Identifier(keywords::While),
-                span: _,
-            }) => {
+            TokenKind::Identifier(keywords::While) => {
                 self.cursor.next();
 
                 let branch = ConditionBranch {
@@ -113,28 +113,31 @@ impl<'parse> Parse<'parse> {
                 self.parse_postfix_expression_kind(ExpressionKind::While(WhileNode { branch }))
             }
             // For
-            Some(Token {
-                kind: TokenKind::Identifier(keywords::For),
-                span: _,
-            }) => {
+            TokenKind::Identifier(keywords::For) => {
                 self.cursor.next();
 
-                std::todo!()
+                let pattern = self.parse_pattern_node()?;
+                let iter = if identifier!(self.cursor => In) {
+                    Box::new(self.parse_expression_kind()?)
+                } else {
+                    return Err(Error::Invalid);
+                };
+                let block = self.parse_block_node()?;
+
+                self.parse_postfix_expression_kind(ExpressionKind::For(ForNode {
+                    pattern,
+                    iter,
+                    block,
+                }))
             }
             // Pattern Match
-            Some(Token {
-                kind: TokenKind::Identifier(keywords::Match),
-                span: _,
-            }) => {
+            TokenKind::Identifier(keywords::Match) => {
                 self.cursor.next();
 
                 std::todo!()
             }
             // Path or Function Call
-            Some(Token {
-                kind: TokenKind::Identifier(_),
-                span: _,
-            }) => {
+            TokenKind::Identifier(_) => {
                 let path = ExpressionKind::Path(self.parse_path_node()?);
                 let expression = if symbol!(self.cursor => LeftParens) {
                     ExpressionKind::FunctionCall(FunctionCallNode {
@@ -149,24 +152,15 @@ impl<'parse> Parse<'parse> {
             }
             // Closure
             // |a| { ... }
-            Some(Token {
-                kind: TokenKind::Pipeline,
-                span: _,
-            }) => {
+            TokenKind::Pipeline => {
                 std::todo!()
             }
             // Closure
             // || { ... }
-            Some(Token {
-                kind: TokenKind::PipelinePipeline,
-                span: _,
-            }) => {
+            TokenKind::PipelinePipeline => {
                 std::todo!()
             }
-            Some(Token {
-                kind: TokenKind::LeftBrace,
-                span: _,
-            }) => {
+            TokenKind::LeftBrace => {
                 self.cursor.next();
 
                 let mut statements = vec![];
@@ -177,10 +171,7 @@ impl<'parse> Parse<'parse> {
 
                 self.parse_postfix_expression_kind(ExpressionKind::Block(BlockNode { statements }))
             }
-            Some(Token {
-                kind: TokenKind::LeftParens,
-                span: _,
-            }) => {
+            TokenKind::LeftParens => {
                 self.cursor.next();
 
                 let mut arguments = vec![];
@@ -194,10 +185,7 @@ impl<'parse> Parse<'parse> {
 
                 self.parse_postfix_expression_kind(ExpressionKind::Tuple(TupleNode { arguments }))
             }
-            Some(Token {
-                kind: TokenKind::LeftBracket,
-                span: _,
-            }) => {
+            TokenKind::LeftBracket => {
                 self.cursor.next();
 
                 let mut expressions = vec![];
@@ -219,21 +207,15 @@ impl<'parse> Parse<'parse> {
         &mut self,
         expression: ExpressionKind,
     ) -> Result<ExpressionKind, Error> {
-        match self.cursor.peek() {
+        match self.cursor.peek().kind {
             // foo?
-            Some(Token {
-                kind: TokenKind::Question,
-                span: _,
-            }) => {
+            TokenKind::Question => {
                 self.cursor.next();
 
                 self.parse_postfix_expression_kind(ExpressionKind::Try(Box::new(expression)))
             }
             // foo()
-            Some(Token {
-                kind: TokenKind::LeftParens,
-                span: _,
-            }) => {
+            TokenKind::LeftParens => {
                 self.cursor.next();
 
                 let arguments = self.parse_argument_nodes()?;
@@ -246,10 +228,7 @@ impl<'parse> Parse<'parse> {
             // foo.await
             // foo.field
             // foo.method_call()
-            Some(Token {
-                kind: TokenKind::Dot,
-                span: _,
-            }) => {
+            TokenKind::Dot => {
                 self.cursor.next();
 
                 let expression = if identifier!(self.cursor => Await) {
@@ -272,10 +251,7 @@ impl<'parse> Parse<'parse> {
                 self.parse_postfix_expression_kind(expression)
             }
             // foo[bar]
-            Some(Token {
-                kind: TokenKind::LeftBracket,
-                span: _,
-            }) => {
+            TokenKind::LeftBracket => {
                 self.cursor.next();
 
                 let index = self.parse_expression_kind()?;
@@ -299,12 +275,9 @@ impl<'parse> Parse<'parse> {
     ) -> Result<ExpressionKind, Error> {
         macro_rules! match_operator {
             ($($kind:ident => $operator:ident,)+ _ => return Ok(lhs),) => {
-                match self.cursor.peek() {
+                match self.cursor.peek().kind {
                     $(
-                        Some(Token {
-                            kind: TokenKind::$kind,
-                            span: _
-                        }) => {
+                        TokenKind::$kind => {
                             self.cursor.next();
                             BinaryOperatorKind::$operator
                         }

@@ -1,4 +1,4 @@
-use danube_token::Token;
+use danube_token::{Token, EOF};
 use std::iter::Peekable;
 use std::slice::Iter;
 
@@ -23,10 +23,10 @@ impl<'parse> Cursor<'parse> {
     }
 
     #[inline]
-    pub fn peek(&mut self) -> Option<&Token> {
+    pub fn peek(&mut self) -> &Token {
         match self.iter.peek() {
-            Some(token) => Some(token),
-            None => None,
+            Some(token) => token,
+            None => &EOF,
         }
     }
 }
@@ -44,29 +44,23 @@ impl<'parse> std::iter::Iterator for Cursor<'parse> {
 #[macro_export]
 macro_rules! identifier {
     ($cursor:expr) => {{
-        use danube_token::{Token, TokenKind};
+        use danube_token::TokenKind;
 
-        match $cursor.peek() {
-            Some(Token {
-                span: _,
-                kind: TokenKind::Identifier(identifier),
-            }) => Some(identifier),
-            _ => None,
+        if let TokenKind::Identifier(identifier) = $cursor.peek().kind {
+            Some(identifier)
+        } else {
+            None
         }
     }};
 
     ($cursor:expr => $keyword:ident) => {{
-        use danube_token::{Token, TokenKind};
+        use danube_token::TokenKind;
 
-        match $cursor.peek() {
-            Some(Token {
-                span: _,
-                kind: TokenKind::Identifier(danube_token::keywords::$keyword),
-            }) => {
-                $cursor.next();
-                true
-            }
-            _ => false,
+        if $cursor.peek().kind == TokenKind::Identifier(danube_token::keywords::$keyword) {
+            $cursor.next();
+            true
+        } else {
+            false
         }
     }};
 }
@@ -74,33 +68,27 @@ macro_rules! identifier {
 #[macro_export]
 macro_rules! symbol {
     ($cursor:expr) => {{
-        use danube_token::{Token, TokenKind};
+        use danube_token::TokenKind;
 
-        match $cursor.peek() {
-            Some(Token { span: _, kind })
-                if !matches!(
-                    kind,
-                    TokenKind::Identifier(_) | TokenKind::Literal(_, _) | TokenKind::Comment(_)
-                ) =>
-            {
-                Some(kind)
-            }
-            _ => None,
+        let kind = &$cursor.peek().kind;
+        if matches!(
+            kind,
+            TokenKind::Identifier(_) | TokenKind::Literal(_, _) | TokenKind::Comment(_)
+        ) {
+            None
+        } else {
+            Some(kind)
         }
     }};
 
     ($cursor:expr => $ident:ident) => {{
-        use danube_token::{Token, TokenKind};
+        use danube_token::TokenKind;
 
-        match $cursor.peek() {
-            Some(Token {
-                kind: TokenKind::$ident,
-                span: _,
-            }) => {
-                $cursor.next();
-                true
-            }
-            _ => false,
+        if $cursor.peek().kind == TokenKind::$ident {
+            $cursor.next();
+            true
+        } else {
+            false
         }
     }};
 }
@@ -110,27 +98,21 @@ macro_rules! literal {
     ($cursor:expr) => {{
         use danube_token::{Token, TokenKind};
 
-        match $cursor.peek() {
-            Some(Token {
-                span: _,
-                kind: TokenKind::Literal(literal),
-            }) => Some(literal),
-            _ => None,
+        if let TokenKind::Literal(literal) = $cursor.peek().kind {
+            Some(literal)
+        } else {
+            None
         }
     }};
 
     ($cursor:expr => $ident:ident) => {{
         use danube_token::{Literal, Token, TokenKind};
 
-        match $cursor.peek() {
-            Some(Token {
-                span: _,
-                kind: TokenKind::Literal($ident),
-            }) => {
-                $cursor.next();
-                true
-            }
-            _ => false,
+        if $cursor.peek().kind == TokenKind::Literal($ident) {
+            $cursor.next();
+            true
+        } else {
+            false
         }
     }};
 }

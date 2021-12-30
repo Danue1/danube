@@ -203,22 +203,26 @@ pub struct LetNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct PatternNode {
-    pub parts: Vec<PatternPart>,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct PatternPart {
-    pub immutablity: ImmutablityKind,
     pub kind: PatternKind,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum PatternKind {
-    Placeholder,
+    /// _
+    Wildcard,
+    /// ..
+    Rest,
+    Ident(),
+    /// 1, 2.3, 'c', "har"
     Literal(LiteralKind),
+    /// foo, foo::bar
     Path(PathNode),
-    UnnamedStruct(ExpressionUnnamedStructNode),
-    NamedStruct(ExpressionNamedStructNode),
+    /// Foo { a, b }
+    NamedStruct(Option<PathNode>, Vec<PatternNode>),
+    /// Foo(a, b)
+    UnnamedStruct(Option<PathNode>, Vec<PatternNode>),
+    /// [foo, bar]
+    Slice(Vec<PatternNode>),
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -241,6 +245,9 @@ pub struct TypeAliasNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum ExpressionKind {
+    // Binding
+    Let(PatternNode, Box<ExpressionKind>),
+
     // Prefix
     Negate(Box<ExpressionKind>),
     Not(Box<ExpressionKind>),
@@ -296,7 +303,7 @@ pub struct WhileNode {
 #[derive(Debug, PartialEq, Clone)]
 pub struct ForNode {
     pub pattern: PatternNode,
-    pub expression: Box<ExpressionKind>,
+    pub iter: Box<ExpressionKind>,
     pub block: BlockNode,
 }
 
