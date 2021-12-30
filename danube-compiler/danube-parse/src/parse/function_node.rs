@@ -8,7 +8,11 @@ impl<'parse> Parse<'parse> {
         let self_type = None;
         let parameters = self.parse_function_parameter_nodes()?;
         let return_type = self.parse_function_return_type()?;
-        let block = self.parse_block_node()?;
+        let block = if symbol!(self.cursor => LeftBrace) {
+            Some(self.parse_block_node()?)
+        } else {
+            None
+        };
 
         Ok(FunctionNode {
             ident,
@@ -26,35 +30,5 @@ impl<'parse> Parse<'parse> {
 
     fn parse_function_return_type(&mut self) -> Result<Option<TypeNode>, Error> {
         std::todo!();
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::Parse;
-    use danube_ast::{FunctionNode, IdentNode};
-    use danube_lex::Lex;
-    use danube_token::{SymbolInterner, Token};
-
-    #[test]
-    #[ignore]
-    fn empty_block() {
-        let source = "hello();";
-        let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
-        let mut interner = SymbolInterner::default();
-
-        assert_eq!(
-            Parse::new(tokens.as_slice()).parse_function_node(),
-            Ok(FunctionNode {
-                ident: IdentNode {
-                    symbol: interner.intern("hello"),
-                },
-                generics: vec![],
-                self_type: None,
-                parameters: vec![],
-                return_type: None,
-                block: None,
-            })
-        );
     }
 }

@@ -1,6 +1,6 @@
 use crate::{Cursor, Error, Lex};
 use danube_span::Span;
-use danube_token::{LiteralKind, Token, TokenKind};
+use danube_token::{LiteralKind, Symbol, Token, TokenKind};
 
 impl<'lex> Lex<'lex> {
     pub fn lex_number(&mut self) -> Result<Token, Error> {
@@ -13,7 +13,7 @@ impl<'lex> Lex<'lex> {
                     Some('0'..='9') => {
                         let float_span = integer_span.concat(lex_numeric(&mut self.cursor));
                         let string = self.cursor.slice(&float_span);
-                        let symbol = self.intern(string);
+                        let symbol = Symbol::intern(string);
                         let kind = TokenKind::Literal(symbol, LiteralKind::Float);
 
                         Ok(Token::new(float_span, kind))
@@ -23,7 +23,7 @@ impl<'lex> Lex<'lex> {
             }
             _ => {
                 let string = self.cursor.slice(&integer_span);
-                let symbol = self.intern(string);
+                let symbol = Symbol::intern(string);
                 let kind = TokenKind::Literal(symbol, LiteralKind::Integer);
 
                 Ok(Token::new(integer_span, kind))
@@ -35,7 +35,7 @@ impl<'lex> Lex<'lex> {
         let float_span = lex_numeric(&mut self.cursor);
         let float_span = Span::new(float_span.start - 1, float_span.end);
         let string = self.cursor.slice(&float_span);
-        let symbol = self.intern(string);
+        let symbol = Symbol::intern(string);
         let kind = TokenKind::Literal(symbol, LiteralKind::Float);
 
         Ok(Token::new(float_span, kind))

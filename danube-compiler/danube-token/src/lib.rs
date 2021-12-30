@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate lazy_static;
+
 pub mod keyword;
 pub mod symbol;
 
@@ -86,10 +89,9 @@ pub enum TokenKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum LiteralKind {
-    Boolean,
+    Char,
     Integer,
     Float,
-    Char,
     String,
 }
 

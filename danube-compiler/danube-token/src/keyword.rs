@@ -51,14 +51,14 @@ macro_rules! reserve {
                 let mut strings = Vec::new();
                 let mut symbols = HashMap::new();
 
-                $(strings.push(keyword_literals::$keyword.to_owned());)+
+                $(strings.push(keyword_literals::$keyword);)+
                 for _ in CURRENT_KEYWORD_COUNT..MAXIMUM_KEYWORD_COUNT {
-                    strings.push(DUMMY.to_owned());
+                    strings.push(DUMMY);
                 }
-                $(strings.push(symbol_literals::$symbol.to_owned());)+
+                $(strings.push(symbol_literals::$symbol);)+
 
-                $(symbols.insert(keyword_literals::$keyword.to_owned(), keywords::$keyword);)+
-                $(symbols.insert(symbol_literals::$symbol.to_owned(), symbols::$symbol);)+
+                $(symbols.insert(keyword_literals::$keyword, keywords::$keyword);)+
+                $(symbols.insert(symbol_literals::$symbol, symbols::$symbol);)+
 
                 SymbolInterner {
                     strings,

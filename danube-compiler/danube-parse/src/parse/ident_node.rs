@@ -13,25 +13,3 @@ impl<'parse> Parse<'parse> {
         }
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use crate::Parse;
-    use danube_ast::IdentNode;
-    use danube_lex::Lex;
-    use danube_token::{SymbolInterner, Token};
-
-    #[test]
-    fn ident_node() {
-        let source = "hello";
-        let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
-        let mut interner = SymbolInterner::default();
-
-        assert_eq!(
-            Parse::new(tokens.as_slice()).parse_ident_node(),
-            Ok(IdentNode {
-                symbol: interner.intern("hello")
-            })
-        );
-    }
-}

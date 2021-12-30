@@ -1,6 +1,6 @@
 use crate::{Error, Lex};
 use danube_span::Span;
-use danube_token::{LiteralKind, Token, TokenKind};
+use danube_token::{LiteralKind, Symbol, Token, TokenKind};
 
 impl<'lex> Lex<'lex> {
     pub fn lex_string(&mut self) -> Result<Token, Error> {
@@ -11,7 +11,7 @@ impl<'lex> Lex<'lex> {
             match self.cursor.next() {
                 Some('"') => {
                     let span = Span::new(start - 1, self.cursor.cursor());
-                    let symbol = self.intern(string.as_ref());
+                    let symbol = Symbol::intern(string.as_ref());
                     let kind = TokenKind::Literal(symbol, LiteralKind::String);
 
                     return Ok(Token::new(span, kind));

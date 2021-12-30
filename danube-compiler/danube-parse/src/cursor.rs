@@ -54,16 +54,19 @@ macro_rules! identifier {
             _ => None,
         }
     }};
+
     ($cursor:expr => $keyword:ident) => {{
-        match identifier!($cursor) {
-            Some(&symbol) => {
-                let is_matched = symbol == danube_token::keywords::$keyword;
-                if is_matched {
-                    $cursor.next();
-                }
-                is_matched
+        use danube_token::{Token, TokenKind};
+
+        match $cursor.peek() {
+            Some(Token {
+                span: _,
+                kind: TokenKind::Identifier(danube_token::keywords::$keyword),
+            }) => {
+                $cursor.next();
+                true
             }
-            None => false,
+            _ => false,
         }
     }};
 }
@@ -74,13 +77,18 @@ macro_rules! symbol {
         use danube_token::{Token, TokenKind};
 
         match $cursor.peek() {
-            Some(Token {
-                span: _,
-                kind: TokenKind::Symbol(symbol),
-            }) => Some(symbol),
+            Some(Token { span: _, kind })
+                if !matches!(
+                    kind,
+                    TokenKind::Identifier(_) | TokenKind::Literal(_, _) | TokenKind::Comment(_)
+                ) =>
+            {
+                Some(kind)
+            }
             _ => None,
         }
     }};
+
     ($cursor:expr => $ident:ident) => {{
         use danube_token::{Token, TokenKind};
 
@@ -110,6 +118,7 @@ macro_rules! literal {
             _ => None,
         }
     }};
+
     ($cursor:expr => $ident:ident) => {{
         use danube_token::{Literal, Token, TokenKind};
 

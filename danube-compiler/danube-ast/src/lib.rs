@@ -1,6 +1,6 @@
 #![warn(clippy::all)]
 
-use danube_token::Symbol;
+use danube_token::{LiteralKind, Symbol};
 use std::collections::HashMap;
 
 #[derive(Debug, PartialEq, Clone)]
@@ -17,27 +17,12 @@ pub struct AttributeNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct PathNode {
-    pub kinds: Vec<PathKind>,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub enum PathKind {
-    Package,
-    Super,
-    Ident(IdentNode),
+    pub idents: Vec<IdentNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct IdentNode {
     pub symbol: Symbol,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub enum LiteralKind {
-    Char(char),
-    Int(i64),
-    Float(f64),
-    String(String),
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -257,18 +242,19 @@ pub struct TypeAliasNode {
 #[derive(Debug, PartialEq, Clone)]
 pub enum ExpressionKind {
     // Prefix
-    Sub(Box<ExpressionKind>),
-    Add(Box<ExpressionKind>),
+    Negate(Box<ExpressionKind>),
     Not(Box<ExpressionKind>),
     BitNot(Box<ExpressionKind>),
 
     // Atomic
-    Literal(LiteralKind),
+    Literal(Symbol, LiteralKind),
     Conditional(ConditionNode),
     Loop(LoopNode),
     While(WhileNode),
     For(ForNode),
     PatternMatch(PatternMatchNode),
+    Path(PathNode),
+    FunctionCall(FunctionCallNode),
     Closure(ClosureNode),
     Block(BlockNode),
     Tuple(TupleNode),
@@ -277,10 +263,9 @@ pub enum ExpressionKind {
     // Postfix
     Try(Box<ExpressionKind>),
     Await(Box<ExpressionKind>),
-    Path(PathNode),
-    Index(IndexNode),
     Field(FieldNode),
-    FunctionCall(FunctionCallNode),
+    Index(IndexNode),
+    MethodCall(MethodCallNode),
 
     // Binary
     Binary(BinaryExpressionNode),
@@ -288,13 +273,12 @@ pub enum ExpressionKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ConditionNode {
-    pub branchs: Vec<ConditionBranch>,
+    pub branches: Vec<ConditionBranch>,
     pub other: Option<BlockNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ConditionBranch {
-    pub pattern: Option<PatternNode>,
     pub expression: Box<ExpressionKind>,
     pub block: BlockNode,
 }
@@ -319,7 +303,7 @@ pub struct ForNode {
 #[derive(Debug, PartialEq, Clone)]
 pub struct PatternMatchNode {
     pub expression: Box<ExpressionKind>,
-    pub branchs: Vec<PatternBranch>,
+    pub branches: Vec<PatternBranch>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -362,17 +346,23 @@ pub struct BinaryExpressionNode {
 #[derive(Debug, PartialEq, Clone)]
 pub struct FieldNode {
     pub expression: Box<ExpressionKind>,
-    pub field: Box<IdentNode>,
+    pub field: IdentNode,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct FunctionCallNode {
     pub expression: Box<ExpressionKind>,
-    pub arguments: Vec<FunctionArgumentNode>,
+    pub arguments: Vec<ArgumentNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct FunctionArgumentNode {
+pub struct MethodCallNode {
+    pub ident: IdentNode,
+    pub arguments: Vec<ArgumentNode>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct ArgumentNode {
     pub ident: Option<IdentNode>,
     pub expression: ExpressionKind,
 }
@@ -401,8 +391,6 @@ pub enum BinaryOperatorKind {
 
     And, // &&
     Or,  // ||
-
-    ChainArrow, // |>
 }
 
 #[derive(Debug, PartialEq, Clone)]

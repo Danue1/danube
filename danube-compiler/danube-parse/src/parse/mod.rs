@@ -15,6 +15,9 @@ mod type_alias_node;
 mod use_node;
 mod visibility_kind;
 
+#[cfg(test)]
+mod tests;
+
 use crate::{Cursor, Error, Resolver};
 use danube_ast::PackageNode;
 use danube_token::Token;
@@ -34,28 +37,5 @@ impl<'parse> Parse<'parse> {
 
     pub fn parse(&mut self) -> Result<PackageNode, Error> {
         self.parse_package_node()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::Parse;
-    use danube_ast::PackageNode;
-    use danube_lex::Lex;
-    use danube_token::Token;
-
-    #[test]
-    fn empty() {
-        let source = "";
-        let lexer = Lex::new(source);
-        let tokens: Vec<Token> = lexer.filter_map(|token| token.ok()).collect();
-
-        assert_eq!(
-            Parse::new(tokens.as_slice()).parse(),
-            Ok(PackageNode {
-                attributes: vec![],
-                items: vec![],
-            })
-        );
     }
 }

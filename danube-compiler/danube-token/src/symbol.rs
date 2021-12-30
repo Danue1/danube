@@ -1,6 +1,6 @@
 use crate::keywords;
 use std::collections::HashMap;
-use std::ops::Index;
+use std::sync::Mutex;
 
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
 pub struct Symbol(pub(crate) SymbolIndex);
@@ -11,30 +11,40 @@ pub struct SymbolIndex {
 }
 
 #[derive(Debug)]
-pub struct SymbolInterner {
-    pub(crate) strings: Vec<String>,
-    pub(crate) symbols: HashMap<String, Symbol>,
+pub(crate) struct SymbolInterner {
+    pub(crate) strings: Vec<&'static str>,
+    pub(crate) symbols: HashMap<&'static str, Symbol>,
 }
 
-#[derive(Debug, Default)]
-pub struct SymbolContainer {
-    strings: Vec<String>,
+lazy_static! {
+    static ref INTERNER: Mutex<SymbolInterner> = Mutex::new(SymbolInterner::default());
+}
+
+impl Symbol {
+    pub fn intern(string: &str) -> Symbol {
+        INTERNER.lock().unwrap().intern(string)
+    }
+
+    pub fn get(&self) -> &'static str {
+        INTERNER.lock().unwrap().strings[self.0.index]
+    }
 }
 
 impl SymbolInterner {
     pub fn intern(&mut self, string: &str) -> Symbol {
-        match self.symbols.get(string) {
-            Some(&name) => name,
-            None => {
-                let symbol = Symbol(SymbolIndex {
-                    index: self.strings.len(),
-                });
+        if let Some(&symbol) = self.symbols.get(string) {
+            symbol
+        } else {
+            let symbol = Symbol(SymbolIndex {
+                index: self.strings.len(),
+            });
 
-                self.strings.push(string.to_owned());
-                self.symbols.insert(string.to_owned(), symbol);
+            let string = Box::leak(string.into());
 
-                symbol
-            }
+            self.strings.push(string);
+            self.symbols.insert(string, symbol);
+
+            symbol
         }
     }
 }
@@ -65,21 +75,5 @@ impl Symbol {
 
     pub fn is_bool_literal(self) -> bool {
         matches!(self, keywords::True | keywords::False)
-    }
-}
-
-impl From<SymbolInterner> for SymbolContainer {
-    fn from(interner: SymbolInterner) -> Self {
-        SymbolContainer {
-            strings: interner.strings,
-        }
-    }
-}
-
-impl Index<Symbol> for SymbolContainer {
-    type Output = str;
-
-    fn index(&self, symbol: Symbol) -> &Self::Output {
-        &self.strings[symbol.0.index]
     }
 }
