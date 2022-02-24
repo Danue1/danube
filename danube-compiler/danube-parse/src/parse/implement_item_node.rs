@@ -4,7 +4,7 @@ use danube_token::keywords;
 
 impl<'parse> Parse<'parse> {
     pub fn parse_implement_item_nodes(&mut self) -> Result<Vec<ImplementItemNode>, Error> {
-        if symbol!(self.cursor => LeftBrace) {
+        if !symbol!(self.cursor => LeftBrace) {
             return Err(Error::Invalid);
         }
 

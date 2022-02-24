@@ -10,12 +10,11 @@ impl<'parse> Parse<'parse> {
             return Err(Error::Invalid);
         };
         let (trait_ident, target) = if identifier!(self.cursor => For) {
-            let path = if let Some(path) = self.parse_path_node()? {
-                path
+            if let Some(path) = self.parse_path_node()? {
+                (Some(trait_ident), path)
             } else {
                 return Err(Error::Invalid);
-            };
-            (Some(trait_ident), path)
+            }
         } else {
             (None, trait_ident)
         };
