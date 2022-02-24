@@ -71,7 +71,7 @@ pub struct StructNode {
 pub struct GenericNode {
     pub ident: IdentNode,
     pub traits: Vec<PathNode>,
-    pub default_traits: Vec<PathNode>,
+    pub default: Option<PathNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]

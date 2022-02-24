@@ -1,6 +1,8 @@
 mod attribute_node;
 mod block_node;
 mod constant_node;
+mod enum_node;
+mod enum_variant_node;
 mod expression_kind;
 mod function_node;
 mod ident_node;
