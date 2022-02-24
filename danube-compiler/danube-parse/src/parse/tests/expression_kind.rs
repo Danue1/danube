@@ -1,7 +1,7 @@
 use crate::Parse;
 use danube_ast::{
     BlockNode, ConditionBranch, ConditionNode, ExpressionKind, ForNode, IdentNode, LoopNode,
-    PathNode, PatternMatchNode, WhileNode,
+    MatchNode, PathNode, WhileNode,
 };
 use danube_lex::Lex;
 use danube_token::{LiteralKind, Symbol, Token};
@@ -234,6 +234,34 @@ fn r#while() {
                 })),
                 block: BlockNode { statements: vec![] }
             },
+        }))
+    );
+}
+
+#[test]
+#[ignore]
+fn r#for() {
+    let source = "for foo in bar { }";
+    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+
+    assert_eq!(
+        Parse::new(tokens.as_slice()).parse_expression_kind(),
+        Ok(ExpressionKind::Loop(LoopNode {
+            block: BlockNode { statements: vec![] }
+        }))
+    );
+}
+
+#[test]
+#[ignore]
+fn r#match() {
+    let source = "match foo { 1 => { } }";
+    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+
+    assert_eq!(
+        Parse::new(tokens.as_slice()).parse_expression_kind(),
+        Ok(ExpressionKind::Loop(LoopNode {
+            block: BlockNode { statements: vec![] }
         }))
     );
 }

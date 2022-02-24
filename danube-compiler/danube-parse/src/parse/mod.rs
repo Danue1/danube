@@ -13,6 +13,7 @@ mod pattern_node;
 mod statement_node;
 mod trait_node;
 mod type_alias_node;
+mod type_node;
 mod use_node;
 mod visibility_kind;
 

@@ -259,7 +259,7 @@ pub enum ExpressionKind {
     Loop(LoopNode),
     While(WhileNode),
     For(ForNode),
-    PatternMatch(PatternMatchNode),
+    Match(MatchNode),
     Path(PathNode),
     FunctionCall(FunctionCallNode),
     Closure(ClosureNode),
@@ -308,28 +308,22 @@ pub struct ForNode {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct PatternMatchNode {
+pub struct MatchNode {
     pub expression: Box<ExpressionKind>,
-    pub branches: Vec<PatternBranch>,
+    pub branches: Vec<MatchBranch>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct PatternBranch {
+pub struct MatchBranch {
     pub pattern: PatternNode,
     pub block: BlockNode,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ClosureNode {
-    pub parameters: Option<ClosureArgumentListKind>,
+    pub parameters: Vec<(IdentNode, Option<TypeNode>)>,
     pub return_type: Option<TypeNode>,
     pub block: BlockNode,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub enum ClosureArgumentListKind {
-    Untyped(Vec<IdentNode>),
-    Typed(Vec<(IdentNode, TypeNode)>),
 }
 
 #[derive(Debug, PartialEq, Clone)]

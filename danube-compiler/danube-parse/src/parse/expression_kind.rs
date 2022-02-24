@@ -1,8 +1,8 @@
 use crate::{Error, Parse};
 use danube_ast::{
-    ArgumentNode, BinaryExpressionNode, BinaryOperatorKind, BlockNode, ConditionBranch,
-    ConditionNode, ExpressionKind, FieldNode, ForNode, FunctionCallNode, IdentNode, IndexNode,
-    LoopNode, MethodCallNode, PatternMatchNode, TupleNode, WhileNode,
+    ArgumentNode, BinaryExpressionNode, BinaryOperatorKind, BlockNode, ClosureNode,
+    ConditionBranch, ConditionNode, ExpressionKind, FieldNode, ForNode, FunctionCallNode,
+    IdentNode, IndexNode, LoopNode, MatchBranch, MatchNode, MethodCallNode, TupleNode, WhileNode,
 };
 use danube_token::{keywords, Token, TokenKind};
 
@@ -130,11 +130,30 @@ impl<'parse> Parse<'parse> {
                     block,
                 }))
             }
-            // Pattern Match
+            // Match
             TokenKind::Identifier(keywords::Match) => {
                 self.cursor.next();
 
-                std::todo!()
+                let expression = self.parse_expression_kind()?;
+                if !symbol!(self.cursor => LeftBrace) {
+                    return Err(Error::Invalid);
+                }
+
+                let mut branches = vec![];
+                while !symbol!(self.cursor => RightBrace) {
+                    let pattern = self.parse_pattern_node()?;
+                    if !symbol!(self.cursor => Eq) || !symbol!(self.cursor => RightChevron) {
+                        return Err(Error::Invalid);
+                    }
+
+                    let block = self.parse_block_node()?;
+                    branches.push(MatchBranch { pattern, block });
+                }
+
+                self.parse_postfix_expression_kind(ExpressionKind::Match(MatchNode {
+                    expression: Box::new(expression),
+                    branches,
+                }))
             }
             // Path or Function Call
             TokenKind::Identifier(_) => {
@@ -153,12 +172,62 @@ impl<'parse> Parse<'parse> {
             // Closure
             // |a| { ... }
             TokenKind::Pipeline => {
-                std::todo!()
+                self.cursor.next();
+
+                let mut parameters = vec![];
+
+                while !symbol!(self.cursor => Pipeline) {
+                    let ident = self.parse_ident_node()?;
+                    let ty = if symbol!(self.cursor => Colon) {
+                        Some(self.parse_type_node()?)
+                    } else {
+                        None
+                    };
+                    parameters.push((ident, ty));
+
+                    if !symbol!(self.cursor => Comma) {
+                        break;
+                    }
+                }
+
+                let return_type = if symbol!(self.cursor => Hyphen) {
+                    if symbol!(self.cursor => RightChevron) {
+                        Some(self.parse_type_node()?)
+                    } else {
+                        return Err(Error::Invalid);
+                    }
+                } else {
+                    None
+                };
+
+                let block = self.parse_block_node()?;
+
+                self.parse_postfix_expression_kind(ExpressionKind::Closure(ClosureNode {
+                    parameters,
+                    return_type,
+                    block,
+                }))
             }
             // Closure
             // || { ... }
             TokenKind::PipelinePipeline => {
-                std::todo!()
+                let return_type = if symbol!(self.cursor => Hyphen) {
+                    if symbol!(self.cursor => RightChevron) {
+                        Some(self.parse_type_node()?)
+                    } else {
+                        return Err(Error::Invalid);
+                    }
+                } else {
+                    None
+                };
+
+                let block = self.parse_block_node()?;
+
+                self.parse_postfix_expression_kind(ExpressionKind::Closure(ClosureNode {
+                    parameters: vec![],
+                    return_type,
+                    block,
+                }))
             }
             TokenKind::LeftBrace => {
                 self.cursor.next();
