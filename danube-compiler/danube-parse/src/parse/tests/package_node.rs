@@ -2,7 +2,6 @@ use crate::Parse;
 use danube_ast::{AttributeNode, IdentNode, PackageNode, PathNode};
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
-use std::collections::HashMap;
 
 #[test]
 fn attribute() {
@@ -18,7 +17,7 @@ fn attribute() {
                         symbol: Symbol::intern("hello")
                     }]
                 },
-                args: HashMap::new(),
+                args: vec![],
             }],
             items: vec![],
         }),
@@ -41,7 +40,7 @@ fn attributes() {
                             symbol: Symbol::intern("hello"),
                         }],
                     },
-                    args: HashMap::new(),
+                    args: vec![],
                 },
                 AttributeNode {
                     path: PathNode {
@@ -49,7 +48,7 @@ fn attributes() {
                             symbol: Symbol::intern("hello"),
                         }],
                     },
-                    args: HashMap::new(),
+                    args: vec![],
                 },
             ],
             items: vec![],

@@ -1,6 +1,5 @@
 use crate::{Error, Parse};
 use danube_ast::AttributeNode;
-use std::collections::HashMap;
 
 impl<'parse> Parse<'parse> {
     pub fn parse_package_attributes(&mut self) -> Result<Vec<AttributeNode>, Error> {
@@ -58,15 +57,37 @@ impl<'parse> Parse<'parse> {
         } else {
             return Err(Error::Invalid);
         };
-        let args = if symbol!(self.cursor => LeftParens) {
-            std::todo!();
+        let args = if !symbol!(self.cursor => LeftParens) {
+            vec![]
         } else {
-            HashMap::new()
-        };
-        if !symbol!(self.cursor => RightBracket) {
-            return Err(Error::Invalid);
-        }
+            let mut args = vec![];
 
-        Ok(AttributeNode { path, args })
+            while !symbol!(self.cursor => RightParens) {
+                let ident = self.parse_ident_node()?;
+                let expression = if symbol!(self.cursor => Eq) {
+                    Some(self.parse_expression_kind()?)
+                } else {
+                    None
+                };
+
+                args.push((ident, expression));
+
+                if !symbol!(self.cursor => Comma) {
+                    if symbol!(self.cursor => RightParens) {
+                        break;
+                    }
+
+                    return Err(Error::Invalid);
+                }
+            }
+
+            args
+        };
+
+        if symbol!(self.cursor => RightBracket) {
+            Ok(AttributeNode { path, args })
+        } else {
+            Err(Error::Invalid)
+        }
     }
 }

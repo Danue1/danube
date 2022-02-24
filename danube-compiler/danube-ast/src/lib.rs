@@ -2,7 +2,6 @@
 
 pub use danube_token::LiteralKind;
 use danube_token::Symbol;
-use std::collections::HashMap;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct PackageNode {
@@ -13,7 +12,7 @@ pub struct PackageNode {
 #[derive(Debug, PartialEq, Clone)]
 pub struct AttributeNode {
     pub path: PathNode,
-    pub args: HashMap<String, Option<LiteralKind>>,
+    pub args: Vec<(IdentNode, Option<ExpressionKind>)>,
 }
 
 #[derive(Debug, PartialEq, Clone)]

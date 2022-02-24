@@ -23,8 +23,7 @@ fn symbols() {
                         Some(Ok(Token::new(Span::new(0, count), kind)))
                     );
                 } else {
-                    // assert with error message for preventing human-mistakes.
-                    std::todo!();
+                    std::unimplemented!();
                 }
             )+
         };

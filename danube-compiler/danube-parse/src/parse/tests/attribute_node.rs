@@ -1,8 +1,7 @@
 use crate::Parse;
-use danube_ast::{AttributeNode, IdentNode, PathNode};
+use danube_ast::{AttributeNode, ExpressionKind, IdentNode, PathNode};
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
-use std::collections::HashMap;
 
 #[test]
 fn package_attribute() {
@@ -17,7 +16,7 @@ fn package_attribute() {
                     symbol: Symbol::intern("hello"),
                 }],
             },
-            args: HashMap::new(),
+            args: vec![],
         }]),
     );
 }
@@ -36,7 +35,7 @@ fn package_attributes() {
                         symbol: Symbol::intern("hello"),
                     }],
                 },
-                args: HashMap::new(),
+                args: vec![],
             },
             AttributeNode {
                 path: PathNode {
@@ -44,7 +43,7 @@ fn package_attributes() {
                         symbol: Symbol::intern("hello"),
                     }]
                 },
-                args: HashMap::new(),
+                args: vec![],
             },
         ]),
     );
@@ -63,7 +62,7 @@ fn item_attribute() {
                     symbol: Symbol::intern("hello"),
                 }],
             },
-            args: HashMap::new(),
+            args: vec![],
         }]),
     );
 }
@@ -82,7 +81,7 @@ fn item_attributes() {
                         symbol: Symbol::intern("hello"),
                     }],
                 },
-                args: HashMap::new(),
+                args: vec![],
             },
             AttributeNode {
                 path: PathNode {
@@ -90,8 +89,58 @@ fn item_attributes() {
                         symbol: Symbol::intern("hello"),
                     }],
                 },
-                args: HashMap::new(),
+                args: vec![],
             },
         ]),
+    );
+}
+
+#[test]
+fn item_attribute_with_argument() {
+    let source = "#[hello(foo)]";
+    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+
+    assert_eq!(
+        Parse::new(tokens.as_slice()).parse_item_attributes(),
+        Ok(vec![AttributeNode {
+            path: PathNode {
+                segments: vec![IdentNode {
+                    symbol: Symbol::intern("hello"),
+                }],
+            },
+            args: vec![(
+                IdentNode {
+                    symbol: Symbol::intern("foo"),
+                },
+                None,
+            )],
+        }]),
+    );
+}
+
+#[test]
+fn item_attribute_with_argument_and_expression() {
+    let source = "#[hello(foo = bar)]";
+    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+
+    assert_eq!(
+        Parse::new(tokens.as_slice()).parse_item_attributes(),
+        Ok(vec![AttributeNode {
+            path: PathNode {
+                segments: vec![IdentNode {
+                    symbol: Symbol::intern("hello"),
+                }],
+            },
+            args: vec![(
+                IdentNode {
+                    symbol: Symbol::intern("foo"),
+                },
+                Some(ExpressionKind::Path(PathNode {
+                    segments: vec![IdentNode {
+                        symbol: Symbol::intern("bar"),
+                    }],
+                })),
+            )],
+        }]),
     );
 }
