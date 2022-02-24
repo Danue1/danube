@@ -1,5 +1,5 @@
 use crate::Parse;
-use danube_ast::{IdentNode, ImmutablityKind, PathNode, TypeAliasNode, TypeKind, TypeNode};
+use danube_ast::{IdentNode, ImmutabilityKind, PathNode, TypeAliasNode, TypeKind, TypeNode};
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
 
@@ -15,7 +15,7 @@ fn alias() {
         symbol: Symbol::intern("Foo"),
       },
       ty: TypeNode {
-        immutablity: ImmutablityKind::Yes,
+        immutability: ImmutabilityKind::Yes,
         kind: TypeKind::Path(PathNode {
           segments: vec![IdentNode {
             symbol: Symbol::intern("Bar"),

@@ -1,6 +1,6 @@
 use crate::Parse;
 use danube_ast::{
-    EnumNode, EnumVariantKind, EnumVariantNode, GenericNode, IdentNode, ImmutablityKind, PathNode,
+    EnumNode, EnumVariantKind, EnumVariantNode, GenericNode, IdentNode, ImmutabilityKind, PathNode,
     TypeKind, TypeNode,
 };
 use danube_lex::Lex;
@@ -44,7 +44,7 @@ fn result() {
                         symbol: Symbol::intern("Ok"),
                     },
                     kind: Some(EnumVariantKind::Unnamed(vec![TypeNode {
-                        immutablity: ImmutablityKind::Yes,
+                        immutability: ImmutabilityKind::Yes,
                         kind: TypeKind::Path(PathNode {
                             segments: vec![IdentNode {
                                 symbol: Symbol::intern("T"),
@@ -57,7 +57,7 @@ fn result() {
                         symbol: Symbol::intern("Err"),
                     },
                     kind: Some(EnumVariantKind::Unnamed(vec![TypeNode {
-                        immutablity: ImmutablityKind::Yes,
+                        immutability: ImmutabilityKind::Yes,
                         kind: TypeKind::Path(PathNode {
                             segments: vec![IdentNode {
                                 symbol: Symbol::intern("E"),

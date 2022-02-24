@@ -1,7 +1,7 @@
 use crate::Parse;
 use danube_ast::{
-    BlockNode, FunctionNode, FunctionParameterNode, IdentNode, ImmutablityKind, PathNode, TypeKind,
-    TypeNode,
+    BlockNode, FunctionNode, FunctionParameterNode, IdentNode, ImmutabilityKind, PathNode,
+    TypeKind, TypeNode,
 };
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
@@ -61,7 +61,7 @@ fn with_return_type() {
             self_type: None,
             parameters: vec![],
             return_type: Some(TypeNode {
-                immutablity: ImmutablityKind::Yes,
+                immutability: ImmutabilityKind::Yes,
                 kind: TypeKind::Path(PathNode {
                     segments: vec![IdentNode {
                         symbol: Symbol::intern("bar"),
@@ -85,7 +85,7 @@ fn immutable_self() {
                 symbol: Symbol::intern("foo"),
             },
             generics: vec![],
-            self_type: Some(ImmutablityKind::Yes),
+            self_type: Some(ImmutabilityKind::Yes),
             parameters: vec![],
             return_type: None,
             block: None,
@@ -105,7 +105,7 @@ fn mutable_self() {
                 symbol: Symbol::intern("foo"),
             },
             generics: vec![],
-            self_type: Some(ImmutablityKind::Nope),
+            self_type: Some(ImmutabilityKind::Nope),
             parameters: vec![],
             return_type: None,
             block: None,
@@ -132,7 +132,7 @@ fn one_parameter() {
                 },
                 parameter_label: None,
                 ty: TypeNode {
-                    immutablity: ImmutablityKind::Yes,
+                    immutability: ImmutabilityKind::Yes,
                     kind: TypeKind::Path(PathNode {
                         segments: vec![IdentNode {
                             symbol: Symbol::intern("Bar"),
@@ -166,7 +166,7 @@ fn two_parameters() {
                     },
                     parameter_label: None,
                     ty: TypeNode {
-                        immutablity: ImmutablityKind::Yes,
+                        immutability: ImmutabilityKind::Yes,
                         kind: TypeKind::Path(PathNode {
                             segments: vec![IdentNode {
                                 symbol: Symbol::intern("Bar"),
@@ -180,7 +180,7 @@ fn two_parameters() {
                     },
                     parameter_label: None,
                     ty: TypeNode {
-                        immutablity: ImmutablityKind::Yes,
+                        immutability: ImmutabilityKind::Yes,
                         kind: TypeKind::Path(PathNode {
                             segments: vec![IdentNode {
                                 symbol: Symbol::intern("Baz"),

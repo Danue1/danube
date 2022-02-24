@@ -1,6 +1,6 @@
 use crate::Parse;
 use danube_ast::{
-    ConstantNode, ExpressionKind, IdentNode, ImmutablityKind, PathNode, PatternKind, PatternNode,
+    ConstantNode, ExpressionKind, IdentNode, ImmutabilityKind, PathNode, PatternKind, PatternNode,
     TypeKind, TypeNode,
 };
 use danube_lex::Lex;
@@ -22,7 +22,7 @@ fn without_expression() {
                 }),
             },
             ty: TypeNode {
-                immutablity: ImmutablityKind::Yes,
+                immutability: ImmutabilityKind::Yes,
                 kind: TypeKind::Path(PathNode {
                     segments: vec![IdentNode {
                         symbol: Symbol::intern("bar"),
@@ -50,7 +50,7 @@ fn with_expression() {
                 }),
             },
             ty: TypeNode {
-                immutablity: ImmutablityKind::Yes,
+                immutability: ImmutabilityKind::Yes,
                 kind: TypeKind::Path(PathNode {
                     segments: vec![IdentNode {
                         symbol: Symbol::intern("bar"),

@@ -1,24 +1,24 @@
 use crate::{Error, Parse};
-use danube_ast::{FunctionParameterNode, ImmutablityKind};
+use danube_ast::{FunctionParameterNode, ImmutabilityKind};
 
 impl<'parse> Parse<'parse> {
   pub fn parse_function_parameter_nodes(
     &mut self,
-  ) -> Result<(Option<ImmutablityKind>, Vec<FunctionParameterNode>), Error> {
+  ) -> Result<(Option<ImmutabilityKind>, Vec<FunctionParameterNode>), Error> {
     if !symbol!(self.cursor => LeftParens) {
       return Err(Error::Invalid);
     }
 
-    let immutablity = if let Ok(immutablity) = self.parse_immutablity_kind() {
+    let immutability = if let Ok(immutability) = self.parse_immutability_kind() {
       if identifier!(self.cursor => SelfLower) {
-        Some(immutablity)
-      } else if immutablity == ImmutablityKind::Nope {
+        Some(immutability)
+      } else if immutability == ImmutabilityKind::Nope {
         return Err(Error::Invalid);
       } else {
         None
       }
     } else if identifier!(self.cursor => SelfLower) {
-      Some(ImmutablityKind::Nope)
+      Some(ImmutabilityKind::Nope)
     } else {
       None
     };
@@ -37,7 +37,7 @@ impl<'parse> Parse<'parse> {
       }
     }
 
-    Ok((immutablity, parameters))
+    Ok((immutability, parameters))
   }
 
   pub fn parse_function_parameter_node(&mut self) -> Result<FunctionParameterNode, Error> {

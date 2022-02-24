@@ -81,14 +81,14 @@ pub enum StructFieldKind {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum ImmutablityKind {
+pub enum ImmutabilityKind {
     Nope,
     Yes,
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct TypeNode {
-    pub immutablity: ImmutablityKind,
+    pub immutability: ImmutabilityKind,
     pub kind: TypeKind,
 }
 
@@ -122,7 +122,7 @@ pub enum EnumVariantKind {
 pub struct FunctionNode {
     pub ident: IdentNode,
     pub generics: GenericNodeList,
-    pub self_type: Option<ImmutablityKind>,
+    pub self_type: Option<ImmutabilityKind>,
     pub parameters: Vec<FunctionParameterNode>,
     pub return_type: Option<TypeNode>,
     pub block: Option<BlockNode>,

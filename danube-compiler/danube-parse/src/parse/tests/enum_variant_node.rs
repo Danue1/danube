@@ -1,6 +1,6 @@
 use crate::Parse;
 use danube_ast::{
-  EnumVariantKind, EnumVariantNode, IdentNode, ImmutablityKind, PathNode, TypeKind, TypeNode,
+  EnumVariantKind, EnumVariantNode, IdentNode, ImmutabilityKind, PathNode, TypeKind, TypeNode,
 };
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
@@ -49,7 +49,7 @@ fn unnamed_with_one_field() {
         symbol: Symbol::intern("Foo")
       },
       kind: Some(EnumVariantKind::Unnamed(vec![TypeNode {
-        immutablity: ImmutablityKind::Yes,
+        immutability: ImmutabilityKind::Yes,
         kind: TypeKind::Path(PathNode {
           segments: vec![IdentNode {
             symbol: Symbol::intern("Bar"),
@@ -73,7 +73,7 @@ fn unnamed_with_two_field() {
       },
       kind: Some(EnumVariantKind::Unnamed(vec![
         TypeNode {
-          immutablity: ImmutablityKind::Yes,
+          immutability: ImmutabilityKind::Yes,
           kind: TypeKind::Path(PathNode {
             segments: vec![IdentNode {
               symbol: Symbol::intern("Bar"),
@@ -81,7 +81,7 @@ fn unnamed_with_two_field() {
           }),
         },
         TypeNode {
-          immutablity: ImmutablityKind::Yes,
+          immutability: ImmutabilityKind::Yes,
           kind: TypeKind::Path(PathNode {
             segments: vec![IdentNode {
               symbol: Symbol::intern("Baz"),
@@ -109,7 +109,7 @@ fn named_with_one_field() {
           symbol: Symbol::intern("bar"),
         },
         TypeNode {
-          immutablity: ImmutablityKind::Yes,
+          immutability: ImmutabilityKind::Yes,
           kind: TypeKind::Path(PathNode {
             segments: vec![IdentNode {
               symbol: Symbol::intern("Bar"),
@@ -138,7 +138,7 @@ fn named_with_two_field() {
             symbol: Symbol::intern("bar"),
           },
           TypeNode {
-            immutablity: ImmutablityKind::Yes,
+            immutability: ImmutabilityKind::Yes,
             kind: TypeKind::Path(PathNode {
               segments: vec![IdentNode {
                 symbol: Symbol::intern("Bar"),
@@ -151,7 +151,7 @@ fn named_with_two_field() {
             symbol: Symbol::intern("baz"),
           },
           TypeNode {
-            immutablity: ImmutablityKind::Yes,
+            immutability: ImmutabilityKind::Yes,
             kind: TypeKind::Path(PathNode {
               segments: vec![IdentNode {
                 symbol: Symbol::intern("Baz"),
