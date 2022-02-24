@@ -1,6 +1,6 @@
 use crate::{Error, Parse};
 use danube_ast::{PatternKind, PatternNode};
-use danube_token::{keywords, Token, TokenKind};
+use danube_token::{keywords, TokenKind};
 
 impl<'parse> Parse<'parse> {
     pub fn parse_pattern_node(&mut self) -> Result<PatternNode, Error> {

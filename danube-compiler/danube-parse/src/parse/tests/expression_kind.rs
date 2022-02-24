@@ -1,7 +1,7 @@
 use crate::Parse;
 use danube_ast::{
     BlockNode, ConditionBranch, ConditionNode, ExpressionKind, ForNode, IdentNode, LoopNode,
-    MatchNode, PathNode, WhileNode,
+    MatchBranch, MatchNode, PathNode, PatternKind, PatternNode, WhileNode,
 };
 use danube_lex::Lex;
 use danube_token::{LiteralKind, Symbol, Token};
@@ -239,29 +239,49 @@ fn r#while() {
 }
 
 #[test]
-#[ignore]
 fn r#for() {
     let source = "for foo in bar { }";
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_expression_kind(),
-        Ok(ExpressionKind::Loop(LoopNode {
+        Ok(ExpressionKind::For(ForNode {
+            pattern: PatternNode {
+                kind: PatternKind::Path(PathNode {
+                    idents: vec![IdentNode {
+                        symbol: Symbol::intern("foo"),
+                    }],
+                }),
+            },
+            iter: Box::new(ExpressionKind::Path(PathNode {
+                idents: vec![IdentNode {
+                    symbol: Symbol::intern("bar"),
+                }],
+            })),
             block: BlockNode { statements: vec![] }
         }))
     );
 }
 
 #[test]
-#[ignore]
 fn r#match() {
     let source = "match foo { 1 => { } }";
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_expression_kind(),
-        Ok(ExpressionKind::Loop(LoopNode {
-            block: BlockNode { statements: vec![] }
+        Ok(ExpressionKind::Match(MatchNode {
+            expression: Box::new(ExpressionKind::Path(PathNode {
+                idents: vec![IdentNode {
+                    symbol: Symbol::intern("foo"),
+                }],
+            })),
+            branches: vec![MatchBranch {
+                pattern: PatternNode {
+                    kind: PatternKind::Literal(Symbol::intern("1"), LiteralKind::Integer,),
+                },
+                block: BlockNode { statements: vec![] }
+            }],
         }))
     );
 }

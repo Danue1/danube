@@ -4,7 +4,7 @@ use danube_ast::{
     ConditionBranch, ConditionNode, ExpressionKind, FieldNode, ForNode, FunctionCallNode,
     IdentNode, IndexNode, LoopNode, MatchBranch, MatchNode, MethodCallNode, TupleNode, WhileNode,
 };
-use danube_token::{keywords, Token, TokenKind};
+use danube_token::{keywords, TokenKind};
 
 impl<'parse> Parse<'parse> {
     pub fn parse_expression_kind(&mut self) -> Result<ExpressionKind, Error> {
@@ -142,7 +142,7 @@ impl<'parse> Parse<'parse> {
                 let mut branches = vec![];
                 while !symbol!(self.cursor => RightBrace) {
                     let pattern = self.parse_pattern_node()?;
-                    if !symbol!(self.cursor => Eq) || !symbol!(self.cursor => RightChevron) {
+                    if !symbol!(self.cursor => EqRightChevron) {
                         return Err(Error::Invalid);
                     }
 
@@ -194,12 +194,8 @@ impl<'parse> Parse<'parse> {
                     }
                 }
 
-                let return_type = if symbol!(self.cursor => Hyphen) {
-                    if symbol!(self.cursor => RightChevron) {
-                        Some(self.parse_type_node()?)
-                    } else {
-                        return Err(Error::Invalid);
-                    }
+                let return_type = if symbol!(self.cursor => HyphenRightChevron) {
+                    Some(self.parse_type_node()?)
                 } else {
                     None
                 };
