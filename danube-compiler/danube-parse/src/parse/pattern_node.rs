@@ -33,18 +33,19 @@ impl<'parse> Parse<'parse> {
 
                 while !symbol!(self.cursor => RightBracket) {
                     patterns.push(self.parse_pattern_node()?);
+
                     if !symbol!(self.cursor => Comma) {
-                        break;
+                        if symbol!(self.cursor => RightBracket) {
+                            break;
+                        }
+
+                        return Err(Error::Invalid);
                     }
                 }
 
-                if symbol!(self.cursor => RightBracket) {
-                    Ok(PatternNode {
-                        kind: PatternKind::Slice(patterns),
-                    })
-                } else {
-                    Err(Error::Invalid)
-                }
+                Ok(PatternNode {
+                    kind: PatternKind::Slice(patterns),
+                })
             }
             TokenKind::LeftParens => {
                 self.cursor.next();
@@ -53,18 +54,19 @@ impl<'parse> Parse<'parse> {
 
                 while !symbol!(self.cursor => RightParens) {
                     fields.push(self.parse_pattern_node()?);
+
                     if !symbol!(self.cursor => Comma) {
-                        break;
+                        if symbol!(self.cursor => RightParens) {
+                            break;
+                        }
+
+                        return Err(Error::Invalid);
                     }
                 }
 
-                if symbol!(self.cursor => RightParens) {
-                    Ok(PatternNode {
-                        kind: PatternKind::UnnamedStruct(None, fields),
-                    })
-                } else {
-                    Err(Error::Invalid)
-                }
+                Ok(PatternNode {
+                    kind: PatternKind::UnnamedStruct(None, fields),
+                })
             }
             _ => {
                 let path = if let Some(path) = self.parse_path_node()? {
@@ -93,16 +95,17 @@ impl<'parse> Parse<'parse> {
                             fields.push((path, pattern));
 
                             if !symbol!(self.cursor => Comma) {
-                                break;
+                                if symbol!(self.cursor => RightBrace) {
+                                    break;
+                                }
+
+                                return Err(Error::Invalid);
                             }
                         }
-                        if symbol!(self.cursor => RightBrace) {
-                            Ok(PatternNode {
-                                kind: PatternKind::NamedStruct(path, fields),
-                            })
-                        } else {
-                            Err(Error::Invalid)
-                        }
+
+                        Ok(PatternNode {
+                            kind: PatternKind::NamedStruct(path, fields),
+                        })
                     }
                     TokenKind::LeftParens => {
                         self.cursor.next();
@@ -111,18 +114,19 @@ impl<'parse> Parse<'parse> {
 
                         while !symbol!(self.cursor => RightParens) {
                             fields.push(self.parse_pattern_node()?);
+
                             if !symbol!(self.cursor => Comma) {
-                                break;
+                                if symbol!(self.cursor => RightParens) {
+                                    break;
+                                }
+
+                                return Err(Error::Invalid);
                             }
                         }
 
-                        if symbol!(self.cursor => RightParens) {
-                            Ok(PatternNode {
-                                kind: PatternKind::UnnamedStruct(Some(path), fields),
-                            })
-                        } else {
-                            Err(Error::Invalid)
-                        }
+                        Ok(PatternNode {
+                            kind: PatternKind::UnnamedStruct(Some(path), fields),
+                        })
                     }
                     _ => Ok(PatternNode {
                         kind: PatternKind::Path(path),

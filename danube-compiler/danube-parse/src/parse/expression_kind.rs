@@ -148,6 +148,8 @@ impl<'parse> Parse<'parse> {
 
                     let block = self.parse_block_node()?;
                     branches.push(MatchBranch { pattern, block });
+
+                    symbol!(self.cursor => Comma);
                 }
 
                 self.parse_postfix_expression_kind(ExpressionKind::Match(MatchNode {
@@ -248,7 +250,11 @@ impl<'parse> Parse<'parse> {
                 while !symbol!(self.cursor => RightParens) {
                     arguments.push(self.parse_prefix_expression_kind()?);
                     if !symbol!(self.cursor => Comma) {
-                        break;
+                        if symbol!(self.cursor => RightParens) {
+                            break;
+                        }
+
+                        return Err(Error::Invalid);
                     }
                 }
 
@@ -262,7 +268,11 @@ impl<'parse> Parse<'parse> {
                 while !symbol!(self.cursor => RightBracket) {
                     expressions.push(self.parse_prefix_expression_kind()?);
                     if !symbol!(self.cursor => Comma) {
-                        break;
+                        if symbol!(self.cursor => RightBracket) {
+                            break;
+                        }
+
+                        return Err(Error::Invalid);
                     }
                 }
 
@@ -419,7 +429,11 @@ impl<'parse> Parse<'parse> {
             });
 
             if !symbol!(self.cursor => Comma) {
-                break;
+                if symbol!(self.cursor => RightParens) {
+                    break;
+                }
+
+                return Err(Error::Invalid);
             }
         }
 

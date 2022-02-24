@@ -185,6 +185,7 @@ impl<'lex> Lex<'lex> {
                 }
                 Some('*') => {
                     self.cursor.next();
+
                     std::todo!();
                 }
                 Some('=') => {

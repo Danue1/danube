@@ -114,18 +114,8 @@ pub struct EnumVariantNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum EnumVariantKind {
-    Unnamed(EnumUnnamedVariantNode),
-    Named(EnumNamedVariantNode),
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct EnumUnnamedVariantNode {
-    pub nodes: Vec<TypeNode>,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct EnumNamedVariantNode {
-    pub nodes: Vec<(IdentNode, TypeNode)>,
+    Unnamed(Vec<TypeNode>),
+    Named(Vec<(IdentNode, TypeNode)>),
 }
 
 #[derive(Debug, PartialEq, Clone)]
