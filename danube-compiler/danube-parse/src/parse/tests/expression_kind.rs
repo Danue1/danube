@@ -15,9 +15,9 @@ fn ident() {
         Parse::new(tokens.as_slice()).parse_expression_kind(),
         Ok(ExpressionKind::Path(PathNode {
             idents: vec![IdentNode {
-                symbol: Symbol::intern("foo")
-            }]
-        }))
+                symbol: Symbol::intern("foo"),
+            }],
+        })),
     );
 }
 
@@ -31,13 +31,13 @@ fn path() {
         Ok(ExpressionKind::Path(PathNode {
             idents: vec![
                 IdentNode {
-                    symbol: Symbol::intern("foo")
+                    symbol: Symbol::intern("foo"),
                 },
                 IdentNode {
-                    symbol: Symbol::intern("bar")
+                    symbol: Symbol::intern("bar"),
                 },
-            ]
-        }))
+            ],
+        })),
     );
 }
 
@@ -50,9 +50,9 @@ fn add() {
         Parse::new(tokens.as_slice()).parse_expression_kind(),
         Ok(ExpressionKind::Path(PathNode {
             idents: vec![IdentNode {
-                symbol: Symbol::intern("foo")
-            }]
-        }))
+                symbol: Symbol::intern("foo"),
+            }],
+        })),
     );
 }
 
@@ -66,10 +66,10 @@ fn negate() {
         Ok(ExpressionKind::Negate(Box::new(ExpressionKind::Path(
             PathNode {
                 idents: vec![IdentNode {
-                    symbol: Symbol::intern("foo")
-                }]
-            }
-        ))))
+                    symbol: Symbol::intern("foo"),
+                }],
+            },
+        )))),
     );
 }
 
@@ -83,10 +83,10 @@ fn not() {
         Ok(ExpressionKind::Not(Box::new(ExpressionKind::Path(
             PathNode {
                 idents: vec![IdentNode {
-                    symbol: Symbol::intern("foo")
-                }]
-            }
-        ))))
+                    symbol: Symbol::intern("foo"),
+                }],
+            },
+        )))),
     );
 }
 
@@ -100,10 +100,10 @@ fn bit_not() {
         Ok(ExpressionKind::BitNot(Box::new(ExpressionKind::Path(
             PathNode {
                 idents: vec![IdentNode {
-                    symbol: Symbol::intern("foo")
-                }]
-            }
-        ))))
+                    symbol: Symbol::intern("foo"),
+                }],
+            },
+        )))),
     );
 }
 
@@ -116,8 +116,8 @@ fn char() {
         Parse::new(tokens.as_slice()).parse_expression_kind(),
         Ok(ExpressionKind::Literal(
             Symbol::intern("a"),
-            LiteralKind::Char
-        ))
+            LiteralKind::Char,
+        )),
     );
 }
 
@@ -130,8 +130,8 @@ fn integer() {
         Parse::new(tokens.as_slice()).parse_expression_kind(),
         Ok(ExpressionKind::Literal(
             Symbol::intern("123"),
-            LiteralKind::Integer
-        ))
+            LiteralKind::Integer,
+        )),
     );
 }
 
@@ -144,8 +144,8 @@ fn float() {
         Parse::new(tokens.as_slice()).parse_expression_kind(),
         Ok(ExpressionKind::Literal(
             Symbol::intern("123.456"),
-            LiteralKind::Float
-        ))
+            LiteralKind::Float,
+        )),
     );
 }
 
@@ -158,8 +158,8 @@ fn string() {
         Parse::new(tokens.as_slice()).parse_expression_kind(),
         Ok(ExpressionKind::Literal(
             Symbol::intern("foo"),
-            LiteralKind::String
-        ))
+            LiteralKind::String,
+        )),
     );
 }
 
@@ -174,13 +174,13 @@ fn conditional_without_else() {
             branches: vec![ConditionBranch {
                 expression: Box::new(ExpressionKind::Path(PathNode {
                     idents: vec![IdentNode {
-                        symbol: Symbol::intern("hello")
-                    }]
+                        symbol: Symbol::intern("hello"),
+                    }],
                 })),
-                block: BlockNode { statements: vec![] }
+                block: BlockNode { statements: vec![] },
             }],
             other: None,
-        }))
+        })),
     );
 }
 
@@ -195,13 +195,13 @@ fn conditional_with_else() {
             branches: vec![ConditionBranch {
                 expression: Box::new(ExpressionKind::Path(PathNode {
                     idents: vec![IdentNode {
-                        symbol: Symbol::intern("hello")
-                    }]
+                        symbol: Symbol::intern("hello"),
+                    }],
                 })),
-                block: BlockNode { statements: vec![] }
+                block: BlockNode { statements: vec![] },
             }],
             other: Some(BlockNode { statements: vec![] }),
-        }))
+        })),
     );
 }
 
@@ -213,8 +213,8 @@ fn r#loop() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_expression_kind(),
         Ok(ExpressionKind::Loop(LoopNode {
-            block: BlockNode { statements: vec![] }
-        }))
+            block: BlockNode { statements: vec![] },
+        })),
     );
 }
 
@@ -229,12 +229,12 @@ fn r#while() {
             branch: ConditionBranch {
                 expression: Box::new(ExpressionKind::Path(PathNode {
                     idents: vec![IdentNode {
-                        symbol: Symbol::intern("hello")
-                    }]
+                        symbol: Symbol::intern("hello"),
+                    }],
                 })),
-                block: BlockNode { statements: vec![] }
+                block: BlockNode { statements: vec![] },
             },
-        }))
+        })),
     );
 }
 
@@ -258,8 +258,8 @@ fn r#for() {
                     symbol: Symbol::intern("bar"),
                 }],
             })),
-            block: BlockNode { statements: vec![] }
-        }))
+            block: BlockNode { statements: vec![] },
+        })),
     );
 }
 
@@ -280,8 +280,8 @@ fn r#match() {
                 pattern: PatternNode {
                     kind: PatternKind::Literal(Symbol::intern("1"), LiteralKind::Integer,),
                 },
-                block: BlockNode { statements: vec![] }
+                block: BlockNode { statements: vec![] },
             }],
-        }))
+        })),
     );
 }

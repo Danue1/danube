@@ -10,7 +10,7 @@ fn current() {
 
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_visibility_kind(),
-        Ok(VisibilityKind::Current)
+        Ok(VisibilityKind::Current),
     );
 }
 
@@ -21,7 +21,7 @@ fn public() {
 
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_visibility_kind(),
-        Ok(VisibilityKind::Public)
+        Ok(VisibilityKind::Public),
     );
 }
 
@@ -34,8 +34,8 @@ fn restricted() {
         Parse::new(tokens.as_slice()).parse_visibility_kind(),
         Ok(VisibilityKind::Restricted(PathNode {
             idents: vec![IdentNode {
-                symbol: Symbol::intern("foo")
-            }]
-        }))
+                symbol: Symbol::intern("foo"),
+            }],
+        })),
     );
 }

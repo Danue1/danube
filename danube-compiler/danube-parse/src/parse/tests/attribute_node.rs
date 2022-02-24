@@ -14,11 +14,11 @@ fn package_attribute() {
         Ok(vec![AttributeNode {
             path: PathNode {
                 idents: vec![IdentNode {
-                    symbol: Symbol::intern("hello")
-                }]
+                    symbol: Symbol::intern("hello"),
+                }],
             },
             args: HashMap::new(),
-        }])
+        }]),
     );
 }
 
@@ -33,20 +33,20 @@ fn package_attributes() {
             AttributeNode {
                 path: PathNode {
                     idents: vec![IdentNode {
-                        symbol: Symbol::intern("hello")
-                    }]
+                        symbol: Symbol::intern("hello"),
+                    }],
                 },
                 args: HashMap::new(),
             },
             AttributeNode {
                 path: PathNode {
                     idents: vec![IdentNode {
-                        symbol: Symbol::intern("hello")
+                        symbol: Symbol::intern("hello"),
                     }]
                 },
                 args: HashMap::new(),
-            }
-        ])
+            },
+        ]),
     );
 }
 
@@ -60,11 +60,11 @@ fn item_attribute() {
         Ok(vec![AttributeNode {
             path: PathNode {
                 idents: vec![IdentNode {
-                    symbol: Symbol::intern("hello")
-                }]
+                    symbol: Symbol::intern("hello"),
+                }],
             },
             args: HashMap::new(),
-        }])
+        }]),
     );
 }
 
@@ -79,19 +79,19 @@ fn item_attributes() {
             AttributeNode {
                 path: PathNode {
                     idents: vec![IdentNode {
-                        symbol: Symbol::intern("hello")
-                    }]
+                        symbol: Symbol::intern("hello"),
+                    }],
                 },
                 args: HashMap::new(),
             },
             AttributeNode {
                 path: PathNode {
                     idents: vec![IdentNode {
-                        symbol: Symbol::intern("hello")
-                    }]
+                        symbol: Symbol::intern("hello"),
+                    }],
                 },
                 args: HashMap::new(),
-            }
-        ])
+            },
+        ]),
     );
 }

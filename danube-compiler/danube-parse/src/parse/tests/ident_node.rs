@@ -11,7 +11,7 @@ fn ident_node() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_ident_node(),
         Ok(IdentNode {
-            symbol: Symbol::intern("hello")
-        })
+            symbol: Symbol::intern("hello"),
+        }),
     );
 }

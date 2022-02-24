@@ -92,7 +92,7 @@ fn generic_with_one() {
         idents: vec![IdentNode {
           symbol: Symbol::intern("bar"),
         }],
-      })]
+      })],
     )),
   );
 }

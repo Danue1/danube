@@ -12,9 +12,9 @@ fn one() {
         Parse::new(tokens.as_slice()).parse_path_node(),
         Ok(Some(PathNode {
             idents: vec![IdentNode {
-                symbol: Symbol::intern("one")
-            }]
-        }))
+                symbol: Symbol::intern("one"),
+            }],
+        })),
     );
 }
 
@@ -28,12 +28,12 @@ fn onw_two() {
         Ok(Some(PathNode {
             idents: vec![
                 IdentNode {
-                    symbol: Symbol::intern("one")
+                    symbol: Symbol::intern("one"),
                 },
                 IdentNode {
-                    symbol: Symbol::intern("two")
+                    symbol: Symbol::intern("two"),
                 },
-            ]
-        }))
+            ],
+        })),
     );
 }

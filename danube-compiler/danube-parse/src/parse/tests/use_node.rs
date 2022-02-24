@@ -14,9 +14,9 @@ fn one() {
             path: PathNode {
                 idents: vec![IdentNode {
                     symbol: Symbol::intern("one"),
-                }]
+                }],
             },
-        })
+        }),
     );
 }
 
@@ -33,13 +33,13 @@ fn two() {
             path: PathNode {
                 idents: vec![
                     IdentNode {
-                        symbol: Symbol::intern("one")
+                        symbol: Symbol::intern("one"),
                     },
                     IdentNode {
-                        symbol: Symbol::intern("two")
+                        symbol: Symbol::intern("two"),
                     },
-                ]
+                ],
             },
-        })
+        }),
     );
 }

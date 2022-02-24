@@ -17,20 +17,20 @@ fn without_expression() {
             pattern: PatternNode {
                 kind: PatternKind::Path(PathNode {
                     idents: vec![IdentNode {
-                        symbol: Symbol::intern("foo")
-                    }]
+                        symbol: Symbol::intern("foo"),
+                    }],
                 }),
             },
             ty: TypeNode {
                 immutablity: ImmutablityKind::Yes,
                 kind: TypeKind::Path(PathNode {
                     idents: vec![IdentNode {
-                        symbol: Symbol::intern("bar")
-                    }]
+                        symbol: Symbol::intern("bar"),
+                    }],
                 }),
             },
             expression: None,
-        })
+        }),
     );
 }
 
@@ -45,23 +45,23 @@ fn with_expression() {
             pattern: PatternNode {
                 kind: PatternKind::Path(PathNode {
                     idents: vec![IdentNode {
-                        symbol: Symbol::intern("foo")
-                    }]
+                        symbol: Symbol::intern("foo"),
+                    }],
                 }),
             },
             ty: TypeNode {
                 immutablity: ImmutablityKind::Yes,
                 kind: TypeKind::Path(PathNode {
                     idents: vec![IdentNode {
-                        symbol: Symbol::intern("bar")
-                    }]
+                        symbol: Symbol::intern("bar"),
+                    }],
                 }),
             },
             expression: Some(ExpressionKind::Path(PathNode {
                 idents: vec![IdentNode {
-                    symbol: Symbol::intern("baz")
+                    symbol: Symbol::intern("baz"),
                 }],
             })),
-        })
+        }),
     );
 }

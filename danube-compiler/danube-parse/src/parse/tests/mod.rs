@@ -28,6 +28,6 @@ fn empty() {
         Ok(PackageNode {
             attributes: vec![],
             items: vec![],
-        })
+        }),
     );
 }

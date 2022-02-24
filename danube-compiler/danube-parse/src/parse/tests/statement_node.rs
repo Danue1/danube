@@ -15,8 +15,8 @@ fn statement_semicolon() {
         Parse::new(tokens.as_slice()).parse_statement_node(),
         Ok(StatementNode {
             id: StatementId(Id(0)),
-            kind: StatementKind::Semicolon
-        })
+            kind: StatementKind::Semicolon,
+        }),
     );
 }
 
@@ -29,8 +29,8 @@ fn statement_break() {
         Parse::new(tokens.as_slice()).parse_statement_node(),
         Ok(StatementNode {
             id: StatementId(Id(0)),
-            kind: StatementKind::Break
-        })
+            kind: StatementKind::Break,
+        }),
     );
 }
 
@@ -43,8 +43,8 @@ fn statement_continue() {
         Parse::new(tokens.as_slice()).parse_statement_node(),
         Ok(StatementNode {
             id: StatementId(Id(0)),
-            kind: StatementKind::Continue
-        })
+            kind: StatementKind::Continue,
+        }),
     );
 }
 
@@ -57,8 +57,8 @@ fn statement_return_without_expression() {
         Parse::new(tokens.as_slice()).parse_statement_node(),
         Ok(StatementNode {
             id: StatementId(Id(0)),
-            kind: StatementKind::Return(None)
-        })
+            kind: StatementKind::Return(None),
+        }),
     );
 }
 
@@ -74,10 +74,10 @@ fn statement_return_with_expression() {
             id: StatementId(Id(0)),
             kind: StatementKind::Return(Some(ExpressionKind::Path(PathNode {
                 idents: vec![IdentNode {
-                    symbol: Symbol::intern("hello")
-                }]
-            })))
-        })
+                    symbol: Symbol::intern("hello"),
+                }],
+            }))),
+        }),
     );
 }
 
@@ -98,20 +98,20 @@ fn statement_return_with_expressions() {
                     lhs: Box::new(ExpressionKind::Path(PathNode {
                         idents: vec![IdentNode {
                             symbol: Symbol::intern("hello"),
-                        }]
+                        }],
                     })),
                     rhs: Box::new(ExpressionKind::Path(PathNode {
                         idents: vec![IdentNode {
                             symbol: Symbol::intern("my"),
-                        }]
+                        }],
                     })),
                 })),
                 rhs: Box::new(ExpressionKind::Path(PathNode {
                     idents: vec![IdentNode {
                         symbol: Symbol::intern("world"),
-                    }]
+                    }],
                 })),
-            })))
-        })
+            }))),
+        }),
     );
 }

@@ -10,6 +10,6 @@ fn empty_block() {
 
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_block_node(),
-        Ok(BlockNode { statements: vec![] })
+        Ok(BlockNode { statements: vec![] }),
     );
 }

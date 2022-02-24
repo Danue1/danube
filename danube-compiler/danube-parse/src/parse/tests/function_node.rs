@@ -20,6 +20,6 @@ fn empty_block() {
             parameters: vec![],
             return_type: None,
             block: None,
-        })
+        }),
     );
 }

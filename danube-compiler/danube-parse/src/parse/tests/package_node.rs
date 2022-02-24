@@ -21,7 +21,7 @@ fn attribute() {
                 args: HashMap::new(),
             }],
             items: vec![],
-        })
+        }),
     );
 }
 
@@ -38,21 +38,21 @@ fn attributes() {
                 AttributeNode {
                     path: PathNode {
                         idents: vec![IdentNode {
-                            symbol: Symbol::intern("hello")
-                        }]
+                            symbol: Symbol::intern("hello"),
+                        }],
                     },
                     args: HashMap::new(),
                 },
                 AttributeNode {
                     path: PathNode {
                         idents: vec![IdentNode {
-                            symbol: Symbol::intern("hello")
-                        }]
+                            symbol: Symbol::intern("hello"),
+                        }],
                     },
                     args: HashMap::new(),
-                }
+                },
             ],
             items: vec![],
-        })
+        }),
     );
 }
