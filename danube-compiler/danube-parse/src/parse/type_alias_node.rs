@@ -9,10 +9,15 @@ impl<'parse> Parse<'parse> {
             let ty = self.parse_type_node()?;
 
             if symbol!(self.cursor => Semicolon) {
-                return Ok(TypeAliasNode { ident, ty });
+                Ok(TypeAliasNode {
+                    ident,
+                    ty: Some(ty),
+                })
+            } else {
+                Err(Error::Invalid)
             }
+        } else {
+            Ok(TypeAliasNode { ident, ty: None })
         }
-
-        Err(Error::Invalid)
     }
 }

@@ -229,7 +229,7 @@ pub struct ExpressionNamedStructNode {
 #[derive(Debug, PartialEq, Clone)]
 pub struct TypeAliasNode {
     pub ident: IdentNode,
-    pub ty: TypeNode,
+    pub ty: Option<TypeNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]

@@ -5,6 +5,7 @@ use std::collections::HashMap;
 impl<'parse> Parse<'parse> {
     pub fn parse_package_attributes(&mut self) -> Result<Vec<AttributeNode>, Error> {
         let mut attributes = vec![];
+
         while let Some(attribute) = self.parse_package_attribute()? {
             attributes.push(attribute);
         }
@@ -14,6 +15,7 @@ impl<'parse> Parse<'parse> {
 
     pub fn parse_item_attributes(&mut self) -> Result<Vec<AttributeNode>, Error> {
         let mut attributes = vec![];
+
         while let Some(attribute) = self.parse_item_attribute()? {
             attributes.push(attribute);
         }
