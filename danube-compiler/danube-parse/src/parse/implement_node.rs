@@ -19,7 +19,6 @@ impl<'parse> Parse<'parse> {
             (None, trait_ident)
         };
         let target_generics = self.parse_generic_nodes()?;
-
         let items = self.parse_implement_item_nodes()?;
 
         Ok(ImplementNode {

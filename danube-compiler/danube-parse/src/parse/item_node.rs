@@ -5,6 +5,7 @@ use danube_token::keywords;
 impl<'parse> Parse<'parse> {
     pub fn parse_item_nodes(&mut self) -> Result<Vec<ItemNode>, Error> {
         let mut items = vec![];
+
         while let Some(item) = self.parse_item_node()? {
             items.push(item);
         }
@@ -15,7 +16,6 @@ impl<'parse> Parse<'parse> {
     pub fn parse_item_node(&mut self) -> Result<Option<ItemNode>, Error> {
         let attributes = self.parse_item_attributes()?;
         let visibility = self.parse_visibility_kind()?;
-
         let kind = match identifier!(self.cursor) {
             Some(keywords::Use) => {
                 self.cursor.next();

@@ -1,5 +1,5 @@
 use crate::{Error, Parse};
-use danube_ast::{StatementKind, StatementNode};
+use danube_ast::{AssignKind, AssignNode, LetNode, StatementKind, StatementNode};
 use danube_token::{keywords, TokenKind};
 
 impl<'parse> Parse<'parse> {
@@ -13,26 +13,111 @@ impl<'parse> Parse<'parse> {
     }
 
     fn parse_statement_kind(&mut self) -> Result<StatementKind, Error> {
-        match self.cursor.next() {
-            Some(token) => match token.kind {
-                TokenKind::Semicolon => Ok(StatementKind::Semicolon),
-                TokenKind::Identifier(keywords::Break) => Ok(StatementKind::Break),
-                TokenKind::Identifier(keywords::Continue) => Ok(StatementKind::Continue),
-                TokenKind::Identifier(keywords::Return) => {
+        match self.cursor.peek().kind {
+            TokenKind::Semicolon => {
+                self.cursor.next();
+
+                Ok(StatementKind::Semicolon)
+            }
+            TokenKind::Identifier(keywords::Break) => {
+                self.cursor.next();
+
+                Ok(StatementKind::Break)
+            }
+            TokenKind::Identifier(keywords::Continue) => {
+                self.cursor.next();
+
+                Ok(StatementKind::Continue)
+            }
+            TokenKind::Identifier(keywords::Return) => {
+                self.cursor.next();
+
+                if symbol!(self.cursor => Semicolon) {
+                    Ok(StatementKind::Return(None))
+                } else {
+                    let expression = self.parse_expression_kind()?;
                     if symbol!(self.cursor => Semicolon) {
-                        Ok(StatementKind::Return(None))
+                        Ok(StatementKind::Return(Some(expression)))
                     } else {
-                        let expression = self.parse_expression_kind()?;
-                        if symbol!(self.cursor => Semicolon) {
-                            Ok(StatementKind::Return(Some(expression)))
-                        } else {
-                            Err(Error::Invalid)
-                        }
+                        Err(Error::Invalid)
                     }
                 }
-                _ => std::todo!(),
-            },
-            _ => std::todo!(),
+            }
+            TokenKind::Identifier(keywords::Let) => {
+                self.cursor.next();
+
+                let immutability = self.parse_immutability_kind()?;
+                let pattern = self.parse_pattern_node()?;
+                let ty = if symbol!(self.cursor => Colon) {
+                    Some(self.parse_type_node()?)
+                } else {
+                    None
+                };
+                let value = if symbol!(self.cursor => Eq) {
+                    Some(self.parse_expression_kind()?)
+                } else {
+                    None
+                };
+                if symbol!(self.cursor => Semicolon) {
+                    Ok(StatementKind::Let(Box::new(LetNode {
+                        immutability,
+                        pattern,
+                        ty,
+                        value,
+                    })))
+                } else {
+                    Err(Error::Invalid)
+                }
+            }
+            _ => {
+                let expression = self.parse_expression_kind()?;
+
+                macro_rules! assign_kind {
+                    ($($token:ident => $assign:ident,)+) => {
+                        match self.cursor.peek().kind {
+                            $(TokenKind::$token => Some(AssignKind::$assign),)+
+                            _ => None
+                        }
+                    };
+                }
+
+                if let Some(kind) = assign_kind! {
+                    Eq => Assign,
+
+                    PlusEq => Add,
+                    HyphenEq => Sub,
+                    AsteriskAsteriskEq => Exp,
+                    AsteriskEq => Mul,
+                    SlashEq => Div,
+                    PercentEq => Mod,
+                    AmpersandAmpersandEq => And,
+                    PipelinePipelineEq => Or,
+
+                    AmpersandEq => BitAnd,
+                    PipelineEq => BitOr,
+                    CaretEq => BitXor,
+                    TildeEq => BitNot,
+                    LeftChevronLeftChevronEq => BitLeft,
+                    RightChevronRightChevronEq => BitRight,
+                } {
+                    self.cursor.next();
+
+                    let lhs = expression;
+                    let rhs = self.parse_expression_kind()?;
+
+                    if symbol!(self.cursor => Semicolon) {
+                        Ok(StatementKind::Assign(Box::new(AssignNode {
+                            kind,
+                            lhs,
+                            rhs,
+                        })))
+                    } else {
+                        Err(Error::Invalid)
+                    }
+                } else {
+                    Ok(StatementKind::Expression(expression))
+                }
+            }
         }
     }
 }

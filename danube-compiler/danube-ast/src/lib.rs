@@ -167,6 +167,8 @@ pub struct AssignNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum AssignKind {
+    Assign, // =
+
     Add, // +=
     Sub, // -=
     Exp, // **=
@@ -186,6 +188,7 @@ pub enum AssignKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct LetNode {
+    pub immutability: ImmutabilityKind,
     pub pattern: PatternNode,
     pub ty: Option<TypeNode>,
     pub value: Option<ExpressionKind>,
@@ -387,7 +390,7 @@ pub enum BinaryOperatorKind {
 pub struct TraitNode {
     pub ident: IdentNode,
     pub generics: GenericNodeList,
-    pub inheritances: Vec<(PathNode, Vec<PathNode>)>,
+    pub inheritances: Vec<PathNode>,
     pub items: Vec<ImplementItemNode>,
 }
 

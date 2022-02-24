@@ -12,6 +12,7 @@ mod package_node;
 mod path_node;
 mod pattern_node;
 mod statement_node;
+mod trait_node;
 mod type_alias_node;
 mod type_kind;
 mod use_node;
