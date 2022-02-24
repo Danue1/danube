@@ -21,10 +21,6 @@ impl<'parse> Parse<'parse> {
         };
         let target_generics = self.parse_generic_nodes()?;
 
-        if !symbol!(self.cursor => LeftBrace) {
-            return Err(Error::Invalid);
-        }
-
         let items = self.parse_implement_item_nodes()?;
 
         Ok(ImplementNode {
