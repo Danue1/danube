@@ -94,10 +94,9 @@ pub struct TypeNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum TypeKind {
-    TypeSelf,
     Tuple(Vec<TypeKind>),
     Path(PathNode),
-    Generic(PathNode, Vec<PathNode>),
+    Generic(PathNode, Vec<TypeKind>),
 }
 
 #[derive(Debug, PartialEq, Clone)]

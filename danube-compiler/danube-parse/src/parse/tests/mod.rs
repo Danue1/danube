@@ -1,5 +1,6 @@
 mod attribute_node;
 mod block_node;
+mod constant_node;
 mod expression_kind;
 mod function_node;
 mod ident_node;
@@ -7,6 +8,7 @@ mod package_node;
 mod path_node;
 mod pattern_node;
 mod statement_node;
+mod type_kind;
 mod use_node;
 mod visibility_kind;
 
