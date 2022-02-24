@@ -14,7 +14,7 @@ fn ident() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_expression_kind(),
         Ok(ExpressionKind::Path(PathNode {
-            idents: vec![IdentNode {
+            segments: vec![IdentNode {
                 symbol: Symbol::intern("foo"),
             }],
         })),
@@ -29,7 +29,7 @@ fn path() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_expression_kind(),
         Ok(ExpressionKind::Path(PathNode {
-            idents: vec![
+            segments: vec![
                 IdentNode {
                     symbol: Symbol::intern("foo"),
                 },
@@ -49,7 +49,7 @@ fn add() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_expression_kind(),
         Ok(ExpressionKind::Path(PathNode {
-            idents: vec![IdentNode {
+            segments: vec![IdentNode {
                 symbol: Symbol::intern("foo"),
             }],
         })),
@@ -65,7 +65,7 @@ fn negate() {
         Parse::new(tokens.as_slice()).parse_expression_kind(),
         Ok(ExpressionKind::Negate(Box::new(ExpressionKind::Path(
             PathNode {
-                idents: vec![IdentNode {
+                segments: vec![IdentNode {
                     symbol: Symbol::intern("foo"),
                 }],
             },
@@ -82,7 +82,7 @@ fn not() {
         Parse::new(tokens.as_slice()).parse_expression_kind(),
         Ok(ExpressionKind::Not(Box::new(ExpressionKind::Path(
             PathNode {
-                idents: vec![IdentNode {
+                segments: vec![IdentNode {
                     symbol: Symbol::intern("foo"),
                 }],
             },
@@ -99,7 +99,7 @@ fn bit_not() {
         Parse::new(tokens.as_slice()).parse_expression_kind(),
         Ok(ExpressionKind::BitNot(Box::new(ExpressionKind::Path(
             PathNode {
-                idents: vec![IdentNode {
+                segments: vec![IdentNode {
                     symbol: Symbol::intern("foo"),
                 }],
             },
@@ -173,7 +173,7 @@ fn conditional_without_else() {
         Ok(ExpressionKind::Conditional(ConditionNode {
             branches: vec![ConditionBranch {
                 expression: Box::new(ExpressionKind::Path(PathNode {
-                    idents: vec![IdentNode {
+                    segments: vec![IdentNode {
                         symbol: Symbol::intern("hello"),
                     }],
                 })),
@@ -194,7 +194,7 @@ fn conditional_with_else() {
         Ok(ExpressionKind::Conditional(ConditionNode {
             branches: vec![ConditionBranch {
                 expression: Box::new(ExpressionKind::Path(PathNode {
-                    idents: vec![IdentNode {
+                    segments: vec![IdentNode {
                         symbol: Symbol::intern("hello"),
                     }],
                 })),
@@ -228,7 +228,7 @@ fn r#while() {
         Ok(ExpressionKind::While(WhileNode {
             branch: ConditionBranch {
                 expression: Box::new(ExpressionKind::Path(PathNode {
-                    idents: vec![IdentNode {
+                    segments: vec![IdentNode {
                         symbol: Symbol::intern("hello"),
                     }],
                 })),
@@ -248,13 +248,13 @@ fn r#for() {
         Ok(ExpressionKind::For(ForNode {
             pattern: PatternNode {
                 kind: PatternKind::Path(PathNode {
-                    idents: vec![IdentNode {
+                    segments: vec![IdentNode {
                         symbol: Symbol::intern("foo"),
                     }],
                 }),
             },
             iter: Box::new(ExpressionKind::Path(PathNode {
-                idents: vec![IdentNode {
+                segments: vec![IdentNode {
                     symbol: Symbol::intern("bar"),
                 }],
             })),
@@ -272,7 +272,7 @@ fn r#match() {
         Parse::new(tokens.as_slice()).parse_expression_kind(),
         Ok(ExpressionKind::Match(MatchNode {
             expression: Box::new(ExpressionKind::Path(PathNode {
-                idents: vec![IdentNode {
+                segments: vec![IdentNode {
                     symbol: Symbol::intern("foo"),
                 }],
             })),

@@ -11,7 +11,7 @@ fn one() {
   assert_eq!(
     Parse::new(tokens.as_slice()).parse_type_kind(),
     Ok(TypeKind::Path(PathNode {
-      idents: vec![IdentNode {
+      segments: vec![IdentNode {
         symbol: Symbol::intern("foo"),
       }],
     })),
@@ -26,7 +26,7 @@ fn two() {
   assert_eq!(
     Parse::new(tokens.as_slice()).parse_type_kind(),
     Ok(TypeKind::Path(PathNode {
-      idents: vec![
+      segments: vec![
         IdentNode {
           symbol: Symbol::intern("foo"),
         },
@@ -46,7 +46,7 @@ fn tuple_with_one() {
   assert_eq!(
     Parse::new(tokens.as_slice()).parse_type_kind(),
     Ok(TypeKind::Tuple(vec![TypeKind::Path(PathNode {
-      idents: vec![IdentNode {
+      segments: vec![IdentNode {
         symbol: Symbol::intern("foo"),
       }],
     })])),
@@ -62,12 +62,12 @@ fn tuple_with_two() {
     Parse::new(tokens.as_slice()).parse_type_kind(),
     Ok(TypeKind::Tuple(vec![
       TypeKind::Path(PathNode {
-        idents: vec![IdentNode {
+        segments: vec![IdentNode {
           symbol: Symbol::intern("foo"),
         }],
       }),
       TypeKind::Path(PathNode {
-        idents: vec![IdentNode {
+        segments: vec![IdentNode {
           symbol: Symbol::intern("bar"),
         }],
       }),
@@ -84,12 +84,12 @@ fn generic_with_one() {
     Parse::new(tokens.as_slice()).parse_type_kind(),
     Ok(TypeKind::Generic(
       PathNode {
-        idents: vec![IdentNode {
+        segments: vec![IdentNode {
           symbol: Symbol::intern("foo"),
         }],
       },
       vec![TypeKind::Path(PathNode {
-        idents: vec![IdentNode {
+        segments: vec![IdentNode {
           symbol: Symbol::intern("bar"),
         }],
       })],
@@ -106,18 +106,18 @@ fn generic_with_two() {
     Parse::new(tokens.as_slice()).parse_type_kind(),
     Ok(TypeKind::Generic(
       PathNode {
-        idents: vec![IdentNode {
+        segments: vec![IdentNode {
           symbol: Symbol::intern("foo"),
         }],
       },
       vec![
         TypeKind::Path(PathNode {
-          idents: vec![IdentNode {
+          segments: vec![IdentNode {
             symbol: Symbol::intern("bar"),
           }],
         }),
         TypeKind::Path(PathNode {
-          idents: vec![IdentNode {
+          segments: vec![IdentNode {
             symbol: Symbol::intern("baz"),
           }],
         }),
@@ -135,12 +135,12 @@ fn tuple_with_generic_with_one() {
     Parse::new(tokens.as_slice()).parse_type_kind(),
     Ok(TypeKind::Tuple(vec![TypeKind::Generic(
       PathNode {
-        idents: vec![IdentNode {
+        segments: vec![IdentNode {
           symbol: Symbol::intern("foo"),
         }],
       },
       vec![TypeKind::Path(PathNode {
-        idents: vec![IdentNode {
+        segments: vec![IdentNode {
           symbol: Symbol::intern("bar"),
         }],
       })],
@@ -157,18 +157,18 @@ fn tuple_with_generic_with_two() {
     Parse::new(tokens.as_slice()).parse_type_kind(),
     Ok(TypeKind::Tuple(vec![TypeKind::Generic(
       PathNode {
-        idents: vec![IdentNode {
+        segments: vec![IdentNode {
           symbol: Symbol::intern("foo"),
         }],
       },
       vec![
         TypeKind::Path(PathNode {
-          idents: vec![IdentNode {
+          segments: vec![IdentNode {
             symbol: Symbol::intern("bar"),
           }],
         }),
         TypeKind::Path(PathNode {
-          idents: vec![IdentNode {
+          segments: vec![IdentNode {
             symbol: Symbol::intern("baz"),
           }],
         }),
@@ -186,12 +186,12 @@ fn generic_with_tuple_with_one() {
     Parse::new(tokens.as_slice()).parse_type_kind(),
     Ok(TypeKind::Generic(
       PathNode {
-        idents: vec![IdentNode {
+        segments: vec![IdentNode {
           symbol: Symbol::intern("foo"),
         }],
       },
       vec![TypeKind::Tuple(vec![TypeKind::Path(PathNode {
-        idents: vec![IdentNode {
+        segments: vec![IdentNode {
           symbol: Symbol::intern("bar"),
         }],
       })])],
@@ -208,18 +208,18 @@ fn generic_with_tuple_with_two() {
     Parse::new(tokens.as_slice()).parse_type_kind(),
     Ok(TypeKind::Generic(
       PathNode {
-        idents: vec![IdentNode {
+        segments: vec![IdentNode {
           symbol: Symbol::intern("foo"),
         }],
       },
       vec![TypeKind::Tuple(vec![
         TypeKind::Path(PathNode {
-          idents: vec![IdentNode {
+          segments: vec![IdentNode {
             symbol: Symbol::intern("bar"),
           }],
         }),
         TypeKind::Path(PathNode {
-          idents: vec![IdentNode {
+          segments: vec![IdentNode {
             symbol: Symbol::intern("baz"),
           }],
         }),

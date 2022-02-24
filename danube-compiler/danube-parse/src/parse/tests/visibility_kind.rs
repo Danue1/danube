@@ -33,7 +33,7 @@ fn restricted() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_visibility_kind(),
         Ok(VisibilityKind::Restricted(PathNode {
-            idents: vec![IdentNode {
+            segments: vec![IdentNode {
                 symbol: Symbol::intern("foo"),
             }],
         })),

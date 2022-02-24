@@ -12,7 +12,7 @@ fn one() {
         Parse::new(tokens.as_slice()).parse_use_node(),
         Ok(UseNode {
             path: PathNode {
-                idents: vec![IdentNode {
+                segments: vec![IdentNode {
                     symbol: Symbol::intern("one"),
                 }],
             },
@@ -31,7 +31,7 @@ fn two() {
         Parse::new(tokens.as_slice()).parse_use_node(),
         Ok(UseNode {
             path: PathNode {
-                idents: vec![
+                segments: vec![
                     IdentNode {
                         symbol: Symbol::intern("one"),
                     },

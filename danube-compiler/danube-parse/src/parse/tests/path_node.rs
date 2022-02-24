@@ -11,7 +11,7 @@ fn one() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_path_node(),
         Ok(Some(PathNode {
-            idents: vec![IdentNode {
+            segments: vec![IdentNode {
                 symbol: Symbol::intern("one"),
             }],
         })),
@@ -26,7 +26,7 @@ fn onw_two() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_path_node(),
         Ok(Some(PathNode {
-            idents: vec![
+            segments: vec![
                 IdentNode {
                     symbol: Symbol::intern("one"),
                 },

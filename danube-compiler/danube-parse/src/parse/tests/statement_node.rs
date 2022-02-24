@@ -73,7 +73,7 @@ fn statement_return_with_expression() {
         Ok(StatementNode {
             id: StatementId(Id(0)),
             kind: StatementKind::Return(Some(ExpressionKind::Path(PathNode {
-                idents: vec![IdentNode {
+                segments: vec![IdentNode {
                     symbol: Symbol::intern("hello"),
                 }],
             }))),
@@ -96,18 +96,18 @@ fn statement_return_with_expressions() {
                 lhs: Box::new(ExpressionKind::Binary(BinaryExpressionNode {
                     kind: BinaryOperatorKind::Add,
                     lhs: Box::new(ExpressionKind::Path(PathNode {
-                        idents: vec![IdentNode {
+                        segments: vec![IdentNode {
                             symbol: Symbol::intern("hello"),
                         }],
                     })),
                     rhs: Box::new(ExpressionKind::Path(PathNode {
-                        idents: vec![IdentNode {
+                        segments: vec![IdentNode {
                             symbol: Symbol::intern("my"),
                         }],
                     })),
                 })),
                 rhs: Box::new(ExpressionKind::Path(PathNode {
-                    idents: vec![IdentNode {
+                    segments: vec![IdentNode {
                         symbol: Symbol::intern("world"),
                     }],
                 })),

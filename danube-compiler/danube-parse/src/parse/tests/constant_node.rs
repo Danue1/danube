@@ -16,7 +16,7 @@ fn without_expression() {
         Ok(ConstantNode {
             pattern: PatternNode {
                 kind: PatternKind::Path(PathNode {
-                    idents: vec![IdentNode {
+                    segments: vec![IdentNode {
                         symbol: Symbol::intern("foo"),
                     }],
                 }),
@@ -24,7 +24,7 @@ fn without_expression() {
             ty: TypeNode {
                 immutablity: ImmutablityKind::Yes,
                 kind: TypeKind::Path(PathNode {
-                    idents: vec![IdentNode {
+                    segments: vec![IdentNode {
                         symbol: Symbol::intern("bar"),
                     }],
                 }),
@@ -44,7 +44,7 @@ fn with_expression() {
         Ok(ConstantNode {
             pattern: PatternNode {
                 kind: PatternKind::Path(PathNode {
-                    idents: vec![IdentNode {
+                    segments: vec![IdentNode {
                         symbol: Symbol::intern("foo"),
                     }],
                 }),
@@ -52,13 +52,13 @@ fn with_expression() {
             ty: TypeNode {
                 immutablity: ImmutablityKind::Yes,
                 kind: TypeKind::Path(PathNode {
-                    idents: vec![IdentNode {
+                    segments: vec![IdentNode {
                         symbol: Symbol::intern("bar"),
                     }],
                 }),
             },
             expression: Some(ExpressionKind::Path(PathNode {
-                idents: vec![IdentNode {
+                segments: vec![IdentNode {
                     symbol: Symbol::intern("baz"),
                 }],
             })),

@@ -18,7 +18,7 @@ pub struct AttributeNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct PathNode {
-    pub idents: Vec<IdentNode>,
+    pub segments: Vec<IdentNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]

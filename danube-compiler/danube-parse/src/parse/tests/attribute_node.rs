@@ -13,7 +13,7 @@ fn package_attribute() {
         Parse::new(tokens.as_slice()).parse_package_attributes(),
         Ok(vec![AttributeNode {
             path: PathNode {
-                idents: vec![IdentNode {
+                segments: vec![IdentNode {
                     symbol: Symbol::intern("hello"),
                 }],
             },
@@ -32,7 +32,7 @@ fn package_attributes() {
         Ok(vec![
             AttributeNode {
                 path: PathNode {
-                    idents: vec![IdentNode {
+                    segments: vec![IdentNode {
                         symbol: Symbol::intern("hello"),
                     }],
                 },
@@ -40,7 +40,7 @@ fn package_attributes() {
             },
             AttributeNode {
                 path: PathNode {
-                    idents: vec![IdentNode {
+                    segments: vec![IdentNode {
                         symbol: Symbol::intern("hello"),
                     }]
                 },
@@ -59,7 +59,7 @@ fn item_attribute() {
         Parse::new(tokens.as_slice()).parse_item_attributes(),
         Ok(vec![AttributeNode {
             path: PathNode {
-                idents: vec![IdentNode {
+                segments: vec![IdentNode {
                     symbol: Symbol::intern("hello"),
                 }],
             },
@@ -78,7 +78,7 @@ fn item_attributes() {
         Ok(vec![
             AttributeNode {
                 path: PathNode {
-                    idents: vec![IdentNode {
+                    segments: vec![IdentNode {
                         symbol: Symbol::intern("hello"),
                     }],
                 },
@@ -86,7 +86,7 @@ fn item_attributes() {
             },
             AttributeNode {
                 path: PathNode {
-                    idents: vec![IdentNode {
+                    segments: vec![IdentNode {
                         symbol: Symbol::intern("hello"),
                     }],
                 },

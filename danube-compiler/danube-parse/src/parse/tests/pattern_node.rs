@@ -51,7 +51,7 @@ fn path() {
         Parse::new(tokens.as_slice()).parse_pattern_node(),
         Ok(PatternNode {
             kind: PatternKind::Path(PathNode {
-                idents: vec![
+                segments: vec![
                     IdentNode {
                         symbol: Symbol::intern("foo"),
                     },
@@ -74,14 +74,14 @@ fn named_struct_with_sugar() {
         Ok(PatternNode {
             kind: PatternKind::NamedStruct(
                 PathNode {
-                    idents: vec![IdentNode {
+                    segments: vec![IdentNode {
                         symbol: Symbol::intern("foo"),
                     }],
                 },
                 vec![
                     (
                         PathNode {
-                            idents: vec![IdentNode {
+                            segments: vec![IdentNode {
                                 symbol: Symbol::intern("a"),
                             }],
                         },
@@ -89,7 +89,7 @@ fn named_struct_with_sugar() {
                     ),
                     (
                         PathNode {
-                            idents: vec![IdentNode {
+                            segments: vec![IdentNode {
                                 symbol: Symbol::intern("b"),
                             }],
                         },
@@ -111,20 +111,20 @@ fn named_struct_without_sugar() {
         Ok(PatternNode {
             kind: PatternKind::NamedStruct(
                 PathNode {
-                    idents: vec![IdentNode {
+                    segments: vec![IdentNode {
                         symbol: Symbol::intern("foo"),
                     }],
                 },
                 vec![
                     (
                         PathNode {
-                            idents: vec![IdentNode {
+                            segments: vec![IdentNode {
                                 symbol: Symbol::intern("a"),
                             }],
                         },
                         Some(PatternNode {
                             kind: PatternKind::Path(PathNode {
-                                idents: vec![IdentNode {
+                                segments: vec![IdentNode {
                                     symbol: Symbol::intern("_a"),
                                 }],
                             }),
@@ -132,13 +132,13 @@ fn named_struct_without_sugar() {
                     ),
                     (
                         PathNode {
-                            idents: vec![IdentNode {
+                            segments: vec![IdentNode {
                                 symbol: Symbol::intern("b"),
                             }],
                         },
                         Some(PatternNode {
                             kind: PatternKind::Path(PathNode {
-                                idents: vec![IdentNode {
+                                segments: vec![IdentNode {
                                     symbol: Symbol::intern("_b"),
                                 }],
                             }),
@@ -160,21 +160,21 @@ fn unnamed_struct_with_sugar() {
         Ok(PatternNode {
             kind: PatternKind::UnnamedStruct(
                 Some(PathNode {
-                    idents: vec![IdentNode {
+                    segments: vec![IdentNode {
                         symbol: Symbol::intern("foo"),
                     }],
                 }),
                 vec![
                     PatternNode {
                         kind: PatternKind::Path(PathNode {
-                            idents: vec![IdentNode {
+                            segments: vec![IdentNode {
                                 symbol: Symbol::intern("a"),
                             }],
                         }),
                     },
                     PatternNode {
                         kind: PatternKind::Path(PathNode {
-                            idents: vec![IdentNode {
+                            segments: vec![IdentNode {
                                 symbol: Symbol::intern("b"),
                             }],
                         }),

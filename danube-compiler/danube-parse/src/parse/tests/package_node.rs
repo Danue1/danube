@@ -14,7 +14,7 @@ fn attribute() {
         Ok(PackageNode {
             attributes: vec![AttributeNode {
                 path: PathNode {
-                    idents: vec![IdentNode {
+                    segments: vec![IdentNode {
                         symbol: Symbol::intern("hello")
                     }]
                 },
@@ -37,7 +37,7 @@ fn attributes() {
             attributes: vec![
                 AttributeNode {
                     path: PathNode {
-                        idents: vec![IdentNode {
+                        segments: vec![IdentNode {
                             symbol: Symbol::intern("hello"),
                         }],
                     },
@@ -45,7 +45,7 @@ fn attributes() {
                 },
                 AttributeNode {
                     path: PathNode {
-                        idents: vec![IdentNode {
+                        segments: vec![IdentNode {
                             symbol: Symbol::intern("hello"),
                         }],
                     },
