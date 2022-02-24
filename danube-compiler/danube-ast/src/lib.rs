@@ -1,6 +1,7 @@
 #![warn(clippy::all)]
 
-use danube_token::{LiteralKind, Symbol};
+pub use danube_token::LiteralKind;
+use danube_token::Symbol;
 use std::collections::HashMap;
 
 #[derive(Debug, PartialEq, Clone)]
@@ -212,13 +213,12 @@ pub enum PatternKind {
     Wildcard,
     /// ..
     Rest,
-    Ident(),
     /// 1, 2.3, 'c', "har"
-    Literal(LiteralKind),
+    Literal(Symbol, LiteralKind),
     /// foo, foo::bar
     Path(PathNode),
     /// Foo { a, b }
-    NamedStruct(Option<PathNode>, Vec<PatternNode>),
+    NamedStruct(PathNode, Vec<(PathNode, Option<PatternNode>)>),
     /// Foo(a, b)
     UnnamedStruct(Option<PathNode>, Vec<PatternNode>),
     /// [foo, bar]

@@ -2,7 +2,7 @@ use crate::keywords;
 use std::collections::HashMap;
 use std::sync::Mutex;
 
-#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
+#[derive(PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
 pub struct Symbol(pub(crate) SymbolIndex);
 
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
@@ -18,6 +18,14 @@ pub(crate) struct SymbolInterner {
 
 lazy_static! {
     static ref INTERNER: Mutex<SymbolInterner> = Mutex::new(SymbolInterner::default());
+}
+
+impl std::fmt::Debug for Symbol {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let interner = INTERNER.lock().unwrap();
+        let string = interner.strings[self.0.index];
+        write!(f, "Symbol(\"{}\")", string)
+    }
 }
 
 impl Symbol {

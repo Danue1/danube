@@ -2,16 +2,17 @@ use crate::{Error, Parse};
 use danube_ast::PathNode;
 
 impl<'parse> Parse<'parse> {
-    pub fn parse_path_node(&mut self) -> Result<PathNode, Error> {
-        let mut idents = vec![];
-        loop {
-            idents.push(self.parse_ident_node()?);
+    pub fn parse_path_node(&mut self) -> Result<Option<PathNode>, Error> {
+        let mut idents = if let Ok(ident) = self.parse_ident_node() {
+            vec![ident]
+        } else {
+            return Ok(None);
+        };
 
-            if !symbol!(self.cursor => ColonColon) {
-                break;
-            }
+        while symbol!(self.cursor => ColonColon) {
+            idents.push(self.parse_ident_node()?);
         }
 
-        Ok(PathNode { idents })
+        Ok(Some(PathNode { idents }))
     }
 }

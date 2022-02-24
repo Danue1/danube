@@ -51,7 +51,11 @@ impl<'parse> Parse<'parse> {
         if !symbol!(self.cursor => LeftBracket) {
             return Err(Error::Invalid);
         }
-        let path = self.parse_path_node()?;
+        let path = if let Some(path) = self.parse_path_node()? {
+            path
+        } else {
+            return Err(Error::Invalid);
+        };
         let args = if symbol!(self.cursor => LeftParens) {
             std::todo!();
         } else {

@@ -10,11 +10,11 @@ fn one() {
 
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_path_node(),
-        Ok(PathNode {
+        Ok(Some(PathNode {
             idents: vec![IdentNode {
                 symbol: Symbol::intern("one")
             }]
-        })
+        }))
     );
 }
 
@@ -25,7 +25,7 @@ fn onw_two() {
 
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_path_node(),
-        Ok(PathNode {
+        Ok(Some(PathNode {
             idents: vec![
                 IdentNode {
                     symbol: Symbol::intern("one")
@@ -34,6 +34,6 @@ fn onw_two() {
                     symbol: Symbol::intern("two")
                 },
             ]
-        })
+        }))
     );
 }

@@ -10,7 +10,12 @@ impl<'parse> Parse<'parse> {
             return Ok(VisibilityKind::Public);
         }
 
-        let visibility_kind = VisibilityKind::Restricted(self.parse_path_node()?);
+        let path = if let Some(path) = self.parse_path_node()? {
+            path
+        } else {
+            return Err(Error::Invalid);
+        };
+        let visibility_kind = VisibilityKind::Restricted(path);
 
         if symbol!(self.cursor => RightParens) {
             Ok(visibility_kind)

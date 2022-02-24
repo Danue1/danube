@@ -24,7 +24,7 @@ impl<'lex> std::iter::Iterator for Lex<'lex> {
                     self.cursor.next();
                 }
                 Some('0'..='9') => return Some(self.lex_number()),
-                Some('a'..='z' | 'A'..='Z') => return Some(self.lex_identifier()),
+                Some('a'..='z' | 'A'..='Z' | '_') => return Some(self.lex_identifier()),
                 Some(_) => return Some(self.lex()),
                 None => return None,
             }
@@ -255,10 +255,6 @@ impl<'lex> Lex<'lex> {
                     symbol!(self.cursor => CaretEq)
                 }
                 _ => symbol!(self.cursor => Caret),
-            },
-            '_' => match self.cursor.peek() {
-                Some('a'..='z' | 'A'..='Z' | '0'..='9') => self.lex_identifier_with_underscore(),
-                _ => symbol!(self.cursor => Underscore),
             },
             '"' => self.lex_string(),
             '\'' => self.lex_char(),

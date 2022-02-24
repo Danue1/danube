@@ -55,7 +55,6 @@ pub enum TokenKind {
     Pipeline,     // |
     Tilde,        // ~
     Caret,        // ^
-    Underscore,   // _
 
     // 2
     HyphenRightChevron,       // ->
@@ -131,7 +130,6 @@ impl TokenKind {
             TokenKind::Pipeline => 1,     // |
             TokenKind::Tilde => 1,        // ~
             TokenKind::Caret => 1,        // ^
-            TokenKind::Underscore => 1,   // _
 
             // 2
             TokenKind::HyphenRightChevron => 2,       // ->

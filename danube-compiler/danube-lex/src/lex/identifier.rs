@@ -9,14 +9,6 @@ impl<'lex> Lex<'lex> {
 
         Ok(Token::new(span, TokenKind::Identifier(symbol)))
     }
-
-    pub fn lex_identifier_with_underscore(&mut self) -> Result<Token, Error> {
-        let span = lex_identifier_postfix(&mut self.cursor);
-        let span = Span::new(span.start - 1, span.end);
-        let symbol = Symbol::intern(self.cursor.slice(&span));
-
-        Ok(Token::new(span, TokenKind::Identifier(symbol)))
-    }
 }
 
 fn lex_identifier_postfix(cursor: &mut Cursor) -> Span {

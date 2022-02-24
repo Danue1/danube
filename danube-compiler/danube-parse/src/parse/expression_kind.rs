@@ -157,7 +157,11 @@ impl<'parse> Parse<'parse> {
             }
             // Path or Function Call
             TokenKind::Identifier(_) => {
-                let path = ExpressionKind::Path(self.parse_path_node()?);
+                let path = if let Some(path) = self.parse_path_node()? {
+                    ExpressionKind::Path(path)
+                } else {
+                    return Err(Error::Invalid);
+                };
                 let expression = if symbol!(self.cursor => LeftParens) {
                     ExpressionKind::FunctionCall(FunctionCallNode {
                         expression: Box::new(path),

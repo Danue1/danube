@@ -56,7 +56,6 @@ fn symbols() {
         "|" => Pipeline,
         "~" => Tilde,
         "^" => Caret,
-        "_" => Underscore,
 
         "->" => HyphenRightChevron,
         "=>" => EqRightChevron,

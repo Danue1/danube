@@ -5,6 +5,7 @@ mod function_node;
 mod ident_node;
 mod package_node;
 mod path_node;
+mod pattern_node;
 mod statement_node;
 mod use_node;
 mod visibility_kind;
