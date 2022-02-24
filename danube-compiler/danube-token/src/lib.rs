@@ -8,11 +8,6 @@ use danube_span::Span;
 pub use keyword::*;
 pub use symbol::*;
 
-pub const EOF: Token = Token {
-    kind: TokenKind::Eof,
-    span: Span::new(0, 0),
-};
-
 #[derive(Debug, PartialEq, Clone)]
 pub struct Token {
     pub kind: TokenKind,

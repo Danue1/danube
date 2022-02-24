@@ -1,10 +1,10 @@
-use danube_span::Span;
+use danube_span::Location;
 
 #[derive(Debug, PartialEq)]
 pub enum Error {
     UnknownSymbol,
-    Invalid(usize),
+    Invalid(Location),
     Need(usize, char),
-    MalformedInteger(Span),
-    MalformedFloating(Span),
+    MalformedInteger(Location),
+    MalformedFloating(Location),
 }

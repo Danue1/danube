@@ -12,11 +12,11 @@ impl<'lex> Lex<'lex> {
 }
 
 fn lex_identifier_postfix(cursor: &mut Cursor) -> Span {
-    let start = cursor.cursor();
+    let start = cursor.location();
     while let Some('a'..='z' | 'A'..='Z' | '0'..='9' | '_') = cursor.peek() {
         cursor.next();
     }
-    let end = cursor.cursor();
+    let end = cursor.location();
 
     Span::new(start, end)
 }

@@ -11,14 +11,14 @@ impl<'lex> Lex<'lex> {
                 self.cursor.next();
                 match self.cursor.peek() {
                     Some('0'..='9') => {
-                        let float_span = integer_span.concat(lex_numeric(&mut self.cursor));
+                        let float_span = integer_span.with_end(lex_numeric(&mut self.cursor).end);
                         let string = self.cursor.slice(&float_span);
                         let symbol = Symbol::intern(string);
                         let kind = TokenKind::Literal(symbol, LiteralKind::Float);
 
                         Ok(Token::new(float_span, kind))
                     }
-                    _ => Err(Error::Invalid(self.cursor.cursor())),
+                    _ => Err(Error::Invalid(self.cursor.location())),
                 }
             }
             _ => {
@@ -32,8 +32,11 @@ impl<'lex> Lex<'lex> {
     }
 
     pub fn lex_number_without_integer(&mut self) -> Result<Token, Error> {
-        let float_span = lex_numeric(&mut self.cursor);
-        let float_span = Span::new(float_span.start - 1, float_span.end);
+        let float_span = {
+            let mut float_span = lex_numeric(&mut self.cursor);
+            float_span.start.decrement();
+            float_span
+        };
         let string = self.cursor.slice(&float_span);
         let symbol = Symbol::intern(string);
         let kind = TokenKind::Literal(symbol, LiteralKind::Float);
@@ -43,11 +46,11 @@ impl<'lex> Lex<'lex> {
 }
 
 fn lex_numeric(cursor: &mut Cursor) -> Span {
-    let start = cursor.cursor();
+    let start = cursor.location();
     while let Some('0'..='9') = cursor.peek() {
         cursor.next();
     }
-    let end = cursor.cursor();
+    let end = cursor.location();
 
     Span::new(start, end)
 }

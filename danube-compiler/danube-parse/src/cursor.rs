@@ -1,10 +1,11 @@
-use danube_token::{Token, EOF};
+use danube_span::{Location, Span};
+use danube_token::{Token, TokenKind};
 use std::iter::Peekable;
 use std::slice::Iter;
 
 #[derive(Debug, Clone)]
 pub struct Cursor<'parse> {
-    cursor: usize,
+    location: Location,
     iter: Peekable<Iter<'parse, Token>>,
 }
 
@@ -12,32 +13,41 @@ impl<'parse> Cursor<'parse> {
     #[inline]
     pub fn new(tokens: &'parse [Token]) -> Self {
         Cursor {
-            cursor: 0,
+            location: Location {
+                offset: 0,
+                line: 1,
+                column: 1,
+            },
             iter: tokens.iter().peekable(),
         }
     }
 
-    #[inline(always)]
-    pub fn cursor(&self) -> usize {
-        self.cursor
-    }
-
     #[inline]
-    pub fn peek(&mut self) -> &Token {
+    pub fn peek(&mut self) -> Token {
         match self.iter.peek() {
-            Some(token) => token,
-            None => &EOF,
+            Some(&token) => token.clone(),
+            None => Token {
+                span: Span::new(
+                    self.location,
+                    Location {
+                        offset: self.location.offset + 1,
+                        line: self.location.line,
+                        column: self.location.column + 1,
+                    },
+                ),
+                kind: TokenKind::Eof,
+            },
         }
     }
 }
 
 impl<'parse> std::iter::Iterator for Cursor<'parse> {
-    type Item = &'parse Token;
+    type Item = Token;
 
     #[inline]
-    fn next(&mut self) -> Option<&'parse Token> {
-        self.cursor += 1;
-        self.iter.next()
+    fn next(&mut self) -> Option<Token> {
+        self.location.increment();
+        self.iter.next().cloned()
     }
 }
 
@@ -70,7 +80,7 @@ macro_rules! symbol {
     ($cursor:expr) => {{
         use danube_token::TokenKind;
 
-        let kind = &$cursor.peek().kind;
+        let kind = $cursor.peek().kind;
         if matches!(
             kind,
             TokenKind::Identifier(_) | TokenKind::Literal(_, _) | TokenKind::Comment(_)

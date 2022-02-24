@@ -7,7 +7,7 @@ mod string;
 mod tests;
 
 use crate::{Cursor, Error};
-use danube_span::Span;
+use danube_span::{Location, Span};
 use danube_token::{Symbol, Token, TokenKind};
 
 pub struct Lex<'lex> {
@@ -35,12 +35,17 @@ impl<'lex> std::iter::Iterator for Lex<'lex> {
 macro_rules! symbol {
     ($cursor:expr => $kind:ident) => {{
         let symbol = TokenKind::$kind;
-        let end = $cursor.cursor();
+        let end = $cursor.location();
         let count = match symbol.count() {
             Some(count) => count,
             None => return Err(Error::UnknownSymbol),
         };
-        let span = Span::new(end - count, end);
+        let start = Location {
+            offset: end.offset - count,
+            line: end.line,
+            column: end.column - count,
+        };
+        let span = Span::new(start, end);
 
         Ok(Token::new(span, symbol))
     }};
@@ -169,7 +174,15 @@ impl<'lex> Lex<'lex> {
             '/' => match self.cursor.peek() {
                 Some('/') => {
                     self.cursor.next();
-                    let start = self.cursor.cursor() - 2;
+                    let start = {
+                        let location = self.cursor.location();
+
+                        Location {
+                            offset: location.offset - 2,
+                            line: location.line,
+                            column: location.column - 2,
+                        }
+                    };
                     let is_document = matches!(self.cursor.peek(), Some('/'));
                     if is_document {
                         self.cursor.next();
@@ -177,7 +190,7 @@ impl<'lex> Lex<'lex> {
                     while !matches!(self.cursor.peek(), Some('\r' | '\n') | None) {
                         self.cursor.next();
                     }
-                    let end = self.cursor.cursor();
+                    let end = self.cursor.location();
                     let span = Span::new(start, end);
                     let symbol = Symbol::intern(self.cursor.slice(&span));
 
@@ -259,7 +272,7 @@ impl<'lex> Lex<'lex> {
             },
             '"' => self.lex_string(),
             '\'' => self.lex_char(),
-            _ => Err(Error::Invalid(self.cursor.cursor())),
+            _ => Err(Error::Invalid(self.cursor.location())),
         }
     }
 }

@@ -1,5 +1,5 @@
 use crate::Lex;
-use danube_span::Span;
+use danube_span::{Location, Span};
 use danube_token::{LiteralKind, Symbol, Token, TokenKind};
 
 #[test]
@@ -20,7 +20,15 @@ fn symbols() {
                 if let Some(count) = kind.count() {
                     assert_eq!(
                         Lex::new($symbol).next(),
-                        Some(Ok(Token::new(Span::new(0, count), kind)))
+                        Some(Ok(Token::new(Span::new(Location {
+                            offset: 0,
+                            line: 1,
+                            column: 1,
+                        }, Location {
+                            offset: count,
+                            line: 1,
+                            column: count + 1
+                        }), kind)))
                     );
                 } else {
                     std::unimplemented!();
@@ -96,7 +104,15 @@ fn integers() {
                 assert_eq!(
                     Lex::new($integer).next(),
                     Some(Ok(Token::new(
-                        Span::new(0, $integer.len()),
+                        Span::new(Location {
+                            offset: 0,
+                            line: 1,
+                            column: 1,
+                        }, Location {
+                            offset: $integer.len(),
+                            line: 1,
+                            column: $integer.len() + 1
+                        }),
                         TokenKind::Literal(Symbol::intern($integer), LiteralKind::Integer),
                     )))
                 );
@@ -116,7 +132,15 @@ fn floatings() {
                 assert_eq!(
                     Lex::new($floating).next(),
                     Some(Ok(Token::new(
-                        Span::new(0, $floating.len()),
+                        Span::new(Location {
+                            offset: 0,
+                            line: 1,
+                            column: 1,
+                        }, Location {
+                            offset: $floating.len(),
+                            line: 1,
+                            column: $floating.len() + 1
+                        }),
                         TokenKind::Literal(Symbol::intern($floating), LiteralKind::Float),
                     )))
                 );
@@ -136,7 +160,15 @@ fn chars() {
                 assert_eq!(
                     Lex::new($char).next(),
                     Some(Ok(Token::new(
-                        Span::new(0, $char.len()),
+                        Span::new(Location {
+                            offset: 0,
+                            line: 1,
+                            column: 1,
+                        }, Location {
+                            offset: $char.len(),
+                            line: 1,
+                            column: $char.len() + 1
+                        }),
                         TokenKind::Literal(Symbol::intern($expect), LiteralKind::Char),
                     )))
                 );
@@ -161,7 +193,15 @@ fn strings() {
                 assert_eq!(
                     Lex::new($string).next(),
                     Some(Ok(Token::new(
-                        Span::new(0, $string.len()),
+                        Span::new(Location {
+                            offset: 0,
+                            line: 1,
+                            column: 1,
+                        }, Location {
+                            offset: $string.len(),
+                            line: 1,
+                            column: $string.len() + 1
+                        }),
                         TokenKind::Literal(Symbol::intern($expect), LiteralKind::String),
                     )))
                 );
@@ -182,10 +222,18 @@ fn identifiers() {
             let mut vec = Vec::new();
             let mut position = 0;
             $(
-                let span = Span::new(position, position + $identifier.len());
+                let span = Span::new(Location {
+                    offset: position,
+                    line: 1,
+                    column: position + 1,
+                }, Location {
+                    offset: position + $identifier.len(),
+                    line: 1,
+                    column: position + $identifier.len() + 1,
+                });
                 #[allow(unused_assignments)]
                 {
-                    position = span.end + 1;
+                    position = span.end.offset + 1;
                 }
                 let kind = TokenKind::Identifier(Symbol::intern($identifier));
                 vec.push(Token::new(span, kind));
@@ -211,7 +259,15 @@ fn keywords() {
                 assert_eq!(
                     Lex::new($keyword).next(),
                     Some(Ok(Token::new(
-                        Span::new(0, $keyword.len()),
+                        Span::new(Location {
+                            offset: 0,
+                            line: 1,
+                            column: 1,
+                        }, Location {
+                            offset: $keyword.len(),
+                            line: 1,
+                            column: $keyword.len() + 1
+                        }),
                         TokenKind::Identifier(Symbol::intern($keyword)),
                     )))
                 );
@@ -232,7 +288,15 @@ fn singleline_comment() {
         ($($comment:expr),+) => {
             $(
                 assert_eq!(Lex::new($comment).next(), Some(Ok(Token::new(
-                    Span::new(0, $comment.len()),
+                    Span::new(Location {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    }, Location {
+                        offset: $comment.len(),
+                        line: 1,
+                        column: $comment.len() + 1
+                    }),
                     TokenKind::Comment(Symbol::intern($comment))
                 ))));
             )+
