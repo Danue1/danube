@@ -5,6 +5,7 @@ mod enum_node;
 mod enum_variant_node;
 mod expression_kind;
 mod function_node;
+mod function_parameter_node;
 mod generic_node;
 mod ident_node;
 mod immutablity_node;
