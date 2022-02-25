@@ -1,7 +1,7 @@
 use crate::Parse;
 use danube_ast::{
-    ConstantNode, ExpressionKind, IdentNode, ImmutabilityKind, PathNode, PatternKind, PatternNode,
-    TypeKind, TypeNode,
+    ConstantNode, ExpressionKind, ExpressionNode, IdentNode, ImmutabilityKind, PathNode,
+    PatternKind, PatternNode, TypeKind, TypeNode, DUMMY_NODE_ID,
 };
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
@@ -15,16 +15,20 @@ fn without_expression() {
         Parse::new(tokens.as_slice()).parse_constant_node(),
         Ok(ConstantNode {
             pattern: PatternNode {
+                id: DUMMY_NODE_ID,
                 kind: PatternKind::Path(PathNode {
                     segments: vec![IdentNode {
+                        id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("foo"),
                     }],
                 }),
             },
             ty: TypeNode {
+                id: DUMMY_NODE_ID,
                 immutability: ImmutabilityKind::Yes,
                 kind: TypeKind::Path(PathNode {
                     segments: vec![IdentNode {
+                        id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("bar"),
                     }],
                 }),
@@ -43,25 +47,33 @@ fn with_expression() {
         Parse::new(tokens.as_slice()).parse_constant_node(),
         Ok(ConstantNode {
             pattern: PatternNode {
+                id: DUMMY_NODE_ID,
                 kind: PatternKind::Path(PathNode {
                     segments: vec![IdentNode {
+                        id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("foo"),
                     }],
                 }),
             },
             ty: TypeNode {
+                id: DUMMY_NODE_ID,
                 immutability: ImmutabilityKind::Yes,
                 kind: TypeKind::Path(PathNode {
                     segments: vec![IdentNode {
+                        id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("bar"),
                     }],
                 }),
             },
-            expression: Some(ExpressionKind::Path(PathNode {
-                segments: vec![IdentNode {
-                    symbol: Symbol::intern("baz"),
-                }],
-            })),
+            expression: Some(ExpressionNode {
+                id: DUMMY_NODE_ID,
+                kind: ExpressionKind::Path(PathNode {
+                    segments: vec![IdentNode {
+                        id: DUMMY_NODE_ID,
+                        symbol: Symbol::intern("baz"),
+                    }],
+                })
+            }),
         }),
     );
 }

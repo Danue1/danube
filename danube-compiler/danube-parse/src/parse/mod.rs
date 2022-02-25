@@ -4,6 +4,7 @@ mod constant_node;
 mod enum_node;
 mod enum_variant_node;
 mod expression_kind;
+mod expression_node;
 mod function_node;
 mod function_parameter_node;
 mod generic_node;
@@ -26,20 +27,18 @@ mod visibility_kind;
 #[cfg(test)]
 mod tests;
 
-use crate::{Cursor, Error, Resolver};
+use crate::{Cursor, Error};
 use danube_ast::PackageNode;
 use danube_token::Token;
 
 pub struct Parse<'parse> {
     cursor: Cursor<'parse>,
-    resolver: Resolver,
 }
 
 impl<'parse> Parse<'parse> {
     pub fn new(tokens: &'parse [Token]) -> Self {
         Parse {
             cursor: Cursor::new(tokens),
-            resolver: Resolver::new(),
         }
     }
 

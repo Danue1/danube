@@ -1,5 +1,5 @@
 use crate::{Error, Parse};
-use danube_ast::{AssignKind, AssignNode, LetNode, StatementKind, StatementNode};
+use danube_ast::{AssignKind, AssignNode, LetNode, StatementKind, StatementNode, DUMMY_NODE_ID};
 use danube_token::{keywords, TokenKind};
 
 impl<'parse> Parse<'parse> {
@@ -7,7 +7,7 @@ impl<'parse> Parse<'parse> {
         let kind = self.parse_statement_kind()?;
 
         Ok(StatementNode {
-            id: self.resolver.next_id().into(),
+            id: DUMMY_NODE_ID,
             kind,
         })
     }
@@ -35,7 +35,7 @@ impl<'parse> Parse<'parse> {
                 if symbol!(self.cursor => Semicolon) {
                     Ok(StatementKind::Return(None))
                 } else {
-                    let expression = self.parse_expression_kind()?;
+                    let expression = self.parse_expression_node()?;
                     if symbol!(self.cursor => Semicolon) {
                         Ok(StatementKind::Return(Some(expression)))
                     } else {
@@ -54,12 +54,13 @@ impl<'parse> Parse<'parse> {
                     None
                 };
                 let value = if symbol!(self.cursor => Eq) {
-                    Some(self.parse_expression_kind()?)
+                    Some(self.parse_expression_node()?)
                 } else {
                     None
                 };
                 if symbol!(self.cursor => Semicolon) {
                     Ok(StatementKind::Let(Box::new(LetNode {
+                        id: DUMMY_NODE_ID,
                         immutability,
                         pattern,
                         ty,
@@ -70,7 +71,7 @@ impl<'parse> Parse<'parse> {
                 }
             }
             _ => {
-                let expression = self.parse_expression_kind()?;
+                let expression = self.parse_expression_node()?;
 
                 macro_rules! assign_kind {
                     ($($token:ident => $assign:ident,)+) => {
@@ -103,7 +104,7 @@ impl<'parse> Parse<'parse> {
                     self.cursor.next();
 
                     let lhs = expression;
-                    let rhs = self.parse_expression_kind()?;
+                    let rhs = self.parse_expression_node()?;
 
                     if symbol!(self.cursor => Semicolon) {
                         Ok(StatementKind::Assign(Box::new(AssignNode {

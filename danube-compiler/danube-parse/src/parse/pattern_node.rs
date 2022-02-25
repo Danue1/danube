@@ -1,5 +1,5 @@
 use crate::{Error, Parse};
-use danube_ast::{PatternKind, PatternNode};
+use danube_ast::{PatternKind, PatternNode, DUMMY_NODE_ID};
 use danube_token::{keywords, TokenKind};
 
 impl<'parse> Parse<'parse> {
@@ -9,6 +9,7 @@ impl<'parse> Parse<'parse> {
                 self.cursor.next();
 
                 Ok(PatternNode {
+                    id: DUMMY_NODE_ID,
                     kind: PatternKind::Rest,
                 })
             }
@@ -16,6 +17,7 @@ impl<'parse> Parse<'parse> {
                 self.cursor.next();
 
                 Ok(PatternNode {
+                    id: DUMMY_NODE_ID,
                     kind: PatternKind::Wildcard,
                 })
             }
@@ -24,7 +26,10 @@ impl<'parse> Parse<'parse> {
 
                 self.cursor.next();
 
-                Ok(PatternNode { kind })
+                Ok(PatternNode {
+                    id: DUMMY_NODE_ID,
+                    kind,
+                })
             }
             TokenKind::LeftBracket => {
                 self.cursor.next();
@@ -44,6 +49,7 @@ impl<'parse> Parse<'parse> {
                 }
 
                 Ok(PatternNode {
+                    id: DUMMY_NODE_ID,
                     kind: PatternKind::Slice(patterns),
                 })
             }
@@ -65,6 +71,7 @@ impl<'parse> Parse<'parse> {
                 }
 
                 Ok(PatternNode {
+                    id: DUMMY_NODE_ID,
                     kind: PatternKind::UnnamedStruct(None, fields),
                 })
             }
@@ -104,6 +111,7 @@ impl<'parse> Parse<'parse> {
                         }
 
                         Ok(PatternNode {
+                            id: DUMMY_NODE_ID,
                             kind: PatternKind::NamedStruct(path, fields),
                         })
                     }
@@ -125,10 +133,12 @@ impl<'parse> Parse<'parse> {
                         }
 
                         Ok(PatternNode {
+                            id: DUMMY_NODE_ID,
                             kind: PatternKind::UnnamedStruct(Some(path), fields),
                         })
                     }
                     _ => Ok(PatternNode {
+                        id: DUMMY_NODE_ID,
                         kind: PatternKind::Path(path),
                     }),
                 }

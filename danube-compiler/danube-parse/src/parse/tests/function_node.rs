@@ -1,7 +1,7 @@
 use crate::Parse;
 use danube_ast::{
     BlockNode, FunctionNode, FunctionParameterNode, IdentNode, ImmutabilityKind, PathNode,
-    TypeKind, TypeNode,
+    TypeKind, TypeNode, DUMMY_NODE_ID,
 };
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
@@ -15,6 +15,7 @@ fn without_block() {
         Parse::new(tokens.as_slice()).parse_function_node(),
         Ok(FunctionNode {
             ident: IdentNode {
+                id: DUMMY_NODE_ID,
                 symbol: Symbol::intern("foo"),
             },
             generics: vec![],
@@ -35,13 +36,17 @@ fn with_block() {
         Parse::new(tokens.as_slice()).parse_function_node(),
         Ok(FunctionNode {
             ident: IdentNode {
+                id: DUMMY_NODE_ID,
                 symbol: Symbol::intern("foo"),
             },
             generics: vec![],
             self_type: None,
             parameters: vec![],
             return_type: None,
-            block: Some(BlockNode { statements: vec![] }),
+            block: Some(BlockNode {
+                id: DUMMY_NODE_ID,
+                statements: vec![]
+            }),
         }),
     );
 }
@@ -55,15 +60,18 @@ fn with_return_type() {
         Parse::new(tokens.as_slice()).parse_function_node(),
         Ok(FunctionNode {
             ident: IdentNode {
+                id: DUMMY_NODE_ID,
                 symbol: Symbol::intern("foo"),
             },
             generics: vec![],
             self_type: None,
             parameters: vec![],
             return_type: Some(TypeNode {
+                id: DUMMY_NODE_ID,
                 immutability: ImmutabilityKind::Yes,
                 kind: TypeKind::Path(PathNode {
                     segments: vec![IdentNode {
+                        id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("bar"),
                     }],
                 }),
@@ -82,6 +90,7 @@ fn immutable_self() {
         Parse::new(tokens.as_slice()).parse_function_node(),
         Ok(FunctionNode {
             ident: IdentNode {
+                id: DUMMY_NODE_ID,
                 symbol: Symbol::intern("foo"),
             },
             generics: vec![],
@@ -102,6 +111,7 @@ fn mutable_self() {
         Parse::new(tokens.as_slice()).parse_function_node(),
         Ok(FunctionNode {
             ident: IdentNode {
+                id: DUMMY_NODE_ID,
                 symbol: Symbol::intern("foo"),
             },
             generics: vec![],
@@ -122,19 +132,24 @@ fn one_parameter() {
         Parse::new(tokens.as_slice()).parse_function_node(),
         Ok(FunctionNode {
             ident: IdentNode {
+                id: DUMMY_NODE_ID,
                 symbol: Symbol::intern("foo"),
             },
             generics: vec![],
             self_type: None,
             parameters: vec![FunctionParameterNode {
+                id: DUMMY_NODE_ID,
                 argument_label: IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("bar"),
                 },
                 parameter_label: None,
                 ty: TypeNode {
+                    id: DUMMY_NODE_ID,
                     immutability: ImmutabilityKind::Yes,
                     kind: TypeKind::Path(PathNode {
                         segments: vec![IdentNode {
+                            id: DUMMY_NODE_ID,
                             symbol: Symbol::intern("Bar"),
                         }],
                     }),
@@ -155,34 +170,43 @@ fn two_parameters() {
         Parse::new(tokens.as_slice()).parse_function_node(),
         Ok(FunctionNode {
             ident: IdentNode {
+                id: DUMMY_NODE_ID,
                 symbol: Symbol::intern("foo"),
             },
             generics: vec![],
             self_type: None,
             parameters: vec![
                 FunctionParameterNode {
+                    id: DUMMY_NODE_ID,
                     argument_label: IdentNode {
+                        id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("bar"),
                     },
                     parameter_label: None,
                     ty: TypeNode {
+                        id: DUMMY_NODE_ID,
                         immutability: ImmutabilityKind::Yes,
                         kind: TypeKind::Path(PathNode {
                             segments: vec![IdentNode {
+                                id: DUMMY_NODE_ID,
                                 symbol: Symbol::intern("Bar"),
                             }],
                         }),
                     }
                 },
                 FunctionParameterNode {
+                    id: DUMMY_NODE_ID,
                     argument_label: IdentNode {
+                        id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("baz"),
                     },
                     parameter_label: None,
                     ty: TypeNode {
+                        id: DUMMY_NODE_ID,
                         immutability: ImmutabilityKind::Yes,
                         kind: TypeKind::Path(PathNode {
                             segments: vec![IdentNode {
+                                id: DUMMY_NODE_ID,
                                 symbol: Symbol::intern("Baz"),
                             }],
                         }),

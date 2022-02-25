@@ -1,5 +1,5 @@
 use crate::{Error, Parse};
-use danube_ast::{ImplementItemKind, ImplementItemNode};
+use danube_ast::{ImplementItemKind, ImplementItemNode, DUMMY_NODE_ID};
 use danube_token::keywords;
 
 impl<'parse> Parse<'parse> {
@@ -25,6 +25,7 @@ impl<'parse> Parse<'parse> {
                 self.cursor.next();
 
                 Ok(ImplementItemNode {
+                    id: DUMMY_NODE_ID,
                     attributes,
                     kind: ImplementItemKind::Type(self.parse_type_alias_node()?),
                 })
@@ -33,6 +34,7 @@ impl<'parse> Parse<'parse> {
                 self.cursor.next();
 
                 Ok(ImplementItemNode {
+                    id: DUMMY_NODE_ID,
                     attributes,
                     kind: ImplementItemKind::Constant(self.parse_constant_node()?),
                 })
@@ -41,6 +43,7 @@ impl<'parse> Parse<'parse> {
                 self.cursor.next();
 
                 Ok(ImplementItemNode {
+                    id: DUMMY_NODE_ID,
                     attributes,
                     kind: ImplementItemKind::Function(self.parse_function_node()?),
                 })

@@ -1,5 +1,5 @@
 use crate::Parse;
-use danube_ast::{IdentNode, LiteralKind, PathNode, PatternKind, PatternNode};
+use danube_ast::{IdentNode, LiteralKind, PathNode, PatternKind, PatternNode, DUMMY_NODE_ID};
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
 
@@ -11,6 +11,7 @@ fn wildcard() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_pattern_node(),
         Ok(PatternNode {
+            id: DUMMY_NODE_ID,
             kind: PatternKind::Wildcard,
         }),
     );
@@ -24,6 +25,7 @@ fn rest() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_pattern_node(),
         Ok(PatternNode {
+            id: DUMMY_NODE_ID,
             kind: PatternKind::Rest,
         }),
     );
@@ -37,6 +39,7 @@ fn literal() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_pattern_node(),
         Ok(PatternNode {
+            id: DUMMY_NODE_ID,
             kind: PatternKind::Literal(Symbol::intern("1"), LiteralKind::Integer),
         }),
     );
@@ -50,12 +53,15 @@ fn path() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_pattern_node(),
         Ok(PatternNode {
+            id: DUMMY_NODE_ID,
             kind: PatternKind::Path(PathNode {
                 segments: vec![
                     IdentNode {
+                        id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("foo"),
                     },
                     IdentNode {
+                        id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("bar"),
                     },
                 ],
@@ -72,9 +78,11 @@ fn named_struct_with_sugar() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_pattern_node(),
         Ok(PatternNode {
+            id: DUMMY_NODE_ID,
             kind: PatternKind::NamedStruct(
                 PathNode {
                     segments: vec![IdentNode {
+                        id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("foo"),
                     }],
                 },
@@ -82,6 +90,7 @@ fn named_struct_with_sugar() {
                     (
                         PathNode {
                             segments: vec![IdentNode {
+                                id: DUMMY_NODE_ID,
                                 symbol: Symbol::intern("a"),
                             }],
                         },
@@ -90,6 +99,7 @@ fn named_struct_with_sugar() {
                     (
                         PathNode {
                             segments: vec![IdentNode {
+                                id: DUMMY_NODE_ID,
                                 symbol: Symbol::intern("b"),
                             }],
                         },
@@ -109,9 +119,11 @@ fn named_struct_without_sugar() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_pattern_node(),
         Ok(PatternNode {
+            id: DUMMY_NODE_ID,
             kind: PatternKind::NamedStruct(
                 PathNode {
                     segments: vec![IdentNode {
+                        id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("foo"),
                     }],
                 },
@@ -119,12 +131,15 @@ fn named_struct_without_sugar() {
                     (
                         PathNode {
                             segments: vec![IdentNode {
+                                id: DUMMY_NODE_ID,
                                 symbol: Symbol::intern("a"),
                             }],
                         },
                         Some(PatternNode {
+                            id: DUMMY_NODE_ID,
                             kind: PatternKind::Path(PathNode {
                                 segments: vec![IdentNode {
+                                    id: DUMMY_NODE_ID,
                                     symbol: Symbol::intern("_a"),
                                 }],
                             }),
@@ -133,12 +148,15 @@ fn named_struct_without_sugar() {
                     (
                         PathNode {
                             segments: vec![IdentNode {
+                                id: DUMMY_NODE_ID,
                                 symbol: Symbol::intern("b"),
                             }],
                         },
                         Some(PatternNode {
+                            id: DUMMY_NODE_ID,
                             kind: PatternKind::Path(PathNode {
                                 segments: vec![IdentNode {
+                                    id: DUMMY_NODE_ID,
                                     symbol: Symbol::intern("_b"),
                                 }],
                             }),
@@ -158,23 +176,29 @@ fn unnamed_struct_with_sugar() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_pattern_node(),
         Ok(PatternNode {
+            id: DUMMY_NODE_ID,
             kind: PatternKind::UnnamedStruct(
                 Some(PathNode {
                     segments: vec![IdentNode {
+                        id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("foo"),
                     }],
                 }),
                 vec![
                     PatternNode {
+                        id: DUMMY_NODE_ID,
                         kind: PatternKind::Path(PathNode {
                             segments: vec![IdentNode {
+                                id: DUMMY_NODE_ID,
                                 symbol: Symbol::intern("a"),
                             }],
                         }),
                     },
                     PatternNode {
+                        id: DUMMY_NODE_ID,
                         kind: PatternKind::Path(PathNode {
                             segments: vec![IdentNode {
+                                id: DUMMY_NODE_ID,
                                 symbol: Symbol::intern("b"),
                             }],
                         }),

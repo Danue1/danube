@@ -1,8 +1,9 @@
 use crate::{Error, Parse};
 use danube_ast::{
     ArgumentNode, BinaryExpressionNode, BinaryOperatorKind, BlockNode, ClosureNode,
-    ConditionBranch, ConditionNode, ExpressionKind, FieldNode, ForNode, FunctionCallNode,
-    IdentNode, IndexNode, LoopNode, MatchBranch, MatchNode, MethodCallNode, TupleNode, WhileNode,
+    ConditionBranch, ConditionNode, ExpressionKind, ExpressionNode, FieldNode, ForNode,
+    FunctionCallNode, IdentNode, IndexNode, LoopNode, MatchBranch, MatchNode, MethodCallNode,
+    TupleNode, WhileNode, DUMMY_NODE_ID,
 };
 use danube_token::{keywords, TokenKind};
 
@@ -13,7 +14,7 @@ impl<'parse> Parse<'parse> {
         self.parse_binary_expression_kind(expression)
     }
 
-    fn parse_prefix_expression_kind(&mut self) -> Result<ExpressionKind, Error> {
+    pub(crate) fn parse_prefix_expression_kind(&mut self) -> Result<ExpressionKind, Error> {
         match symbol!(self.cursor) {
             Some(TokenKind::Plus) => {
                 self.cursor.next();
@@ -24,28 +25,28 @@ impl<'parse> Parse<'parse> {
                 self.cursor.next();
 
                 Ok(ExpressionKind::Negate(Box::new(
-                    self.parse_prefix_expression_kind()?,
+                    self.parse_prefix_expression_node()?,
                 )))
             }
             Some(TokenKind::Exclamation) => {
                 self.cursor.next();
 
                 Ok(ExpressionKind::Not(Box::new(
-                    self.parse_prefix_expression_kind()?,
+                    self.parse_prefix_expression_node()?,
                 )))
             }
             Some(TokenKind::Tilde) => {
                 self.cursor.next();
 
                 Ok(ExpressionKind::BitNot(Box::new(
-                    self.parse_prefix_expression_kind()?,
+                    self.parse_prefix_expression_node()?,
                 )))
             }
             _ => self.parse_atomic_expression_kind(),
         }
     }
 
-    fn parse_atomic_expression_kind(&mut self) -> Result<ExpressionKind, Error> {
+    pub(crate) fn parse_atomic_expression_kind(&mut self) -> Result<ExpressionKind, Error> {
         match &self.cursor.peek().kind {
             TokenKind::Literal(symbol, kind) => {
                 let symbol = symbol.clone();
@@ -67,10 +68,13 @@ impl<'parse> Parse<'parse> {
                                 if !symbol!(self.cursor => Eq) {
                                     return Err(Error::Invalid);
                                 }
-                                let expression = self.parse_expression_kind()?;
-                                Box::new(ExpressionKind::Let(pattern, Box::new(expression)))
+                                let expression = self.parse_expression_node()?;
+                                Box::new(ExpressionNode {
+                                    id: DUMMY_NODE_ID,
+                                    kind: ExpressionKind::Let(pattern, Box::new(expression)),
+                                })
                             } else {
-                                Box::new(self.parse_expression_kind()?)
+                                Box::new(self.parse_expression_node()?)
                             },
                             block: self.parse_block_node()?,
                         }
@@ -106,7 +110,7 @@ impl<'parse> Parse<'parse> {
                 self.cursor.next();
 
                 let branch = ConditionBranch {
-                    expression: Box::new(self.parse_expression_kind()?),
+                    expression: Box::new(self.parse_expression_node()?),
                     block: self.parse_block_node()?,
                 };
 
@@ -118,7 +122,7 @@ impl<'parse> Parse<'parse> {
 
                 let pattern = self.parse_pattern_node()?;
                 let iter = if identifier!(self.cursor => In) {
-                    Box::new(self.parse_expression_kind()?)
+                    Box::new(self.parse_expression_node()?)
                 } else {
                     return Err(Error::Invalid);
                 };
@@ -134,7 +138,7 @@ impl<'parse> Parse<'parse> {
             TokenKind::Identifier(keywords::Match) => {
                 self.cursor.next();
 
-                let expression = self.parse_expression_kind()?;
+                let expression = self.parse_expression_node()?;
                 if !symbol!(self.cursor => LeftBrace) {
                     return Err(Error::Invalid);
                 }
@@ -166,7 +170,10 @@ impl<'parse> Parse<'parse> {
                 };
                 let expression = if symbol!(self.cursor => LeftParens) {
                     ExpressionKind::FunctionCall(FunctionCallNode {
-                        expression: Box::new(path),
+                        expression: Box::new(ExpressionNode {
+                            id: DUMMY_NODE_ID,
+                            kind: path,
+                        }),
                         arguments: self.parse_argument_nodes()?,
                     })
                 } else {
@@ -240,7 +247,10 @@ impl<'parse> Parse<'parse> {
                     statements.push(self.parse_statement_node()?);
                 }
 
-                self.parse_postfix_expression_kind(ExpressionKind::Block(BlockNode { statements }))
+                self.parse_postfix_expression_kind(ExpressionKind::Block(BlockNode {
+                    id: DUMMY_NODE_ID,
+                    statements,
+                }))
             }
             TokenKind::LeftParens => {
                 self.cursor.next();
@@ -248,7 +258,7 @@ impl<'parse> Parse<'parse> {
                 let mut arguments = vec![];
 
                 while !symbol!(self.cursor => RightParens) {
-                    arguments.push(self.parse_prefix_expression_kind()?);
+                    arguments.push(self.parse_prefix_expression_node()?);
                     if !symbol!(self.cursor => Comma) {
                         if symbol!(self.cursor => RightParens) {
                             break;
@@ -266,7 +276,7 @@ impl<'parse> Parse<'parse> {
                 let mut expressions = vec![];
 
                 while !symbol!(self.cursor => RightBracket) {
-                    expressions.push(self.parse_prefix_expression_kind()?);
+                    expressions.push(self.parse_prefix_expression_node()?);
                     if !symbol!(self.cursor => Comma) {
                         if symbol!(self.cursor => RightBracket) {
                             break;
@@ -282,7 +292,7 @@ impl<'parse> Parse<'parse> {
         }
     }
 
-    fn parse_postfix_expression_kind(
+    pub(crate) fn parse_postfix_expression_kind(
         &mut self,
         expression: ExpressionKind,
     ) -> Result<ExpressionKind, Error> {
@@ -291,7 +301,10 @@ impl<'parse> Parse<'parse> {
             TokenKind::Question => {
                 self.cursor.next();
 
-                self.parse_postfix_expression_kind(ExpressionKind::Try(Box::new(expression)))
+                self.parse_postfix_expression_kind(ExpressionKind::Try(Box::new(ExpressionNode {
+                    id: DUMMY_NODE_ID,
+                    kind: expression,
+                })))
             }
             // foo()
             TokenKind::LeftParens => {
@@ -300,7 +313,10 @@ impl<'parse> Parse<'parse> {
                 let arguments = self.parse_argument_nodes()?;
 
                 self.parse_postfix_expression_kind(ExpressionKind::FunctionCall(FunctionCallNode {
-                    expression: Box::new(expression),
+                    expression: Box::new(ExpressionNode {
+                        id: DUMMY_NODE_ID,
+                        kind: expression,
+                    }),
                     arguments,
                 }))
             }
@@ -311,7 +327,10 @@ impl<'parse> Parse<'parse> {
                 self.cursor.next();
 
                 let expression = if identifier!(self.cursor => Await) {
-                    ExpressionKind::Await(Box::new(expression))
+                    ExpressionKind::Await(Box::new(ExpressionNode {
+                        id: DUMMY_NODE_ID,
+                        kind: expression,
+                    }))
                 } else {
                     let ident = self.parse_ident_node()?;
 
@@ -321,7 +340,10 @@ impl<'parse> Parse<'parse> {
                         ExpressionKind::MethodCall(MethodCallNode { ident, arguments })
                     } else {
                         ExpressionKind::Field(FieldNode {
-                            expression: Box::new(expression),
+                            expression: Box::new(ExpressionNode {
+                                id: DUMMY_NODE_ID,
+                                kind: expression,
+                            }),
                             field: ident,
                         })
                     }
@@ -333,11 +355,14 @@ impl<'parse> Parse<'parse> {
             TokenKind::LeftBracket => {
                 self.cursor.next();
 
-                let index = self.parse_expression_kind()?;
+                let index = self.parse_expression_node()?;
 
                 if symbol!(self.cursor => RightBracket) {
                     self.parse_postfix_expression_kind(ExpressionKind::Index(IndexNode {
-                        expression: Box::new(expression),
+                        expression: Box::new(ExpressionNode {
+                            id: DUMMY_NODE_ID,
+                            kind: expression,
+                        }),
                         index: Box::new(index),
                     }))
                 } else {
@@ -392,10 +417,13 @@ impl<'parse> Parse<'parse> {
 
             _ => return Ok(lhs),
         };
-        let rhs = self.parse_prefix_expression_kind()?;
+        let rhs = self.parse_prefix_expression_node()?;
         let expression = ExpressionKind::Binary(BinaryExpressionNode {
             kind,
-            lhs: Box::new(lhs),
+            lhs: Box::new(ExpressionNode {
+                id: DUMMY_NODE_ID,
+                kind: lhs,
+            }),
             rhs: Box::new(rhs),
         });
 
@@ -407,6 +435,7 @@ impl<'parse> Parse<'parse> {
 
         while !symbol!(self.cursor => RightParens) {
             arguments.push(ArgumentNode {
+                id: DUMMY_NODE_ID,
                 ident: {
                     let mut cursor = self.cursor.clone();
 
@@ -417,7 +446,10 @@ impl<'parse> Parse<'parse> {
                             self.cursor.next();
                             self.cursor.next();
 
-                            Some(IdentNode { symbol })
+                            Some(IdentNode {
+                                id: DUMMY_NODE_ID,
+                                symbol,
+                            })
                         } else {
                             None
                         }
@@ -425,7 +457,7 @@ impl<'parse> Parse<'parse> {
                         None
                     }
                 },
-                expression: self.parse_expression_kind()?,
+                expression: self.parse_expression_node()?,
             });
 
             if !symbol!(self.cursor => Comma) {

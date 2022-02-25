@@ -1,5 +1,5 @@
 use crate::{Error, Parse};
-use danube_ast::{FunctionParameterNode, ImmutabilityKind};
+use danube_ast::{FunctionParameterNode, ImmutabilityKind, DUMMY_NODE_ID};
 
 impl<'parse> Parse<'parse> {
     pub fn parse_function_parameter_nodes(
@@ -49,6 +49,7 @@ impl<'parse> Parse<'parse> {
         };
 
         Ok(FunctionParameterNode {
+            id: DUMMY_NODE_ID,
             argument_label,
             parameter_label,
             ty,

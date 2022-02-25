@@ -3,7 +3,7 @@ mod block_node;
 mod constant_node;
 mod enum_node;
 mod enum_variant_node;
-mod expression_kind;
+mod expression_node;
 mod function_node;
 mod ident_node;
 mod implement_item_node;
@@ -19,7 +19,7 @@ mod use_node;
 mod visibility_kind;
 
 use crate::Parse;
-use danube_ast::PackageNode;
+use danube_ast::{PackageNode, DUMMY_NODE_ID};
 use danube_lex::Lex;
 use danube_token::Token;
 
@@ -32,6 +32,7 @@ fn empty() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse(),
         Ok(PackageNode {
+            id: DUMMY_NODE_ID,
             attributes: vec![],
             items: vec![],
         }),

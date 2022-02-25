@@ -1,8 +1,8 @@
 use crate::Parse;
 use danube_ast::{
-    AssignKind, AssignNode, BinaryExpressionNode, BinaryOperatorKind, ExpressionKind, Id,
-    IdentNode, ImmutabilityKind, LetNode, PathNode, PatternKind, PatternNode, StatementId,
-    StatementKind, StatementNode, TypeKind, TypeNode,
+    AssignKind, AssignNode, BinaryExpressionNode, BinaryOperatorKind, ExpressionKind,
+    ExpressionNode, IdentNode, ImmutabilityKind, LetNode, PathNode, PatternKind, PatternNode,
+    StatementKind, StatementNode, TypeKind, TypeNode, DUMMY_NODE_ID,
 };
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
@@ -15,7 +15,7 @@ fn semicolon() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_statement_node(),
         Ok(StatementNode {
-            id: StatementId(Id(0)),
+            id: DUMMY_NODE_ID,
             kind: StatementKind::Semicolon,
         }),
     );
@@ -29,7 +29,7 @@ fn r#break() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_statement_node(),
         Ok(StatementNode {
-            id: StatementId(Id(0)),
+            id: DUMMY_NODE_ID,
             kind: StatementKind::Break,
         }),
     );
@@ -43,7 +43,7 @@ fn r#continue() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_statement_node(),
         Ok(StatementNode {
-            id: StatementId(Id(0)),
+            id: DUMMY_NODE_ID,
             kind: StatementKind::Continue,
         }),
     );
@@ -57,7 +57,7 @@ fn return_without_expression() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_statement_node(),
         Ok(StatementNode {
-            id: StatementId(Id(0)),
+            id: DUMMY_NODE_ID,
             kind: StatementKind::Return(None),
         }),
     );
@@ -72,12 +72,16 @@ fn return_with_expression() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_statement_node(),
         Ok(StatementNode {
-            id: StatementId(Id(0)),
-            kind: StatementKind::Return(Some(ExpressionKind::Path(PathNode {
-                segments: vec![IdentNode {
-                    symbol: Symbol::intern("hello"),
-                }],
-            }))),
+            id: DUMMY_NODE_ID,
+            kind: StatementKind::Return(Some(ExpressionNode {
+                id: DUMMY_NODE_ID,
+                kind: ExpressionKind::Path(PathNode {
+                    segments: vec![IdentNode {
+                        id: DUMMY_NODE_ID,
+                        symbol: Symbol::intern("hello"),
+                    }],
+                }),
+            })),
         }),
     );
 }
@@ -91,28 +95,46 @@ fn return_with_expressions() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_statement_node(),
         Ok(StatementNode {
-            id: StatementId(Id(0)),
-            kind: StatementKind::Return(Some(ExpressionKind::Binary(BinaryExpressionNode {
-                kind: BinaryOperatorKind::Add,
-                lhs: Box::new(ExpressionKind::Binary(BinaryExpressionNode {
+            id: DUMMY_NODE_ID,
+            kind: StatementKind::Return(Some(ExpressionNode {
+                id: DUMMY_NODE_ID,
+                kind: ExpressionKind::Binary(BinaryExpressionNode {
                     kind: BinaryOperatorKind::Add,
-                    lhs: Box::new(ExpressionKind::Path(PathNode {
-                        segments: vec![IdentNode {
-                            symbol: Symbol::intern("hello"),
-                        }],
-                    })),
-                    rhs: Box::new(ExpressionKind::Path(PathNode {
-                        segments: vec![IdentNode {
-                            symbol: Symbol::intern("my"),
-                        }],
-                    })),
-                })),
-                rhs: Box::new(ExpressionKind::Path(PathNode {
-                    segments: vec![IdentNode {
-                        symbol: Symbol::intern("world"),
-                    }],
-                })),
-            }))),
+                    lhs: Box::new(ExpressionNode {
+                        id: DUMMY_NODE_ID,
+                        kind: ExpressionKind::Binary(BinaryExpressionNode {
+                            kind: BinaryOperatorKind::Add,
+                            lhs: Box::new(ExpressionNode {
+                                id: DUMMY_NODE_ID,
+                                kind: ExpressionKind::Path(PathNode {
+                                    segments: vec![IdentNode {
+                                        id: DUMMY_NODE_ID,
+                                        symbol: Symbol::intern("hello"),
+                                    }],
+                                }),
+                            }),
+                            rhs: Box::new(ExpressionNode {
+                                id: DUMMY_NODE_ID,
+                                kind: ExpressionKind::Path(PathNode {
+                                    segments: vec![IdentNode {
+                                        id: DUMMY_NODE_ID,
+                                        symbol: Symbol::intern("my"),
+                                    }],
+                                }),
+                            }),
+                        }),
+                    }),
+                    rhs: Box::new(ExpressionNode {
+                        id: DUMMY_NODE_ID,
+                        kind: ExpressionKind::Path(PathNode {
+                            segments: vec![IdentNode {
+                                id: DUMMY_NODE_ID,
+                                symbol: Symbol::intern("world"),
+                            }],
+                        }),
+                    }),
+                }),
+            })),
         }),
     );
 }
@@ -126,12 +148,15 @@ fn let_with_nothing() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_statement_node(),
         Ok(StatementNode {
-            id: StatementId(Id(0)),
+            id: DUMMY_NODE_ID,
             kind: StatementKind::Let(Box::new(LetNode {
+                id: DUMMY_NODE_ID,
                 immutability: ImmutabilityKind::Yes,
                 pattern: PatternNode {
+                    id: DUMMY_NODE_ID,
                     kind: PatternKind::Path(PathNode {
                         segments: vec![IdentNode {
+                            id: DUMMY_NODE_ID,
                             symbol: Symbol::intern("foo"),
                         }],
                     }),
@@ -152,20 +177,25 @@ fn let_with_type() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_statement_node(),
         Ok(StatementNode {
-            id: StatementId(Id(0)),
+            id: DUMMY_NODE_ID,
             kind: StatementKind::Let(Box::new(LetNode {
+                id: DUMMY_NODE_ID,
                 immutability: ImmutabilityKind::Yes,
                 pattern: PatternNode {
+                    id: DUMMY_NODE_ID,
                     kind: PatternKind::Path(PathNode {
                         segments: vec![IdentNode {
+                            id: DUMMY_NODE_ID,
                             symbol: Symbol::intern("foo"),
                         }],
                     }),
                 },
                 ty: Some(TypeNode {
+                    id: DUMMY_NODE_ID,
                     immutability: ImmutabilityKind::Yes,
                     kind: TypeKind::Path(PathNode {
                         segments: vec![IdentNode {
+                            id: DUMMY_NODE_ID,
                             symbol: Symbol::intern("Foo"),
                         }],
                     }),
@@ -185,22 +215,29 @@ fn let_with_value() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_statement_node(),
         Ok(StatementNode {
-            id: StatementId(Id(0)),
+            id: DUMMY_NODE_ID,
             kind: StatementKind::Let(Box::new(LetNode {
+                id: DUMMY_NODE_ID,
                 immutability: ImmutabilityKind::Yes,
                 pattern: PatternNode {
+                    id: DUMMY_NODE_ID,
                     kind: PatternKind::Path(PathNode {
                         segments: vec![IdentNode {
+                            id: DUMMY_NODE_ID,
                             symbol: Symbol::intern("foo"),
                         }],
                     }),
                 },
                 ty: None,
-                value: Some(ExpressionKind::Path(PathNode {
-                    segments: vec![IdentNode {
-                        symbol: Symbol::intern("bar"),
-                    }],
-                })),
+                value: Some(ExpressionNode {
+                    id: DUMMY_NODE_ID,
+                    kind: ExpressionKind::Path(PathNode {
+                        segments: vec![IdentNode {
+                            id: DUMMY_NODE_ID,
+                            symbol: Symbol::intern("bar"),
+                        }],
+                    }),
+                }),
             })),
         }),
     );
@@ -215,19 +252,27 @@ fn assign() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_statement_node(),
         Ok(StatementNode {
-            id: StatementId(Id(0)),
+            id: DUMMY_NODE_ID,
             kind: StatementKind::Assign(Box::new(AssignNode {
                 kind: AssignKind::Assign,
-                lhs: ExpressionKind::Path(PathNode {
-                    segments: vec![IdentNode {
-                        symbol: Symbol::intern("foo"),
-                    }],
-                }),
-                rhs: ExpressionKind::Path(PathNode {
-                    segments: vec![IdentNode {
-                        symbol: Symbol::intern("bar"),
-                    }],
-                }),
+                lhs: ExpressionNode {
+                    id: DUMMY_NODE_ID,
+                    kind: ExpressionKind::Path(PathNode {
+                        segments: vec![IdentNode {
+                            id: DUMMY_NODE_ID,
+                            symbol: Symbol::intern("foo"),
+                        }],
+                    }),
+                },
+                rhs: ExpressionNode {
+                    id: DUMMY_NODE_ID,
+                    kind: ExpressionKind::Path(PathNode {
+                        segments: vec![IdentNode {
+                            id: DUMMY_NODE_ID,
+                            symbol: Symbol::intern("bar"),
+                        }],
+                    }),
+                },
             })),
         }),
     );
@@ -242,19 +287,27 @@ fn add_assign() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_statement_node(),
         Ok(StatementNode {
-            id: StatementId(Id(0)),
+            id: DUMMY_NODE_ID,
             kind: StatementKind::Assign(Box::new(AssignNode {
                 kind: AssignKind::Add,
-                lhs: ExpressionKind::Path(PathNode {
-                    segments: vec![IdentNode {
-                        symbol: Symbol::intern("foo"),
-                    }],
-                }),
-                rhs: ExpressionKind::Path(PathNode {
-                    segments: vec![IdentNode {
-                        symbol: Symbol::intern("bar"),
-                    }],
-                }),
+                lhs: ExpressionNode {
+                    id: DUMMY_NODE_ID,
+                    kind: ExpressionKind::Path(PathNode {
+                        segments: vec![IdentNode {
+                            id: DUMMY_NODE_ID,
+                            symbol: Symbol::intern("foo"),
+                        }],
+                    }),
+                },
+                rhs: ExpressionNode {
+                    id: DUMMY_NODE_ID,
+                    kind: ExpressionKind::Path(PathNode {
+                        segments: vec![IdentNode {
+                            id: DUMMY_NODE_ID,
+                            symbol: Symbol::intern("bar"),
+                        }],
+                    }),
+                },
             })),
         }),
     );

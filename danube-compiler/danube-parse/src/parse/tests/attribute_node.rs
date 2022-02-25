@@ -1,5 +1,8 @@
 use crate::Parse;
-use danube_ast::{AttributeNode, ExpressionKind, IdentNode, PathNode};
+use danube_ast::{
+    AttributeNode, ExpressionKind, ExpressionNode, IdentNode, PathNode, DUMMY_ATTRIBUTE_ID,
+    DUMMY_NODE_ID,
+};
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
 
@@ -11,8 +14,10 @@ fn package_attribute() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_package_attributes(),
         Ok(vec![AttributeNode {
+            id: DUMMY_ATTRIBUTE_ID,
             path: PathNode {
                 segments: vec![IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("hello"),
                 }],
             },
@@ -30,16 +35,20 @@ fn package_attributes() {
         Parse::new(tokens.as_slice()).parse_package_attributes(),
         Ok(vec![
             AttributeNode {
+                id: DUMMY_ATTRIBUTE_ID,
                 path: PathNode {
                     segments: vec![IdentNode {
+                        id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("hello"),
                     }],
                 },
                 args: vec![],
             },
             AttributeNode {
+                id: DUMMY_ATTRIBUTE_ID,
                 path: PathNode {
                     segments: vec![IdentNode {
+                        id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("hello"),
                     }]
                 },
@@ -57,8 +66,10 @@ fn item_attribute() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_item_attributes(),
         Ok(vec![AttributeNode {
+            id: DUMMY_ATTRIBUTE_ID,
             path: PathNode {
                 segments: vec![IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("hello"),
                 }],
             },
@@ -76,16 +87,20 @@ fn item_attributes() {
         Parse::new(tokens.as_slice()).parse_item_attributes(),
         Ok(vec![
             AttributeNode {
+                id: DUMMY_ATTRIBUTE_ID,
                 path: PathNode {
                     segments: vec![IdentNode {
+                        id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("hello"),
                     }],
                 },
                 args: vec![],
             },
             AttributeNode {
+                id: DUMMY_ATTRIBUTE_ID,
                 path: PathNode {
                     segments: vec![IdentNode {
+                        id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("hello"),
                     }],
                 },
@@ -103,13 +118,16 @@ fn item_attribute_with_argument() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_item_attributes(),
         Ok(vec![AttributeNode {
+            id: DUMMY_ATTRIBUTE_ID,
             path: PathNode {
                 segments: vec![IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("hello"),
                 }],
             },
             args: vec![(
                 IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("foo"),
                 },
                 None,
@@ -126,20 +144,27 @@ fn item_attribute_with_argument_and_expression() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_item_attributes(),
         Ok(vec![AttributeNode {
+            id: DUMMY_ATTRIBUTE_ID,
             path: PathNode {
                 segments: vec![IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("hello"),
                 }],
             },
             args: vec![(
                 IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("foo"),
                 },
-                Some(ExpressionKind::Path(PathNode {
-                    segments: vec![IdentNode {
-                        symbol: Symbol::intern("bar"),
-                    }],
-                })),
+                Some(ExpressionNode {
+                    id: DUMMY_NODE_ID,
+                    kind: ExpressionKind::Path(PathNode {
+                        segments: vec![IdentNode {
+                            id: DUMMY_NODE_ID,
+                            symbol: Symbol::intern("bar"),
+                        }],
+                    }),
+                }),
             )],
         }]),
     );

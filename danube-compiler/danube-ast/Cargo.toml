@@ -6,3 +6,4 @@ edition = "2018"
 
 [dependencies]
 danube-token = { path = "../danube-token" }
+danube-index = { path = "../danube-index" }

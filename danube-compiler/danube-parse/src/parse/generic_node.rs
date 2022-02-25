@@ -1,5 +1,5 @@
 use crate::{Error, Parse};
-use danube_ast::GenericNode;
+use danube_ast::{GenericNode, DUMMY_NODE_ID};
 
 impl<'parse> Parse<'parse> {
     pub fn parse_generic_nodes(&mut self) -> Result<Vec<GenericNode>, Error> {
@@ -56,6 +56,7 @@ impl<'parse> Parse<'parse> {
         };
 
         Ok(GenericNode {
+            id: DUMMY_NODE_ID,
             ident,
             traits,
             default,

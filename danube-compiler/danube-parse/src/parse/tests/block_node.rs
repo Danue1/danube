@@ -1,5 +1,5 @@
 use crate::Parse;
-use danube_ast::BlockNode;
+use danube_ast::{BlockNode, DUMMY_NODE_ID};
 use danube_lex::Lex;
 use danube_token::Token;
 
@@ -10,6 +10,9 @@ fn empty_block() {
 
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_block_node(),
-        Ok(BlockNode { statements: vec![] }),
+        Ok(BlockNode {
+            id: DUMMY_NODE_ID,
+            statements: vec![]
+        }),
     );
 }

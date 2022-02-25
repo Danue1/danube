@@ -1,5 +1,5 @@
 use crate::{Error, Parse};
-use danube_ast::{EnumVariantKind, EnumVariantNode};
+use danube_ast::{EnumVariantKind, EnumVariantNode, DUMMY_NODE_ID};
 use danube_token::TokenKind;
 
 impl<'parse> Parse<'parse> {
@@ -25,6 +25,7 @@ impl<'parse> Parse<'parse> {
                 }
 
                 Ok(EnumVariantNode {
+                    id: DUMMY_NODE_ID,
                     ident,
                     kind: Some(EnumVariantKind::Unnamed(variants)),
                 })
@@ -53,11 +54,16 @@ impl<'parse> Parse<'parse> {
                 }
 
                 Ok(EnumVariantNode {
+                    id: DUMMY_NODE_ID,
                     ident,
                     kind: Some(EnumVariantKind::Named(variants)),
                 })
             }
-            _ => Ok(EnumVariantNode { ident, kind: None }),
+            _ => Ok(EnumVariantNode {
+                id: DUMMY_NODE_ID,
+                ident,
+                kind: None,
+            }),
         }
     }
 }

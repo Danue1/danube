@@ -10,7 +10,7 @@ impl<'parse> Parse<'parse> {
             return Err(Error::Invalid);
         };
         let expression = if symbol!(self.cursor => Eq) {
-            Some(self.parse_expression_kind()?)
+            Some(self.parse_expression_node()?)
         } else {
             None
         };

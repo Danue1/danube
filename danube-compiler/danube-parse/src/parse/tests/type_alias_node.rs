@@ -1,5 +1,7 @@
 use crate::Parse;
-use danube_ast::{IdentNode, ImmutabilityKind, PathNode, TypeAliasNode, TypeKind, TypeNode};
+use danube_ast::{
+  IdentNode, ImmutabilityKind, PathNode, TypeAliasNode, TypeKind, TypeNode, DUMMY_NODE_ID,
+};
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
 
@@ -12,6 +14,7 @@ fn without_type() {
     Parse::new(tokens.as_slice()).parse_type_alias_node(),
     Ok(TypeAliasNode {
       ident: IdentNode {
+        id: DUMMY_NODE_ID,
         symbol: Symbol::intern("Foo"),
       },
       ty: None,
@@ -28,12 +31,15 @@ fn with_type() {
     Parse::new(tokens.as_slice()).parse_type_alias_node(),
     Ok(TypeAliasNode {
       ident: IdentNode {
+        id: DUMMY_NODE_ID,
         symbol: Symbol::intern("Foo"),
       },
       ty: Some(TypeNode {
+        id: DUMMY_NODE_ID,
         immutability: ImmutabilityKind::Yes,
         kind: TypeKind::Path(PathNode {
           segments: vec![IdentNode {
+            id: DUMMY_NODE_ID,
             symbol: Symbol::intern("Bar"),
           }],
         }),

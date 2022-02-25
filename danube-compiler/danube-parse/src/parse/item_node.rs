@@ -1,5 +1,5 @@
 use crate::{Error, Parse};
-use danube_ast::{ItemKind, ItemNode};
+use danube_ast::{ItemKind, ItemNode, DUMMY_NODE_ID};
 use danube_token::keywords;
 
 impl<'parse> Parse<'parse> {
@@ -62,7 +62,7 @@ impl<'parse> Parse<'parse> {
         };
 
         Ok(Some(ItemNode {
-            id: self.resolver.next_id().into(),
+            id: DUMMY_NODE_ID,
             attributes,
             visibility,
             kind,

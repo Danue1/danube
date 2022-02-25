@@ -1,5 +1,5 @@
 use crate::{Error, Parse};
-use danube_ast::AttributeNode;
+use danube_ast::{AttributeNode, DUMMY_ATTRIBUTE_ID};
 
 impl<'parse> Parse<'parse> {
     pub fn parse_package_attributes(&mut self) -> Result<Vec<AttributeNode>, Error> {
@@ -65,7 +65,7 @@ impl<'parse> Parse<'parse> {
             while !symbol!(self.cursor => RightParens) {
                 let ident = self.parse_ident_node()?;
                 let expression = if symbol!(self.cursor => Eq) {
-                    Some(self.parse_expression_kind()?)
+                    Some(self.parse_expression_node()?)
                 } else {
                     None
                 };
@@ -85,7 +85,11 @@ impl<'parse> Parse<'parse> {
         };
 
         if symbol!(self.cursor => RightBracket) {
-            Ok(AttributeNode { path, args })
+            Ok(AttributeNode {
+                id: DUMMY_ATTRIBUTE_ID,
+                path,
+                args,
+            })
         } else {
             Err(Error::Invalid)
         }

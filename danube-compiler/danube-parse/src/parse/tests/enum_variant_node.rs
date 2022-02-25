@@ -1,6 +1,7 @@
 use crate::Parse;
 use danube_ast::{
     EnumVariantKind, EnumVariantNode, IdentNode, ImmutabilityKind, PathNode, TypeKind, TypeNode,
+    DUMMY_NODE_ID,
 };
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
@@ -13,7 +14,9 @@ fn without_struct() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_enum_variant_node(),
         Ok(EnumVariantNode {
+            id: DUMMY_NODE_ID,
             ident: IdentNode {
+                id: DUMMY_NODE_ID,
                 symbol: Symbol::intern("Foo")
             },
             kind: None,
@@ -29,7 +32,9 @@ fn unnamed_without_fields() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_enum_variant_node(),
         Ok(EnumVariantNode {
+            id: DUMMY_NODE_ID,
             ident: IdentNode {
+                id: DUMMY_NODE_ID,
                 symbol: Symbol::intern("Foo")
             },
             kind: Some(EnumVariantKind::Unnamed(vec![])),
@@ -45,13 +50,17 @@ fn unnamed_with_one_field() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_enum_variant_node(),
         Ok(EnumVariantNode {
+            id: DUMMY_NODE_ID,
             ident: IdentNode {
+                id: DUMMY_NODE_ID,
                 symbol: Symbol::intern("Foo")
             },
             kind: Some(EnumVariantKind::Unnamed(vec![TypeNode {
+                id: DUMMY_NODE_ID,
                 immutability: ImmutabilityKind::Yes,
                 kind: TypeKind::Path(PathNode {
                     segments: vec![IdentNode {
+                        id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("Bar"),
                     }],
                 }),
@@ -68,22 +77,28 @@ fn unnamed_with_two_field() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_enum_variant_node(),
         Ok(EnumVariantNode {
+            id: DUMMY_NODE_ID,
             ident: IdentNode {
+                id: DUMMY_NODE_ID,
                 symbol: Symbol::intern("Foo")
             },
             kind: Some(EnumVariantKind::Unnamed(vec![
                 TypeNode {
+                    id: DUMMY_NODE_ID,
                     immutability: ImmutabilityKind::Yes,
                     kind: TypeKind::Path(PathNode {
                         segments: vec![IdentNode {
+                            id: DUMMY_NODE_ID,
                             symbol: Symbol::intern("Bar"),
                         }],
                     }),
                 },
                 TypeNode {
+                    id: DUMMY_NODE_ID,
                     immutability: ImmutabilityKind::Yes,
                     kind: TypeKind::Path(PathNode {
                         segments: vec![IdentNode {
+                            id: DUMMY_NODE_ID,
                             symbol: Symbol::intern("Baz"),
                         }],
                     }),
@@ -101,17 +116,22 @@ fn named_with_one_field() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_enum_variant_node(),
         Ok(EnumVariantNode {
+            id: DUMMY_NODE_ID,
             ident: IdentNode {
+                id: DUMMY_NODE_ID,
                 symbol: Symbol::intern("Foo")
             },
             kind: Some(EnumVariantKind::Named(vec![(
                 IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("bar"),
                 },
                 TypeNode {
+                    id: DUMMY_NODE_ID,
                     immutability: ImmutabilityKind::Yes,
                     kind: TypeKind::Path(PathNode {
                         segments: vec![IdentNode {
+                            id: DUMMY_NODE_ID,
                             symbol: Symbol::intern("Bar"),
                         }],
                     }),
@@ -129,18 +149,23 @@ fn named_with_two_field() {
     assert_eq!(
         Parse::new(tokens.as_slice()).parse_enum_variant_node(),
         Ok(EnumVariantNode {
+            id: DUMMY_NODE_ID,
             ident: IdentNode {
+                id: DUMMY_NODE_ID,
                 symbol: Symbol::intern("Foo")
             },
             kind: Some(EnumVariantKind::Named(vec![
                 (
                     IdentNode {
+                        id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("bar"),
                     },
                     TypeNode {
+                        id: DUMMY_NODE_ID,
                         immutability: ImmutabilityKind::Yes,
                         kind: TypeKind::Path(PathNode {
                             segments: vec![IdentNode {
+                                id: DUMMY_NODE_ID,
                                 symbol: Symbol::intern("Bar"),
                             }],
                         }),
@@ -148,12 +173,15 @@ fn named_with_two_field() {
                 ),
                 (
                     IdentNode {
+                        id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("baz"),
                     },
                     TypeNode {
+                        id: DUMMY_NODE_ID,
                         immutability: ImmutabilityKind::Yes,
                         kind: TypeKind::Path(PathNode {
                             segments: vec![IdentNode {
+                                id: DUMMY_NODE_ID,
                                 symbol: Symbol::intern("Baz"),
                             }],
                         }),

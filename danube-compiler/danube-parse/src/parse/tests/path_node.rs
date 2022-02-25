@@ -1,5 +1,5 @@
 use crate::Parse;
-use danube_ast::{IdentNode, PathNode};
+use danube_ast::{IdentNode, PathNode, DUMMY_NODE_ID};
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
 
@@ -12,6 +12,7 @@ fn one() {
         Parse::new(tokens.as_slice()).parse_path_node(),
         Ok(Some(PathNode {
             segments: vec![IdentNode {
+                id: DUMMY_NODE_ID,
                 symbol: Symbol::intern("one"),
             }],
         })),
@@ -28,9 +29,11 @@ fn onw_two() {
         Ok(Some(PathNode {
             segments: vec![
                 IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("one"),
                 },
                 IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("two"),
                 },
             ],

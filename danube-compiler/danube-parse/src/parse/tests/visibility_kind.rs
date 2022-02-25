@@ -1,5 +1,5 @@
 use crate::Parse;
-use danube_ast::{IdentNode, PathNode, VisibilityKind};
+use danube_ast::{IdentNode, PathNode, VisibilityKind, DUMMY_NODE_ID};
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
 
@@ -34,6 +34,7 @@ fn restricted() {
         Parse::new(tokens.as_slice()).parse_visibility_kind(),
         Ok(VisibilityKind::Restricted(PathNode {
             segments: vec![IdentNode {
+                id: DUMMY_NODE_ID,
                 symbol: Symbol::intern("foo"),
             }],
         })),

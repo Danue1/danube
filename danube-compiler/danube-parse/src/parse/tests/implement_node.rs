@@ -1,5 +1,5 @@
 use crate::Parse;
-use danube_ast::{GenericNode, IdentNode, ImplementNode, PathNode};
+use danube_ast::{GenericNode, IdentNode, ImplementNode, PathNode, DUMMY_NODE_ID};
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
 
@@ -15,6 +15,7 @@ fn with_nothing() {
             trait_ident: None,
             target: PathNode {
                 segments: vec![IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("Foo"),
                 }],
             },
@@ -33,7 +34,9 @@ fn with_generics() {
         Parse::new(tokens.as_slice()).parse_implement_node(),
         Ok(ImplementNode {
             generics: vec![GenericNode {
+                id: DUMMY_NODE_ID,
                 ident: IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("T"),
                 },
                 traits: vec![],
@@ -42,6 +45,7 @@ fn with_generics() {
             trait_ident: None,
             target: PathNode {
                 segments: vec![IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("Foo"),
                 }],
             },
@@ -60,7 +64,9 @@ fn target_generics_with_generics() {
         Parse::new(tokens.as_slice()).parse_implement_node(),
         Ok(ImplementNode {
             generics: vec![GenericNode {
+                id: DUMMY_NODE_ID,
                 ident: IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("T"),
                 },
                 traits: vec![],
@@ -69,11 +75,14 @@ fn target_generics_with_generics() {
             trait_ident: None,
             target: PathNode {
                 segments: vec![IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("Foo"),
                 }],
             },
             target_generics: vec![GenericNode {
+                id: DUMMY_NODE_ID,
                 ident: IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("T"),
                 },
                 traits: vec![],
@@ -95,11 +104,13 @@ fn for_with_generics() {
             generics: vec![],
             trait_ident: Some(PathNode {
                 segments: vec![IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("Foo"),
                 }],
             }),
             target: PathNode {
                 segments: vec![IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("Bar"),
                 }],
             },
@@ -120,16 +131,20 @@ fn for_generics_with_generics() {
             generics: vec![],
             trait_ident: Some(PathNode {
                 segments: vec![IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("Foo"),
                 }],
             }),
             target: PathNode {
                 segments: vec![IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("Bar"),
                 }],
             },
             target_generics: vec![GenericNode {
+                id: DUMMY_NODE_ID,
                 ident: IdentNode {
+                    id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("T"),
                 },
                 traits: vec![],
