@@ -6,7 +6,15 @@ version = 3
 name = "danube-ast"
 version = "0.1.0"
 dependencies = [
+ "danube-index",
  "danube-token",
+]
+
+[[package]]
+name = "danube-ast-lowering"
+version = "0.1.0"
+dependencies = [
+ "danube-hir",
 ]
 
 [[package]]
@@ -21,11 +29,8 @@ name = "danube-hir"
 version = "0.1.0"
 
 [[package]]
-name = "danube-hir-lowering"
+name = "danube-index"
 version = "0.1.0"
-dependencies = [
- "danube-hir",
-]
 
 [[package]]
 name = "danube-ir"
@@ -44,6 +49,7 @@ name = "danube-parse"
 version = "0.1.0"
 dependencies = [
  "danube-ast",
+ "danube-index",
  "danube-lex",
  "danube-span",
  "danube-token",

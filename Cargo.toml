@@ -1,9 +1,10 @@
 [workspace]
 members = [
   "danube-compiler/danube-ast",
+  "danube-compiler/danube-ast-lowering",
   "danube-compiler/danube-compile",
   "danube-compiler/danube-hir",
-  "danube-compiler/danube-hir-lowering",
+  "danube-compiler/danube-index",
   "danube-compiler/danube-ir",
   "danube-compiler/danube-lex",
   "danube-compiler/danube-parse",
