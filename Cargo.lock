@@ -18,22 +18,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "danube-codegen"
+version = "0.1.0"
+
+[[package]]
 name = "danube-compile"
 version = "0.1.0"
-dependencies = [
- "danube-ir",
-]
 
 [[package]]
 name = "danube-hir"
 version = "0.1.0"
 
 [[package]]
-name = "danube-index"
+name = "danube-hir-lowering"
 version = "0.1.0"
 
 [[package]]
-name = "danube-ir"
+name = "danube-index"
 version = "0.1.0"
 
 [[package]]
@@ -43,6 +44,22 @@ dependencies = [
  "danube-span",
  "danube-token",
 ]
+
+[[package]]
+name = "danube-lir"
+version = "0.1.0"
+
+[[package]]
+name = "danube-mir"
+version = "0.1.0"
+
+[[package]]
+name = "danube-mir-lowering"
+version = "0.1.0"
+
+[[package]]
+name = "danube-name-resolution"
+version = "0.1.0"
 
 [[package]]
 name = "danube-parse"
