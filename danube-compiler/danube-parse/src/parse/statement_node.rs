@@ -97,7 +97,6 @@ impl<'parse> Parse<'parse> {
                     AmpersandEq => BitAnd,
                     PipelineEq => BitOr,
                     CaretEq => BitXor,
-                    TildeEq => BitNot,
                     LeftChevronLeftChevronEq => BitLeft,
                     RightChevronRightChevronEq => BitRight,
                 } {

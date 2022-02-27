@@ -114,28 +114,6 @@ fn not() {
 }
 
 #[test]
-fn bit_not() {
-    let source = "~foo";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
-
-    assert_eq!(
-        Parse::new(tokens.as_slice()).parse_expression_node(),
-        Ok(ExpressionNode {
-            id: DUMMY_NODE_ID,
-            kind: ExpressionKind::BitNot(Box::new(ExpressionNode {
-                id: DUMMY_NODE_ID,
-                kind: ExpressionKind::Path(PathNode {
-                    segments: vec![IdentNode {
-                        id: DUMMY_NODE_ID,
-                        symbol: Symbol::intern("foo"),
-                    }],
-                }),
-            })),
-        }),
-    );
-}
-
-#[test]
 fn char() {
     let source = "'a'";
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();

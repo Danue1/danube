@@ -256,13 +256,6 @@ impl<'lex> Lex<'lex> {
                 }
                 _ => symbol!(self.cursor => Pipeline),
             },
-            '~' => match self.cursor.peek() {
-                Some('=') => {
-                    self.cursor.next();
-                    symbol!(self.cursor => TildeEq)
-                }
-                _ => symbol!(self.cursor => Tilde),
-            },
             '^' => match self.cursor.peek() {
                 Some('=') => {
                     self.cursor.next();

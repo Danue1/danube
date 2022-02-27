@@ -35,13 +35,6 @@ impl<'parse> Parse<'parse> {
                     self.parse_prefix_expression_node()?,
                 )))
             }
-            Some(TokenKind::Tilde) => {
-                self.cursor.next();
-
-                Ok(ExpressionKind::BitNot(Box::new(
-                    self.parse_prefix_expression_node()?,
-                )))
-            }
             _ => self.parse_atomic_expression_kind(),
         }
     }

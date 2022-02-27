@@ -48,7 +48,6 @@ pub enum TokenKind {
     Question,     // ?
     Ampersand,    // &
     Pipeline,     // |
-    Tilde,        // ~
     Caret,        // ^
 
     // 2
@@ -68,7 +67,6 @@ pub enum TokenKind {
     PipelinePipeline,         // ||
     AmpersandEq,              // &=
     PipelineEq,               // |=
-    TildeEq,                  // ~=
     CaretEq,                  // ^=
     LeftChevronLeftChevron,   // <<
     RightChevronRightChevron, // >>
@@ -123,7 +121,6 @@ impl TokenKind {
             TokenKind::Question => 1,     // ?
             TokenKind::Ampersand => 1,    // &
             TokenKind::Pipeline => 1,     // |
-            TokenKind::Tilde => 1,        // ~
             TokenKind::Caret => 1,        // ^
 
             // 2
@@ -143,7 +140,6 @@ impl TokenKind {
             TokenKind::PipelinePipeline => 2,         // ||
             TokenKind::AmpersandEq => 2,              // &=
             TokenKind::PipelineEq => 2,               // |=
-            TokenKind::TildeEq => 2,                  // ~=
             TokenKind::CaretEq => 2,                  // ^=
             TokenKind::LeftChevronLeftChevron => 2,   // <<
             TokenKind::RightChevronRightChevron => 2, // >>

@@ -196,7 +196,6 @@ pub enum AssignKind {
     BitAnd,   // &=
     BitOr,    // |=
     BitXor,   // ^=
-    BitNot,   // ~=
     BitLeft,  // <<=
     BitRight, // >>=
 }
@@ -254,7 +253,6 @@ pub enum ExpressionKind {
     // Prefix
     Negate(Box<ExpressionNode>),
     Not(Box<ExpressionNode>),
-    BitNot(Box<ExpressionNode>),
 
     // Atomic
     Literal(Symbol, LiteralKind),

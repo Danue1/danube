@@ -61,7 +61,6 @@ fn symbols() {
         "?" => Question,
         "&" => Ampersand,
         "|" => Pipeline,
-        "~" => Tilde,
         "^" => Caret,
 
         "->" => HyphenRightChevron,
@@ -80,7 +79,6 @@ fn symbols() {
         "||" => PipelinePipeline,
         "&=" => AmpersandEq,
         "|=" => PipelineEq,
-        "~=" => TildeEq,
         "^=" => CaretEq,
         "<<" => LeftChevronLeftChevron,
         ">>" => RightChevronRightChevron,
