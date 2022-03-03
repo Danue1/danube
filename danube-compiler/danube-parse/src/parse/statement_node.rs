@@ -1,14 +1,15 @@
-use crate::{Context, Error, Parse};
+use crate::{Context, Parse};
 use danube_ast::{
     AssignKind, AssignNode, ExpressionNode, ImmutabilityKind, LetNode, PatternNode, StatementKind,
     StatementNode, TypeNode, DUMMY_NODE_ID,
 };
+use danube_diagnostics::MessageBuilder;
 use danube_token::{keywords, TokenKind};
 
 impl Parse for StatementNode {
     type Output = StatementNode;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         Ok(StatementNode {
             id: DUMMY_NODE_ID,
             kind: StatementKind::parse(context)?,
@@ -19,7 +20,7 @@ impl Parse for StatementNode {
 impl Parse for StatementKind {
     type Output = StatementKind;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         match context.cursor.peek().kind {
             TokenKind::Semicolon => {
                 context.cursor.next();
@@ -46,7 +47,7 @@ impl Parse for StatementKind {
                     if symbol!(context.cursor => Semicolon) {
                         Ok(StatementKind::Return(Some(expression)))
                     } else {
-                        Err(Error::Invalid)
+                        context.report(MessageBuilder::error("Expected `;`").build())
                     }
                 }
             }
@@ -74,7 +75,7 @@ impl Parse for StatementKind {
                         value,
                     })))
                 } else {
-                    Err(Error::Invalid)
+                    context.report(MessageBuilder::error("Expected `;`").build())
                 }
             }
             _ => {
@@ -119,7 +120,7 @@ impl Parse for StatementKind {
                             rhs,
                         })))
                     } else {
-                        Err(Error::Invalid)
+                        context.report(MessageBuilder::error("Expected `;`").build())
                     }
                 } else {
                     Ok(StatementKind::Expression(expression))

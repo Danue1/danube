@@ -1,84 +1,17 @@
-use crate::{Context, Parse};
 use danube_ast::{
     BlockNode, ConditionBranch, ConditionNode, ExpressionKind, ExpressionNode, ForNode, IdentNode,
     LoopNode, MatchBranch, MatchNode, PathNode, PatternKind, PatternNode, WhileNode, DUMMY_NODE_ID,
 };
-use danube_lex::Lex;
-use danube_token::{LiteralKind, Symbol, Token};
+use danube_token::{LiteralKind, Symbol};
 
-#[test]
-fn ident() {
-    let source = "foo";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+assert_node! {
+    #[test]
+    fn ident() -> ExpressionNode {
+        let source = "foo";
 
-    assert_eq!(
-        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(ExpressionNode {
-            id: DUMMY_NODE_ID,
-            kind: ExpressionKind::Path(PathNode {
-                segments: vec![IdentNode {
-                    id: DUMMY_NODE_ID,
-                    symbol: Symbol::intern("foo"),
-                }],
-            }),
-        }),
-    );
-}
-
-#[test]
-fn path() {
-    let source = "foo::bar";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
-
-    assert_eq!(
-        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(ExpressionNode {
-            id: DUMMY_NODE_ID,
-            kind: ExpressionKind::Path(PathNode {
-                segments: vec![
-                    IdentNode {
-                        id: DUMMY_NODE_ID,
-                        symbol: Symbol::intern("foo"),
-                    },
-                    IdentNode {
-                        id: DUMMY_NODE_ID,
-                        symbol: Symbol::intern("bar"),
-                    },
-                ],
-            }),
-        }),
-    );
-}
-
-#[test]
-fn add() {
-    let source = "+foo";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
-
-    assert_eq!(
-        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(ExpressionNode {
-            id: DUMMY_NODE_ID,
-            kind: ExpressionKind::Path(PathNode {
-                segments: vec![IdentNode {
-                    id: DUMMY_NODE_ID,
-                    symbol: Symbol::intern("foo"),
-                }],
-            }),
-        }),
-    );
-}
-
-#[test]
-fn negate() {
-    let source = "-foo";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
-
-    assert_eq!(
-        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(ExpressionNode {
-            id: DUMMY_NODE_ID,
-            kind: ExpressionKind::Negate(Box::new(ExpressionNode {
+        assert_eq!(
+            source,
+            Ok(ExpressionNode {
                 id: DUMMY_NODE_ID,
                 kind: ExpressionKind::Path(PathNode {
                     segments: vec![IdentNode {
@@ -86,251 +19,61 @@ fn negate() {
                         symbol: Symbol::intern("foo"),
                     }],
                 }),
-            })),
-        }),
-    );
-}
+            }),
+        );
+    }
 
-#[test]
-fn not() {
-    let source = "!foo";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+    #[test]
+    fn path() -> ExpressionNode {
+        let source = "foo::bar";
 
-    assert_eq!(
-        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(ExpressionNode {
-            id: DUMMY_NODE_ID,
-            kind: ExpressionKind::Not(Box::new(ExpressionNode {
+        assert_eq!(
+            source,
+            Ok(ExpressionNode {
                 id: DUMMY_NODE_ID,
                 kind: ExpressionKind::Path(PathNode {
-                    segments: vec![IdentNode {
-                        id: DUMMY_NODE_ID,
-                        symbol: Symbol::intern("foo"),
-                    }],
-                }),
-            })),
-        }),
-    );
-}
-
-#[test]
-fn char() {
-    let source = "'a'";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
-
-    assert_eq!(
-        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(ExpressionNode {
-            id: DUMMY_NODE_ID,
-            kind: ExpressionKind::Literal(Symbol::intern("a"), LiteralKind::Char),
-        }),
-    );
-}
-
-#[test]
-fn integer() {
-    let source = "123";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
-
-    assert_eq!(
-        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(ExpressionNode {
-            id: DUMMY_NODE_ID,
-            kind: ExpressionKind::Literal(Symbol::intern("123"), LiteralKind::Integer),
-        }),
-    );
-}
-
-#[test]
-fn float() {
-    let source = "123.456";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
-
-    assert_eq!(
-        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(ExpressionNode {
-            id: DUMMY_NODE_ID,
-            kind: ExpressionKind::Literal(Symbol::intern("123.456"), LiteralKind::Float),
-        }),
-    );
-}
-
-#[test]
-fn string() {
-    let source = "\"foo\"";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
-
-    assert_eq!(
-        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(ExpressionNode {
-            id: DUMMY_NODE_ID,
-            kind: ExpressionKind::Literal(Symbol::intern("foo"), LiteralKind::String),
-        }),
-    );
-}
-
-#[test]
-fn conditional_without_else() {
-    let source = "if hello { }";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
-
-    assert_eq!(
-        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(ExpressionNode {
-            id: DUMMY_NODE_ID,
-            kind: ExpressionKind::Conditional(ConditionNode {
-                branches: vec![ConditionBranch {
-                    expression: Box::new(ExpressionNode {
-                        id: DUMMY_NODE_ID,
-                        kind: ExpressionKind::Path(PathNode {
-                            segments: vec![IdentNode {
-                                id: DUMMY_NODE_ID,
-                                symbol: Symbol::intern("hello"),
-                            }],
-                        }),
-                    }),
-                    block: BlockNode {
-                        id: DUMMY_NODE_ID,
-                        statements: vec![]
-                    },
-                }],
-                other: None,
-            }),
-        }),
-    );
-}
-
-#[test]
-fn conditional_with_else() {
-    let source = "if hello { } else { }";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
-
-    assert_eq!(
-        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(ExpressionNode {
-            id: DUMMY_NODE_ID,
-            kind: ExpressionKind::Conditional(ConditionNode {
-                branches: vec![ConditionBranch {
-                    expression: Box::new(ExpressionNode {
-                        id: DUMMY_NODE_ID,
-                        kind: ExpressionKind::Path(PathNode {
-                            segments: vec![IdentNode {
-                                id: DUMMY_NODE_ID,
-                                symbol: Symbol::intern("hello"),
-                            }],
-                        }),
-                    }),
-                    block: BlockNode {
-                        id: DUMMY_NODE_ID,
-                        statements: vec![]
-                    },
-                }],
-                other: Some(BlockNode {
-                    id: DUMMY_NODE_ID,
-                    statements: vec![]
-                }),
-            }),
-        }),
-    );
-}
-
-#[test]
-fn r#loop() {
-    let source = "loop { }";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
-
-    assert_eq!(
-        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(ExpressionNode {
-            id: DUMMY_NODE_ID,
-            kind: ExpressionKind::Loop(LoopNode {
-                block: BlockNode {
-                    id: DUMMY_NODE_ID,
-                    statements: vec![]
-                },
-            }),
-        }),
-    );
-}
-
-#[test]
-fn r#while() {
-    let source = "while hello { }";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
-
-    assert_eq!(
-        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(ExpressionNode {
-            id: DUMMY_NODE_ID,
-            kind: ExpressionKind::While(WhileNode {
-                branch: ConditionBranch {
-                    expression: Box::new(ExpressionNode {
-                        id: DUMMY_NODE_ID,
-                        kind: ExpressionKind::Path(PathNode {
-                            segments: vec![IdentNode {
-                                id: DUMMY_NODE_ID,
-                                symbol: Symbol::intern("hello"),
-                            }],
-                        }),
-                    }),
-                    block: BlockNode {
-                        id: DUMMY_NODE_ID,
-                        statements: vec![]
-                    },
-                },
-            }),
-        }),
-    );
-}
-
-#[test]
-fn r#for() {
-    let source = "for foo in bar { }";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
-
-    assert_eq!(
-        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(ExpressionNode {
-            id: DUMMY_NODE_ID,
-            kind: ExpressionKind::For(ForNode {
-                pattern: PatternNode {
-                    id: DUMMY_NODE_ID,
-                    kind: PatternKind::Path(PathNode {
-                        segments: vec![IdentNode {
+                    segments: vec![
+                        IdentNode {
                             id: DUMMY_NODE_ID,
                             symbol: Symbol::intern("foo"),
-                        }],
-                    }),
-                },
-                iter: Box::new(ExpressionNode {
-                    id: DUMMY_NODE_ID,
-                    kind: ExpressionKind::Path(PathNode {
-                        segments: vec![IdentNode {
+                        },
+                        IdentNode {
                             id: DUMMY_NODE_ID,
                             symbol: Symbol::intern("bar"),
-                        }],
-                    }),
+                        },
+                    ],
                 }),
-                block: BlockNode {
-                    id: DUMMY_NODE_ID,
-                    statements: vec![]
-                },
             }),
-        }),
-    );
-}
+        );
+    }
 
-#[test]
-fn r#match() {
-    let source = "match foo { 1 => { } }";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+    #[test]
+    fn add() -> ExpressionNode {
+        let source = "+foo";
 
-    assert_eq!(
-        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(ExpressionNode {
-            id: DUMMY_NODE_ID,
-            kind: ExpressionKind::Match(MatchNode {
-                expression: Box::new(ExpressionNode {
+        assert_eq!(
+            source,
+            Ok(ExpressionNode {
+                id: DUMMY_NODE_ID,
+                kind: ExpressionKind::Path(PathNode {
+                    segments: vec![IdentNode {
+                        id: DUMMY_NODE_ID,
+                        symbol: Symbol::intern("foo"),
+                    }],
+                }),
+            }),
+        );
+    }
+
+    #[test]
+    fn negate() -> ExpressionNode {
+        let source = "-foo";
+
+        assert_eq!(
+            source,
+            Ok(ExpressionNode {
+                id: DUMMY_NODE_ID,
+                kind: ExpressionKind::Negate(Box::new(ExpressionNode {
                     id: DUMMY_NODE_ID,
                     kind: ExpressionKind::Path(PathNode {
                         segments: vec![IdentNode {
@@ -338,18 +81,260 @@ fn r#match() {
                             symbol: Symbol::intern("foo"),
                         }],
                     }),
+                })),
+            }),
+        );
+    }
+
+    #[test]
+    fn not() -> ExpressionNode {
+        let source = "!foo";
+
+        assert_eq!(
+            source,
+            Ok(ExpressionNode {
+                id: DUMMY_NODE_ID,
+                kind: ExpressionKind::Not(Box::new(ExpressionNode {
+                    id: DUMMY_NODE_ID,
+                    kind: ExpressionKind::Path(PathNode {
+                        segments: vec![IdentNode {
+                            id: DUMMY_NODE_ID,
+                            symbol: Symbol::intern("foo"),
+                        }],
+                    }),
+                })),
+            }),
+        );
+    }
+
+    #[test]
+    fn char() -> ExpressionNode {
+        let source = "'a'";
+
+        assert_eq!(
+            source,
+            Ok(ExpressionNode {
+                id: DUMMY_NODE_ID,
+                kind: ExpressionKind::Literal(Symbol::intern("a"), LiteralKind::Char),
+            }),
+        );
+    }
+
+    #[test]
+    fn integer() -> ExpressionNode {
+        let source = "123";
+
+        assert_eq!(
+            source,
+            Ok(ExpressionNode {
+                id: DUMMY_NODE_ID,
+                kind: ExpressionKind::Literal(Symbol::intern("123"), LiteralKind::Integer),
+            }),
+        );
+    }
+
+    #[test]
+    fn float() -> ExpressionNode {
+        let source = "123.456";
+
+        assert_eq!(
+            source,
+            Ok(ExpressionNode {
+                id: DUMMY_NODE_ID,
+                kind: ExpressionKind::Literal(Symbol::intern("123.456"), LiteralKind::Float),
+            }),
+        );
+    }
+
+    #[test]
+    fn string() -> ExpressionNode {
+        let source = "\"foo\"";
+
+        assert_eq!(
+            source,
+            Ok(ExpressionNode {
+                id: DUMMY_NODE_ID,
+                kind: ExpressionKind::Literal(Symbol::intern("foo"), LiteralKind::String),
+            }),
+        );
+    }
+
+    #[test]
+    fn conditional_without_else() -> ExpressionNode {
+        let source = "if hello { }";
+
+        assert_eq!(
+            source,
+            Ok(ExpressionNode {
+                id: DUMMY_NODE_ID,
+                kind: ExpressionKind::Conditional(ConditionNode {
+                    branches: vec![ConditionBranch {
+                        expression: Box::new(ExpressionNode {
+                            id: DUMMY_NODE_ID,
+                            kind: ExpressionKind::Path(PathNode {
+                                segments: vec![IdentNode {
+                                    id: DUMMY_NODE_ID,
+                                    symbol: Symbol::intern("hello"),
+                                }],
+                            }),
+                        }),
+                        block: BlockNode {
+                            id: DUMMY_NODE_ID,
+                            statements: vec![]
+                        },
+                    }],
+                    other: None,
                 }),
-                branches: vec![MatchBranch {
-                    pattern: PatternNode {
+            }),
+        );
+    }
+
+    #[test]
+    fn conditional_with_else() -> ExpressionNode {
+        let source = "if hello { } else { }";
+
+        assert_eq!(
+            source,
+            Ok(ExpressionNode {
+                id: DUMMY_NODE_ID,
+                kind: ExpressionKind::Conditional(ConditionNode {
+                    branches: vec![ConditionBranch {
+                        expression: Box::new(ExpressionNode {
+                            id: DUMMY_NODE_ID,
+                            kind: ExpressionKind::Path(PathNode {
+                                segments: vec![IdentNode {
+                                    id: DUMMY_NODE_ID,
+                                    symbol: Symbol::intern("hello"),
+                                }],
+                            }),
+                        }),
+                        block: BlockNode {
+                            id: DUMMY_NODE_ID,
+                            statements: vec![]
+                        },
+                    }],
+                    other: Some(BlockNode {
                         id: DUMMY_NODE_ID,
-                        kind: PatternKind::Literal(Symbol::intern("1"), LiteralKind::Integer,),
-                    },
+                        statements: vec![]
+                    }),
+                }),
+            }),
+        );
+    }
+
+    #[test]
+    fn r#loop() -> ExpressionNode {
+        let source = "loop { }";
+
+        assert_eq!(
+            source,
+            Ok(ExpressionNode {
+                id: DUMMY_NODE_ID,
+                kind: ExpressionKind::Loop(LoopNode {
                     block: BlockNode {
                         id: DUMMY_NODE_ID,
                         statements: vec![]
                     },
-                }],
+                }),
             }),
-        }),
-    );
+        );
+    }
+
+    #[test]
+    fn r#while() -> ExpressionNode {
+        let source = "while hello { }";
+
+        assert_eq!(
+            source,
+            Ok(ExpressionNode {
+                id: DUMMY_NODE_ID,
+                kind: ExpressionKind::While(WhileNode {
+                    branch: ConditionBranch {
+                        expression: Box::new(ExpressionNode {
+                            id: DUMMY_NODE_ID,
+                            kind: ExpressionKind::Path(PathNode {
+                                segments: vec![IdentNode {
+                                    id: DUMMY_NODE_ID,
+                                    symbol: Symbol::intern("hello"),
+                                }],
+                            }),
+                        }),
+                        block: BlockNode {
+                            id: DUMMY_NODE_ID,
+                            statements: vec![]
+                        },
+                    },
+                }),
+            }),
+        );
+    }
+
+    #[test]
+    fn r#for() -> ExpressionNode {
+        let source = "for foo in bar { }";
+
+        assert_eq!(
+            source,
+            Ok(ExpressionNode {
+                id: DUMMY_NODE_ID,
+                kind: ExpressionKind::For(ForNode {
+                    pattern: PatternNode {
+                        id: DUMMY_NODE_ID,
+                        kind: PatternKind::Path(PathNode {
+                            segments: vec![IdentNode {
+                                id: DUMMY_NODE_ID,
+                                symbol: Symbol::intern("foo"),
+                            }],
+                        }),
+                    },
+                    iter: Box::new(ExpressionNode {
+                        id: DUMMY_NODE_ID,
+                        kind: ExpressionKind::Path(PathNode {
+                            segments: vec![IdentNode {
+                                id: DUMMY_NODE_ID,
+                                symbol: Symbol::intern("bar"),
+                            }],
+                        }),
+                    }),
+                    block: BlockNode {
+                        id: DUMMY_NODE_ID,
+                        statements: vec![]
+                    },
+                }),
+            }),
+        );
+    }
+
+    #[test]
+    fn r#match() -> ExpressionNode {
+        let source = "match foo { 1 => { } }";
+
+        assert_eq!(
+            source,
+            Ok(ExpressionNode {
+                id: DUMMY_NODE_ID,
+                kind: ExpressionKind::Match(MatchNode {
+                    expression: Box::new(ExpressionNode {
+                        id: DUMMY_NODE_ID,
+                        kind: ExpressionKind::Path(PathNode {
+                            segments: vec![IdentNode {
+                                id: DUMMY_NODE_ID,
+                                symbol: Symbol::intern("foo"),
+                            }],
+                        }),
+                    }),
+                    branches: vec![MatchBranch {
+                        pattern: PatternNode {
+                            id: DUMMY_NODE_ID,
+                            kind: PatternKind::Literal(Symbol::intern("1"), LiteralKind::Integer,),
+                        },
+                        block: BlockNode {
+                            id: DUMMY_NODE_ID,
+                            statements: vec![]
+                        },
+                    }],
+                }),
+            }),
+        );
+    }
 }

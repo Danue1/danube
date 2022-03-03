@@ -1,42 +1,40 @@
-use crate::{Context, Parse};
 use danube_ast::{IdentNode, PathNode, DUMMY_NODE_ID};
-use danube_lex::Lex;
-use danube_token::{Symbol, Token};
+use danube_token::Symbol;
 
-#[test]
-fn one() {
-    let source = "one";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+assert_node! {
+    #[test]
+    fn one() -> PathNode {
+        let source = "one";
 
-    assert_eq!(
-        PathNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(Some(PathNode {
-            segments: vec![IdentNode {
-                id: DUMMY_NODE_ID,
-                symbol: Symbol::intern("one"),
-            }],
-        })),
-    );
-}
-
-#[test]
-fn onw_two() {
-    let source = "one::two";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
-
-    assert_eq!(
-        PathNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(Some(PathNode {
-            segments: vec![
-                IdentNode {
+        assert_eq!(
+            source,
+            Ok(Some(PathNode {
+                segments: vec![IdentNode {
                     id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("one"),
-                },
-                IdentNode {
-                    id: DUMMY_NODE_ID,
-                    symbol: Symbol::intern("two"),
-                },
-            ],
-        })),
-    );
+                }],
+            })),
+        );
+    }
+
+    #[test]
+    fn onw_two() -> PathNode {
+        let source = "one::two";
+
+        assert_eq!(
+            source,
+            Ok(Some(PathNode {
+                segments: vec![
+                    IdentNode {
+                        id: DUMMY_NODE_ID,
+                        symbol: Symbol::intern("one"),
+                    },
+                    IdentNode {
+                        id: DUMMY_NODE_ID,
+                        symbol: Symbol::intern("two"),
+                    },
+                ],
+            })),
+        );
+    }
 }

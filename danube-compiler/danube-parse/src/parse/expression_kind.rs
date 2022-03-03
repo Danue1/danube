@@ -1,18 +1,19 @@
 use super::argument_node::ArgumentNodeList;
 use super::expression_node::PrefixExpressionNode;
-use crate::{Context, Error, Parse};
+use crate::{Context, Parse};
 use danube_ast::{
     BinaryExpressionNode, BinaryOperatorKind, BlockNode, ClosureNode, ConditionBranch,
     ConditionNode, ExpressionKind, ExpressionNode, FieldNode, ForNode, FunctionCallNode, IdentNode,
     IndexNode, LoopNode, MatchBranch, MatchNode, MethodCallNode, PathNode, PatternNode,
     StatementNode, TupleNode, TypeNode, WhileNode, DUMMY_NODE_ID,
 };
+use danube_diagnostics::MessageBuilder;
 use danube_token::{keywords, TokenKind};
 
 impl Parse for ExpressionKind {
     type Output = ExpressionKind;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         let expression = PrefixExpressionKind::parse(context)?;
 
         parse_binary_expression_kind(context, expression)
@@ -24,7 +25,7 @@ pub(crate) struct PrefixExpressionKind;
 impl Parse for PrefixExpressionKind {
     type Output = ExpressionKind;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         match symbol!(context.cursor) {
             Some(TokenKind::Plus) => {
                 context.cursor.next();
@@ -55,7 +56,7 @@ struct AtomicExpressionKind;
 impl Parse for AtomicExpressionKind {
     type Output = ExpressionKind;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         match &context.cursor.peek().kind {
             TokenKind::Literal(symbol, kind) => {
                 let symbol = *symbol;
@@ -75,7 +76,9 @@ impl Parse for AtomicExpressionKind {
                             expression: if identifier!(context.cursor => Let) {
                                 let pattern = PatternNode::parse(context)?;
                                 if !symbol!(context.cursor => Eq) {
-                                    return Err(Error::Invalid);
+                                    return context.report(
+                                        MessageBuilder::error("Expected `=`").build(),
+                                    );
                                 }
                                 let expression = ExpressionNode::parse(context)?;
                                 Box::new(ExpressionNode {
@@ -133,7 +136,7 @@ impl Parse for AtomicExpressionKind {
                 let iter = if identifier!(context.cursor => In) {
                     Box::new(ExpressionNode::parse(context)?)
                 } else {
-                    return Err(Error::Invalid);
+                    return context.report(MessageBuilder::error("Expected `in`").build());
                 };
                 let block = BlockNode::parse(context)?;
 
@@ -152,14 +155,14 @@ impl Parse for AtomicExpressionKind {
 
                 let expression = ExpressionNode::parse(context)?;
                 if !symbol!(context.cursor => LeftBrace) {
-                    return Err(Error::Invalid);
+                    return context.report(MessageBuilder::error("Expected `{`").build());
                 }
 
                 let mut branches = vec![];
                 while !symbol!(context.cursor => RightBrace) {
                     let pattern = PatternNode::parse(context)?;
                     if !symbol!(context.cursor => EqRightChevron) {
-                        return Err(Error::Invalid);
+                        return context.report(MessageBuilder::error("Expected `=>`").build());
                     }
 
                     let block = BlockNode::parse(context)?;
@@ -181,7 +184,7 @@ impl Parse for AtomicExpressionKind {
                 let path = if let Some(path) = PathNode::parse(context)? {
                     ExpressionKind::Path(path)
                 } else {
-                    return Err(Error::Invalid);
+                    return context.report(MessageBuilder::error("Expected path").build());
                 };
                 let expression = if symbol!(context.cursor => LeftParens) {
                     ExpressionKind::FunctionCall(FunctionCallNode {
@@ -242,7 +245,7 @@ impl Parse for AtomicExpressionKind {
                     if symbol!(context.cursor => RightChevron) {
                         Some(TypeNode::parse(context)?)
                     } else {
-                        return Err(Error::Invalid);
+                        return context.report(MessageBuilder::error("Expected `>`").build());
                     }
                 } else {
                     None
@@ -310,7 +313,7 @@ impl Parse for AtomicExpressionKind {
 
                 parse_postfix_expression_kind(context, ExpressionKind::Array(expressions))
             }
-            _ => Err(Error::Invalid),
+            _ => context.report(MessageBuilder::error("Expected expression").build()),
         }
     }
 }
@@ -318,7 +321,7 @@ impl Parse for AtomicExpressionKind {
 fn parse_postfix_expression_kind(
     context: &mut Context,
     expression: ExpressionKind,
-) -> Result<ExpressionKind, Error> {
+) -> Result<ExpressionKind, ()> {
     match context.cursor.peek().kind {
         // foo?
         TokenKind::Question => {
@@ -399,7 +402,7 @@ fn parse_postfix_expression_kind(
                     }),
                 )
             } else {
-                Err(Error::Invalid)
+                context.report(MessageBuilder::error("Expected `]`").build())
             }
         }
         _ => Ok(expression),
@@ -409,7 +412,7 @@ fn parse_postfix_expression_kind(
 fn parse_binary_expression_kind(
     context: &mut Context,
     lhs: ExpressionKind,
-) -> Result<ExpressionKind, Error> {
+) -> Result<ExpressionKind, ()> {
     macro_rules! match_operator {
         ($($kind:ident => $operator:ident,)+ _ => return Ok(lhs),) => {
             match context.cursor.peek().kind {

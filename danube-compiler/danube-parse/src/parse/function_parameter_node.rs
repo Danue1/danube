@@ -1,21 +1,22 @@
-use crate::{Context, Error, Parse};
+use crate::{Context, Parse};
 use danube_ast::{FunctionParameterNode, IdentNode, ImmutabilityKind, TypeNode, DUMMY_NODE_ID};
+use danube_diagnostics::MessageBuilder;
 
 pub(crate) struct FunctionParameterNodeList;
 
 impl Parse for FunctionParameterNodeList {
     type Output = (Option<ImmutabilityKind>, Vec<FunctionParameterNode>);
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         if !symbol!(context.cursor => LeftParens) {
-            return Err(Error::Invalid);
+            return context.report(MessageBuilder::error("Expected `(`").build());
         }
 
         let immutability = if let Ok(immutability) = ImmutabilityKind::parse(context) {
             if identifier!(context.cursor => SelfLower) {
                 Some(immutability)
             } else if immutability == ImmutabilityKind::Nope {
-                return Err(Error::Invalid);
+                return context.report(MessageBuilder::error("Expected `self`").build());
             } else {
                 None
             }
@@ -42,7 +43,7 @@ impl Parse for FunctionParameterNodeList {
 impl Parse for FunctionParameterNode {
     type Output = FunctionParameterNode;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         let argument_label = IdentNode::parse(context)?;
         let (parameter_label, ty) = if symbol!(context.cursor => Colon) {
             (None, TypeNode::parse(context)?)

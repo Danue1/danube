@@ -1,11 +1,12 @@
-use crate::{Context, Error, Parse};
+use crate::{Context, Parse};
 use danube_ast::{EnumVariantKind, EnumVariantNode, IdentNode, TypeNode, DUMMY_NODE_ID};
+use danube_diagnostics::MessageBuilder;
 use danube_token::TokenKind;
 
 impl Parse for EnumVariantNode {
     type Output = EnumVariantNode;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         let ident = IdentNode::parse(context)?;
 
         match symbol!(context.cursor) {
@@ -38,7 +39,7 @@ impl Parse for EnumVariantNode {
                     let ty = if symbol!(context.cursor => Colon) {
                         TypeNode::parse(context)?
                     } else {
-                        return Err(Error::Invalid);
+                        return context.report(MessageBuilder::error("Expected `:`").build());
                     };
                     variants.push((ident, ty));
 

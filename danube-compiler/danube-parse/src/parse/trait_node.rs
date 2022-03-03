@@ -1,12 +1,13 @@
 use super::generic_node::GenericNodeList;
 use super::implement_item_node::ImplementItemNodeList;
-use crate::{Context, Error, Parse};
+use crate::{Context, Parse};
 use danube_ast::{IdentNode, PathNode, TraitNode};
+use danube_diagnostics::MessageBuilder;
 
 impl Parse for TraitNode {
     type Output = TraitNode;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         let ident = IdentNode::parse(context)?;
         let generics = GenericNodeList::parse(context)?;
         let inheritances = if symbol!(context.cursor => Colon) {
@@ -17,13 +18,14 @@ impl Parse for TraitNode {
                     if let Some(path) = PathNode::parse(context)? {
                         inheritances.push(path);
                     } else {
-                        return Err(Error::Invalid);
+                        return context
+                            .report(MessageBuilder::error("Expected trait path").build());
                     }
                 }
 
                 inheritances
             } else {
-                return Err(Error::Invalid);
+                return context.report(MessageBuilder::error("Expected trait path").build());
             }
         } else {
             vec![]

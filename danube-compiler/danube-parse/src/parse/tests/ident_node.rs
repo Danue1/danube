@@ -1,18 +1,17 @@
-use crate::{Context, Parse};
 use danube_ast::{IdentNode, DUMMY_NODE_ID};
-use danube_lex::Lex;
-use danube_token::{Symbol, Token};
+use danube_token::Symbol;
 
-#[test]
-fn ident_node() {
-    let source = "hello";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+assert_node! {
+    #[test]
+    fn ident_node() -> IdentNode {
+        let source = "hello";
 
-    assert_eq!(
-        IdentNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(IdentNode {
-            id: DUMMY_NODE_ID,
-            symbol: Symbol::intern("hello"),
-        }),
-    );
+        assert_eq!(
+            source,
+            Ok(IdentNode {
+                id: DUMMY_NODE_ID,
+                symbol: Symbol::intern("hello"),
+            }),
+        );
+    }
 }

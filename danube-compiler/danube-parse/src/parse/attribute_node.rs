@@ -1,12 +1,13 @@
-use crate::{Context, Error, Parse};
+use crate::{Context, Parse};
 use danube_ast::{AttributeNode, ExpressionNode, IdentNode, PathNode, DUMMY_ATTRIBUTE_ID};
+use danube_diagnostics::MessageBuilder;
 
 pub(crate) struct PackageAttributeNodeList;
 
 impl Parse for PackageAttributeNodeList {
     type Output = Vec<AttributeNode>;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         let mut attributes = vec![];
 
         while let Some(attribute) = PackageAttributeNode::parse(context)? {
@@ -22,12 +23,12 @@ pub(crate) struct PackageAttributeNode;
 impl Parse for PackageAttributeNode {
     type Output = Option<AttributeNode>;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         if symbol!(context.cursor => Hash) {
             if symbol!(context.cursor => Exclamation) {
                 Ok(Some(AttributeNode::parse(context)?))
             } else {
-                Err(Error::Invalid)
+                context.report(MessageBuilder::error("Expected `!` after `#`").build())
             }
         } else {
             Ok(None)
@@ -40,7 +41,7 @@ pub(crate) struct ItemAttributeNodeList;
 impl Parse for ItemAttributeNodeList {
     type Output = Vec<AttributeNode>;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         let mut attributes = vec![];
 
         while let Some(attribute) = ItemAttributeNode::parse(context)? {
@@ -56,7 +57,7 @@ pub(crate) struct ItemAttributeNode;
 impl Parse for ItemAttributeNode {
     type Output = Option<AttributeNode>;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         if symbol!(context.cursor => Hash) {
             Ok(Some(AttributeNode::parse(context)?))
         } else {
@@ -68,15 +69,15 @@ impl Parse for ItemAttributeNode {
 impl Parse for AttributeNode {
     type Output = AttributeNode;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         if !symbol!(context.cursor => LeftBracket) {
-            return Err(Error::Invalid);
+            return context.report(MessageBuilder::error("Expected `[` after `#`").build());
         }
 
         let path = if let Some(path) = PathNode::parse(context)? {
             path
         } else {
-            return Err(Error::Invalid);
+            return context.report(MessageBuilder::error("Expected path after `[`").build());
         };
         let args = if !symbol!(context.cursor => LeftParens) {
             vec![]
@@ -108,7 +109,7 @@ impl Parse for AttributeNode {
                 args,
             })
         } else {
-            Err(Error::Invalid)
+            context.report(MessageBuilder::error("Expected `]` after `[`").build())
         }
     }
 }

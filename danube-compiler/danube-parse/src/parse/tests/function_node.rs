@@ -1,182 +1,136 @@
-use crate::{Context, Parse};
 use danube_ast::{
     BlockNode, FunctionNode, FunctionParameterNode, IdentNode, ImmutabilityKind, PathNode,
     TypeKind, TypeNode, DUMMY_NODE_ID,
 };
-use danube_lex::Lex;
-use danube_token::{Symbol, Token};
+use danube_token::Symbol;
 
-#[test]
-fn without_block() {
-    let source = "foo();";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+assert_node! {
+    #[test]
+    fn without_block() -> FunctionNode {
+        let source = "foo();";
 
-    assert_eq!(
-        FunctionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(FunctionNode {
-            ident: IdentNode {
-                id: DUMMY_NODE_ID,
-                symbol: Symbol::intern("foo"),
-            },
-            generics: vec![],
-            self_type: None,
-            parameters: vec![],
-            return_type: None,
-            block: None,
-        }),
-    );
-}
-
-#[test]
-fn with_block() {
-    let source = "foo() { }";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
-
-    assert_eq!(
-        FunctionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(FunctionNode {
-            ident: IdentNode {
-                id: DUMMY_NODE_ID,
-                symbol: Symbol::intern("foo"),
-            },
-            generics: vec![],
-            self_type: None,
-            parameters: vec![],
-            return_type: None,
-            block: Some(BlockNode {
-                id: DUMMY_NODE_ID,
-                statements: vec![]
+        assert_eq!(
+            source,
+            Ok(FunctionNode {
+                ident: IdentNode {
+                    id: DUMMY_NODE_ID,
+                    symbol: Symbol::intern("foo"),
+                },
+                generics: vec![],
+                self_type: None,
+                parameters: vec![],
+                return_type: None,
+                block: None,
             }),
-        }),
-    );
-}
+        );
+    }
 
-#[test]
-fn with_return_type() {
-    let source = "foo() -> bar;";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+    #[test]
+    fn with_block() -> FunctionNode {
+        let source = "foo() { }";
 
-    assert_eq!(
-        FunctionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(FunctionNode {
-            ident: IdentNode {
-                id: DUMMY_NODE_ID,
-                symbol: Symbol::intern("foo"),
-            },
-            generics: vec![],
-            self_type: None,
-            parameters: vec![],
-            return_type: Some(TypeNode {
-                id: DUMMY_NODE_ID,
-                immutability: ImmutabilityKind::Yes,
-                kind: TypeKind::Path(PathNode {
-                    segments: vec![IdentNode {
-                        id: DUMMY_NODE_ID,
-                        symbol: Symbol::intern("bar"),
-                    }],
+        assert_eq!(
+            source,
+            Ok(FunctionNode {
+                ident: IdentNode {
+                    id: DUMMY_NODE_ID,
+                    symbol: Symbol::intern("foo"),
+                },
+                generics: vec![],
+                self_type: None,
+                parameters: vec![],
+                return_type: None,
+                block: Some(BlockNode {
+                    id: DUMMY_NODE_ID,
+                    statements: vec![]
                 }),
             }),
-            block: None,
-        }),
-    );
-}
+        );
+    }
 
-#[test]
-fn immutable_self() {
-    let source = "foo(self);";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+    #[test]
+    fn with_return_type() -> FunctionNode {
+        let source = "foo() -> bar;";
 
-    assert_eq!(
-        FunctionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(FunctionNode {
-            ident: IdentNode {
-                id: DUMMY_NODE_ID,
-                symbol: Symbol::intern("foo"),
-            },
-            generics: vec![],
-            self_type: Some(ImmutabilityKind::Yes),
-            parameters: vec![],
-            return_type: None,
-            block: None,
-        }),
-    );
-}
-
-#[test]
-fn mutable_self() {
-    let source = "foo(mut self);";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
-
-    assert_eq!(
-        FunctionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(FunctionNode {
-            ident: IdentNode {
-                id: DUMMY_NODE_ID,
-                symbol: Symbol::intern("foo"),
-            },
-            generics: vec![],
-            self_type: Some(ImmutabilityKind::Nope),
-            parameters: vec![],
-            return_type: None,
-            block: None,
-        }),
-    );
-}
-
-#[test]
-fn one_parameter() {
-    let source = "foo(bar: Bar);";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
-
-    assert_eq!(
-        FunctionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(FunctionNode {
-            ident: IdentNode {
-                id: DUMMY_NODE_ID,
-                symbol: Symbol::intern("foo"),
-            },
-            generics: vec![],
-            self_type: None,
-            parameters: vec![FunctionParameterNode {
-                id: DUMMY_NODE_ID,
-                argument_label: IdentNode {
+        assert_eq!(
+            source,
+            Ok(FunctionNode {
+                ident: IdentNode {
                     id: DUMMY_NODE_ID,
-                    symbol: Symbol::intern("bar"),
+                    symbol: Symbol::intern("foo"),
                 },
-                parameter_label: None,
-                ty: TypeNode {
+                generics: vec![],
+                self_type: None,
+                parameters: vec![],
+                return_type: Some(TypeNode {
                     id: DUMMY_NODE_ID,
                     immutability: ImmutabilityKind::Yes,
                     kind: TypeKind::Path(PathNode {
                         segments: vec![IdentNode {
                             id: DUMMY_NODE_ID,
-                            symbol: Symbol::intern("Bar"),
+                            symbol: Symbol::intern("bar"),
                         }],
                     }),
-                }
-            }],
-            return_type: None,
-            block: None,
-        }),
-    );
-}
+                }),
+                block: None,
+            }),
+        );
+    }
 
-#[test]
-fn two_parameters() {
-    let source = "foo(bar: Bar, baz: Baz);";
-    let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+    #[test]
+    fn immutable_self() -> FunctionNode {
+        let source = "foo(self);";
 
-    assert_eq!(
-        FunctionNode::parse(&mut Context::new(tokens.as_slice())),
-        Ok(FunctionNode {
-            ident: IdentNode {
-                id: DUMMY_NODE_ID,
-                symbol: Symbol::intern("foo"),
-            },
-            generics: vec![],
-            self_type: None,
-            parameters: vec![
-                FunctionParameterNode {
+        assert_eq!(
+            source,
+            Ok(FunctionNode {
+                ident: IdentNode {
+                    id: DUMMY_NODE_ID,
+                    symbol: Symbol::intern("foo"),
+                },
+                generics: vec![],
+                self_type: Some(ImmutabilityKind::Yes),
+                parameters: vec![],
+                return_type: None,
+                block: None,
+            }),
+        );
+    }
+
+    #[test]
+    fn mutable_self() -> FunctionNode {
+        let source = "foo(mut self);";
+
+        assert_eq!(
+            source,
+            Ok(FunctionNode {
+                ident: IdentNode {
+                    id: DUMMY_NODE_ID,
+                    symbol: Symbol::intern("foo"),
+                },
+                generics: vec![],
+                self_type: Some(ImmutabilityKind::Nope),
+                parameters: vec![],
+                return_type: None,
+                block: None,
+            }),
+        );
+    }
+
+    #[test]
+    fn one_parameter() -> FunctionNode {
+        let source = "foo(bar: Bar);";
+
+        assert_eq!(
+            source,
+            Ok(FunctionNode {
+                ident: IdentNode {
+                    id: DUMMY_NODE_ID,
+                    symbol: Symbol::intern("foo"),
+                },
+                generics: vec![],
+                self_type: None,
+                parameters: vec![FunctionParameterNode {
                     id: DUMMY_NODE_ID,
                     argument_label: IdentNode {
                         id: DUMMY_NODE_ID,
@@ -193,28 +147,67 @@ fn two_parameters() {
                             }],
                         }),
                     }
-                },
-                FunctionParameterNode {
+                }],
+                return_type: None,
+                block: None,
+            }),
+        );
+    }
+
+    #[test]
+    fn two_parameters() -> FunctionNode {
+        let source = "foo(bar: Bar, baz: Baz);";
+
+        assert_eq!(
+            source,
+            Ok(FunctionNode {
+                ident: IdentNode {
                     id: DUMMY_NODE_ID,
-                    argument_label: IdentNode {
-                        id: DUMMY_NODE_ID,
-                        symbol: Symbol::intern("baz"),
-                    },
-                    parameter_label: None,
-                    ty: TypeNode {
-                        id: DUMMY_NODE_ID,
-                        immutability: ImmutabilityKind::Yes,
-                        kind: TypeKind::Path(PathNode {
-                            segments: vec![IdentNode {
-                                id: DUMMY_NODE_ID,
-                                symbol: Symbol::intern("Baz"),
-                            }],
-                        }),
-                    }
+                    symbol: Symbol::intern("foo"),
                 },
-            ],
-            return_type: None,
-            block: None,
-        }),
-    );
+                generics: vec![],
+                self_type: None,
+                parameters: vec![
+                    FunctionParameterNode {
+                        id: DUMMY_NODE_ID,
+                        argument_label: IdentNode {
+                            id: DUMMY_NODE_ID,
+                            symbol: Symbol::intern("bar"),
+                        },
+                        parameter_label: None,
+                        ty: TypeNode {
+                            id: DUMMY_NODE_ID,
+                            immutability: ImmutabilityKind::Yes,
+                            kind: TypeKind::Path(PathNode {
+                                segments: vec![IdentNode {
+                                    id: DUMMY_NODE_ID,
+                                    symbol: Symbol::intern("Bar"),
+                                }],
+                            }),
+                        }
+                    },
+                    FunctionParameterNode {
+                        id: DUMMY_NODE_ID,
+                        argument_label: IdentNode {
+                            id: DUMMY_NODE_ID,
+                            symbol: Symbol::intern("baz"),
+                        },
+                        parameter_label: None,
+                        ty: TypeNode {
+                            id: DUMMY_NODE_ID,
+                            immutability: ImmutabilityKind::Yes,
+                            kind: TypeKind::Path(PathNode {
+                                segments: vec![IdentNode {
+                                    id: DUMMY_NODE_ID,
+                                    symbol: Symbol::intern("Baz"),
+                                }],
+                            }),
+                        }
+                    },
+                ],
+                return_type: None,
+                block: None,
+            }),
+        );
+    }
 }

@@ -1,12 +1,13 @@
 use super::generic_node::GenericNodeList;
-use crate::{Context, Error, Parse};
+use crate::{Context, Parse};
 use danube_ast::{EnumNode, EnumVariantNode, IdentNode};
+use danube_diagnostics::MessageBuilder;
 use danube_token::TokenKind;
 
 impl Parse for EnumNode {
     type Output = EnumNode;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         let ident = IdentNode::parse(context)?;
         let generics = GenericNodeList::parse(context)?;
 
@@ -39,7 +40,7 @@ impl Parse for EnumNode {
                     variants,
                 })
             }
-            _ => Err(Error::Invalid),
+            _ => context.report(MessageBuilder::error("Expected `{` or `;`").build()),
         }
     }
 }

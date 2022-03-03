@@ -1,9 +1,10 @@
 use super::attribute_node::ItemAttributeNodeList;
-use crate::{Context, Error, Parse};
+use crate::{Context, Parse};
 use danube_ast::{
     ConstantNode, EnumNode, FunctionNode, ImplementNode, ItemKind, ItemNode, TraitNode,
     TypeAliasNode, UseNode, VisibilityKind, DUMMY_NODE_ID,
 };
+use danube_diagnostics::MessageBuilder;
 use danube_token::keywords;
 
 pub(crate) struct ItemNodeList;
@@ -11,7 +12,7 @@ pub(crate) struct ItemNodeList;
 impl Parse for ItemNodeList {
     type Output = Vec<ItemNode>;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         let mut items = vec![];
 
         while let Some(item) = ItemNode::parse(context)? {
@@ -25,7 +26,7 @@ impl Parse for ItemNodeList {
 impl Parse for ItemNode {
     type Output = Option<ItemNode>;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         let attributes = ItemAttributeNodeList::parse(context)?;
         let visibility = VisibilityKind::parse(context)?;
         let kind = match identifier!(context.cursor) {
@@ -68,7 +69,12 @@ impl Parse for ItemNode {
                 return if attributes.is_empty() {
                     Ok(None)
                 } else {
-                    Err(Error::Invalid)
+                    context.report(
+                        MessageBuilder::error(
+                            "Expected `use`, `enum`, `fn`, `type`, `trait`, `const`, or `impl`",
+                        )
+                        .build(),
+                    )
                 }
             }
         };

@@ -1,12 +1,13 @@
-use crate::{Context, Error, Parse};
+use crate::{Context, Parse};
 use danube_ast::{BlockNode, StatementNode, DUMMY_NODE_ID};
+use danube_diagnostics::MessageBuilder;
 
 impl Parse for BlockNode {
     type Output = BlockNode;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         if !symbol!(context.cursor => LeftBrace) {
-            return Err(Error::Invalid);
+            return context.report(MessageBuilder::error("Expected `{`").build());
         }
 
         let mut statements = vec![];

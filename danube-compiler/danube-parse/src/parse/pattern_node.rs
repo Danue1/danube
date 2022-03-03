@@ -1,11 +1,12 @@
-use crate::{Context, Error, Parse};
+use crate::{Context, Parse};
 use danube_ast::{PathNode, PatternKind, PatternNode, DUMMY_NODE_ID};
+use danube_diagnostics::MessageBuilder;
 use danube_token::{keywords, TokenKind};
 
 impl Parse for PatternNode {
     type Output = PatternNode;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         match context.cursor.peek().kind {
             TokenKind::DotDot => {
                 context.cursor.next();
@@ -74,7 +75,7 @@ impl Parse for PatternNode {
                 let path = if let Some(path) = PathNode::parse(context)? {
                     path
                 } else {
-                    return Err(Error::Invalid);
+                    return context.report(MessageBuilder::error("Expected pattern path").build());
                 };
 
                 match context.cursor.peek().kind {
@@ -87,7 +88,8 @@ impl Parse for PatternNode {
                             let path = if let Some(path) = PathNode::parse(context)? {
                                 path
                             } else {
-                                return Err(Error::Invalid);
+                                return context
+                                    .report(MessageBuilder::error("Expected field path").build());
                             };
                             let pattern = if symbol!(context.cursor => Colon) {
                                 Some(PatternNode::parse(context)?)

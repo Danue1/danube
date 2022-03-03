@@ -1,10 +1,10 @@
-use crate::{Context, Error, Parse};
+use crate::{Context, Parse};
 use danube_ast::{IdentNode, PathNode};
 
 impl Parse for PathNode {
     type Output = Option<PathNode>;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         let mut segments = if let Ok(ident) = IdentNode::parse(context) {
             vec![ident]
         } else {

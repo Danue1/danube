@@ -28,30 +28,24 @@ mod visibility_kind;
 #[cfg(test)]
 mod tests;
 
-use crate::{Cursor, Error};
+use crate::Context;
 use danube_ast::PackageNode;
+use danube_diagnostics::Diagnostics;
 use danube_token::Token;
-
-pub(crate) struct Context<'context> {
-    pub(crate) cursor: Cursor<'context>,
-}
-
-impl<'context> Context<'context> {
-    pub(crate) fn new(token: &'context [Token]) -> Self {
-        Context {
-            cursor: Cursor::new(token),
-        }
-    }
-}
+use std::cell::RefCell;
 
 pub(crate) trait Parse {
     type Output;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error>;
+    fn parse(context: &mut Context) -> Result<Self::Output, ()>;
 }
 
-pub fn parse(token: &[Token]) -> Result<PackageNode, Error> {
-    let mut context = Context::new(token);
+#[allow(clippy::result_unit_err)]
+pub fn parse<'parse>(
+    token: &'parse [Token],
+    diagnostics: &'parse RefCell<Diagnostics>,
+) -> Result<PackageNode, ()> {
+    let mut context = Context::new(token, diagnostics);
 
     PackageNode::parse(&mut context)
 }

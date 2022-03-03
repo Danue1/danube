@@ -1,11 +1,12 @@
-use crate::{Context, Error, Parse};
+use crate::{Context, Parse};
 use danube_ast::{PathNode, TypeKind};
+use danube_diagnostics::MessageBuilder;
 use danube_token::TokenKind;
 
 impl Parse for TypeKind {
     type Output = TypeKind;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         match context.cursor.peek().kind {
             TokenKind::LeftParens => {
                 context.cursor.next();
@@ -19,14 +20,14 @@ impl Parse for TypeKind {
                 if symbol!(context.cursor => RightParens) {
                     Ok(TypeKind::Tuple(parameters))
                 } else {
-                    Err(Error::Invalid)
+                    context.report(MessageBuilder::error("Expected `)`").build())
                 }
             }
             _ => {
                 let path = if let Some(path) = PathNode::parse(context)? {
                     path
                 } else {
-                    return Err(Error::Invalid);
+                    return context.report(MessageBuilder::error("Expected type path").build());
                 };
 
                 if !symbol!(context.cursor => LeftChevron) {
@@ -42,7 +43,7 @@ impl Parse for TypeKind {
                 if symbol!(context.cursor => RightChevron) {
                     Ok(TypeKind::Generic(path, parameters))
                 } else {
-                    Err(Error::Invalid)
+                    context.report(MessageBuilder::error("Expected `>`").build())
                 }
             }
         }

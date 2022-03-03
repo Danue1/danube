@@ -2,9 +2,10 @@
 
 #[macro_use]
 pub mod cursor;
-pub mod error;
+#[macro_use]
+mod context;
 pub mod parse;
 
+use context::*;
 pub use cursor::*;
-pub use error::*;
 pub use parse::*;

@@ -1,4 +1,4 @@
-use crate::{Context, Error, Parse};
+use crate::{Context, Parse};
 use danube_ast::{ArgumentNode, ExpressionNode, IdentNode, DUMMY_NODE_ID};
 
 pub(crate) struct ArgumentNodeList;
@@ -6,7 +6,7 @@ pub(crate) struct ArgumentNodeList;
 impl Parse for ArgumentNodeList {
     type Output = Vec<ArgumentNode>;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         if symbol!(context.cursor => LeftParens) {
             return Ok(vec![]);
         }
@@ -28,7 +28,7 @@ impl Parse for ArgumentNodeList {
 impl Parse for ArgumentNode {
     type Output = ArgumentNode;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         let mut cursor = context.cursor.clone();
         let ident = if let Some(symbol) = identifier!(cursor) {
             if symbol!(cursor => Colon) {

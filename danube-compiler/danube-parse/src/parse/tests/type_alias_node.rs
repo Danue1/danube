@@ -1,49 +1,47 @@
-use crate::{Context, Parse};
 use danube_ast::{
   IdentNode, ImmutabilityKind, PathNode, TypeAliasNode, TypeKind, TypeNode, DUMMY_NODE_ID,
 };
-use danube_lex::Lex;
-use danube_token::{Symbol, Token};
+use danube_token::Symbol;
 
-#[test]
-fn without_type() {
-  let source = "Foo;";
-  let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+assert_node! {
+  #[test]
+  fn without_type() -> TypeAliasNode {
+    let source = "Foo;";
 
-  assert_eq!(
-    TypeAliasNode::parse(&mut Context::new(tokens.as_slice())),
-    Ok(TypeAliasNode {
-      ident: IdentNode {
-        id: DUMMY_NODE_ID,
-        symbol: Symbol::intern("Foo"),
-      },
-      ty: None,
-    }),
-  );
-}
+    assert_eq!(
+      source,
+      Ok(TypeAliasNode {
+        ident: IdentNode {
+          id: DUMMY_NODE_ID,
+          symbol: Symbol::intern("Foo"),
+        },
+        ty: None,
+      }),
+    );
+  }
 
-#[test]
-fn with_type() {
-  let source = "Foo = Bar;";
-  let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
+  #[test]
+  fn with_type() -> TypeAliasNode {
+    let source = "Foo = Bar;";
 
-  assert_eq!(
-    TypeAliasNode::parse(&mut Context::new(tokens.as_slice())),
-    Ok(TypeAliasNode {
-      ident: IdentNode {
-        id: DUMMY_NODE_ID,
-        symbol: Symbol::intern("Foo"),
-      },
-      ty: Some(TypeNode {
-        id: DUMMY_NODE_ID,
-        immutability: ImmutabilityKind::Yes,
-        kind: TypeKind::Path(PathNode {
-          segments: vec![IdentNode {
-            id: DUMMY_NODE_ID,
-            symbol: Symbol::intern("Bar"),
-          }],
+    assert_eq!(
+      source,
+      Ok(TypeAliasNode {
+        ident: IdentNode {
+          id: DUMMY_NODE_ID,
+          symbol: Symbol::intern("Foo"),
+        },
+        ty: Some(TypeNode {
+          id: DUMMY_NODE_ID,
+          immutability: ImmutabilityKind::Yes,
+          kind: TypeKind::Path(PathNode {
+            segments: vec![IdentNode {
+              id: DUMMY_NODE_ID,
+              symbol: Symbol::intern("Bar"),
+            }],
+          }),
         }),
       }),
-    }),
-  );
+    );
+  }
 }

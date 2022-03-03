@@ -1,12 +1,12 @@
 use super::function_parameter_node::FunctionParameterNodeList;
 use super::generic_node::GenericNodeList;
-use crate::{Context, Error, Parse};
+use crate::{Context, Parse};
 use danube_ast::{BlockNode, FunctionNode, IdentNode, TypeNode};
 
 impl Parse for FunctionNode {
     type Output = FunctionNode;
 
-    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, ()> {
         let ident = IdentNode::parse(context)?;
         let generics = GenericNodeList::parse(context)?;
         let (self_type, parameters) = FunctionParameterNodeList::parse(context)?;
@@ -33,7 +33,7 @@ struct FunctionReturnType;
 impl Parse for FunctionReturnType {
     type Output = Option<TypeNode>;
 
-    fn parse(context: &mut Context) -> Result<Option<TypeNode>, Error> {
+    fn parse(context: &mut Context) -> Result<Option<TypeNode>, ()> {
         if symbol!(context.cursor => HyphenRightChevron) {
             Ok(Some(TypeNode::parse(context)?))
         } else {
