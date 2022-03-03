@@ -44,12 +44,6 @@ impl<'context> Context<'context> {
     }
 }
 
-pub(crate) trait ParseList {
-    type Output;
-
-    fn parse_list(context: &mut Context) -> Result<Vec<Self::Output>, Error>;
-}
-
 pub(crate) trait Parse {
     type Output;
 

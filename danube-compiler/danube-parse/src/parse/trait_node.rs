@@ -1,12 +1,14 @@
-use crate::{Context, Error, Parse, ParseList};
-use danube_ast::{GenericNode, IdentNode, ImplementItemNode, PathNode, TraitNode};
+use super::generic_node::GenericNodeList;
+use super::implement_item_node::ImplementItemNodeList;
+use crate::{Context, Error, Parse};
+use danube_ast::{IdentNode, PathNode, TraitNode};
 
 impl Parse for TraitNode {
     type Output = TraitNode;
 
     fn parse(context: &mut Context) -> Result<Self::Output, Error> {
         let ident = IdentNode::parse(context)?;
-        let generics = GenericNode::parse_list(context)?;
+        let generics = GenericNodeList::parse(context)?;
         let inheritances = if symbol!(context.cursor => Colon) {
             if let Some(path) = PathNode::parse(context)? {
                 let mut inheritances = vec![path];
@@ -26,7 +28,7 @@ impl Parse for TraitNode {
         } else {
             vec![]
         };
-        let items = ImplementItemNode::parse_list(context)?;
+        let items = ImplementItemNodeList::parse(context)?;
 
         Ok(TraitNode {
             ident,

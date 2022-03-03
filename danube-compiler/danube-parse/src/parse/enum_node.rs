@@ -1,5 +1,6 @@
-use crate::{Context, Error, Parse, ParseList};
-use danube_ast::{EnumNode, EnumVariantNode, GenericNode, IdentNode};
+use super::generic_node::GenericNodeList;
+use crate::{Context, Error, Parse};
+use danube_ast::{EnumNode, EnumVariantNode, IdentNode};
 use danube_token::TokenKind;
 
 impl Parse for EnumNode {
@@ -7,7 +8,7 @@ impl Parse for EnumNode {
 
     fn parse(context: &mut Context) -> Result<Self::Output, Error> {
         let ident = IdentNode::parse(context)?;
-        let generics = GenericNode::parse_list(context)?;
+        let generics = GenericNodeList::parse(context)?;
 
         match symbol!(context.cursor) {
             Some(TokenKind::Semicolon) => {

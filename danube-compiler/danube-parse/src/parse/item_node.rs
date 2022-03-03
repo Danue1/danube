@@ -1,15 +1,17 @@
-use super::attribute_node::ItemAttributeNode;
-use crate::{Context, Error, Parse, ParseList};
+use super::attribute_node::ItemAttributeNodeList;
+use crate::{Context, Error, Parse};
 use danube_ast::{
     ConstantNode, EnumNode, FunctionNode, ImplementNode, ItemKind, ItemNode, TraitNode,
     TypeAliasNode, UseNode, VisibilityKind, DUMMY_NODE_ID,
 };
 use danube_token::keywords;
 
-impl ParseList for ItemNode {
-    type Output = ItemNode;
+pub(crate) struct ItemNodeList;
 
-    fn parse_list(context: &mut Context) -> Result<Vec<Self::Output>, Error> {
+impl Parse for ItemNodeList {
+    type Output = Vec<ItemNode>;
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
         let mut items = vec![];
 
         while let Some(item) = ItemNode::parse(context)? {
@@ -24,7 +26,7 @@ impl Parse for ItemNode {
     type Output = Option<ItemNode>;
 
     fn parse(context: &mut Context) -> Result<Self::Output, Error> {
-        let attributes = ItemAttributeNode::parse_list(context)?;
+        let attributes = ItemAttributeNodeList::parse(context)?;
         let visibility = VisibilityKind::parse(context)?;
         let kind = match identifier!(context.cursor) {
             Some(keywords::Use) => {

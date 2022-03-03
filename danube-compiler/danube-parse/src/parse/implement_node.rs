@@ -1,11 +1,13 @@
-use crate::{Context, Error, Parse, ParseList};
-use danube_ast::{GenericNode, ImplementItemNode, ImplementNode, PathNode};
+use super::generic_node::GenericNodeList;
+use super::implement_item_node::ImplementItemNodeList;
+use crate::{Context, Error, Parse};
+use danube_ast::{ImplementNode, PathNode};
 
 impl Parse for ImplementNode {
     type Output = ImplementNode;
 
     fn parse(context: &mut Context) -> Result<Self::Output, Error> {
-        let generics = GenericNode::parse_list(context)?;
+        let generics = GenericNodeList::parse(context)?;
         let trait_ident = if let Some(path) = PathNode::parse(context)? {
             path
         } else {
@@ -20,8 +22,8 @@ impl Parse for ImplementNode {
         } else {
             (None, trait_ident)
         };
-        let target_generics = GenericNode::parse_list(context)?;
-        let items = ImplementItemNode::parse_list(context)?;
+        let target_generics = GenericNodeList::parse(context)?;
+        let items = ImplementItemNodeList::parse(context)?;
 
         Ok(ImplementNode {
             generics,

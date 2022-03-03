@@ -1,10 +1,12 @@
-use crate::{Context, Error, Parse, ParseList};
+use crate::{Context, Error, Parse};
 use danube_ast::{GenericNode, IdentNode, PathNode, DUMMY_NODE_ID};
 
-impl ParseList for GenericNode {
-    type Output = GenericNode;
+pub(crate) struct GenericNodeList;
 
-    fn parse_list(context: &mut Context) -> Result<Vec<Self::Output>, Error> {
+impl Parse for GenericNodeList {
+    type Output = Vec<GenericNode>;
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
         if !symbol!(context.cursor => LeftChevron) {
             return Ok(vec![]);
         }

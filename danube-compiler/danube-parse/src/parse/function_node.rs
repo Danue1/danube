@@ -1,13 +1,14 @@
 use super::function_parameter_node::FunctionParameterNodeList;
-use crate::{Context, Error, Parse, ParseList};
-use danube_ast::{BlockNode, FunctionNode, GenericNode, IdentNode, TypeNode};
+use super::generic_node::GenericNodeList;
+use crate::{Context, Error, Parse};
+use danube_ast::{BlockNode, FunctionNode, IdentNode, TypeNode};
 
 impl Parse for FunctionNode {
     type Output = FunctionNode;
 
     fn parse(context: &mut Context) -> Result<Self::Output, Error> {
         let ident = IdentNode::parse(context)?;
-        let generics = GenericNode::parse_list(context)?;
+        let generics = GenericNodeList::parse(context)?;
         let (self_type, parameters) = FunctionParameterNodeList::parse(context)?;
         let return_type = FunctionReturnType::parse(context)?;
         let block = if symbol!(context.cursor => Semicolon) {

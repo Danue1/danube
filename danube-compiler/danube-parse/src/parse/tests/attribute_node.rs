@@ -1,5 +1,5 @@
-use crate::parse::attribute_node::{ItemAttributeNode, PackageAttributeNode};
-use crate::{Context, ParseList};
+use crate::parse::attribute_node::{ItemAttributeNodeList, PackageAttributeNodeList};
+use crate::{Context, Parse};
 use danube_ast::{
     AttributeNode, ExpressionKind, ExpressionNode, IdentNode, PathNode, DUMMY_ATTRIBUTE_ID,
     DUMMY_NODE_ID,
@@ -13,7 +13,7 @@ fn package_attribute() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        PackageAttributeNode::parse_list(&mut Context::new(tokens.as_slice())),
+        PackageAttributeNodeList::parse(&mut Context::new(tokens.as_slice())),
         Ok(vec![AttributeNode {
             id: DUMMY_ATTRIBUTE_ID,
             path: PathNode {
@@ -33,7 +33,7 @@ fn package_attributes() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        PackageAttributeNode::parse_list(&mut Context::new(tokens.as_slice())),
+        PackageAttributeNodeList::parse(&mut Context::new(tokens.as_slice())),
         Ok(vec![
             AttributeNode {
                 id: DUMMY_ATTRIBUTE_ID,
@@ -65,7 +65,7 @@ fn item_attribute() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        ItemAttributeNode::parse_list(&mut Context::new(tokens.as_slice())),
+        ItemAttributeNodeList::parse(&mut Context::new(tokens.as_slice())),
         Ok(vec![AttributeNode {
             id: DUMMY_ATTRIBUTE_ID,
             path: PathNode {
@@ -85,7 +85,7 @@ fn item_attributes() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        ItemAttributeNode::parse_list(&mut Context::new(tokens.as_slice())),
+        ItemAttributeNodeList::parse(&mut Context::new(tokens.as_slice())),
         Ok(vec![
             AttributeNode {
                 id: DUMMY_ATTRIBUTE_ID,
@@ -117,7 +117,7 @@ fn item_attribute_with_argument() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        ItemAttributeNode::parse_list(&mut Context::new(tokens.as_slice())),
+        ItemAttributeNodeList::parse(&mut Context::new(tokens.as_slice())),
         Ok(vec![AttributeNode {
             id: DUMMY_ATTRIBUTE_ID,
             path: PathNode {
@@ -143,7 +143,7 @@ fn item_attribute_with_argument_and_expression() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        ItemAttributeNode::parse_list(&mut Context::new(tokens.as_slice())),
+        ItemAttributeNodeList::parse(&mut Context::new(tokens.as_slice())),
         Ok(vec![AttributeNode {
             id: DUMMY_ATTRIBUTE_ID,
             path: PathNode {

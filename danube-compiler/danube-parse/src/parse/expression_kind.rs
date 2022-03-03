@@ -1,10 +1,11 @@
+use super::argument_node::ArgumentNodeList;
 use super::expression_node::PrefixExpressionNode;
-use crate::{Context, Error, Parse, ParseList};
+use crate::{Context, Error, Parse};
 use danube_ast::{
-    ArgumentNode, BinaryExpressionNode, BinaryOperatorKind, BlockNode, ClosureNode,
-    ConditionBranch, ConditionNode, ExpressionKind, ExpressionNode, FieldNode, ForNode,
-    FunctionCallNode, IdentNode, IndexNode, LoopNode, MatchBranch, MatchNode, MethodCallNode,
-    PathNode, PatternNode, StatementNode, TupleNode, TypeNode, WhileNode, DUMMY_NODE_ID,
+    BinaryExpressionNode, BinaryOperatorKind, BlockNode, ClosureNode, ConditionBranch,
+    ConditionNode, ExpressionKind, ExpressionNode, FieldNode, ForNode, FunctionCallNode, IdentNode,
+    IndexNode, LoopNode, MatchBranch, MatchNode, MethodCallNode, PathNode, PatternNode,
+    StatementNode, TupleNode, TypeNode, WhileNode, DUMMY_NODE_ID,
 };
 use danube_token::{keywords, TokenKind};
 
@@ -188,7 +189,7 @@ impl Parse for AtomicExpressionKind {
                             id: DUMMY_NODE_ID,
                             kind: path,
                         }),
-                        arguments: ArgumentNode::parse_list(context)?,
+                        arguments: ArgumentNodeList::parse(context)?,
                     })
                 } else {
                     path
@@ -338,7 +339,7 @@ fn parse_postfix_expression_kind(
         TokenKind::LeftParens => {
             context.cursor.next();
 
-            let arguments = ArgumentNode::parse_list(context)?;
+            let arguments = ArgumentNodeList::parse(context)?;
 
             parse_postfix_expression_kind(
                 context,
@@ -368,7 +369,7 @@ fn parse_postfix_expression_kind(
                 if symbol!(context.cursor => LeftParens) {
                     ExpressionKind::MethodCall(MethodCallNode {
                         ident,
-                        arguments: ArgumentNode::parse_list(context)?,
+                        arguments: ArgumentNodeList::parse(context)?,
                     })
                 } else {
                     ExpressionKind::Field(FieldNode {

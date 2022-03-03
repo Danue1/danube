@@ -1,14 +1,16 @@
-use super::attribute_node::ItemAttributeNode;
-use crate::{Context, Error, Parse, ParseList};
+use super::attribute_node::ItemAttributeNodeList;
+use crate::{Context, Error, Parse};
 use danube_ast::{
     ConstantNode, FunctionNode, ImplementItemKind, ImplementItemNode, TypeAliasNode, DUMMY_NODE_ID,
 };
 use danube_token::keywords;
 
-impl ParseList for ImplementItemNode {
-    type Output = ImplementItemNode;
+pub(crate) struct ImplementItemNodeList;
 
-    fn parse_list(context: &mut Context) -> Result<Vec<Self::Output>, Error> {
+impl Parse for ImplementItemNodeList {
+    type Output = Vec<ImplementItemNode>;
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
         if !symbol!(context.cursor => LeftBrace) {
             return Err(Error::Invalid);
         }
@@ -27,7 +29,7 @@ impl Parse for ImplementItemNode {
     type Output = ImplementItemNode;
 
     fn parse(context: &mut Context) -> Result<Self::Output, Error> {
-        let attributes = ItemAttributeNode::parse_list(context)?;
+        let attributes = ItemAttributeNodeList::parse(context)?;
 
         match identifier!(context.cursor) {
             Some(keywords::Type) => {

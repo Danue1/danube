@@ -1,12 +1,12 @@
-use crate::{Context, Error, Parse, ParseList};
+use crate::{Context, Error, Parse};
 use danube_ast::{AttributeNode, ExpressionNode, IdentNode, PathNode, DUMMY_ATTRIBUTE_ID};
 
-pub(crate) struct PackageAttributeNode;
+pub(crate) struct PackageAttributeNodeList;
 
-impl ParseList for PackageAttributeNode {
-    type Output = AttributeNode;
+impl Parse for PackageAttributeNodeList {
+    type Output = Vec<AttributeNode>;
 
-    fn parse_list(context: &mut Context) -> Result<Vec<Self::Output>, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
         let mut attributes = vec![];
 
         while let Some(attribute) = PackageAttributeNode::parse(context)? {
@@ -16,6 +16,8 @@ impl ParseList for PackageAttributeNode {
         Ok(attributes)
     }
 }
+
+pub(crate) struct PackageAttributeNode;
 
 impl Parse for PackageAttributeNode {
     type Output = Option<AttributeNode>;
@@ -33,12 +35,12 @@ impl Parse for PackageAttributeNode {
     }
 }
 
-pub(crate) struct ItemAttributeNode;
+pub(crate) struct ItemAttributeNodeList;
 
-impl ParseList for ItemAttributeNode {
-    type Output = AttributeNode;
+impl Parse for ItemAttributeNodeList {
+    type Output = Vec<AttributeNode>;
 
-    fn parse_list(context: &mut Context) -> Result<Vec<Self::Output>, Error> {
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
         let mut attributes = vec![];
 
         while let Some(attribute) = ItemAttributeNode::parse(context)? {
@@ -48,6 +50,8 @@ impl ParseList for ItemAttributeNode {
         Ok(attributes)
     }
 }
+
+pub(crate) struct ItemAttributeNode;
 
 impl Parse for ItemAttributeNode {
     type Output = Option<AttributeNode>;
