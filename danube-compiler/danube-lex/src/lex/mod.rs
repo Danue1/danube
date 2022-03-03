@@ -6,7 +6,8 @@ mod string;
 #[cfg(test)]
 mod tests;
 
-use crate::{Cursor, Error};
+use crate::Cursor;
+use danube_diagnostics::{Message, MessageBuilder};
 use danube_span::{Location, Span};
 use danube_token::{Symbol, Token, TokenKind};
 
@@ -15,7 +16,7 @@ pub struct Lex<'lex> {
 }
 
 impl<'lex> std::iter::Iterator for Lex<'lex> {
-    type Item = Result<Token, Error>;
+    type Item = Result<Token, Message>;
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
@@ -38,7 +39,11 @@ macro_rules! symbol {
         let end = $cursor.location();
         let count = match symbol.count() {
             Some(count) => count,
-            None => return Err(Error::UnknownSymbol),
+            None => {
+                return Err(
+                    MessageBuilder::error(format!("unexpected symbol: {:#?}", symbol)).build(),
+                );
+            }
         };
         let start = Location {
             offset: end.offset - count,
@@ -59,7 +64,7 @@ impl<'lex> Lex<'lex> {
     }
 
     #[inline(always)]
-    fn lex(&mut self) -> Result<Token, Error> {
+    fn lex(&mut self) -> Result<Token, Message> {
         match self.cursor.next().unwrap() {
             '(' => symbol!(self.cursor => LeftParens),
             ')' => symbol!(self.cursor => RightParens),
@@ -265,7 +270,11 @@ impl<'lex> Lex<'lex> {
             },
             '"' => self.lex_string(),
             '\'' => self.lex_char(),
-            _ => Err(Error::Invalid(self.cursor.location())),
+            _ => Err(MessageBuilder::error(format!(
+                "unexpected character: '{}'",
+                self.cursor.peek().unwrap()
+            ))
+            .build()),
         }
     }
 }

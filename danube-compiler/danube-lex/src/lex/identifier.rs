@@ -1,9 +1,10 @@
-use crate::{Cursor, Error, Lex};
+use crate::{Cursor, Lex};
+use danube_diagnostics::Message;
 use danube_span::Span;
 use danube_token::{Symbol, Token, TokenKind};
 
 impl<'lex> Lex<'lex> {
-    pub fn lex_identifier(&mut self) -> Result<Token, Error> {
+    pub fn lex_identifier(&mut self) -> Result<Token, Message> {
         let span = lex_identifier_postfix(&mut self.cursor);
         let symbol = Symbol::intern(self.cursor.slice(&span));
 

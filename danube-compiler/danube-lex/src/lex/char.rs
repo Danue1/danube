@@ -1,9 +1,10 @@
-use crate::{Error, Lex};
+use crate::Lex;
+use danube_diagnostics::{Message, MessageBuilder};
 use danube_span::{Location, Span};
 use danube_token::{LiteralKind, Symbol, Token, TokenKind};
 
 impl<'lex> Lex<'lex> {
-    pub fn lex_char(&mut self) -> Result<Token, Error> {
+    pub fn lex_char(&mut self) -> Result<Token, Message> {
         let start = self.cursor.location();
 
         match self.cursor.next() {
@@ -14,13 +15,10 @@ impl<'lex> Lex<'lex> {
                     Some('t') => '\t',
                     Some(c) => c,
                     None => {
-                        let location = self.cursor.location();
-
-                        return Err(Error::Invalid(Location {
-                            offset: location.offset - 1,
-                            line: location.line,
-                            column: location.column - 1,
-                        }));
+                        return Err(MessageBuilder::error(
+                            "Expected a character after the backslash",
+                        )
+                        .build());
                     }
                 };
                 match self.cursor.next() {
@@ -42,11 +40,10 @@ impl<'lex> Lex<'lex> {
 
                         Ok(Token::new(span, kind))
                     }
-                    _ => Err(Error::Invalid(Location {
-                        offset: start.offset + 2,
-                        line: start.line,
-                        column: start.column + 2,
-                    })),
+                    _ => Err(
+                        MessageBuilder::error("Expected a closing quote after the character")
+                            .build(),
+                    ),
                 }
             }
             Some(c) => {
@@ -67,7 +64,7 @@ impl<'lex> Lex<'lex> {
 
                 Ok(Token::new(span, kind))
             }
-            _ => Err(Error::Invalid(start)),
+            _ => Err(MessageBuilder::error("Expected a character after the opening quote").build()),
         }
     }
 }

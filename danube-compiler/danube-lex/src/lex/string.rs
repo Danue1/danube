@@ -1,9 +1,10 @@
-use crate::{Error, Lex};
+use crate::Lex;
+use danube_diagnostics::{Message, MessageBuilder};
 use danube_span::{Location, Span};
 use danube_token::{LiteralKind, Symbol, Token, TokenKind};
 
 impl<'lex> Lex<'lex> {
-    pub fn lex_string(&mut self) -> Result<Token, Error> {
+    pub fn lex_string(&mut self) -> Result<Token, Message> {
         let start = self.cursor.location();
         let mut string = String::new();
 
@@ -30,13 +31,10 @@ impl<'lex> Lex<'lex> {
                         Some('t') => '\t',
                         Some(c) => c,
                         None => {
-                            let location = self.cursor.location();
-
-                            return Err(Error::Invalid(Location {
-                                offset: location.offset - 1,
-                                line: location.line,
-                                column: location.column - 1,
-                            }));
+                            return Err(MessageBuilder::error(
+                                "Expected a character after the backslash",
+                            )
+                            .build());
                         }
                     };
                     string.push(c);
@@ -44,7 +42,7 @@ impl<'lex> Lex<'lex> {
                 Some(c) => {
                     string.push(c);
                 }
-                None => return Err(Error::Invalid(self.cursor.location())),
+                None => return Err(MessageBuilder::error("Expected a closing quote").build()),
             }
         }
     }

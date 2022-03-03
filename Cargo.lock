@@ -48,6 +48,7 @@ version = "0.1.0"
 name = "danube-lex"
 version = "0.1.0"
 dependencies = [
+ "danube-diagnostics",
  "danube-span",
  "danube-token",
 ]

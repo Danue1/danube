@@ -1,9 +1,10 @@
-use crate::{Cursor, Error, Lex};
+use crate::{Cursor, Lex};
+use danube_diagnostics::{Message, MessageBuilder};
 use danube_span::Span;
 use danube_token::{LiteralKind, Symbol, Token, TokenKind};
 
 impl<'lex> Lex<'lex> {
-    pub fn lex_number(&mut self) -> Result<Token, Error> {
+    pub fn lex_number(&mut self) -> Result<Token, Message> {
         let integer_span = lex_numeric(&mut self.cursor);
 
         match self.cursor.peek() {
@@ -18,7 +19,9 @@ impl<'lex> Lex<'lex> {
 
                         Ok(Token::new(float_span, kind))
                     }
-                    _ => Err(Error::Invalid(self.cursor.location())),
+                    _ => Err(
+                        MessageBuilder::error("Expected a digit after the decimal point").build(),
+                    ),
                 }
             }
             _ => {
@@ -31,7 +34,7 @@ impl<'lex> Lex<'lex> {
         }
     }
 
-    pub fn lex_number_without_integer(&mut self) -> Result<Token, Error> {
+    pub fn lex_number_without_integer(&mut self) -> Result<Token, Message> {
         let float_span = {
             let mut float_span = lex_numeric(&mut self.cursor);
             float_span.start.decrement();
