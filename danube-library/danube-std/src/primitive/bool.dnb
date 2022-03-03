@@ -1,4 +1,5 @@
 use crate::{Default, From, PartialEq};
+use crate::builtin::eq_bool_to_bool;
 
 pub use Bool::*;
 
@@ -15,8 +16,9 @@ impl Default for Bool {
 }
 
 impl PartialEq for Bool {
-    #[native]
-    fn eq(self, rhs: Self::Rhs) -> Bool;
+    fn eq(self, rhs: Self::Rhs) -> Bool {
+        eq_bool_to_bool(self, rhs)
+    }
 }
 
 impl From<Float> for Bool {
