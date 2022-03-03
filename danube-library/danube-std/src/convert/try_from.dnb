@@ -1,5 +1,5 @@
 pub trait TryFrom<T> {
-  type Error;
+    type Error;
 
-  fn try_from(t: T) -> Result<Self, Self::Error>;
+    fn try_from(t: T) -> Result<Self, Self::Error>;
 }

@@ -1,33 +1,12 @@
-use crate::primitive::*;
-
 pub trait Into<T> {
-  fn into(self T;
+    fn into(self) -> T;
 }
 
-impl Into<Bool> for Bool {
-  fn into(self) -> Bool = Bool::from(self);
-}
-
-impl Into<Bool> for Float {
-  fn into(self) -> Bool = Bool::from(self);
-}
-
-impl Into<Bool> for Int {
-  fn into(self) -> Bool = Bool::from(self);
-}
-
-impl Into<Bool> for Size {
-  fn into(self) -> Bool = Bool::from(self);
-}
-
-impl Into<Bool> for String {
-  fn into(self) -> Bool = Bool::from(self);
-}
-
-impl Into<Bool> for Uint {
-  fn into(self) -> Bool = Bool::from(self);
-}
-
-impl Into<Bool> for Usize {
-  fn into(self) -> Bool = Bool::from(self);
+impl<T, U> Into<U> for T
+where
+    U: From<T>
+{
+    fn into(self) -> U {
+        <U as From<T>>::from(self)
+    }
 }

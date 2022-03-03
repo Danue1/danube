@@ -1,40 +1,53 @@
-pub trait Shl<Rhs = Self> {
-  type Output;
+use crate::builtin::{
+    shl_float_to_float,
+    shl_int_to_int,
+    shl_isize_to_isize,
+    shl_uint_to_uint,
+    shl_usize_to_usize,
+};
 
-  fn shl(self, rhs: Rhs) -> Self::Output;
+pub trait Shl<Rhs = Self> {
+    type Output;
+
+    fn shl(self, rhs: Rhs) -> Self::Output;
 }
 
 impl Shl for Float {
-  type Output = Float;
+    type Output = Float;
 
-  #[native]
-  fn shl(self, rhs: Rhs) -> Self::Output;
+    fn shl(self, rhs: Self::Rhs) -> Self::Output {
+        shl_float_to_float(self, rhs)
+    }
 }
 
 impl Shl for Int {
-  type Output = Int;
+    type Output = Int;
 
-  #[native]
-  fn shl(self, rhs: Rhs) -> Self::Output;
+    fn shl(self, rhs: Self::Rhs) -> Self::Output {
+        shl_int_to_int(self, rhs)
+    }
 }
 
 impl Shl for Size {
-  type Output = Size;
+    type Output = Size;
 
-  #[native]
-  fn shl(self, rhs: Rhs) -> Self::Output;
+    fn shl(self, rhs: Self::Rhs) -> Self::Output {
+        shl_isize_to_isize(self, rhs)
+    }
 }
 
 impl Shl for Uint {
-  type Output = Uint;
+    type Output = Uint;
 
-  #[native]
-  fn shl(self, rhs: Rhs) -> Self::Output;
+    fn shl(self, rhs: Self::Rhs) -> Self::Output {
+        shl_uint_to_uint(self, rhs)
+    }
 }
 
 impl Shl for Usize {
-  type Output = Usize;
+    type Output = Usize;
 
-  #[native]
-  fn shl(self, rhs: Rhs) -> Self::Output;
+    fn shl(self, rhs: Self::Rhs) -> Self::Output {
+        shl_usize_to_usize(self, rhs)
+    }
 }

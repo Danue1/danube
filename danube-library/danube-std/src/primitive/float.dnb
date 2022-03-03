@@ -1,2 +1,17 @@
-#[primitive(name = "Float")]
-pub type Float = ();
+use crate::{Default, PartialEq};
+use crate::builtin::eq_float_to_float;
+
+#[primitive]
+pub type Float;
+
+impl Default for Float {
+    fn default() -> Float {
+        0.0
+    }
+}
+
+impl PartialEq for Float {
+    fn eq(self, rhs: Self::Rhs) -> Float {
+        eq_float_to_float(self, rhs)
+    }
+}

@@ -1,47 +1,62 @@
-pub trait Add<Rhs = Self> {
-  type Output;
+use crate::builtin::{
+    add_float_to_float,
+    add_int_to_int,
+    add_isize_to_isize,
+    add_string_to_string,
+    add_uint_to_uint,
+    add_usize_to_usize,
+};
 
-  fn add(self, rhs: Rhs) -> Self::Output;
+pub trait Add<Rhs = Self> {
+    type Output;
+
+    fn add(self, rhs: Rhs) -> Self::Output;
 }
 
 impl Add for Float {
-  type Output = Float;
+    type Output = Float;
 
-  #[native]
-  fn add(self, rhs: Rhs) -> Self::Output;
+    fn add(self, rhs: Self::Rhs) -> Self::Output {
+        add_float_to_float(self, rhs)
+    }
 }
 
 impl Add for Int {
-  type Output = Int;
+    type Output = Int;
 
-  #[native]
-  fn add(self, rhs: Rhs) -> Self::Output;
+    fn add(self, rhs: Self::Rhs) -> Self::Output {
+        add_int_to_int(self, rhs)
+    }
 }
 
 impl Add for Size {
-  type Output = Size;
+    type Output = Size;
 
-  #[native]
-  fn add(self, rhs: Rhs) -> Self::Output;
+    fn add(self, rhs: Self::Rhs) -> Self::Output {
+        add_isize_to_isize(self, rhs)
+    }
 }
 
 impl Add for String {
-  type Output = String;
+    type Output = String;
 
-  #[native]
-  fn add(self, rhs: Rhs) -> Self::Output;
+    fn add(self, rhs: Self::Rhs) -> Self::Output {
+        add_string_to_string(self, rhs)
+    }
 }
 
 impl Add for Uint {
-  type Output = Uint;
+    type Output = Uint;
 
-  #[native]
-  fn add(self, rhs: Rhs) -> Self::Output;
+    fn add(self, rhs: Self::Rhs) -> Self::Output {
+        add_uint_to_uint(self, rhs)
+    }
 }
 
 impl Add for Usize {
-  type Output = Usize;
+    type Output = Usize;
 
-  #[native]
-  fn add(self, rhs: Rhs) -> Self::Output;
+    fn add(self, rhs: Self::Rhs) -> Self::Output {
+        add_usize_to_usize(self, rhs)
+    }
 }

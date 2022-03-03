@@ -1,2 +1,17 @@
-#[primitive(name = "String")]
-pub type String = ();
+use crate::{Default, PartialEq};
+use crate::builtin::eq_string_to_string;
+
+#[primitive]
+pub type String;
+
+impl Default for String {
+    fn default() -> String {
+        ""
+    }
+}
+
+impl PartialEq for String {
+    fn eq(self, rhs: Self::Rhs) -> String {
+        eq_string_to_string(self, rhs)
+    }
+}

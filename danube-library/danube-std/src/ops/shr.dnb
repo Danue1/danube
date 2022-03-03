@@ -1,40 +1,53 @@
-pub trait Shr<Rhs = Self> {
-  type Output;
+use crate::builtin::{
+    shr_float_to_float,
+    shr_int_to_int,
+    shr_isize_to_isize,
+    shr_uint_to_uint,
+    shr_usize_to_usize,
+};
 
-  fn shr(self, rhs: Rhs) -> Self::Output;
+pub trait Shr<Rhs = Self> {
+    type Output;
+
+    fn shr(self, rhs: Rhs) -> Self::Output;
 }
 
 impl Shr for Float {
-  type Output = Float;
+    type Output = Float;
 
-  #[native]
-  fn shr(self, rhs: Rhs) -> Self::Output;
+    fn shr(self, rhs: Self::Rhs) -> Self::Output {
+        shr_float_to_float(self, rhs)
+    }
 }
 
 impl Shr for Int {
-  type Output = Int;
+    type Output = Int;
 
-  #[native]
-  fn shr(self, rhs: Rhs) -> Self::Output;
+    fn shr(self, rhs: Self::Rhs) -> Self::Output {
+        shr_int_to_int(self, rhs)
+    }
 }
 
 impl Shr for Size {
-  type Output = Size;
+    type Output = Size;
 
-  #[native]
-  fn shr(self, rhs: Rhs) -> Self::Output;
+    fn shr(self, rhs: Self::Rhs) -> Self::Output {
+        shr_isize_to_isize(self, rhs)
+    }
 }
 
 impl Shr for Uint {
-  type Output = Uint;
+    type Output = Uint;
 
-  #[native]
-  fn shr(self, rhs: Rhs) -> Self::Output;
+    fn shr(self, rhs: Self::Rhs) -> Self::Output {
+        shr_uint_to_uint(self, rhs)
+    }
 }
 
 impl Shr for Usize {
-  type Output = Usize;
+    type Output = Usize;
 
-  #[native]
-  fn shr(self, rhs: Rhs) -> Self::Output;
+    fn shr(self, rhs: Self::Rhs) -> Self::Output {
+        shr_usize_to_usize(self, rhs)
+    }
 }

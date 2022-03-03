@@ -1,5 +1,5 @@
 pub trait TryInto<T> {
-  type Error;
+    type Error;
 
-  fn try_into(self) -> Result<T, Self::Error>;
+    fn try_into(self) -> Result<T, Self::Error>;
 }

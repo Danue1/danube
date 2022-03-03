@@ -1,0 +1,89 @@
+use crate::{Bool, Float, Int, Isize, String, Uint, Usize};
+
+extern "danube" {
+    // a == b
+    pub fn eq_float_to_float(a: Float, b: Float) -> Bool;
+    pub fn eq_int_to_int(a: Int, b: Int) -> Bool;
+    pub fn eq_isize_to_isize(a: Isize, b: Isize) -> Bool;
+    pub fn eq_string_to_string(a: String, b: String) -> Bool;
+    pub fn eq_uint_to_uint(a: Uint, b: Uint) -> Bool;
+    pub fn eq_usize_to_usize(a: Usize, b: Usize) -> Bool;
+
+    // a + b
+    pub fn add_float_to_float(a: Float, b: Float) -> Float;
+    pub fn add_int_to_int(a: Int, b: Int) -> Int;
+    pub fn add_isize_to_isize(a: Isize, b: Isize) -> Isize;
+    pub fn add_string_to_string(a: String, b: String) -> String;
+    pub fn add_uint_to_uint(a: Uint, b: Uint) -> Uint;
+    pub fn add_usize_to_usize(a: Usize, b: Usize) -> Usize;
+
+    // a & b
+    pub fn bit_and_float_to_float(a: Float, b: Float) -> Float;
+    pub fn bit_and_int_to_int(a: Int, b: Int) -> Int;
+    pub fn bit_and_isize_to_isize(a: Isize, b: Isize) -> Isize;
+    pub fn bit_and_uint_to_uint(a: Uint, b: Uint) -> Uint;
+    pub fn bit_and_usize_to_usize(a: Usize, b: Usize) -> Usize;
+
+    // a | b
+    pub fn bit_or_float_to_float(a: Float, b: Float) -> Float;
+    pub fn bit_or_int_to_int(a: Int, b: Int) -> Int;
+    pub fn bit_or_isize_to_isize(a: Isize, b: Isize) -> Isize;
+    pub fn bit_or_uint_to_uint(a: Uint, b: Uint) -> Uint;
+    pub fn bit_or_usize_to_usize(a: Usize, b: Usize) -> Usize;
+
+    // a ^ b
+    pub fn bit_xor_float_to_float(a: Float, b: Float) -> Float;
+    pub fn bit_xor_int_to_int(a: Int, b: Int) -> Int;
+    pub fn bit_xor_isize_to_isize(a: Isize, b: Isize) -> Isize;
+    pub fn bit_xor_uint_to_uint(a: Uint, b: Uint) -> Uint;
+    pub fn bit_xor_usize_to_usize(a: Usize, b: Usize) -> Usize;
+
+    // a ** b
+    pub fn exp_float_to_float(a: Float, b: Float) -> Float;
+    pub fn exp_int_to_int(a: Int, b: Int) -> Int;
+    pub fn exp_isize_to_isize(a: Isize, b: Isize) -> Isize;
+    pub fn exp_uint_to_uint(a: Uint, b: Uint) -> Uint;
+    pub fn exp_usize_to_usize(a: Usize, b: Usize) -> Usize;
+
+    // a * b
+    pub fn mul_float_to_float(a: Float, b: Float) -> Float;
+    pub fn mul_int_to_int(a: Int, b: Int) -> Int;
+    pub fn mul_isize_to_isize(a: Isize, b: Isize) -> Isize;
+    pub fn mul_uint_to_uint(a: Uint, b: Uint) -> Uint;
+    pub fn mul_usize_to_usize(a: Usize, b: Usize) -> Usize;
+
+    // -a
+    pub fn neg_float_to_float(a: Float, b: Float) -> Float;
+    pub fn neg_int_to_int(a: Int, b: Int) -> Int;
+    pub fn neg_isize_to_isize(a: Isize, b: Isize) -> Isize;
+    pub fn neg_uint_to_uint(a: Uint, b: Uint) -> Uint;
+    pub fn neg_usize_to_usize(a: Usize, b: Usize) -> Usize;
+
+    // a % b
+    pub fn rem_float_to_float(a: Float, b: Float) -> Float;
+    pub fn rem_int_to_int(a: Int, b: Int) -> Int;
+    pub fn rem_isize_to_isize(a: Isize, b: Isize) -> Isize;
+    pub fn rem_uint_to_uint(a: Uint, b: Uint) -> Uint;
+    pub fn rem_usize_to_usize(a: Usize, b: Usize) -> Usize;
+
+    // a << b
+    pub fn shl_float_to_float(a: Float, b: Float) -> Float;
+    pub fn shl_int_to_int(a: Int, b: Int) -> Int;
+    pub fn shl_isize_to_isize(a: Isize, b: Isize) -> Isize;
+    pub fn shl_uint_to_uint(a: Uint, b: Uint) -> Uint;
+    pub fn shl_usize_to_usize(a: Usize, b: Usize) -> Usize;
+
+    // a >> b
+    pub fn shr_float_to_float(a: Float, b: Float) -> Float;
+    pub fn shr_int_to_int(a: Int, b: Int) -> Int;
+    pub fn shr_isize_to_isize(a: Isize, b: Isize) -> Isize;
+    pub fn shr_uint_to_uint(a: Uint, b: Uint) -> Uint;
+    pub fn shr_usize_to_usize(a: Usize, b: Usize) -> Usize;
+
+    // a - b
+    pub fn sub_float_to_float(a: Float, b: Float) -> Float;
+    pub fn sub_int_to_int(a: Int, b: Int) -> Int;
+    pub fn sub_isize_to_isize(a: Isize, b: Isize) -> Isize;
+    pub fn sub_uint_to_uint(a: Uint, b: Uint) -> Uint;
+    pub fn sub_usize_to_usize(a: Usize, b: Usize) -> Usize;
+}

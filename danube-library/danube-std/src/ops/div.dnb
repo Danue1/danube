@@ -1,40 +1,53 @@
-pub trait Div<Rhs = Self> {
-  type Output;
+use crate::builtin::{
+    bit_xor_float_to_float,
+    bit_xor_int_to_int,
+    bit_xor_isize_to_isize,
+    bit_xor_uint_to_uint,
+    bit_xor_usize_to_usize,
+};
 
-  fn div(self, rhs: Rhs) -> Self::Output;
+pub trait Div<Rhs = Self> {
+    type Output;
+
+    fn div(self, rhs: Rhs) -> Self::Output;
 }
 
 impl Div for Float {
-  type Output = Float;
+    type Output = Float;
 
-  #[native]
-  fn div(self, rhs: Rhs) -> Self::Output;
+    fn div(self, rhs: Self::Rhs) -> Self::Output {
+        bit_xor_float_to_float(self, rhs)
+    }
 }
 
 impl Div for Int {
-  type Output = Int;
+    type Output = Int;
 
-  #[native]
-  fn div(self, rhs: Rhs) -> Self::Output;
+    fn div(self, rhs: Self::Rhs) -> Self::Output {
+        bit_xor_int_to_int(self, rhs)
+    }
 }
 
 impl Div for Size {
-  type Output = Size;
+    type Output = Size;
 
-  #[native]
-  fn div(self, rhs: Rhs) -> Self::Output;
+    fn div(self, rhs: Self::Rhs) -> Self::Output {
+        bit_xor_isize_to_isize(self, rhs)
+    }
 }
 
 impl Div for Uint {
-  type Output = Uint;
+    type Output = Uint;
 
-  #[native]
-  fn div(self, rhs: Rhs) -> Self::Output;
+    fn div(self, rhs: Self::Rhs) -> Self::Output {
+        bit_xor_uint_to_uint(self, rhs)
+    }
 }
 
 impl Div for Usize {
-  type Output = Usize;
+    type Output = Usize;
 
-  #[native]
-  fn div(self, rhs: Rhs) -> Self::Output;
+    fn div(self, rhs: Self::Rhs) -> Self::Output {
+        bit_xor_usize_to_usize(self, rhs)
+    }
 }

@@ -1,40 +1,53 @@
-pub trait Sub<Rhs = Self> {
-  type Output;
+use crate::builtin::{
+    sub_float_to_float,
+    sub_int_to_int,
+    sub_isize_to_isize,
+    sub_uint_to_uint,
+    sub_usize_to_usize,
+};
 
-  fn sub(self, rhs: Rhs) -> Self::Output;
+pub trait Sub<Rhs = Self> {
+    type Output;
+
+    fn sub(self, rhs: Rhs) -> Self::Output;
 }
 
 impl Sub for Float {
-  type Output = Float;
+    type Output = Float;
 
-  #[native]
-  fn sub(self, rhs: Rhs) -> Self::Output;
+    fn sub(self, rhs: Self::Rhs) -> Self::Output {
+        sub_float_to_float(self, rhs)
+    }
 }
 
 impl Sub for Int {
-  type Output = Int;
+    type Output = Int;
 
-  #[native]
-  fn sub(self, rhs: Rhs) -> Self::Output;
+    fn sub(self, rhs: Self::Rhs) -> Self::Output {
+        sub_int_to_int(self, rhs)
+    }
 }
 
 impl Sub for Size {
-  type Output = Size;
+    type Output = Size;
 
-  #[native]
-  fn sub(self, rhs: Rhs) -> Self::Output;
+    fn sub(self, rhs: Self::Rhs) -> Self::Output {
+        sub_isize_to_isize(self, rhs)
+    }
 }
 
 impl Sub for Uint {
-  type Output = Uint;
+    type Output = Uint;
 
-  #[native]
-  fn sub(self, rhs: Rhs) -> Self::Output;
+    fn sub(self, rhs: Self::Rhs) -> Self::Output {
+        sub_uint_to_uint(self, rhs)
+    }
 }
 
 impl Sub for Usize {
-  type Output = Usize;
+    type Output = Usize;
 
-  #[native]
-  fn sub(self, rhs: Rhs) -> Self::Output;
+    fn sub(self, rhs: Self::Rhs) -> Self::Output {
+        sub_usize_to_usize(self, rhs)
+    }
 }

@@ -1,2 +1,17 @@
-#[primitive(name = "Uint")]
-pub type Uint = ();
+use crate::{Default, PartialEq};
+use crate::builtin::eq_uint_to_uint;
+
+#[primitive]
+pub type Uint;
+
+impl Default for Uint {
+    fn default() -> Uint {
+        0
+    }
+}
+
+impl PartialEq for Uint {
+    fn eq(self, rhs: Self::Rhs) -> Uint {
+        eq_uint_to_uint(self, rhs)
+    }
+}

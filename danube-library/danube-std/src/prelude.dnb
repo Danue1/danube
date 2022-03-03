@@ -1,8 +1,8 @@
-use cmp::*;
-use convert::*;
-use default::*;
-use either::*;
-use ops::*;
-use option::*;
-use primitive::*;
-use result::*;
+pub use cmp::*;
+pub use convert::*;
+pub use default::*;
+pub use either::*;
+pub use ops::*;
+pub use option::*;
+pub use primitive::*;
+pub use result::*;

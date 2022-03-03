@@ -1,1 +1,3 @@
-pub fn identity<T>(t: T) -> T = t;
+pub fn identity<T>(t: T) -> T {
+    t
+}

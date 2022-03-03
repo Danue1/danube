@@ -1,1 +1,56 @@
-enum Bool = false | true;
+use crate::{Default, From, PartialEq};
+
+pub use Bool::*;
+
+#[allow(non_camel_case_types)]
+pub enum Bool {
+    false,
+    true,
+}
+
+impl Default for Bool {
+    fn default() -> Bool {
+        false
+    }
+}
+
+impl PartialEq for Bool {
+    #[native]
+    fn eq(self, rhs: Self::Rhs) -> Bool;
+}
+
+impl From<Float> for Bool {
+    fn from(value: Float) -> Bool {
+        value != 0
+    }
+}
+
+impl From<Int> for Bool {
+    fn from(value: Int) -> Bool {
+        value != 0
+    }
+}
+
+impl From<Size> for Bool {
+    fn from(value: Size) -> Bool {
+        value != 0
+    }
+}
+
+impl From<String> for Bool {
+    fn from(value: String) -> Bool {
+        value != ""
+    }
+}
+
+impl From<Uint> for Bool {
+    fn from(value: Uint) -> Bool {
+        value != 0
+    }
+}
+
+impl From<Usize> for Bool {
+    fn from(value: Usize) -> Bool {
+        value != 0
+    }
+}

@@ -1,40 +1,53 @@
-pub trait Exp<Rhs = Self> {
-  type Output;
+use crate::builtin::{
+    exp_float_to_float,
+    exp_int_to_int,
+    exp_isize_to_isize,
+    exp_uint_to_uint,
+    exp_usize_to_usize,
+};
 
-  fn exp(self, rhs: Rhs) -> Self::Output;
+pub trait Exp<Rhs = Self> {
+    type Output;
+
+    fn exp(self, rhs: Rhs) -> Self::Output;
 }
 
 impl Exp for Float {
-  type Output = Float;
+    type Output = Float;
 
-  #[native]
-  fn exp(self, rhs: Rhs) -> Self::Output;
+    fn exp(self, rhs: Self::Rhs) -> Self::Output {
+        exp_float_to_float(self, rhs)
+    }
 }
 
 impl Exp for Int {
-  type Output = Int;
+    type Output = Int;
 
-  #[native]
-  fn exp(self, rhs: Rhs) -> Self::Output;
+    fn exp(self, rhs: Self::Rhs) -> Self::Output {
+        exp_int_to_int(self, rhs)
+    }
 }
 
 impl Exp for Size {
-  type Output = Size;
+    type Output = Size;
 
-  #[native]
-  fn exp(self, rhs: Rhs) -> Self::Output;
+    fn exp(self, rhs: Self::Rhs) -> Self::Output {
+        exp_isize_to_isize(self, rhs)
+    }
 }
 
 impl Exp for Uint {
-  type Output = Uint;
+    type Output = Uint;
 
-  #[native]
-  fn exp(self, rhs: Rhs) -> Self::Output;
+    fn exp(self, rhs: Self::Rhs) -> Self::Output {
+        exp_uint_to_uint(self, rhs)
+    }
 }
 
 impl Exp for Usize {
-  type Output = Usize;
+    type Output = Usize;
 
-  #[native]
-  fn exp(self, rhs: Rhs) -> Self::Output;
+    fn exp(self, rhs: Self::Rhs) -> Self::Output {
+        exp_usize_to_usize(self, rhs)
+    }
 }

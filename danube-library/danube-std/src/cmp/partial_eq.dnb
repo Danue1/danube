@@ -1,44 +1,13 @@
 pub trait PartialEq<Rhs = Self> {
-  fn eq(self, rhs: Rhs) -> Bool;
+    fn eq(self, rhs: Rhs) -> Bool;
 
-  fn ne(self, rhs: Rhs) -> Bool = !self.eq(rhs);
+    fn ne(self, rhs: Rhs) -> Bool {
+        !self.eq(rhs)
+    }
 }
 
 impl<T: PartialEq> PartialEq<T> for T {
-  fn eq(self, rhs: T) -> Bool = self == rhs;
-}
-
-impl PartialEq for Bool {
-  #[native]
-  fn eq(self, rhs: Self::Rhs) -> Bool = self == rhs;
-}
-
-impl PartialEq for Float {
-  #[native]
-  fn eq(self, rhs: Self::Rhs) -> Bool = self == rhs;
-}
-
-impl PartialEq for Int {
-  #[native]
-  fn eq(self, rhs: Self::Rhs) -> Bool = self == rhs;
-}
-
-impl PartialEq for Size {
-  #[native]
-  fn eq(self, rhs: Self::Rhs) -> Bool = self == rhs;
-}
-
-impl PartialEq for String {
-  #[native]
-  fn eq(self, rhs: Self::Rhs) -> Bool = self == rhs;
-}
-
-impl PartialEq for Uint {
-  #[native]
-  fn eq(self, rhs: Self::Rhs) -> Bool = self == rhs;
-}
-
-impl PartialEq for Usize {
-  #[native]
-  fn eq(self, rhs: Self::Rhs) -> Bool = self == rhs;
+    fn eq(self, rhs: T) -> Bool {
+        T::eq(self, rhs)
+    }
 }
