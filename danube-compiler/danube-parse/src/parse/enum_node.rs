@@ -28,10 +28,8 @@ impl Parse for EnumNode {
                 while !symbol!(context.cursor => RightBrace) {
                     variants.push(EnumVariantNode::parse(context)?);
 
-                    if !symbol!(context.cursor => Comma) {
-                        if symbol!(context.cursor => RightBrace) {
-                            break;
-                        }
+                    if !symbol!(context.cursor => Comma) && symbol!(context.cursor => RightBrace) {
+                        break;
                     }
                 }
 

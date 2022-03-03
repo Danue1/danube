@@ -93,10 +93,8 @@ impl Parse for AttributeNode {
 
                 args.push((ident, expression));
 
-                if !symbol!(context.cursor => Comma) {
-                    if symbol!(context.cursor => RightParens) {
-                        break;
-                    }
+                if !symbol!(context.cursor => Comma) && symbol!(context.cursor => RightParens) {
+                    break;
                 }
             }
 

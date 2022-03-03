@@ -58,7 +58,7 @@ impl Parse for AtomicExpressionKind {
     fn parse(context: &mut Context) -> Result<Self::Output, Error> {
         match &context.cursor.peek().kind {
             TokenKind::Literal(symbol, kind) => {
-                let symbol = symbol.clone();
+                let symbol = *symbol;
                 let kind = kind.clone();
 
                 context.cursor.next();
@@ -284,10 +284,8 @@ impl Parse for AtomicExpressionKind {
                 while !symbol!(context.cursor => RightParens) {
                     arguments.push(PrefixExpressionNode::parse(context)?);
 
-                    if !symbol!(context.cursor => Comma) {
-                        if symbol!(context.cursor => RightParens) {
-                            break;
-                        }
+                    if !symbol!(context.cursor => Comma) && symbol!(context.cursor => RightParens) {
+                        break;
                     }
                 }
 
@@ -304,10 +302,9 @@ impl Parse for AtomicExpressionKind {
                 while !symbol!(context.cursor => RightBracket) {
                     expressions.push(PrefixExpressionNode::parse(context)?);
 
-                    if !symbol!(context.cursor => Comma) {
-                        if symbol!(context.cursor => RightBracket) {
-                            break;
-                        }
+                    if !symbol!(context.cursor => Comma) && symbol!(context.cursor => RightBracket)
+                    {
+                        break;
                     }
                 }
 
@@ -463,5 +460,5 @@ fn parse_binary_expression_kind(
         rhs: Box::new(rhs),
     });
 
-    Ok(parse_binary_expression_kind(context, expression)?)
+    parse_binary_expression_kind(context, expression)
 }

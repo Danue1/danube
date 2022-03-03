@@ -16,10 +16,8 @@ impl Parse for ArgumentNodeList {
         while !symbol!(context.cursor => RightParens) {
             arguments.push(ArgumentNode::parse(context)?);
 
-            if !symbol!(context.cursor => Comma) {
-                if symbol!(context.cursor => RightParens) {
-                    break;
-                }
+            if !symbol!(context.cursor => Comma) && symbol!(context.cursor => RightParens) {
+                break;
             }
         }
 
@@ -33,8 +31,6 @@ impl Parse for ArgumentNode {
     fn parse(context: &mut Context) -> Result<Self::Output, Error> {
         let mut cursor = context.cursor.clone();
         let ident = if let Some(symbol) = identifier!(cursor) {
-            let symbol = symbol.clone();
-
             if symbol!(cursor => Colon) {
                 context.cursor.next();
                 context.cursor.next();

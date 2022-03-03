@@ -30,10 +30,8 @@ impl Parse for FunctionParameterNodeList {
         while !symbol!(context.cursor => RightParens) {
             parameters.push(FunctionParameterNode::parse(context)?);
 
-            if !symbol!(context.cursor => Comma) {
-                if symbol!(context.cursor => RightParens) {
-                    break;
-                }
+            if !symbol!(context.cursor => Comma) && symbol!(context.cursor => RightParens) {
+                break;
             }
         }
 

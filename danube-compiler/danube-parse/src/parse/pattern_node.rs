@@ -41,10 +41,9 @@ impl Parse for PatternNode {
                 while !symbol!(context.cursor => RightBracket) {
                     patterns.push(PatternNode::parse(context)?);
 
-                    if !symbol!(context.cursor => Comma) {
-                        if symbol!(context.cursor => RightBracket) {
-                            break;
-                        }
+                    if !symbol!(context.cursor => Comma) && symbol!(context.cursor => RightBracket)
+                    {
+                        break;
                     }
                 }
 
@@ -61,10 +60,8 @@ impl Parse for PatternNode {
                 while !symbol!(context.cursor => RightParens) {
                     fields.push(PatternNode::parse(context)?);
 
-                    if !symbol!(context.cursor => Comma) {
-                        if symbol!(context.cursor => RightParens) {
-                            break;
-                        }
+                    if !symbol!(context.cursor => Comma) && symbol!(context.cursor => RightParens) {
+                        break;
                     }
                 }
 
@@ -99,10 +96,10 @@ impl Parse for PatternNode {
                             };
                             fields.push((path, pattern));
 
-                            if !symbol!(context.cursor => Comma) {
-                                if symbol!(context.cursor => RightBrace) {
-                                    break;
-                                }
+                            if !symbol!(context.cursor => Comma)
+                                && symbol!(context.cursor => RightBrace)
+                            {
+                                break;
                             }
                         }
 
@@ -119,10 +116,10 @@ impl Parse for PatternNode {
                         while !symbol!(context.cursor => RightParens) {
                             fields.push(PatternNode::parse(context)?);
 
-                            if !symbol!(context.cursor => Comma) {
-                                if symbol!(context.cursor => RightParens) {
-                                    break;
-                                }
+                            if !symbol!(context.cursor => Comma)
+                                && symbol!(context.cursor => RightParens)
+                            {
+                                break;
                             }
                         }
 

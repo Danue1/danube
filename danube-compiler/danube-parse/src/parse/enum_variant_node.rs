@@ -17,10 +17,8 @@ impl Parse for EnumVariantNode {
                 while !symbol!(context.cursor => RightParens) {
                     variants.push(TypeNode::parse(context)?);
 
-                    if !symbol!(context.cursor => Comma) {
-                        if symbol!(context.cursor => RightParens) {
-                            break;
-                        }
+                    if !symbol!(context.cursor => Comma) && symbol!(context.cursor => RightParens) {
+                        break;
                     }
                 }
 
@@ -44,10 +42,8 @@ impl Parse for EnumVariantNode {
                     };
                     variants.push((ident, ty));
 
-                    if !symbol!(context.cursor => Comma) {
-                        if symbol!(context.cursor => RightBrace) {
-                            break;
-                        }
+                    if !symbol!(context.cursor => Comma) && symbol!(context.cursor => RightBrace) {
+                        break;
                     }
                 }
 

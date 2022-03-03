@@ -50,7 +50,7 @@ pub(crate) trait Parse {
     fn parse(context: &mut Context) -> Result<Self::Output, Error>;
 }
 
-pub fn parse<'parse>(token: &'parse [Token]) -> Result<PackageNode, Error> {
+pub fn parse(token: &[Token]) -> Result<PackageNode, Error> {
     let mut context = Context::new(token);
 
     PackageNode::parse(&mut context)
