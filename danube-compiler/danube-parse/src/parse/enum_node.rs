@@ -31,8 +31,6 @@ impl Parse for EnumNode {
                         if symbol!(context.cursor => RightBrace) {
                             break;
                         }
-
-                        return Err(Error::Invalid);
                     }
                 }
 

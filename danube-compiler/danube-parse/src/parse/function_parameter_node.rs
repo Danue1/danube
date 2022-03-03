@@ -34,8 +34,6 @@ impl Parse for FunctionParameterNodeList {
                 if symbol!(context.cursor => RightParens) {
                     break;
                 }
-
-                return Err(Error::Invalid);
             }
         }
 

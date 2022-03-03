@@ -21,8 +21,6 @@ impl Parse for EnumVariantNode {
                         if symbol!(context.cursor => RightParens) {
                             break;
                         }
-
-                        return Err(Error::Invalid);
                     }
                 }
 
@@ -50,8 +48,6 @@ impl Parse for EnumVariantNode {
                         if symbol!(context.cursor => RightBrace) {
                             break;
                         }
-
-                        return Err(Error::Invalid);
                     }
                 }
 

@@ -5,6 +5,10 @@ impl ParseList for ArgumentNode {
     type Output = ArgumentNode;
 
     fn parse_list(context: &mut Context) -> Result<Vec<Self::Output>, Error> {
+        if symbol!(context.cursor => LeftParens) {
+            return Ok(vec![]);
+        }
+
         let mut arguments = vec![];
 
         while !symbol!(context.cursor => RightParens) {
@@ -14,8 +18,6 @@ impl ParseList for ArgumentNode {
                 if symbol!(context.cursor => RightParens) {
                     break;
                 }
-
-                return Err(Error::Invalid);
             }
         }
 

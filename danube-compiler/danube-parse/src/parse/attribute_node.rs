@@ -23,9 +23,7 @@ impl Parse for PackageAttributeNode {
     fn parse(context: &mut Context) -> Result<Self::Output, Error> {
         if symbol!(context.cursor => Hash) {
             if symbol!(context.cursor => Exclamation) {
-                let attribute = AttributeNode::parse(context)?;
-
-                Ok(Some(attribute))
+                Ok(Some(AttributeNode::parse(context)?))
             } else {
                 Err(Error::Invalid)
             }
@@ -56,9 +54,7 @@ impl Parse for ItemAttributeNode {
 
     fn parse(context: &mut Context) -> Result<Self::Output, Error> {
         if symbol!(context.cursor => Hash) {
-            let attribute = AttributeNode::parse(context)?;
-
-            Ok(Some(attribute))
+            Ok(Some(AttributeNode::parse(context)?))
         } else {
             Ok(None)
         }
@@ -72,6 +68,7 @@ impl Parse for AttributeNode {
         if !symbol!(context.cursor => LeftBracket) {
             return Err(Error::Invalid);
         }
+
         let path = if let Some(path) = PathNode::parse(context)? {
             path
         } else {
@@ -96,8 +93,6 @@ impl Parse for AttributeNode {
                     if symbol!(context.cursor => RightParens) {
                         break;
                     }
-
-                    return Err(Error::Invalid);
                 }
             }
 

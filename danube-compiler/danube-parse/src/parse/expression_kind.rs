@@ -282,12 +282,11 @@ impl Parse for AtomicExpressionKind {
 
                 while !symbol!(context.cursor => RightParens) {
                     arguments.push(PrefixExpressionNode::parse(context)?);
+
                     if !symbol!(context.cursor => Comma) {
                         if symbol!(context.cursor => RightParens) {
                             break;
                         }
-
-                        return Err(Error::Invalid);
                     }
                 }
 
@@ -303,12 +302,11 @@ impl Parse for AtomicExpressionKind {
 
                 while !symbol!(context.cursor => RightBracket) {
                     expressions.push(PrefixExpressionNode::parse(context)?);
+
                     if !symbol!(context.cursor => Comma) {
                         if symbol!(context.cursor => RightBracket) {
                             break;
                         }
-
-                        return Err(Error::Invalid);
                     }
                 }
 

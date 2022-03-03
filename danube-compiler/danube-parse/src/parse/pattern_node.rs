@@ -45,8 +45,6 @@ impl Parse for PatternNode {
                         if symbol!(context.cursor => RightBracket) {
                             break;
                         }
-
-                        return Err(Error::Invalid);
                     }
                 }
 
@@ -67,8 +65,6 @@ impl Parse for PatternNode {
                         if symbol!(context.cursor => RightParens) {
                             break;
                         }
-
-                        return Err(Error::Invalid);
                     }
                 }
 
@@ -107,8 +103,6 @@ impl Parse for PatternNode {
                                 if symbol!(context.cursor => RightBrace) {
                                     break;
                                 }
-
-                                return Err(Error::Invalid);
                             }
                         }
 
@@ -129,8 +123,6 @@ impl Parse for PatternNode {
                                 if symbol!(context.cursor => RightParens) {
                                     break;
                                 }
-
-                                return Err(Error::Invalid);
                             }
                         }
 
