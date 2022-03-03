@@ -1,4 +1,4 @@
-use crate::Parse;
+use crate::{Context, Parse};
 use danube_ast::{
   IdentNode, ImmutabilityKind, PathNode, TypeAliasNode, TypeKind, TypeNode, DUMMY_NODE_ID,
 };
@@ -11,7 +11,7 @@ fn without_type() {
   let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
   assert_eq!(
-    Parse::new(tokens.as_slice()).parse_type_alias_node(),
+    TypeAliasNode::parse(&mut Context::new(tokens.as_slice())),
     Ok(TypeAliasNode {
       ident: IdentNode {
         id: DUMMY_NODE_ID,
@@ -28,7 +28,7 @@ fn with_type() {
   let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
   assert_eq!(
-    Parse::new(tokens.as_slice()).parse_type_alias_node(),
+    TypeAliasNode::parse(&mut Context::new(tokens.as_slice())),
     Ok(TypeAliasNode {
       ident: IdentNode {
         id: DUMMY_NODE_ID,

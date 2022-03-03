@@ -1,4 +1,4 @@
-use crate::Parse;
+use crate::{Context, Parse};
 use danube_ast::{IdentNode, LiteralKind, PathNode, PatternKind, PatternNode, DUMMY_NODE_ID};
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
@@ -9,7 +9,7 @@ fn wildcard() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_pattern_node(),
+        PatternNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(PatternNode {
             id: DUMMY_NODE_ID,
             kind: PatternKind::Wildcard,
@@ -23,7 +23,7 @@ fn rest() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_pattern_node(),
+        PatternNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(PatternNode {
             id: DUMMY_NODE_ID,
             kind: PatternKind::Rest,
@@ -37,7 +37,7 @@ fn literal() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_pattern_node(),
+        PatternNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(PatternNode {
             id: DUMMY_NODE_ID,
             kind: PatternKind::Literal(Symbol::intern("1"), LiteralKind::Integer),
@@ -51,7 +51,7 @@ fn path() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_pattern_node(),
+        PatternNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(PatternNode {
             id: DUMMY_NODE_ID,
             kind: PatternKind::Path(PathNode {
@@ -76,7 +76,7 @@ fn named_struct_with_sugar() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_pattern_node(),
+        PatternNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(PatternNode {
             id: DUMMY_NODE_ID,
             kind: PatternKind::NamedStruct(
@@ -117,7 +117,7 @@ fn named_struct_without_sugar() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_pattern_node(),
+        PatternNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(PatternNode {
             id: DUMMY_NODE_ID,
             kind: PatternKind::NamedStruct(
@@ -174,7 +174,7 @@ fn unnamed_struct_with_sugar() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_pattern_node(),
+        PatternNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(PatternNode {
             id: DUMMY_NODE_ID,
             kind: PatternKind::UnnamedStruct(

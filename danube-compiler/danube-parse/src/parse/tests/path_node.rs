@@ -1,4 +1,4 @@
-use crate::Parse;
+use crate::{Context, Parse};
 use danube_ast::{IdentNode, PathNode, DUMMY_NODE_ID};
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
@@ -9,7 +9,7 @@ fn one() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_path_node(),
+        PathNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(Some(PathNode {
             segments: vec![IdentNode {
                 id: DUMMY_NODE_ID,
@@ -25,7 +25,7 @@ fn onw_two() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_path_node(),
+        PathNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(Some(PathNode {
             segments: vec![
                 IdentNode {

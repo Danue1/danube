@@ -1,19 +1,21 @@
-use crate::{Error, Parse};
-use danube_ast::{GenericNode, DUMMY_NODE_ID};
+use crate::{Context, Error, Parse, ParseList};
+use danube_ast::{GenericNode, IdentNode, PathNode, DUMMY_NODE_ID};
 
-impl<'parse> Parse<'parse> {
-    pub fn parse_generic_nodes(&mut self) -> Result<Vec<GenericNode>, Error> {
-        if !symbol!(self.cursor => LeftChevron) {
+impl ParseList for GenericNode {
+    type Output = GenericNode;
+
+    fn parse_list(context: &mut Context) -> Result<Vec<Self::Output>, Error> {
+        if !symbol!(context.cursor => LeftChevron) {
             return Ok(vec![]);
         }
 
         let mut generics = vec![];
 
-        while !symbol!(self.cursor => RightChevron) {
-            generics.push(self.parse_generic_node()?);
+        while !symbol!(context.cursor => RightChevron) {
+            generics.push(GenericNode::parse(context)?);
 
-            if !symbol!(self.cursor => Comma) {
-                if symbol!(self.cursor => RightChevron) {
+            if !symbol!(context.cursor => Comma) {
+                if symbol!(context.cursor => RightChevron) {
                     break;
                 }
 
@@ -23,18 +25,22 @@ impl<'parse> Parse<'parse> {
 
         Ok(generics)
     }
+}
 
-    pub fn parse_generic_node(&mut self) -> Result<GenericNode, Error> {
-        let ident = self.parse_ident_node()?;
-        let traits = if symbol!(self.cursor => Colon) {
-            let mut paths = if let Some(path) = self.parse_path_node()? {
+impl Parse for GenericNode {
+    type Output = GenericNode;
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+        let ident = IdentNode::parse(context)?;
+        let traits = if symbol!(context.cursor => Colon) {
+            let mut paths = if let Some(path) = PathNode::parse(context)? {
                 vec![path]
             } else {
                 return Err(Error::Invalid);
             };
 
-            while symbol!(self.cursor => Plus) {
-                if let Some(path) = self.parse_path_node()? {
+            while symbol!(context.cursor => Plus) {
+                if let Some(path) = PathNode::parse(context)? {
                     paths.push(path);
                 } else {
                     return Err(Error::Invalid);
@@ -45,8 +51,8 @@ impl<'parse> Parse<'parse> {
         } else {
             vec![]
         };
-        let default = if symbol!(self.cursor => Eq) {
-            if let Some(path) = self.parse_path_node()? {
+        let default = if symbol!(context.cursor => Eq) {
+            if let Some(path) = PathNode::parse(context)? {
                 Some(path)
             } else {
                 return Err(Error::Invalid);

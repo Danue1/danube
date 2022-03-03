@@ -1,4 +1,4 @@
-use crate::Parse;
+use crate::{Context, Parse};
 use danube_ast::{IdentNode, PathNode, VisibilityKind, DUMMY_NODE_ID};
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
@@ -9,7 +9,7 @@ fn current() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_visibility_kind(),
+        VisibilityKind::parse(&mut Context::new(tokens.as_slice())),
         Ok(VisibilityKind::Current),
     );
 }
@@ -20,7 +20,7 @@ fn public() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_visibility_kind(),
+        VisibilityKind::parse(&mut Context::new(tokens.as_slice())),
         Ok(VisibilityKind::Public),
     );
 }
@@ -31,7 +31,7 @@ fn restricted() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_visibility_kind(),
+        VisibilityKind::parse(&mut Context::new(tokens.as_slice())),
         Ok(VisibilityKind::Restricted(PathNode {
             segments: vec![IdentNode {
                 id: DUMMY_NODE_ID,

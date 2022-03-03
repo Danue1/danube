@@ -1,4 +1,4 @@
-use crate::Parse;
+use crate::{Context, Parse};
 use danube_ast::{GenericNode, IdentNode, ImplementNode, PathNode, DUMMY_NODE_ID};
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
@@ -9,7 +9,7 @@ fn with_nothing() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_implement_node(),
+        ImplementNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ImplementNode {
             generics: vec![],
             trait_ident: None,
@@ -31,7 +31,7 @@ fn with_generics() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_implement_node(),
+        ImplementNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ImplementNode {
             generics: vec![GenericNode {
                 id: DUMMY_NODE_ID,
@@ -61,7 +61,7 @@ fn target_generics_with_generics() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_implement_node(),
+        ImplementNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ImplementNode {
             generics: vec![GenericNode {
                 id: DUMMY_NODE_ID,
@@ -99,7 +99,7 @@ fn for_with_generics() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_implement_node(),
+        ImplementNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ImplementNode {
             generics: vec![],
             trait_ident: Some(PathNode {
@@ -126,7 +126,7 @@ fn for_generics_with_generics() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_implement_node(),
+        ImplementNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ImplementNode {
             generics: vec![],
             trait_ident: Some(PathNode {

@@ -1,42 +1,49 @@
-use crate::{Error, Parse};
-use danube_ast::{AssignKind, AssignNode, LetNode, StatementKind, StatementNode, DUMMY_NODE_ID};
+use crate::{Context, Error, Parse};
+use danube_ast::{
+    AssignKind, AssignNode, ExpressionNode, ImmutabilityKind, LetNode, PatternNode, StatementKind,
+    StatementNode, TypeNode, DUMMY_NODE_ID,
+};
 use danube_token::{keywords, TokenKind};
 
-impl<'parse> Parse<'parse> {
-    pub fn parse_statement_node(&mut self) -> Result<StatementNode, Error> {
-        let kind = self.parse_statement_kind()?;
+impl Parse for StatementNode {
+    type Output = StatementNode;
 
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
         Ok(StatementNode {
             id: DUMMY_NODE_ID,
-            kind,
+            kind: StatementKind::parse(context)?,
         })
     }
+}
 
-    fn parse_statement_kind(&mut self) -> Result<StatementKind, Error> {
-        match self.cursor.peek().kind {
+impl Parse for StatementKind {
+    type Output = StatementKind;
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+        match context.cursor.peek().kind {
             TokenKind::Semicolon => {
-                self.cursor.next();
+                context.cursor.next();
 
                 Ok(StatementKind::Semicolon)
             }
             TokenKind::Identifier(keywords::Break) => {
-                self.cursor.next();
+                context.cursor.next();
 
                 Ok(StatementKind::Break)
             }
             TokenKind::Identifier(keywords::Continue) => {
-                self.cursor.next();
+                context.cursor.next();
 
                 Ok(StatementKind::Continue)
             }
             TokenKind::Identifier(keywords::Return) => {
-                self.cursor.next();
+                context.cursor.next();
 
-                if symbol!(self.cursor => Semicolon) {
+                if symbol!(context.cursor => Semicolon) {
                     Ok(StatementKind::Return(None))
                 } else {
-                    let expression = self.parse_expression_node()?;
-                    if symbol!(self.cursor => Semicolon) {
+                    let expression = ExpressionNode::parse(context)?;
+                    if symbol!(context.cursor => Semicolon) {
                         Ok(StatementKind::Return(Some(expression)))
                     } else {
                         Err(Error::Invalid)
@@ -44,21 +51,21 @@ impl<'parse> Parse<'parse> {
                 }
             }
             TokenKind::Identifier(keywords::Let) => {
-                self.cursor.next();
+                context.cursor.next();
 
-                let immutability = self.parse_immutability_kind()?;
-                let pattern = self.parse_pattern_node()?;
-                let ty = if symbol!(self.cursor => Colon) {
-                    Some(self.parse_type_node()?)
+                let immutability = ImmutabilityKind::parse(context)?;
+                let pattern = PatternNode::parse(context)?;
+                let ty = if symbol!(context.cursor => Colon) {
+                    Some(TypeNode::parse(context)?)
                 } else {
                     None
                 };
-                let value = if symbol!(self.cursor => Eq) {
-                    Some(self.parse_expression_node()?)
+                let value = if symbol!(context.cursor => Eq) {
+                    Some(ExpressionNode::parse(context)?)
                 } else {
                     None
                 };
-                if symbol!(self.cursor => Semicolon) {
+                if symbol!(context.cursor => Semicolon) {
                     Ok(StatementKind::Let(Box::new(LetNode {
                         id: DUMMY_NODE_ID,
                         immutability,
@@ -71,11 +78,11 @@ impl<'parse> Parse<'parse> {
                 }
             }
             _ => {
-                let expression = self.parse_expression_node()?;
+                let expression = ExpressionNode::parse(context)?;
 
                 macro_rules! assign_kind {
                     ($($token:ident => $assign:ident,)+) => {
-                        match self.cursor.peek().kind {
+                        match context.cursor.peek().kind {
                             $(TokenKind::$token => Some(AssignKind::$assign),)+
                             _ => None
                         }
@@ -100,12 +107,12 @@ impl<'parse> Parse<'parse> {
                     LeftChevronLeftChevronEq => BitLeft,
                     RightChevronRightChevronEq => BitRight,
                 } {
-                    self.cursor.next();
+                    context.cursor.next();
 
                     let lhs = expression;
-                    let rhs = self.parse_expression_node()?;
+                    let rhs = ExpressionNode::parse(context)?;
 
-                    if symbol!(self.cursor => Semicolon) {
+                    if symbol!(context.cursor => Semicolon) {
                         Ok(StatementKind::Assign(Box::new(AssignNode {
                             kind,
                             lhs,

@@ -1,22 +1,24 @@
-use crate::{Error, Parse};
-use danube_ast::{EnumVariantKind, EnumVariantNode, DUMMY_NODE_ID};
+use crate::{Context, Error, Parse};
+use danube_ast::{EnumVariantKind, EnumVariantNode, IdentNode, TypeNode, DUMMY_NODE_ID};
 use danube_token::TokenKind;
 
-impl<'parse> Parse<'parse> {
-    pub fn parse_enum_variant_node(&mut self) -> Result<EnumVariantNode, Error> {
-        let ident = self.parse_ident_node()?;
+impl Parse for EnumVariantNode {
+    type Output = EnumVariantNode;
 
-        match symbol!(self.cursor) {
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+        let ident = IdentNode::parse(context)?;
+
+        match symbol!(context.cursor) {
             Some(TokenKind::LeftParens) => {
-                self.cursor.next();
+                context.cursor.next();
 
                 let mut variants = vec![];
 
-                while !symbol!(self.cursor => RightParens) {
-                    variants.push(self.parse_type_node()?);
+                while !symbol!(context.cursor => RightParens) {
+                    variants.push(TypeNode::parse(context)?);
 
-                    if !symbol!(self.cursor => Comma) {
-                        if symbol!(self.cursor => RightParens) {
+                    if !symbol!(context.cursor => Comma) {
+                        if symbol!(context.cursor => RightParens) {
                             break;
                         }
 
@@ -31,21 +33,21 @@ impl<'parse> Parse<'parse> {
                 })
             }
             Some(TokenKind::LeftBrace) => {
-                self.cursor.next();
+                context.cursor.next();
 
                 let mut variants = vec![];
 
-                while !symbol!(self.cursor => RightBrace) {
-                    let ident = self.parse_ident_node()?;
-                    let ty = if symbol!(self.cursor => Colon) {
-                        self.parse_type_node()?
+                while !symbol!(context.cursor => RightBrace) {
+                    let ident = IdentNode::parse(context)?;
+                    let ty = if symbol!(context.cursor => Colon) {
+                        TypeNode::parse(context)?
                     } else {
                         return Err(Error::Invalid);
                     };
                     variants.push((ident, ty));
 
-                    if !symbol!(self.cursor => Comma) {
-                        if symbol!(self.cursor => RightBrace) {
+                    if !symbol!(context.cursor => Comma) {
+                        if symbol!(context.cursor => RightBrace) {
                             break;
                         }
 

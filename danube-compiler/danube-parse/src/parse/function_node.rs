@@ -1,16 +1,19 @@
-use crate::{Error, Parse};
-use danube_ast::{FunctionNode, TypeNode};
+use super::function_parameter_node::FunctionParameterNodeList;
+use crate::{Context, Error, Parse, ParseList};
+use danube_ast::{BlockNode, FunctionNode, GenericNode, IdentNode, TypeNode};
 
-impl<'parse> Parse<'parse> {
-    pub fn parse_function_node(&mut self) -> Result<FunctionNode, Error> {
-        let ident = self.parse_ident_node()?;
-        let generics = self.parse_generic_nodes()?;
-        let (self_type, parameters) = self.parse_function_parameter_nodes()?;
-        let return_type = self.parse_function_return_type()?;
-        let block = if symbol!(self.cursor => Semicolon) {
+impl Parse for FunctionNode {
+    type Output = FunctionNode;
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+        let ident = IdentNode::parse(context)?;
+        let generics = GenericNode::parse_list(context)?;
+        let (self_type, parameters) = FunctionParameterNodeList::parse(context)?;
+        let return_type = FunctionReturnType::parse(context)?;
+        let block = if symbol!(context.cursor => Semicolon) {
             None
         } else {
-            Some(self.parse_block_node()?)
+            Some(BlockNode::parse(context)?)
         };
 
         Ok(FunctionNode {
@@ -22,10 +25,16 @@ impl<'parse> Parse<'parse> {
             block,
         })
     }
+}
 
-    fn parse_function_return_type(&mut self) -> Result<Option<TypeNode>, Error> {
-        if symbol!(self.cursor => HyphenRightChevron) {
-            Ok(Some(self.parse_type_node()?))
+struct FunctionReturnType;
+
+impl Parse for FunctionReturnType {
+    type Output = Option<TypeNode>;
+
+    fn parse(context: &mut Context) -> Result<Option<TypeNode>, Error> {
+        if symbol!(context.cursor => HyphenRightChevron) {
+            Ok(Some(TypeNode::parse(context)?))
         } else {
             Ok(None)
         }

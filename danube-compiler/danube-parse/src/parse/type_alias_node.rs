@@ -1,14 +1,16 @@
-use crate::{Error, Parse};
-use danube_ast::TypeAliasNode;
+use crate::{Context, Error, Parse};
+use danube_ast::{IdentNode, TypeAliasNode, TypeNode};
 
-impl<'parse> Parse<'parse> {
-    pub fn parse_type_alias_node(&mut self) -> Result<TypeAliasNode, Error> {
-        let ident = self.parse_ident_node()?;
+impl Parse for TypeAliasNode {
+    type Output = TypeAliasNode;
 
-        if symbol!(self.cursor => Eq) {
-            let ty = self.parse_type_node()?;
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+        let ident = IdentNode::parse(context)?;
 
-            if symbol!(self.cursor => Semicolon) {
+        if symbol!(context.cursor => Eq) {
+            let ty = TypeNode::parse(context)?;
+
+            if symbol!(context.cursor => Semicolon) {
                 Ok(TypeAliasNode {
                     ident,
                     ty: Some(ty),

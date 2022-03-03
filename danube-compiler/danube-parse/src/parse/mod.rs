@@ -1,3 +1,4 @@
+mod argument_node;
 mod attribute_node;
 mod block_node;
 mod constant_node;
@@ -9,7 +10,7 @@ mod function_node;
 mod function_parameter_node;
 mod generic_node;
 mod ident_node;
-mod immutability_node;
+mod immutability_kind;
 mod implement_item_node;
 mod implement_node;
 mod item_node;
@@ -31,18 +32,32 @@ use crate::{Cursor, Error};
 use danube_ast::PackageNode;
 use danube_token::Token;
 
-pub struct Parse<'parse> {
-    cursor: Cursor<'parse>,
+pub(crate) struct Context<'context> {
+    pub(crate) cursor: Cursor<'context>,
 }
 
-impl<'parse> Parse<'parse> {
-    pub fn new(tokens: &'parse [Token]) -> Self {
-        Parse {
-            cursor: Cursor::new(tokens),
+impl<'context> Context<'context> {
+    pub(crate) fn new(token: &'context [Token]) -> Self {
+        Context {
+            cursor: Cursor::new(token),
         }
     }
+}
 
-    pub fn parse(&mut self) -> Result<PackageNode, Error> {
-        self.parse_package_node()
-    }
+pub(crate) trait ParseList {
+    type Output;
+
+    fn parse_list(context: &mut Context) -> Result<Vec<Self::Output>, Error>;
+}
+
+pub(crate) trait Parse {
+    type Output;
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error>;
+}
+
+pub fn parse<'parse>(token: &'parse [Token]) -> Result<PackageNode, Error> {
+    let mut context = Context::new(token);
+
+    PackageNode::parse(&mut context)
 }

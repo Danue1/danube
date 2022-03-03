@@ -1,4 +1,4 @@
-use crate::Parse;
+use crate::{Context, Parse};
 use danube_ast::{
     AttributeNode, IdentNode, PackageNode, PathNode, DUMMY_ATTRIBUTE_ID, DUMMY_NODE_ID,
 };
@@ -11,7 +11,7 @@ fn attribute() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_package_node(),
+        PackageNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(PackageNode {
             id: DUMMY_NODE_ID,
             attributes: vec![AttributeNode {
@@ -36,7 +36,7 @@ fn attributes() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_package_node(),
+        PackageNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(PackageNode {
             id: DUMMY_NODE_ID,
             attributes: vec![

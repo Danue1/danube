@@ -1,221 +1,245 @@
-use crate::{Error, Parse};
+use super::expression_node::PrefixExpressionNode;
+use crate::{Context, Error, Parse, ParseList};
 use danube_ast::{
     ArgumentNode, BinaryExpressionNode, BinaryOperatorKind, BlockNode, ClosureNode,
     ConditionBranch, ConditionNode, ExpressionKind, ExpressionNode, FieldNode, ForNode,
     FunctionCallNode, IdentNode, IndexNode, LoopNode, MatchBranch, MatchNode, MethodCallNode,
-    TupleNode, WhileNode, DUMMY_NODE_ID,
+    PathNode, PatternNode, StatementNode, TupleNode, TypeNode, WhileNode, DUMMY_NODE_ID,
 };
 use danube_token::{keywords, TokenKind};
 
-impl<'parse> Parse<'parse> {
-    pub fn parse_expression_kind(&mut self) -> Result<ExpressionKind, Error> {
-        let expression = self.parse_prefix_expression_kind()?;
+impl Parse for ExpressionKind {
+    type Output = ExpressionKind;
 
-        self.parse_binary_expression_kind(expression)
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+        let expression = PrefixExpressionKind::parse(context)?;
+
+        parse_binary_expression_kind(context, expression)
     }
+}
 
-    pub(crate) fn parse_prefix_expression_kind(&mut self) -> Result<ExpressionKind, Error> {
-        match symbol!(self.cursor) {
+pub(crate) struct PrefixExpressionKind;
+
+impl Parse for PrefixExpressionKind {
+    type Output = ExpressionKind;
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+        match symbol!(context.cursor) {
             Some(TokenKind::Plus) => {
-                self.cursor.next();
+                context.cursor.next();
 
-                self.parse_prefix_expression_kind()
+                PrefixExpressionKind::parse(context)
             }
             Some(TokenKind::Hyphen) => {
-                self.cursor.next();
+                context.cursor.next();
 
                 Ok(ExpressionKind::Negate(Box::new(
-                    self.parse_prefix_expression_node()?,
+                    PrefixExpressionNode::parse(context)?,
                 )))
             }
             Some(TokenKind::Exclamation) => {
-                self.cursor.next();
+                context.cursor.next();
 
-                Ok(ExpressionKind::Not(Box::new(
-                    self.parse_prefix_expression_node()?,
-                )))
+                Ok(ExpressionKind::Not(Box::new(PrefixExpressionNode::parse(
+                    context,
+                )?)))
             }
-            _ => self.parse_atomic_expression_kind(),
+            _ => AtomicExpressionKind::parse(context),
         }
     }
+}
 
-    pub(crate) fn parse_atomic_expression_kind(&mut self) -> Result<ExpressionKind, Error> {
-        match &self.cursor.peek().kind {
+struct AtomicExpressionKind;
+
+impl Parse for AtomicExpressionKind {
+    type Output = ExpressionKind;
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+        match &context.cursor.peek().kind {
             TokenKind::Literal(symbol, kind) => {
                 let symbol = symbol.clone();
                 let kind = kind.clone();
 
-                self.cursor.next();
+                context.cursor.next();
 
-                self.parse_postfix_expression_kind(ExpressionKind::Literal(symbol, kind))
+                parse_postfix_expression_kind(context, ExpressionKind::Literal(symbol, kind))
             }
             // If
             TokenKind::Identifier(keywords::If) => {
-                self.cursor.next();
+                context.cursor.next();
 
                 macro_rules! branch {
                     () => {
                         ConditionBranch {
-                            expression: if identifier!(self.cursor => Let) {
-                                let pattern = self.parse_pattern_node()?;
-                                if !symbol!(self.cursor => Eq) {
+                            expression: if identifier!(context.cursor => Let) {
+                                let pattern = PatternNode::parse(context)?;
+                                if !symbol!(context.cursor => Eq) {
                                     return Err(Error::Invalid);
                                 }
-                                let expression = self.parse_expression_node()?;
+                                let expression = ExpressionNode::parse(context)?;
                                 Box::new(ExpressionNode {
                                     id: DUMMY_NODE_ID,
                                     kind: ExpressionKind::Let(pattern, Box::new(expression)),
                                 })
                             } else {
-                                Box::new(self.parse_expression_node()?)
+                                Box::new(ExpressionNode::parse(context)?)
                             },
-                            block: self.parse_block_node()?,
+                            block: BlockNode::parse(context)?,
                         }
                     };
                 }
 
                 let mut branches = vec![branch!()];
                 let mut other = None;
-                while identifier!(self.cursor => Else) {
-                    if !identifier!(self.cursor => If) {
-                        other = Some(self.parse_block_node()?);
+                while identifier!(context.cursor => Else) {
+                    if !identifier!(context.cursor => If) {
+                        other = Some(BlockNode::parse(context)?);
                         break;
                     }
 
                     branches.push(branch!());
                 }
 
-                self.parse_postfix_expression_kind(ExpressionKind::Conditional(ConditionNode {
-                    branches,
-                    other,
-                }))
+                parse_postfix_expression_kind(
+                    context,
+                    ExpressionKind::Conditional(ConditionNode { branches, other }),
+                )
             }
             // Loop
             TokenKind::Identifier(keywords::Loop) => {
-                self.cursor.next();
+                context.cursor.next();
 
-                let block = self.parse_block_node()?;
+                let block = BlockNode::parse(context)?;
 
-                self.parse_postfix_expression_kind(ExpressionKind::Loop(LoopNode { block }))
+                parse_postfix_expression_kind(context, ExpressionKind::Loop(LoopNode { block }))
             }
             // While
             TokenKind::Identifier(keywords::While) => {
-                self.cursor.next();
+                context.cursor.next();
 
                 let branch = ConditionBranch {
-                    expression: Box::new(self.parse_expression_node()?),
-                    block: self.parse_block_node()?,
+                    expression: Box::new(ExpressionNode::parse(context)?),
+                    block: BlockNode::parse(context)?,
                 };
 
-                self.parse_postfix_expression_kind(ExpressionKind::While(WhileNode { branch }))
+                parse_postfix_expression_kind(context, ExpressionKind::While(WhileNode { branch }))
             }
             // For
             TokenKind::Identifier(keywords::For) => {
-                self.cursor.next();
+                context.cursor.next();
 
-                let pattern = self.parse_pattern_node()?;
-                let iter = if identifier!(self.cursor => In) {
-                    Box::new(self.parse_expression_node()?)
+                let pattern = PatternNode::parse(context)?;
+                let iter = if identifier!(context.cursor => In) {
+                    Box::new(ExpressionNode::parse(context)?)
                 } else {
                     return Err(Error::Invalid);
                 };
-                let block = self.parse_block_node()?;
+                let block = BlockNode::parse(context)?;
 
-                self.parse_postfix_expression_kind(ExpressionKind::For(ForNode {
-                    pattern,
-                    iter,
-                    block,
-                }))
+                parse_postfix_expression_kind(
+                    context,
+                    ExpressionKind::For(ForNode {
+                        pattern,
+                        iter,
+                        block,
+                    }),
+                )
             }
             // Match
             TokenKind::Identifier(keywords::Match) => {
-                self.cursor.next();
+                context.cursor.next();
 
-                let expression = self.parse_expression_node()?;
-                if !symbol!(self.cursor => LeftBrace) {
+                let expression = ExpressionNode::parse(context)?;
+                if !symbol!(context.cursor => LeftBrace) {
                     return Err(Error::Invalid);
                 }
 
                 let mut branches = vec![];
-                while !symbol!(self.cursor => RightBrace) {
-                    let pattern = self.parse_pattern_node()?;
-                    if !symbol!(self.cursor => EqRightChevron) {
+                while !symbol!(context.cursor => RightBrace) {
+                    let pattern = PatternNode::parse(context)?;
+                    if !symbol!(context.cursor => EqRightChevron) {
                         return Err(Error::Invalid);
                     }
 
-                    let block = self.parse_block_node()?;
+                    let block = BlockNode::parse(context)?;
                     branches.push(MatchBranch { pattern, block });
 
-                    symbol!(self.cursor => Comma);
+                    symbol!(context.cursor => Comma);
                 }
 
-                self.parse_postfix_expression_kind(ExpressionKind::Match(MatchNode {
-                    expression: Box::new(expression),
-                    branches,
-                }))
+                parse_postfix_expression_kind(
+                    context,
+                    ExpressionKind::Match(MatchNode {
+                        expression: Box::new(expression),
+                        branches,
+                    }),
+                )
             }
             // Path or Function Call
             TokenKind::Identifier(_) => {
-                let path = if let Some(path) = self.parse_path_node()? {
+                let path = if let Some(path) = PathNode::parse(context)? {
                     ExpressionKind::Path(path)
                 } else {
                     return Err(Error::Invalid);
                 };
-                let expression = if symbol!(self.cursor => LeftParens) {
+                let expression = if symbol!(context.cursor => LeftParens) {
                     ExpressionKind::FunctionCall(FunctionCallNode {
                         expression: Box::new(ExpressionNode {
                             id: DUMMY_NODE_ID,
                             kind: path,
                         }),
-                        arguments: self.parse_argument_nodes()?,
+                        arguments: ArgumentNode::parse_list(context)?,
                     })
                 } else {
                     path
                 };
 
-                self.parse_postfix_expression_kind(expression)
+                parse_postfix_expression_kind(context, expression)
             }
             // Closure
             // |a| { ... }
             TokenKind::Pipeline => {
-                self.cursor.next();
+                context.cursor.next();
 
                 let mut parameters = vec![];
 
-                while !symbol!(self.cursor => Pipeline) {
-                    let ident = self.parse_ident_node()?;
-                    let ty = if symbol!(self.cursor => Colon) {
-                        Some(self.parse_type_node()?)
+                while !symbol!(context.cursor => Pipeline) {
+                    let ident = IdentNode::parse(context)?;
+                    let ty = if symbol!(context.cursor => Colon) {
+                        Some(TypeNode::parse(context)?)
                     } else {
                         None
                     };
                     parameters.push((ident, ty));
 
-                    if !symbol!(self.cursor => Comma) {
+                    if !symbol!(context.cursor => Comma) {
                         break;
                     }
                 }
 
-                let return_type = if symbol!(self.cursor => HyphenRightChevron) {
-                    Some(self.parse_type_node()?)
+                let return_type = if symbol!(context.cursor => HyphenRightChevron) {
+                    Some(TypeNode::parse(context)?)
                 } else {
                     None
                 };
 
-                let block = self.parse_block_node()?;
+                let block = BlockNode::parse(context)?;
 
-                self.parse_postfix_expression_kind(ExpressionKind::Closure(ClosureNode {
-                    parameters,
-                    return_type,
-                    block,
-                }))
+                parse_postfix_expression_kind(
+                    context,
+                    ExpressionKind::Closure(ClosureNode {
+                        parameters,
+                        return_type,
+                        block,
+                    }),
+                )
             }
             // Closure
             // || { ... }
             TokenKind::PipelinePipeline => {
-                let return_type = if symbol!(self.cursor => Hyphen) {
-                    if symbol!(self.cursor => RightChevron) {
-                        Some(self.parse_type_node()?)
+                let return_type = if symbol!(context.cursor => Hyphen) {
+                    if symbol!(context.cursor => RightChevron) {
+                        Some(TypeNode::parse(context)?)
                     } else {
                         return Err(Error::Invalid);
                     }
@@ -223,37 +247,43 @@ impl<'parse> Parse<'parse> {
                     None
                 };
 
-                let block = self.parse_block_node()?;
+                let block = BlockNode::parse(context)?;
 
-                self.parse_postfix_expression_kind(ExpressionKind::Closure(ClosureNode {
-                    parameters: vec![],
-                    return_type,
-                    block,
-                }))
+                parse_postfix_expression_kind(
+                    context,
+                    ExpressionKind::Closure(ClosureNode {
+                        parameters: vec![],
+                        return_type,
+                        block,
+                    }),
+                )
             }
             TokenKind::LeftBrace => {
-                self.cursor.next();
+                context.cursor.next();
 
                 let mut statements = vec![];
 
-                while !symbol!(self.cursor => RightBrace) {
-                    statements.push(self.parse_statement_node()?);
+                while !symbol!(context.cursor => RightBrace) {
+                    statements.push(StatementNode::parse(context)?);
                 }
 
-                self.parse_postfix_expression_kind(ExpressionKind::Block(BlockNode {
-                    id: DUMMY_NODE_ID,
-                    statements,
-                }))
+                parse_postfix_expression_kind(
+                    context,
+                    ExpressionKind::Block(BlockNode {
+                        id: DUMMY_NODE_ID,
+                        statements,
+                    }),
+                )
             }
             TokenKind::LeftParens => {
-                self.cursor.next();
+                context.cursor.next();
 
                 let mut arguments = vec![];
 
-                while !symbol!(self.cursor => RightParens) {
-                    arguments.push(self.parse_prefix_expression_node()?);
-                    if !symbol!(self.cursor => Comma) {
-                        if symbol!(self.cursor => RightParens) {
+                while !symbol!(context.cursor => RightParens) {
+                    arguments.push(PrefixExpressionNode::parse(context)?);
+                    if !symbol!(context.cursor => Comma) {
+                        if symbol!(context.cursor => RightParens) {
                             break;
                         }
 
@@ -261,17 +291,20 @@ impl<'parse> Parse<'parse> {
                     }
                 }
 
-                self.parse_postfix_expression_kind(ExpressionKind::Tuple(TupleNode { arguments }))
+                parse_postfix_expression_kind(
+                    context,
+                    ExpressionKind::Tuple(TupleNode { arguments }),
+                )
             }
             TokenKind::LeftBracket => {
-                self.cursor.next();
+                context.cursor.next();
 
                 let mut expressions = vec![];
 
-                while !symbol!(self.cursor => RightBracket) {
-                    expressions.push(self.parse_prefix_expression_node()?);
-                    if !symbol!(self.cursor => Comma) {
-                        if symbol!(self.cursor => RightBracket) {
+                while !symbol!(context.cursor => RightBracket) {
+                    expressions.push(PrefixExpressionNode::parse(context)?);
+                    if !symbol!(context.cursor => Comma) {
+                        if symbol!(context.cursor => RightBracket) {
                             break;
                         }
 
@@ -279,189 +312,157 @@ impl<'parse> Parse<'parse> {
                     }
                 }
 
-                self.parse_postfix_expression_kind(ExpressionKind::Array(expressions))
+                parse_postfix_expression_kind(context, ExpressionKind::Array(expressions))
             }
             _ => Err(Error::Invalid),
         }
     }
+}
 
-    pub(crate) fn parse_postfix_expression_kind(
-        &mut self,
-        expression: ExpressionKind,
-    ) -> Result<ExpressionKind, Error> {
-        match self.cursor.peek().kind {
-            // foo?
-            TokenKind::Question => {
-                self.cursor.next();
+fn parse_postfix_expression_kind(
+    context: &mut Context,
+    expression: ExpressionKind,
+) -> Result<ExpressionKind, Error> {
+    match context.cursor.peek().kind {
+        // foo?
+        TokenKind::Question => {
+            context.cursor.next();
 
-                self.parse_postfix_expression_kind(ExpressionKind::Try(Box::new(ExpressionNode {
+            parse_postfix_expression_kind(
+                context,
+                ExpressionKind::Try(Box::new(ExpressionNode {
                     id: DUMMY_NODE_ID,
                     kind: expression,
-                })))
-            }
-            // foo()
-            TokenKind::LeftParens => {
-                self.cursor.next();
+                })),
+            )
+        }
+        // foo()
+        TokenKind::LeftParens => {
+            context.cursor.next();
 
-                let arguments = self.parse_argument_nodes()?;
+            let arguments = ArgumentNode::parse_list(context)?;
 
-                self.parse_postfix_expression_kind(ExpressionKind::FunctionCall(FunctionCallNode {
+            parse_postfix_expression_kind(
+                context,
+                ExpressionKind::FunctionCall(FunctionCallNode {
                     expression: Box::new(ExpressionNode {
                         id: DUMMY_NODE_ID,
                         kind: expression,
                     }),
                     arguments,
+                }),
+            )
+        }
+        // foo.await
+        // foo.field
+        // foo.method_call()
+        TokenKind::Dot => {
+            context.cursor.next();
+
+            let expression = if identifier!(context.cursor => Await) {
+                ExpressionKind::Await(Box::new(ExpressionNode {
+                    id: DUMMY_NODE_ID,
+                    kind: expression,
                 }))
-            }
-            // foo.await
-            // foo.field
-            // foo.method_call()
-            TokenKind::Dot => {
-                self.cursor.next();
+            } else {
+                let ident = IdentNode::parse(context)?;
 
-                let expression = if identifier!(self.cursor => Await) {
-                    ExpressionKind::Await(Box::new(ExpressionNode {
-                        id: DUMMY_NODE_ID,
-                        kind: expression,
-                    }))
+                if symbol!(context.cursor => LeftParens) {
+                    ExpressionKind::MethodCall(MethodCallNode {
+                        ident,
+                        arguments: ArgumentNode::parse_list(context)?,
+                    })
                 } else {
-                    let ident = self.parse_ident_node()?;
+                    ExpressionKind::Field(FieldNode {
+                        expression: Box::new(ExpressionNode {
+                            id: DUMMY_NODE_ID,
+                            kind: expression,
+                        }),
+                        field: ident,
+                    })
+                }
+            };
 
-                    if symbol!(self.cursor => LeftParens) {
-                        let arguments = self.parse_argument_nodes()?;
+            parse_postfix_expression_kind(context, expression)
+        }
+        // foo[bar]
+        TokenKind::LeftBracket => {
+            context.cursor.next();
 
-                        ExpressionKind::MethodCall(MethodCallNode { ident, arguments })
-                    } else {
-                        ExpressionKind::Field(FieldNode {
-                            expression: Box::new(ExpressionNode {
-                                id: DUMMY_NODE_ID,
-                                kind: expression,
-                            }),
-                            field: ident,
-                        })
-                    }
-                };
+            let index = ExpressionNode::parse(context)?;
 
-                self.parse_postfix_expression_kind(expression)
-            }
-            // foo[bar]
-            TokenKind::LeftBracket => {
-                self.cursor.next();
-
-                let index = self.parse_expression_node()?;
-
-                if symbol!(self.cursor => RightBracket) {
-                    self.parse_postfix_expression_kind(ExpressionKind::Index(IndexNode {
+            if symbol!(context.cursor => RightBracket) {
+                parse_postfix_expression_kind(
+                    context,
+                    ExpressionKind::Index(IndexNode {
                         expression: Box::new(ExpressionNode {
                             id: DUMMY_NODE_ID,
                             kind: expression,
                         }),
                         index: Box::new(index),
-                    }))
-                } else {
-                    Err(Error::Invalid)
-                }
+                    }),
+                )
+            } else {
+                Err(Error::Invalid)
             }
-            _ => Ok(expression),
         }
+        _ => Ok(expression),
     }
+}
 
-    fn parse_binary_expression_kind(
-        &mut self,
-        lhs: ExpressionKind,
-    ) -> Result<ExpressionKind, Error> {
-        macro_rules! match_operator {
-            ($($kind:ident => $operator:ident,)+ _ => return Ok(lhs),) => {
-                match self.cursor.peek().kind {
-                    $(
-                        TokenKind::$kind => {
-                            self.cursor.next();
-                            BinaryOperatorKind::$operator
-                        }
-                    )+
-                    _ => return Ok(lhs),
-                }
-            };
-        }
-
-        let kind = match_operator! {
-            Plus => Add,
-            Hyphen => Sub,
-            Asterisk => Mul,
-            AsteriskAsterisk => Exp,
-            Slash => Div,
-            Percent => Mod,
-
-            Ampersand => BitAnd,
-            Pipeline => BitOr,
-            Caret => BitXor,
-            LeftChevronLeftChevron => BitLeft,
-            RightChevronRightChevron => BitRight,
-
-            EqEq => Equal,
-            ExclamationEq => NotEqual,
-            RightChevron => GreaterThan,
-            LeftChevron => LessThan,
-            RightChevronEq => GreaterThanOrEqual,
-            LeftChevronEq => LessThanOrEqual,
-
-            AmpersandAmpersand => And,
-            PipelinePipeline => Or,
-
-            _ => return Ok(lhs),
-        };
-        let rhs = self.parse_prefix_expression_node()?;
-        let expression = ExpressionKind::Binary(BinaryExpressionNode {
-            kind,
-            lhs: Box::new(ExpressionNode {
-                id: DUMMY_NODE_ID,
-                kind: lhs,
-            }),
-            rhs: Box::new(rhs),
-        });
-
-        Ok(self.parse_binary_expression_kind(expression)?)
-    }
-
-    fn parse_argument_nodes(&mut self) -> Result<Vec<ArgumentNode>, Error> {
-        let mut arguments = vec![];
-
-        while !symbol!(self.cursor => RightParens) {
-            arguments.push(ArgumentNode {
-                id: DUMMY_NODE_ID,
-                ident: {
-                    let mut cursor = self.cursor.clone();
-
-                    if let Some(symbol) = identifier!(cursor) {
-                        let symbol = symbol.clone();
-
-                        if symbol!(cursor => Colon) {
-                            self.cursor.next();
-                            self.cursor.next();
-
-                            Some(IdentNode {
-                                id: DUMMY_NODE_ID,
-                                symbol,
-                            })
-                        } else {
-                            None
-                        }
-                    } else {
-                        None
+fn parse_binary_expression_kind(
+    context: &mut Context,
+    lhs: ExpressionKind,
+) -> Result<ExpressionKind, Error> {
+    macro_rules! match_operator {
+        ($($kind:ident => $operator:ident,)+ _ => return Ok(lhs),) => {
+            match context.cursor.peek().kind {
+                $(
+                    TokenKind::$kind => {
+                        context.cursor.next();
+                        BinaryOperatorKind::$operator
                     }
-                },
-                expression: self.parse_expression_node()?,
-            });
-
-            if !symbol!(self.cursor => Comma) {
-                if symbol!(self.cursor => RightParens) {
-                    break;
-                }
-
-                return Err(Error::Invalid);
+                )+
+                _ => return Ok(lhs),
             }
-        }
-
-        Ok(arguments)
+        };
     }
+
+    let kind = match_operator! {
+        Plus => Add,
+        Hyphen => Sub,
+        Asterisk => Mul,
+        AsteriskAsterisk => Exp,
+        Slash => Div,
+        Percent => Mod,
+
+        Ampersand => BitAnd,
+        Pipeline => BitOr,
+        Caret => BitXor,
+        LeftChevronLeftChevron => BitLeft,
+        RightChevronRightChevron => BitRight,
+
+        EqEq => Equal,
+        ExclamationEq => NotEqual,
+        RightChevron => GreaterThan,
+        LeftChevron => LessThan,
+        RightChevronEq => GreaterThanOrEqual,
+        LeftChevronEq => LessThanOrEqual,
+
+        AmpersandAmpersand => And,
+        PipelinePipeline => Or,
+
+        _ => return Ok(lhs),
+    };
+    let rhs = PrefixExpressionNode::parse(context)?;
+    let expression = ExpressionKind::Binary(BinaryExpressionNode {
+        kind,
+        lhs: Box::new(ExpressionNode {
+            id: DUMMY_NODE_ID,
+            kind: lhs,
+        }),
+        rhs: Box::new(rhs),
+    });
+
+    Ok(parse_binary_expression_kind(context, expression)?)
 }

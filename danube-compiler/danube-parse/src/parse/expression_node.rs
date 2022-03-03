@@ -1,18 +1,27 @@
-use crate::{Error, Parse};
-use danube_ast::{ExpressionNode, DUMMY_NODE_ID};
+use super::expression_kind::PrefixExpressionKind;
+use crate::{Context, Error, Parse};
+use danube_ast::{ExpressionKind, ExpressionNode, DUMMY_NODE_ID};
 
-impl<'parse> Parse<'parse> {
-    pub fn parse_expression_node(&mut self) -> Result<ExpressionNode, Error> {
+impl Parse for ExpressionNode {
+    type Output = ExpressionNode;
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
         Ok(ExpressionNode {
             id: DUMMY_NODE_ID,
-            kind: self.parse_expression_kind()?,
+            kind: ExpressionKind::parse(context)?,
         })
     }
+}
 
-    pub(crate) fn parse_prefix_expression_node(&mut self) -> Result<ExpressionNode, Error> {
+pub(crate) struct PrefixExpressionNode;
+
+impl Parse for PrefixExpressionNode {
+    type Output = ExpressionNode;
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
         Ok(ExpressionNode {
             id: DUMMY_NODE_ID,
-            kind: self.parse_prefix_expression_kind()?,
+            kind: PrefixExpressionKind::parse(context)?,
         })
     }
 }

@@ -1,15 +1,15 @@
-use crate::{Error, Parse};
-use danube_ast::{PackageNode, DUMMY_NODE_ID};
+use super::attribute_node::PackageAttributeNode;
+use crate::{Context, Error, Parse, ParseList};
+use danube_ast::{ItemNode, PackageNode, DUMMY_NODE_ID};
 
-impl<'parse> Parse<'parse> {
-    pub fn parse_package_node(&mut self) -> Result<PackageNode, Error> {
-        let attributes = self.parse_package_attributes()?;
-        let items = self.parse_item_nodes()?;
+impl Parse for PackageNode {
+    type Output = PackageNode;
 
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
         Ok(PackageNode {
             id: DUMMY_NODE_ID,
-            attributes,
-            items,
+            attributes: PackageAttributeNode::parse_list(context)?,
+            items: ItemNode::parse_list(context)?,
         })
     }
 }

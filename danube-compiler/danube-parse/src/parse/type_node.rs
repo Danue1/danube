@@ -1,15 +1,14 @@
-use crate::{Error, Parse};
-use danube_ast::{TypeNode, DUMMY_NODE_ID};
+use crate::{Context, Error, Parse};
+use danube_ast::{ImmutabilityKind, TypeKind, TypeNode, DUMMY_NODE_ID};
 
-impl<'parse> Parse<'parse> {
-    pub fn parse_type_node(&mut self) -> Result<TypeNode, Error> {
-        let immutability = self.parse_immutability_kind()?;
-        let kind = self.parse_type_kind()?;
+impl Parse for TypeNode {
+    type Output = TypeNode;
 
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
         Ok(TypeNode {
             id: DUMMY_NODE_ID,
-            immutability,
-            kind,
+            immutability: ImmutabilityKind::parse(context)?,
+            kind: TypeKind::parse(context)?,
         })
     }
 }

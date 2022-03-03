@@ -1,21 +1,23 @@
-use crate::{Error, Parse};
-use danube_ast::ConstantNode;
+use crate::{Context, Error, Parse};
+use danube_ast::{ConstantNode, ExpressionNode, PatternNode, TypeNode};
 
-impl<'parse> Parse<'parse> {
-    pub fn parse_constant_node(&mut self) -> Result<ConstantNode, Error> {
-        let pattern = self.parse_pattern_node()?;
-        let ty = if symbol!(self.cursor => Colon) {
-            self.parse_type_node()?
+impl Parse for ConstantNode {
+    type Output = ConstantNode;
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+        let pattern = PatternNode::parse(context)?;
+        let ty = if symbol!(context.cursor => Colon) {
+            TypeNode::parse(context)?
         } else {
             return Err(Error::Invalid);
         };
-        let expression = if symbol!(self.cursor => Eq) {
-            Some(self.parse_expression_node()?)
+        let expression = if symbol!(context.cursor => Eq) {
+            Some(ExpressionNode::parse(context)?)
         } else {
             None
         };
 
-        if symbol!(self.cursor => Semicolon) {
+        if symbol!(context.cursor => Semicolon) {
             Ok(ConstantNode {
                 pattern,
                 ty,

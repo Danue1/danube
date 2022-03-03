@@ -18,7 +18,7 @@ mod type_kind;
 mod use_node;
 mod visibility_kind;
 
-use crate::Parse;
+use crate::{Context, Parse};
 use danube_ast::{PackageNode, DUMMY_NODE_ID};
 use danube_lex::Lex;
 use danube_token::Token;
@@ -30,7 +30,7 @@ fn empty() {
     let tokens: Vec<Token> = lexer.filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse(),
+        PackageNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(PackageNode {
             id: DUMMY_NODE_ID,
             attributes: vec![],

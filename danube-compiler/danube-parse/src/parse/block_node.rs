@@ -1,16 +1,18 @@
-use crate::{Error, Parse};
-use danube_ast::{BlockNode, DUMMY_NODE_ID};
+use crate::{Context, Error, Parse};
+use danube_ast::{BlockNode, StatementNode, DUMMY_NODE_ID};
 
-impl<'parse> Parse<'parse> {
-    pub fn parse_block_node(&mut self) -> Result<BlockNode, Error> {
-        if !symbol!(self.cursor => LeftBrace) {
+impl Parse for BlockNode {
+    type Output = BlockNode;
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+        if !symbol!(context.cursor => LeftBrace) {
             return Err(Error::Invalid);
         }
 
         let mut statements = vec![];
 
-        while !symbol!(self.cursor => RightBrace) {
-            statements.push(self.parse_statement_node()?);
+        while !symbol!(context.cursor => RightBrace) {
+            statements.push(StatementNode::parse(context)?);
         }
 
         Ok(BlockNode {

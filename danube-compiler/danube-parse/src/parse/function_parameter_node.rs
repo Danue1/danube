@@ -1,23 +1,25 @@
-use crate::{Error, Parse};
-use danube_ast::{FunctionParameterNode, ImmutabilityKind, DUMMY_NODE_ID};
+use crate::{Context, Error, Parse};
+use danube_ast::{FunctionParameterNode, IdentNode, ImmutabilityKind, TypeNode, DUMMY_NODE_ID};
 
-impl<'parse> Parse<'parse> {
-    pub fn parse_function_parameter_nodes(
-        &mut self,
-    ) -> Result<(Option<ImmutabilityKind>, Vec<FunctionParameterNode>), Error> {
-        if !symbol!(self.cursor => LeftParens) {
+pub(crate) struct FunctionParameterNodeList;
+
+impl Parse for FunctionParameterNodeList {
+    type Output = (Option<ImmutabilityKind>, Vec<FunctionParameterNode>);
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+        if !symbol!(context.cursor => LeftParens) {
             return Err(Error::Invalid);
         }
 
-        let immutability = if let Ok(immutability) = self.parse_immutability_kind() {
-            if identifier!(self.cursor => SelfLower) {
+        let immutability = if let Ok(immutability) = ImmutabilityKind::parse(context) {
+            if identifier!(context.cursor => SelfLower) {
                 Some(immutability)
             } else if immutability == ImmutabilityKind::Nope {
                 return Err(Error::Invalid);
             } else {
                 None
             }
-        } else if identifier!(self.cursor => SelfLower) {
+        } else if identifier!(context.cursor => SelfLower) {
             Some(ImmutabilityKind::Nope)
         } else {
             None
@@ -25,11 +27,11 @@ impl<'parse> Parse<'parse> {
 
         let mut parameters = vec![];
 
-        while !symbol!(self.cursor => RightParens) {
-            parameters.push(self.parse_function_parameter_node()?);
+        while !symbol!(context.cursor => RightParens) {
+            parameters.push(FunctionParameterNode::parse(context)?);
 
-            if !symbol!(self.cursor => Comma) {
-                if symbol!(self.cursor => RightParens) {
+            if !symbol!(context.cursor => Comma) {
+                if symbol!(context.cursor => RightParens) {
                     break;
                 }
 
@@ -39,13 +41,17 @@ impl<'parse> Parse<'parse> {
 
         Ok((immutability, parameters))
     }
+}
 
-    pub fn parse_function_parameter_node(&mut self) -> Result<FunctionParameterNode, Error> {
-        let argument_label = self.parse_ident_node()?;
-        let (parameter_label, ty) = if symbol!(self.cursor => Colon) {
-            (None, self.parse_type_node()?)
+impl Parse for FunctionParameterNode {
+    type Output = FunctionParameterNode;
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+        let argument_label = IdentNode::parse(context)?;
+        let (parameter_label, ty) = if symbol!(context.cursor => Colon) {
+            (None, TypeNode::parse(context)?)
         } else {
-            (Some(self.parse_ident_node()?), self.parse_type_node()?)
+            (Some(IdentNode::parse(context)?), TypeNode::parse(context)?)
         };
 
         Ok(FunctionParameterNode {

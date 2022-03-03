@@ -1,4 +1,4 @@
-use crate::Parse;
+use crate::{Context, Parse};
 use danube_ast::{IdentNode, TraitNode, DUMMY_NODE_ID};
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
@@ -9,7 +9,7 @@ fn without_items() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_trait_node(),
+        TraitNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(TraitNode {
             ident: IdentNode {
                 id: DUMMY_NODE_ID,

@@ -1,4 +1,4 @@
-use crate::Parse;
+use crate::{Context, Parse};
 use danube_ast::{IdentNode, PathNode, TypeKind, DUMMY_NODE_ID};
 use danube_lex::Lex;
 use danube_token::{Symbol, Token};
@@ -9,7 +9,7 @@ fn one() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_type_kind(),
+        TypeKind::parse(&mut Context::new(tokens.as_slice())),
         Ok(TypeKind::Path(PathNode {
             segments: vec![IdentNode {
                 id: DUMMY_NODE_ID,
@@ -25,7 +25,7 @@ fn two() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_type_kind(),
+        TypeKind::parse(&mut Context::new(tokens.as_slice())),
         Ok(TypeKind::Path(PathNode {
             segments: vec![
                 IdentNode {
@@ -47,7 +47,7 @@ fn tuple_with_one() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_type_kind(),
+        TypeKind::parse(&mut Context::new(tokens.as_slice())),
         Ok(TypeKind::Tuple(vec![TypeKind::Path(PathNode {
             segments: vec![IdentNode {
                 id: DUMMY_NODE_ID,
@@ -63,7 +63,7 @@ fn tuple_with_two() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_type_kind(),
+        TypeKind::parse(&mut Context::new(tokens.as_slice())),
         Ok(TypeKind::Tuple(vec![
             TypeKind::Path(PathNode {
                 segments: vec![IdentNode {
@@ -87,7 +87,7 @@ fn generic_with_one() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_type_kind(),
+        TypeKind::parse(&mut Context::new(tokens.as_slice())),
         Ok(TypeKind::Generic(
             PathNode {
                 segments: vec![IdentNode {
@@ -111,7 +111,7 @@ fn generic_with_two() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_type_kind(),
+        TypeKind::parse(&mut Context::new(tokens.as_slice())),
         Ok(TypeKind::Generic(
             PathNode {
                 segments: vec![IdentNode {
@@ -143,7 +143,7 @@ fn tuple_with_generic_with_one() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_type_kind(),
+        TypeKind::parse(&mut Context::new(tokens.as_slice())),
         Ok(TypeKind::Tuple(vec![TypeKind::Generic(
             PathNode {
                 segments: vec![IdentNode {
@@ -167,7 +167,7 @@ fn tuple_with_generic_with_two() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_type_kind(),
+        TypeKind::parse(&mut Context::new(tokens.as_slice())),
         Ok(TypeKind::Tuple(vec![TypeKind::Generic(
             PathNode {
                 segments: vec![IdentNode {
@@ -199,7 +199,7 @@ fn generic_with_tuple_with_one() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_type_kind(),
+        TypeKind::parse(&mut Context::new(tokens.as_slice())),
         Ok(TypeKind::Generic(
             PathNode {
                 segments: vec![IdentNode {
@@ -223,7 +223,7 @@ fn generic_with_tuple_with_two() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_type_kind(),
+        TypeKind::parse(&mut Context::new(tokens.as_slice())),
         Ok(TypeKind::Generic(
             PathNode {
                 segments: vec![IdentNode {

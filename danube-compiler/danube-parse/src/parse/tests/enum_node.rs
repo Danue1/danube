@@ -1,4 +1,4 @@
-use crate::Parse;
+use crate::{Context, Parse};
 use danube_ast::{
     EnumNode, EnumVariantKind, EnumVariantNode, GenericNode, IdentNode, ImmutabilityKind, PathNode,
     TypeKind, TypeNode, DUMMY_NODE_ID,
@@ -17,7 +17,7 @@ fn result() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_enum_node(),
+        EnumNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(EnumNode {
             ident: IdentNode {
                 id: DUMMY_NODE_ID,

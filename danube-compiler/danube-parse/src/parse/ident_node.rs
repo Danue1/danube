@@ -1,11 +1,13 @@
-use crate::{Error, Parse};
+use crate::{Context, Error, Parse};
 use danube_ast::{IdentNode, DUMMY_NODE_ID};
 
-impl<'parse> Parse<'parse> {
-    pub fn parse_ident_node(&mut self) -> Result<IdentNode, Error> {
-        match identifier!(self.cursor) {
+impl Parse for IdentNode {
+    type Output = IdentNode;
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+        match identifier!(context.cursor) {
             Some(symbol) => {
-                self.cursor.next();
+                context.cursor.next();
 
                 Ok(IdentNode {
                     id: DUMMY_NODE_ID,

@@ -1,32 +1,29 @@
-use crate::{Error, Parse};
-use danube_ast::{AttributeNode, DUMMY_ATTRIBUTE_ID};
+use crate::{Context, Error, Parse, ParseList};
+use danube_ast::{AttributeNode, ExpressionNode, IdentNode, PathNode, DUMMY_ATTRIBUTE_ID};
 
-impl<'parse> Parse<'parse> {
-    pub fn parse_package_attributes(&mut self) -> Result<Vec<AttributeNode>, Error> {
+pub(crate) struct PackageAttributeNode;
+
+impl ParseList for PackageAttributeNode {
+    type Output = AttributeNode;
+
+    fn parse_list(context: &mut Context) -> Result<Vec<Self::Output>, Error> {
         let mut attributes = vec![];
 
-        while let Some(attribute) = self.parse_package_attribute()? {
+        while let Some(attribute) = PackageAttributeNode::parse(context)? {
             attributes.push(attribute);
         }
 
         Ok(attributes)
     }
+}
 
-    pub fn parse_item_attributes(&mut self) -> Result<Vec<AttributeNode>, Error> {
-        let mut attributes = vec![];
+impl Parse for PackageAttributeNode {
+    type Output = Option<AttributeNode>;
 
-        while let Some(attribute) = self.parse_item_attribute()? {
-            attributes.push(attribute);
-        }
-
-        Ok(attributes)
-    }
-
-    #[inline]
-    fn parse_package_attribute(&mut self) -> Result<Option<AttributeNode>, Error> {
-        if symbol!(self.cursor => Hash) {
-            if symbol!(self.cursor => Exclamation) {
-                let attribute = self.parse_attribute_inner()?;
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+        if symbol!(context.cursor => Hash) {
+            if symbol!(context.cursor => Exclamation) {
+                let attribute = AttributeNode::parse(context)?;
 
                 Ok(Some(attribute))
             } else {
@@ -36,44 +33,67 @@ impl<'parse> Parse<'parse> {
             Ok(None)
         }
     }
+}
 
-    #[inline]
-    fn parse_item_attribute(&mut self) -> Result<Option<AttributeNode>, Error> {
-        if symbol!(self.cursor => Hash) {
-            let attribute = self.parse_attribute_inner()?;
+pub(crate) struct ItemAttributeNode;
+
+impl ParseList for ItemAttributeNode {
+    type Output = AttributeNode;
+
+    fn parse_list(context: &mut Context) -> Result<Vec<Self::Output>, Error> {
+        let mut attributes = vec![];
+
+        while let Some(attribute) = ItemAttributeNode::parse(context)? {
+            attributes.push(attribute);
+        }
+
+        Ok(attributes)
+    }
+}
+
+impl Parse for ItemAttributeNode {
+    type Output = Option<AttributeNode>;
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+        if symbol!(context.cursor => Hash) {
+            let attribute = AttributeNode::parse(context)?;
 
             Ok(Some(attribute))
         } else {
             Ok(None)
         }
     }
+}
 
-    fn parse_attribute_inner(&mut self) -> Result<AttributeNode, Error> {
-        if !symbol!(self.cursor => LeftBracket) {
+impl Parse for AttributeNode {
+    type Output = AttributeNode;
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+        if !symbol!(context.cursor => LeftBracket) {
             return Err(Error::Invalid);
         }
-        let path = if let Some(path) = self.parse_path_node()? {
+        let path = if let Some(path) = PathNode::parse(context)? {
             path
         } else {
             return Err(Error::Invalid);
         };
-        let args = if !symbol!(self.cursor => LeftParens) {
+        let args = if !symbol!(context.cursor => LeftParens) {
             vec![]
         } else {
             let mut args = vec![];
 
-            while !symbol!(self.cursor => RightParens) {
-                let ident = self.parse_ident_node()?;
-                let expression = if symbol!(self.cursor => Eq) {
-                    Some(self.parse_expression_node()?)
+            while !symbol!(context.cursor => RightParens) {
+                let ident = IdentNode::parse(context)?;
+                let expression = if symbol!(context.cursor => Eq) {
+                    Some(ExpressionNode::parse(context)?)
                 } else {
                     None
                 };
 
                 args.push((ident, expression));
 
-                if !symbol!(self.cursor => Comma) {
-                    if symbol!(self.cursor => RightParens) {
+                if !symbol!(context.cursor => Comma) {
+                    if symbol!(context.cursor => RightParens) {
                         break;
                     }
 
@@ -84,7 +104,7 @@ impl<'parse> Parse<'parse> {
             args
         };
 
-        if symbol!(self.cursor => RightBracket) {
+        if symbol!(context.cursor => RightBracket) {
             Ok(AttributeNode {
                 id: DUMMY_ATTRIBUTE_ID,
                 path,

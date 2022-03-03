@@ -1,4 +1,4 @@
-use crate::Parse;
+use crate::{Context, Parse};
 use danube_ast::{
     BlockNode, FunctionNode, FunctionParameterNode, IdentNode, ImmutabilityKind, PathNode,
     TypeKind, TypeNode, DUMMY_NODE_ID,
@@ -12,7 +12,7 @@ fn without_block() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_function_node(),
+        FunctionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(FunctionNode {
             ident: IdentNode {
                 id: DUMMY_NODE_ID,
@@ -33,7 +33,7 @@ fn with_block() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_function_node(),
+        FunctionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(FunctionNode {
             ident: IdentNode {
                 id: DUMMY_NODE_ID,
@@ -57,7 +57,7 @@ fn with_return_type() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_function_node(),
+        FunctionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(FunctionNode {
             ident: IdentNode {
                 id: DUMMY_NODE_ID,
@@ -87,7 +87,7 @@ fn immutable_self() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_function_node(),
+        FunctionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(FunctionNode {
             ident: IdentNode {
                 id: DUMMY_NODE_ID,
@@ -108,7 +108,7 @@ fn mutable_self() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_function_node(),
+        FunctionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(FunctionNode {
             ident: IdentNode {
                 id: DUMMY_NODE_ID,
@@ -129,7 +129,7 @@ fn one_parameter() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_function_node(),
+        FunctionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(FunctionNode {
             ident: IdentNode {
                 id: DUMMY_NODE_ID,
@@ -167,7 +167,7 @@ fn two_parameters() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_function_node(),
+        FunctionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(FunctionNode {
             ident: IdentNode {
                 id: DUMMY_NODE_ID,

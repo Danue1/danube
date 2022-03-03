@@ -1,15 +1,17 @@
-use crate::{Error, Parse};
-use danube_ast::EnumNode;
+use crate::{Context, Error, Parse, ParseList};
+use danube_ast::{EnumNode, EnumVariantNode, GenericNode, IdentNode};
 use danube_token::TokenKind;
 
-impl<'parse> Parse<'parse> {
-    pub fn parse_enum_node(&mut self) -> Result<EnumNode, Error> {
-        let ident = self.parse_ident_node()?;
-        let generics = self.parse_generic_nodes()?;
+impl Parse for EnumNode {
+    type Output = EnumNode;
 
-        match symbol!(self.cursor) {
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+        let ident = IdentNode::parse(context)?;
+        let generics = GenericNode::parse_list(context)?;
+
+        match symbol!(context.cursor) {
             Some(TokenKind::Semicolon) => {
-                self.cursor.next();
+                context.cursor.next();
 
                 Ok(EnumNode {
                     ident,
@@ -18,15 +20,15 @@ impl<'parse> Parse<'parse> {
                 })
             }
             Some(TokenKind::LeftBrace) => {
-                self.cursor.next();
+                context.cursor.next();
 
                 let mut variants = vec![];
 
-                while !symbol!(self.cursor => RightBrace) {
-                    variants.push(self.parse_enum_variant_node()?);
+                while !symbol!(context.cursor => RightBrace) {
+                    variants.push(EnumVariantNode::parse(context)?);
 
-                    if !symbol!(self.cursor => Comma) {
-                        if symbol!(self.cursor => RightBrace) {
+                    if !symbol!(context.cursor => Comma) {
+                        if symbol!(context.cursor => RightBrace) {
                             break;
                         }
 

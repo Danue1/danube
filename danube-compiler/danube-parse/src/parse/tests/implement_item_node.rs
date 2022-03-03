@@ -1,4 +1,4 @@
-use crate::Parse;
+use crate::{Context, Parse};
 use danube_ast::{
     BlockNode, ConstantNode, ExpressionKind, ExpressionNode, FunctionNode, IdentNode,
     ImmutabilityKind, ImplementItemKind, ImplementItemNode, PathNode, PatternKind, PatternNode,
@@ -13,7 +13,7 @@ fn type_without_type() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_implement_item_node(),
+        ImplementItemNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ImplementItemNode {
             id: DUMMY_NODE_ID,
             attributes: vec![],
@@ -34,7 +34,7 @@ fn type_with_type() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_implement_item_node(),
+        ImplementItemNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ImplementItemNode {
             id: DUMMY_NODE_ID,
             attributes: vec![],
@@ -64,7 +64,7 @@ fn constant_without_value() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_implement_item_node(),
+        ImplementItemNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ImplementItemNode {
             id: DUMMY_NODE_ID,
             attributes: vec![],
@@ -100,7 +100,7 @@ fn constant_with_value() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_implement_item_node(),
+        ImplementItemNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ImplementItemNode {
             id: DUMMY_NODE_ID,
             attributes: vec![],
@@ -144,7 +144,7 @@ fn function_without_body() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_implement_item_node(),
+        ImplementItemNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ImplementItemNode {
             id: DUMMY_NODE_ID,
             attributes: vec![],
@@ -169,7 +169,7 @@ fn function_with_body() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_implement_item_node(),
+        ImplementItemNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ImplementItemNode {
             id: DUMMY_NODE_ID,
             attributes: vec![],

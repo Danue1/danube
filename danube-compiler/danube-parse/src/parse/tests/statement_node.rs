@@ -1,4 +1,4 @@
-use crate::Parse;
+use crate::{Context, Parse};
 use danube_ast::{
     AssignKind, AssignNode, BinaryExpressionNode, BinaryOperatorKind, ExpressionKind,
     ExpressionNode, IdentNode, ImmutabilityKind, LetNode, PathNode, PatternKind, PatternNode,
@@ -13,7 +13,7 @@ fn semicolon() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_statement_node(),
+        StatementNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(StatementNode {
             id: DUMMY_NODE_ID,
             kind: StatementKind::Semicolon,
@@ -27,7 +27,7 @@ fn r#break() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_statement_node(),
+        StatementNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(StatementNode {
             id: DUMMY_NODE_ID,
             kind: StatementKind::Break,
@@ -41,7 +41,7 @@ fn r#continue() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_statement_node(),
+        StatementNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(StatementNode {
             id: DUMMY_NODE_ID,
             kind: StatementKind::Continue,
@@ -55,7 +55,7 @@ fn return_without_expression() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_statement_node(),
+        StatementNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(StatementNode {
             id: DUMMY_NODE_ID,
             kind: StatementKind::Return(None),
@@ -70,7 +70,7 @@ fn return_with_expression() {
     let tokens: Vec<Token> = lexer.filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_statement_node(),
+        StatementNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(StatementNode {
             id: DUMMY_NODE_ID,
             kind: StatementKind::Return(Some(ExpressionNode {
@@ -93,7 +93,7 @@ fn return_with_expressions() {
     let tokens: Vec<Token> = lexer.filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_statement_node(),
+        StatementNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(StatementNode {
             id: DUMMY_NODE_ID,
             kind: StatementKind::Return(Some(ExpressionNode {
@@ -146,7 +146,7 @@ fn let_with_nothing() {
     let tokens: Vec<Token> = lexer.filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_statement_node(),
+        StatementNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(StatementNode {
             id: DUMMY_NODE_ID,
             kind: StatementKind::Let(Box::new(LetNode {
@@ -175,7 +175,7 @@ fn let_with_type() {
     let tokens: Vec<Token> = lexer.filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_statement_node(),
+        StatementNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(StatementNode {
             id: DUMMY_NODE_ID,
             kind: StatementKind::Let(Box::new(LetNode {
@@ -213,7 +213,7 @@ fn let_with_value() {
     let tokens: Vec<Token> = lexer.filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_statement_node(),
+        StatementNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(StatementNode {
             id: DUMMY_NODE_ID,
             kind: StatementKind::Let(Box::new(LetNode {
@@ -250,7 +250,7 @@ fn assign() {
     let tokens: Vec<Token> = lexer.filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_statement_node(),
+        StatementNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(StatementNode {
             id: DUMMY_NODE_ID,
             kind: StatementKind::Assign(Box::new(AssignNode {
@@ -285,7 +285,7 @@ fn add_assign() {
     let tokens: Vec<Token> = lexer.filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_statement_node(),
+        StatementNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(StatementNode {
             id: DUMMY_NODE_ID,
             kind: StatementKind::Assign(Box::new(AssignNode {

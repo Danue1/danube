@@ -1,12 +1,14 @@
-use crate::{Error, Parse};
-use danube_ast::{PatternKind, PatternNode, DUMMY_NODE_ID};
+use crate::{Context, Error, Parse};
+use danube_ast::{PathNode, PatternKind, PatternNode, DUMMY_NODE_ID};
 use danube_token::{keywords, TokenKind};
 
-impl<'parse> Parse<'parse> {
-    pub fn parse_pattern_node(&mut self) -> Result<PatternNode, Error> {
-        match self.cursor.peek().kind {
+impl Parse for PatternNode {
+    type Output = PatternNode;
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+        match context.cursor.peek().kind {
             TokenKind::DotDot => {
-                self.cursor.next();
+                context.cursor.next();
 
                 Ok(PatternNode {
                     id: DUMMY_NODE_ID,
@@ -14,7 +16,7 @@ impl<'parse> Parse<'parse> {
                 })
             }
             TokenKind::Identifier(keywords::Placeholder) => {
-                self.cursor.next();
+                context.cursor.next();
 
                 Ok(PatternNode {
                     id: DUMMY_NODE_ID,
@@ -24,7 +26,7 @@ impl<'parse> Parse<'parse> {
             TokenKind::Literal(symbol, ref kind) => {
                 let kind = PatternKind::Literal(symbol, kind.clone());
 
-                self.cursor.next();
+                context.cursor.next();
 
                 Ok(PatternNode {
                     id: DUMMY_NODE_ID,
@@ -32,15 +34,15 @@ impl<'parse> Parse<'parse> {
                 })
             }
             TokenKind::LeftBracket => {
-                self.cursor.next();
+                context.cursor.next();
 
                 let mut patterns = Vec::new();
 
-                while !symbol!(self.cursor => RightBracket) {
-                    patterns.push(self.parse_pattern_node()?);
+                while !symbol!(context.cursor => RightBracket) {
+                    patterns.push(PatternNode::parse(context)?);
 
-                    if !symbol!(self.cursor => Comma) {
-                        if symbol!(self.cursor => RightBracket) {
+                    if !symbol!(context.cursor => Comma) {
+                        if symbol!(context.cursor => RightBracket) {
                             break;
                         }
 
@@ -54,15 +56,15 @@ impl<'parse> Parse<'parse> {
                 })
             }
             TokenKind::LeftParens => {
-                self.cursor.next();
+                context.cursor.next();
 
                 let mut fields = Vec::new();
 
-                while !symbol!(self.cursor => RightParens) {
-                    fields.push(self.parse_pattern_node()?);
+                while !symbol!(context.cursor => RightParens) {
+                    fields.push(PatternNode::parse(context)?);
 
-                    if !symbol!(self.cursor => Comma) {
-                        if symbol!(self.cursor => RightParens) {
+                    if !symbol!(context.cursor => Comma) {
+                        if symbol!(context.cursor => RightParens) {
                             break;
                         }
 
@@ -76,33 +78,33 @@ impl<'parse> Parse<'parse> {
                 })
             }
             _ => {
-                let path = if let Some(path) = self.parse_path_node()? {
+                let path = if let Some(path) = PathNode::parse(context)? {
                     path
                 } else {
                     return Err(Error::Invalid);
                 };
 
-                match self.cursor.peek().kind {
+                match context.cursor.peek().kind {
                     TokenKind::LeftBrace => {
-                        self.cursor.next();
+                        context.cursor.next();
 
                         let mut fields = Vec::new();
 
-                        while !symbol!(self.cursor => RightBrace) {
-                            let path = if let Some(path) = self.parse_path_node()? {
+                        while !symbol!(context.cursor => RightBrace) {
+                            let path = if let Some(path) = PathNode::parse(context)? {
                                 path
                             } else {
                                 return Err(Error::Invalid);
                             };
-                            let pattern = if symbol!(self.cursor => Colon) {
-                                Some(self.parse_pattern_node()?)
+                            let pattern = if symbol!(context.cursor => Colon) {
+                                Some(PatternNode::parse(context)?)
                             } else {
                                 None
                             };
                             fields.push((path, pattern));
 
-                            if !symbol!(self.cursor => Comma) {
-                                if symbol!(self.cursor => RightBrace) {
+                            if !symbol!(context.cursor => Comma) {
+                                if symbol!(context.cursor => RightBrace) {
                                     break;
                                 }
 
@@ -116,15 +118,15 @@ impl<'parse> Parse<'parse> {
                         })
                     }
                     TokenKind::LeftParens => {
-                        self.cursor.next();
+                        context.cursor.next();
 
                         let mut fields = Vec::new();
 
-                        while !symbol!(self.cursor => RightParens) {
-                            fields.push(self.parse_pattern_node()?);
+                        while !symbol!(context.cursor => RightParens) {
+                            fields.push(PatternNode::parse(context)?);
 
-                            if !symbol!(self.cursor => Comma) {
-                                if symbol!(self.cursor => RightParens) {
+                            if !symbol!(context.cursor => Comma) {
+                                if symbol!(context.cursor => RightParens) {
                                     break;
                                 }
 

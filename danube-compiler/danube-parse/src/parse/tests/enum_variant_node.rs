@@ -1,4 +1,4 @@
-use crate::Parse;
+use crate::{Context, Parse};
 use danube_ast::{
     EnumVariantKind, EnumVariantNode, IdentNode, ImmutabilityKind, PathNode, TypeKind, TypeNode,
     DUMMY_NODE_ID,
@@ -12,7 +12,7 @@ fn without_struct() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_enum_variant_node(),
+        EnumVariantNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(EnumVariantNode {
             id: DUMMY_NODE_ID,
             ident: IdentNode {
@@ -30,7 +30,7 @@ fn unnamed_without_fields() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_enum_variant_node(),
+        EnumVariantNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(EnumVariantNode {
             id: DUMMY_NODE_ID,
             ident: IdentNode {
@@ -48,7 +48,7 @@ fn unnamed_with_one_field() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_enum_variant_node(),
+        EnumVariantNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(EnumVariantNode {
             id: DUMMY_NODE_ID,
             ident: IdentNode {
@@ -75,7 +75,7 @@ fn unnamed_with_two_field() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_enum_variant_node(),
+        EnumVariantNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(EnumVariantNode {
             id: DUMMY_NODE_ID,
             ident: IdentNode {
@@ -114,7 +114,7 @@ fn named_with_one_field() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_enum_variant_node(),
+        EnumVariantNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(EnumVariantNode {
             id: DUMMY_NODE_ID,
             ident: IdentNode {
@@ -147,7 +147,7 @@ fn named_with_two_field() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_enum_variant_node(),
+        EnumVariantNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(EnumVariantNode {
             id: DUMMY_NODE_ID,
             ident: IdentNode {

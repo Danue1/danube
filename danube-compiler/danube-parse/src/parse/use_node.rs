@@ -1,10 +1,12 @@
-use crate::{Error, Parse};
-use danube_ast::UseNode;
+use crate::{Context, Error, Parse};
+use danube_ast::{PathNode, UseNode};
 
-impl<'parse> Parse<'parse> {
-    pub fn parse_use_node(&mut self) -> Result<UseNode, Error> {
-        if let Some(path) = self.parse_path_node()? {
-            if symbol!(self.cursor => Semicolon) {
+impl Parse for UseNode {
+    type Output = UseNode;
+
+    fn parse(context: &mut Context) -> Result<Self::Output, Error> {
+        if let Some(path) = PathNode::parse(context)? {
+            if symbol!(context.cursor => Semicolon) {
                 Ok(UseNode { path })
             } else {
                 Err(Error::Invalid)

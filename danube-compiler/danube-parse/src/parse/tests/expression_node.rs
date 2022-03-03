@@ -1,4 +1,4 @@
-use crate::Parse;
+use crate::{Context, Parse};
 use danube_ast::{
     BlockNode, ConditionBranch, ConditionNode, ExpressionKind, ExpressionNode, ForNode, IdentNode,
     LoopNode, MatchBranch, MatchNode, PathNode, PatternKind, PatternNode, WhileNode, DUMMY_NODE_ID,
@@ -12,7 +12,7 @@ fn ident() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_expression_node(),
+        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ExpressionNode {
             id: DUMMY_NODE_ID,
             kind: ExpressionKind::Path(PathNode {
@@ -31,7 +31,7 @@ fn path() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_expression_node(),
+        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ExpressionNode {
             id: DUMMY_NODE_ID,
             kind: ExpressionKind::Path(PathNode {
@@ -56,7 +56,7 @@ fn add() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_expression_node(),
+        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ExpressionNode {
             id: DUMMY_NODE_ID,
             kind: ExpressionKind::Path(PathNode {
@@ -75,7 +75,7 @@ fn negate() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_expression_node(),
+        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ExpressionNode {
             id: DUMMY_NODE_ID,
             kind: ExpressionKind::Negate(Box::new(ExpressionNode {
@@ -97,7 +97,7 @@ fn not() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_expression_node(),
+        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ExpressionNode {
             id: DUMMY_NODE_ID,
             kind: ExpressionKind::Not(Box::new(ExpressionNode {
@@ -119,7 +119,7 @@ fn char() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_expression_node(),
+        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ExpressionNode {
             id: DUMMY_NODE_ID,
             kind: ExpressionKind::Literal(Symbol::intern("a"), LiteralKind::Char),
@@ -133,7 +133,7 @@ fn integer() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_expression_node(),
+        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ExpressionNode {
             id: DUMMY_NODE_ID,
             kind: ExpressionKind::Literal(Symbol::intern("123"), LiteralKind::Integer),
@@ -147,7 +147,7 @@ fn float() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_expression_node(),
+        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ExpressionNode {
             id: DUMMY_NODE_ID,
             kind: ExpressionKind::Literal(Symbol::intern("123.456"), LiteralKind::Float),
@@ -161,7 +161,7 @@ fn string() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_expression_node(),
+        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ExpressionNode {
             id: DUMMY_NODE_ID,
             kind: ExpressionKind::Literal(Symbol::intern("foo"), LiteralKind::String),
@@ -175,7 +175,7 @@ fn conditional_without_else() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_expression_node(),
+        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ExpressionNode {
             id: DUMMY_NODE_ID,
             kind: ExpressionKind::Conditional(ConditionNode {
@@ -206,7 +206,7 @@ fn conditional_with_else() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_expression_node(),
+        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ExpressionNode {
             id: DUMMY_NODE_ID,
             kind: ExpressionKind::Conditional(ConditionNode {
@@ -240,7 +240,7 @@ fn r#loop() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_expression_node(),
+        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ExpressionNode {
             id: DUMMY_NODE_ID,
             kind: ExpressionKind::Loop(LoopNode {
@@ -259,7 +259,7 @@ fn r#while() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_expression_node(),
+        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ExpressionNode {
             id: DUMMY_NODE_ID,
             kind: ExpressionKind::While(WhileNode {
@@ -289,7 +289,7 @@ fn r#for() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_expression_node(),
+        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ExpressionNode {
             id: DUMMY_NODE_ID,
             kind: ExpressionKind::For(ForNode {
@@ -326,7 +326,7 @@ fn r#match() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_expression_node(),
+        ExpressionNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ExpressionNode {
             id: DUMMY_NODE_ID,
             kind: ExpressionKind::Match(MatchNode {

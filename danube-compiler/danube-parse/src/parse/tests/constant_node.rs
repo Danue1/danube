@@ -1,4 +1,4 @@
-use crate::Parse;
+use crate::{Context, Parse};
 use danube_ast::{
     ConstantNode, ExpressionKind, ExpressionNode, IdentNode, ImmutabilityKind, PathNode,
     PatternKind, PatternNode, TypeKind, TypeNode, DUMMY_NODE_ID,
@@ -12,7 +12,7 @@ fn without_expression() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_constant_node(),
+        ConstantNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ConstantNode {
             pattern: PatternNode {
                 id: DUMMY_NODE_ID,
@@ -44,7 +44,7 @@ fn with_expression() {
     let tokens: Vec<Token> = Lex::new(source).filter_map(|token| token.ok()).collect();
 
     assert_eq!(
-        Parse::new(tokens.as_slice()).parse_constant_node(),
+        ConstantNode::parse(&mut Context::new(tokens.as_slice())),
         Ok(ConstantNode {
             pattern: PatternNode {
                 id: DUMMY_NODE_ID,
