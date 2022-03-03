@@ -1,3 +1,5 @@
+#![warn(clippy::all)]
+
 #[macro_use]
 pub mod cursor;
 pub mod error;
