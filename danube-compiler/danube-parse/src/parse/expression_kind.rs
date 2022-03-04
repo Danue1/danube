@@ -2,10 +2,11 @@ use super::argument_node::ArgumentNodeList;
 use super::expression_node::PrefixExpressionNode;
 use crate::{Context, Parse};
 use danube_ast::{
-    BinaryExpressionNode, BinaryOperatorKind, BlockNode, ClosureNode, ConditionBranch,
-    ConditionNode, ExpressionKind, ExpressionNode, FieldNode, ForNode, FunctionCallNode, IdentNode,
-    IndexNode, LetExpressionNode, LiteralNode, LoopNode, MatchBranch, MatchNode, MethodCallNode,
-    PathNode, PatternNode, StatementNode, TupleNode, TypeNode, WhileNode, DUMMY_NODE_ID,
+    BinaryExpressionNode, BinaryOperatorKind, BlockNode, ClosureNode, ClosureParameterNode,
+    ConditionBranch, ConditionNode, ExpressionKind, ExpressionNode, FieldNode, ForNode,
+    FunctionCallNode, IdentNode, IndexNode, LetExpressionNode, LiteralNode, LoopNode, MatchBranch,
+    MatchNode, MethodCallNode, PathNode, PatternNode, StatementNode, TupleNode, TypeNode,
+    WhileNode, DUMMY_NODE_ID,
 };
 use danube_diagnostics::MessageBuilder;
 use danube_token::{keywords, TokenKind};
@@ -220,7 +221,7 @@ impl Parse for AtomicExpressionKind {
                     } else {
                         None
                     };
-                    parameters.push((ident, ty));
+                    parameters.push(ClosureParameterNode { ident, ty });
 
                     if !symbol!(context.cursor => Comma) {
                         break;

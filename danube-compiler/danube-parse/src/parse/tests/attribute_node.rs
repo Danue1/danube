@@ -1,7 +1,7 @@
 use crate::parse::attribute_node::{ItemAttributeNodeList, PackageAttributeNodeList};
 use danube_ast::{
-    AttributeNode, ExpressionKind, ExpressionNode, IdentNode, PathNode, DUMMY_ATTRIBUTE_ID,
-    DUMMY_NODE_ID,
+    AttributeArgumentNode, AttributeNode, ExpressionKind, ExpressionNode, IdentNode, PathNode,
+    DUMMY_ATTRIBUTE_ID, DUMMY_NODE_ID,
 };
 use danube_token::Symbol;
 
@@ -120,13 +120,13 @@ assert_node! {
                         symbol: Symbol::intern("hello"),
                     }],
                 },
-                args: vec![(
-                    IdentNode {
+                args: vec![AttributeArgumentNode{
+                    ident: IdentNode {
                         id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("foo"),
                     },
-                    None,
-                )],
+                    value: None,
+                }],
             }]),
         );
     }
@@ -145,12 +145,12 @@ assert_node! {
                         symbol: Symbol::intern("hello"),
                     }],
                 },
-                args: vec![(
-                    IdentNode {
+                args: vec![AttributeArgumentNode {
+                    ident: IdentNode {
                         id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("foo"),
                     },
-                    Some(ExpressionNode {
+                    value: Some(ExpressionNode {
                         id: DUMMY_NODE_ID,
                         kind: ExpressionKind::Path(PathNode {
                             segments: vec![IdentNode {
@@ -159,7 +159,7 @@ assert_node! {
                             }],
                         }),
                     }),
-                )],
+                }],
             }]),
         );
     }

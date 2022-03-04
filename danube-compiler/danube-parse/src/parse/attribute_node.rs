@@ -1,5 +1,7 @@
 use crate::{Context, Parse};
-use danube_ast::{AttributeNode, ExpressionNode, IdentNode, PathNode, DUMMY_ATTRIBUTE_ID};
+use danube_ast::{
+    AttributeArgumentNode, AttributeNode, ExpressionNode, IdentNode, PathNode, DUMMY_ATTRIBUTE_ID,
+};
 use danube_diagnostics::MessageBuilder;
 
 pub(crate) struct PackageAttributeNodeList;
@@ -86,13 +88,13 @@ impl Parse for AttributeNode {
 
             while !symbol!(context.cursor => RightParens) {
                 let ident = IdentNode::parse(context)?;
-                let expression = if symbol!(context.cursor => Eq) {
+                let value = if symbol!(context.cursor => Eq) {
                     Some(ExpressionNode::parse(context)?)
                 } else {
                     None
                 };
 
-                args.push((ident, expression));
+                args.push(AttributeArgumentNode { ident, value });
 
                 if !symbol!(context.cursor => Comma) && symbol!(context.cursor => RightParens) {
                     break;

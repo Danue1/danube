@@ -13,7 +13,13 @@ pub struct PackageNode {
 pub struct AttributeNode {
     pub id: AttributeId,
     pub path: PathNode,
-    pub args: Vec<(IdentNode, Option<ExpressionNode>)>,
+    pub args: Vec<AttributeArgumentNode>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct AttributeArgumentNode {
+    pub ident: IdentNode,
+    pub value: Option<ExpressionNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -59,12 +65,10 @@ pub enum VisibilityKind {
     Restricted(PathNode),
 }
 
-pub type GenericNodeList = Vec<GenericNode>;
-
 #[derive(Debug, PartialEq, Clone)]
 pub struct StructNode {
     pub ident: IdentNode,
-    pub generics: GenericNodeList,
+    pub generics: Vec<GenericNode>,
     pub fields: Option<StructFieldKind>,
 }
 
@@ -124,7 +128,7 @@ pub struct GenericTypeNode {
 #[derive(Debug, PartialEq, Clone)]
 pub struct EnumNode {
     pub ident: IdentNode,
-    pub generics: GenericNodeList,
+    pub generics: Vec<GenericNode>,
     pub variants: Vec<EnumVariantNode>,
 }
 
@@ -162,7 +166,7 @@ pub struct EnumNamedVariantNode {
 #[derive(Debug, PartialEq, Clone)]
 pub struct FunctionNode {
     pub ident: IdentNode,
-    pub generics: GenericNodeList,
+    pub generics: Vec<GenericNode>,
     pub self_type: Option<ImmutabilityKind>,
     pub parameters: Vec<FunctionParameterNode>,
     pub return_type: Option<TypeNode>,
@@ -374,9 +378,15 @@ pub struct MatchBranch {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ClosureNode {
-    pub parameters: Vec<(IdentNode, Option<TypeNode>)>,
+    pub parameters: Vec<ClosureParameterNode>,
     pub return_type: Option<TypeNode>,
     pub block: BlockNode,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct ClosureParameterNode {
+    pub ident: IdentNode,
+    pub ty: Option<TypeNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -451,7 +461,7 @@ pub enum BinaryOperatorKind {
 #[derive(Debug, PartialEq, Clone)]
 pub struct TraitNode {
     pub ident: IdentNode,
-    pub generics: GenericNodeList,
+    pub generics: Vec<GenericNode>,
     pub inheritances: Vec<PathNode>,
     pub items: Vec<ImplementItemNode>,
 }
@@ -465,10 +475,10 @@ pub struct ConstantNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ImplementNode {
-    pub generics: GenericNodeList,
+    pub generics: Vec<GenericNode>,
     pub trait_ident: Option<PathNode>,
     pub target: PathNode,
-    pub target_generics: GenericNodeList,
+    pub target_generics: Vec<GenericNode>,
     pub items: Vec<ImplementItemNode>,
 }
 
