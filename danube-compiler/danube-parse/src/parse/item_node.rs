@@ -1,7 +1,7 @@
 use super::attribute_node::ItemAttributeNodeList;
 use crate::{Context, Parse};
 use danube_ast::{
-    ConstantNode, EnumNode, FunctionNode, ImplementNode, ItemKind, ItemNode, TraitNode,
+    ConstantNode, EnumNode, FunctionNode, ImplementNode, ItemKind, ItemNode, StructNode, TraitNode,
     TypeAliasNode, UseNode, VisibilityKind, DUMMY_NODE_ID,
 };
 use danube_diagnostics::MessageBuilder;
@@ -39,6 +39,11 @@ impl Parse for ItemNode {
                 context.cursor.next();
 
                 ItemKind::Enum(EnumNode::parse(context)?)
+            }
+            Some(keywords::Struct) => {
+                context.cursor.next();
+
+                ItemKind::Struct(StructNode::parse(context)?)
             }
             Some(keywords::Fn) => {
                 context.cursor.next();
