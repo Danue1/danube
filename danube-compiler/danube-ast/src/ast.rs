@@ -274,7 +274,13 @@ pub struct LiteralNode {
 #[derive(Debug, PartialEq, Clone)]
 pub struct PatternNamedStructNode {
     pub path: PathNode,
-    pub fields: Vec<(PathNode, Option<PatternNode>)>,
+    pub fields: Vec<PatternNamedStructFieldNode>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct PatternNamedStructFieldNode {
+    pub path: PathNode,
+    pub pattern: Option<PatternNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]

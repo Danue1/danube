@@ -3,11 +3,21 @@
 version = 3
 
 [[package]]
+name = "convert_case"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fb4a24b1aaf0fd0ce8b45161144d6f42cd91677fd5940fd431183eb023b3a2b8"
+
+[[package]]
 name = "danube-ast"
 version = "0.1.0"
 dependencies = [
+ "convert_case",
  "danube-index",
  "danube-token",
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -26,7 +36,13 @@ name = "danube-compile"
 version = "0.1.0"
 dependencies = [
  "danube-diagnostics",
+ "danube-lex",
+ "danube-parse",
 ]
+
+[[package]]
+name = "danube-dependency-graph"
+version = "0.1.0"
 
 [[package]]
 name = "danube-diagnostics"
@@ -68,6 +84,10 @@ version = "0.1.0"
 [[package]]
 name = "danube-name-resolution"
 version = "0.1.0"
+dependencies = [
+ "danube-ast",
+ "danube-dependency-graph",
+]
 
 [[package]]
 name = "danube-parse"
@@ -141,3 +161,38 @@ name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
+
+[[package]]
+name = "proc-macro2"
+version = "1.0.36"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c7342d5883fbccae1cc37a2353b09c87c9b0f3afd73f5fb9bba687a1f733b029"
+dependencies = [
+ "unicode-xid",
+]
+
+[[package]]
+name = "quote"
+version = "1.0.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "864d3e96a899863136fc6e99f3d7cae289dafe43bf2c5ac19b70df7210c0a145"
+dependencies = [
+ "proc-macro2",
+]
+
+[[package]]
+name = "syn"
+version = "1.0.86"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8a65b3f4ffa0092e9887669db0eae07941f023991ab58ea44da8fe8e2d511c6b"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "unicode-xid",
+]
+
+[[package]]
+name = "unicode-xid"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8ccb82d61f80a663efe1f787a51b16b5a51e3314d6ac365b08639f52387b33f3"

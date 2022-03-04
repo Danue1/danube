@@ -1,6 +1,6 @@
 use danube_ast::{
-    IdentNode, LiteralKind, LiteralNode, PathNode, PatternKind, PatternNamedStructNode,
-    PatternNode, PatternUnnamedStructNode, DUMMY_NODE_ID,
+    IdentNode, LiteralKind, LiteralNode, PathNode, PatternKind, PatternNamedStructFieldNode,
+    PatternNamedStructNode, PatternNode, PatternUnnamedStructNode, DUMMY_NODE_ID,
 };
 use danube_token::Symbol;
 
@@ -87,24 +87,24 @@ assert_node! {
                         }],
                     },
                     fields: vec![
-                        (
-                            PathNode {
+                        PatternNamedStructFieldNode{
+                            path: PathNode {
                                 segments: vec![IdentNode {
                                     id: DUMMY_NODE_ID,
                                     symbol: Symbol::intern("a"),
                                 }],
                             },
-                            None,
-                        ),
-                        (
-                            PathNode {
+                            pattern: None,
+                        },
+                        PatternNamedStructFieldNode{
+                            path: PathNode {
                                 segments: vec![IdentNode {
                                     id: DUMMY_NODE_ID,
                                     symbol: Symbol::intern("b"),
                                 }],
                             },
-                            None,
-                        ),
+                            pattern: None,
+                        },
                     ],
                 }),
             }),
@@ -127,14 +127,14 @@ assert_node! {
                         }],
                     },
                     fields: vec![
-                        (
-                            PathNode {
+                        PatternNamedStructFieldNode {
+                            path: PathNode {
                                 segments: vec![IdentNode {
                                     id: DUMMY_NODE_ID,
                                     symbol: Symbol::intern("a"),
                                 }],
                             },
-                            Some(PatternNode {
+                            pattern: Some(PatternNode {
                                 id: DUMMY_NODE_ID,
                                 kind: PatternKind::Path(PathNode {
                                     segments: vec![IdentNode {
@@ -143,15 +143,15 @@ assert_node! {
                                     }],
                                 }),
                             }),
-                        ),
-                        (
-                            PathNode {
+                        },
+                        PatternNamedStructFieldNode {
+                            path: PathNode {
                                 segments: vec![IdentNode {
                                     id: DUMMY_NODE_ID,
                                     symbol: Symbol::intern("b"),
                                 }],
                             },
-                            Some(PatternNode {
+                            pattern: Some(PatternNode {
                                 id: DUMMY_NODE_ID,
                                 kind: PatternKind::Path(PathNode {
                                     segments: vec![IdentNode {
@@ -160,7 +160,7 @@ assert_node! {
                                     }],
                                 }),
                             }),
-                        ),
+                        },
                     ],
                 }),
             }),

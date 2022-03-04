@@ -5,3 +5,5 @@ authors = ["Danuel <public.danuel@gmail.com>"]
 edition = "2021"
 
 [dependencies]
+danube-ast = { path = "../danube-ast" }
+danube-dependency-graph = { path = "../danube-dependency-graph" }

@@ -4,6 +4,7 @@ members = [
   "danube-compiler/danube-ast-lowering",
   "danube-compiler/danube-codegen",
   "danube-compiler/danube-compile",
+  "danube-compiler/danube-dependency-graph",
   "danube-compiler/danube-diagnostics",
   "danube-compiler/danube-hir",
   "danube-compiler/danube-hir-lowering",

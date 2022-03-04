@@ -6,3 +6,5 @@ edition = "2018"
 
 [dependencies]
 danube-diagnostics = { path = "../danube-diagnostics" }
+danube-lex = { path = "../danube-lex" }
+danube-parse = { path = "../danube-parse" }

@@ -1,7 +1,7 @@
 use crate::{Context, Parse};
 use danube_ast::{
-    LiteralNode, PathNode, PatternKind, PatternNamedStructNode, PatternNode,
-    PatternUnnamedStructNode, DUMMY_NODE_ID,
+    LiteralNode, PathNode, PatternKind, PatternNamedStructFieldNode, PatternNamedStructNode,
+    PatternNode, PatternUnnamedStructNode, DUMMY_NODE_ID,
 };
 use danube_diagnostics::MessageBuilder;
 use danube_token::{keywords, TokenKind};
@@ -105,7 +105,7 @@ impl Parse for PatternNode {
                             } else {
                                 None
                             };
-                            fields.push((path, pattern));
+                            fields.push(PatternNamedStructFieldNode { path, pattern });
 
                             if !symbol!(context.cursor => Comma)
                                 && symbol!(context.cursor => RightBrace)
