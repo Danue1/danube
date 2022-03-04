@@ -14,6 +14,7 @@ mod immutability_kind;
 mod implement_item_node;
 mod implement_node;
 mod item_node;
+mod mod_node;
 mod named_struct_field;
 mod package_node;
 mod path_node;

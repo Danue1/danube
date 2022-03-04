@@ -1,8 +1,8 @@
 use super::attribute_node::ItemAttributeNodeList;
 use crate::{Context, Parse};
 use danube_ast::{
-    ConstantNode, EnumNode, FunctionNode, ImplementNode, ItemKind, ItemNode, StructNode, TraitNode,
-    TypeAliasNode, UseNode, VisibilityKind, DUMMY_NODE_ID,
+    ConstantNode, EnumNode, FunctionNode, ImplementNode, ItemKind, ItemNode, ModNode, StructNode,
+    TraitNode, TypeAliasNode, UseNode, VisibilityKind, DUMMY_NODE_ID,
 };
 use danube_diagnostics::MessageBuilder;
 use danube_token::keywords;
@@ -30,6 +30,11 @@ impl Parse for ItemNode {
         let attributes = ItemAttributeNodeList::parse(context)?;
         let visibility = VisibilityKind::parse(context)?;
         let kind = match identifier!(context.cursor) {
+            Some(keywords::Mod) => {
+                context.cursor.next();
+
+                ItemKind::Mod(ModNode::parse(context)?)
+            }
             Some(keywords::Use) => {
                 context.cursor.next();
 

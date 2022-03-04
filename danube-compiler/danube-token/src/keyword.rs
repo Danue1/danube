@@ -125,6 +125,7 @@ reserve! {
         Let: "let",
         Loop: "loop",
         Match: "match",
+        Mod: "mod",
         Mut: "mut",
         Pub: "pub",
         Package: "package",

@@ -31,6 +31,9 @@ pub trait Visit<'ast>: Sized {
     fn visit_item_kind(&mut self, context: &Self::Context, item_kind: &'ast ItemKind) {
         walk_item_kind(self, context, item_kind);
     }
+    fn visit_mod_node(&mut self, context: &Self::Context, mod_node: &'ast ModNode) {
+        walk_mod_node(self, context, mod_node);
+    }
     fn visit_use_node(&mut self, context: &Self::Context, use_node: &'ast UseNode) {
         walk_use_node(self, context, use_node);
     }
@@ -384,6 +387,9 @@ fn walk_item_kind<'ast, V: Visit<'ast>>(
     item_kind: &'ast ItemKind,
 ) {
     match item_kind {
+        ItemKind::Mod(node) => {
+            visitor.visit_mod_node(context, node);
+        }
         ItemKind::Use(node) => {
             visitor.visit_use_node(context, node);
         }
@@ -408,6 +414,19 @@ fn walk_item_kind<'ast, V: Visit<'ast>>(
         ItemKind::Implement(node) => {
             visitor.visit_implement_node(context, node);
         }
+    }
+}
+#[allow(unused_variables)]
+pub fn walk_mod_node<'ast, V: Visit<'ast>>(
+    visitor: &mut V,
+    context: &V::Context,
+    mod_node: &'ast ModNode,
+) {
+    for attributes in mod_node.attributes.iter() {
+        visitor.visit_attribute_node(context, attributes);
+    }
+    for items in mod_node.items.iter() {
+        visitor.visit_item_node(context, items);
     }
 }
 #[allow(unused_variables)]

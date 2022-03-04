@@ -43,6 +43,7 @@ pub struct ItemNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum ItemKind {
+    Mod(ModNode),
     Use(UseNode),
     Enum(EnumNode),
     Struct(StructNode),
@@ -51,6 +52,13 @@ pub enum ItemKind {
     Trait(TraitNode),
     Constant(ConstantNode),
     Implement(ImplementNode),
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct ModNode {
+    pub attributes: Vec<AttributeNode>,
+    pub ident: IdentNode,
+    pub items: Vec<ItemNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
