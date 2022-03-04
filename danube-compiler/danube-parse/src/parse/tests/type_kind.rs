@@ -1,4 +1,4 @@
-use danube_ast::{IdentNode, PathNode, TypeKind, DUMMY_NODE_ID};
+use danube_ast::{GenericTypeNode, IdentNode, PathNode, TypeKind, DUMMY_NODE_ID};
 use danube_token::Symbol;
 
 assert_node! {
@@ -82,20 +82,20 @@ assert_node! {
 
         assert_eq!(
             source,
-            Ok(TypeKind::Generic(
-                PathNode {
+            Ok(TypeKind::Generic(GenericTypeNode {
+                path: PathNode {
                     segments: vec![IdentNode {
                         id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("foo"),
                     }],
                 },
-                vec![TypeKind::Path(PathNode {
+                parameters: vec![TypeKind::Path(PathNode {
                     segments: vec![IdentNode {
                         id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("bar"),
                     }],
                 })],
-            )),
+            })),
         );
     }
 
@@ -105,14 +105,14 @@ assert_node! {
 
         assert_eq!(
             source,
-            Ok(TypeKind::Generic(
-                PathNode {
+            Ok(TypeKind::Generic(GenericTypeNode {
+                path: PathNode {
                     segments: vec![IdentNode {
                         id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("foo"),
                     }],
                 },
-                vec![
+                parameters: vec![
                     TypeKind::Path(PathNode {
                         segments: vec![IdentNode {
                             id: DUMMY_NODE_ID,
@@ -126,7 +126,7 @@ assert_node! {
                         }],
                     }),
                 ],
-            )),
+            })),
         );
     }
 
@@ -136,20 +136,20 @@ assert_node! {
 
         assert_eq!(
             source,
-            Ok(TypeKind::Tuple(vec![TypeKind::Generic(
-                PathNode {
+            Ok(TypeKind::Tuple(vec![TypeKind::Generic(GenericTypeNode {
+                path: PathNode {
                     segments: vec![IdentNode {
                         id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("foo"),
                     }],
                 },
-                vec![TypeKind::Path(PathNode {
+                parameters: vec![TypeKind::Path(PathNode {
                     segments: vec![IdentNode {
                         id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("bar"),
                     }],
                 })],
-            )])),
+            })])),
         );
     }
 
@@ -159,14 +159,14 @@ assert_node! {
 
         assert_eq!(
             source,
-            Ok(TypeKind::Tuple(vec![TypeKind::Generic(
-                PathNode {
+            Ok(TypeKind::Tuple(vec![TypeKind::Generic(GenericTypeNode {
+                path: PathNode {
                     segments: vec![IdentNode {
                         id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("foo"),
                     }],
                 },
-                vec![
+                parameters: vec![
                     TypeKind::Path(PathNode {
                         segments: vec![IdentNode {
                             id: DUMMY_NODE_ID,
@@ -180,7 +180,7 @@ assert_node! {
                         }],
                     }),
                 ],
-            )])),
+            })])),
         );
     }
 
@@ -190,20 +190,20 @@ assert_node! {
 
         assert_eq!(
             source,
-            Ok(TypeKind::Generic(
-                PathNode {
+            Ok(TypeKind::Generic(GenericTypeNode {
+                path: PathNode {
                     segments: vec![IdentNode {
                         id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("foo"),
                     }],
                 },
-                vec![TypeKind::Tuple(vec![TypeKind::Path(PathNode {
+                parameters: vec![TypeKind::Tuple(vec![TypeKind::Path(PathNode {
                     segments: vec![IdentNode {
                         id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("bar"),
                     }],
                 })])],
-            )),
+            })),
         );
     }
 
@@ -213,14 +213,14 @@ assert_node! {
 
         assert_eq!(
             source,
-            Ok(TypeKind::Generic(
-                PathNode {
+            Ok(TypeKind::Generic(GenericTypeNode {
+                path: PathNode {
                     segments: vec![IdentNode {
                         id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("foo"),
                     }],
                 },
-                vec![TypeKind::Tuple(vec![
+                parameters: vec![TypeKind::Tuple(vec![
                     TypeKind::Path(PathNode {
                         segments: vec![IdentNode {
                             id: DUMMY_NODE_ID,
@@ -234,7 +234,7 @@ assert_node! {
                         }],
                     }),
                 ])],
-            )),
+            })),
         );
     }
 }

@@ -1,6 +1,6 @@
 use danube_ast::{
-    EnumVariantKind, EnumVariantNode, IdentNode, ImmutabilityKind, PathNode, TypeKind, TypeNode,
-    DUMMY_NODE_ID,
+    EnumNamedVariantNode, EnumVariantKind, EnumVariantNode, IdentNode, ImmutabilityKind, PathNode,
+    TypeKind, TypeNode, DUMMY_NODE_ID,
 };
 use danube_token::Symbol;
 
@@ -115,12 +115,12 @@ assert_node! {
                     id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("Foo")
                 },
-                kind: Some(EnumVariantKind::Named(vec![(
-                    IdentNode {
+                kind: Some(EnumVariantKind::Named(vec![EnumNamedVariantNode {
+                    ident: IdentNode {
                         id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("bar"),
                     },
-                    TypeNode {
+                    ty: TypeNode {
                         id: DUMMY_NODE_ID,
                         immutability: ImmutabilityKind::Yes,
                         kind: TypeKind::Path(PathNode {
@@ -130,7 +130,7 @@ assert_node! {
                             }],
                         }),
                     },
-                )])),
+                }])),
             }),
         );
     }
@@ -147,12 +147,12 @@ assert_node! {
                     symbol: Symbol::intern("Foo")
                 },
                 kind: Some(EnumVariantKind::Named(vec![
-                    (
-                        IdentNode {
+                    EnumNamedVariantNode {
+                        ident: IdentNode {
                             id: DUMMY_NODE_ID,
                             symbol: Symbol::intern("bar"),
                         },
-                        TypeNode {
+                        ty: TypeNode {
                             id: DUMMY_NODE_ID,
                             immutability: ImmutabilityKind::Yes,
                             kind: TypeKind::Path(PathNode {
@@ -162,13 +162,13 @@ assert_node! {
                                 }],
                             }),
                         },
-                    ),
-                    (
-                        IdentNode {
+                    },
+                    EnumNamedVariantNode {
+                        ident: IdentNode {
                             id: DUMMY_NODE_ID,
                             symbol: Symbol::intern("baz"),
                         },
-                        TypeNode {
+                        ty: TypeNode {
                             id: DUMMY_NODE_ID,
                             immutability: ImmutabilityKind::Yes,
                             kind: TypeKind::Path(PathNode {
@@ -178,7 +178,7 @@ assert_node! {
                                 }],
                             }),
                         },
-                    ),
+                    },
                 ])),
             }),
         );

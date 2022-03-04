@@ -1,5 +1,8 @@
 use crate::{Context, Parse};
-use danube_ast::{PathNode, PatternKind, PatternNode, DUMMY_NODE_ID};
+use danube_ast::{
+    LiteralNode, PathNode, PatternKind, PatternNamedStructNode, PatternNode,
+    PatternUnnamedStructNode, DUMMY_NODE_ID,
+};
 use danube_diagnostics::MessageBuilder;
 use danube_token::{keywords, TokenKind};
 
@@ -25,7 +28,10 @@ impl Parse for PatternNode {
                 })
             }
             TokenKind::Literal(symbol, ref kind) => {
-                let kind = PatternKind::Literal(symbol, kind.clone());
+                let kind = PatternKind::Literal(LiteralNode {
+                    symbol,
+                    kind: kind.clone(),
+                });
 
                 context.cursor.next();
 
@@ -68,7 +74,10 @@ impl Parse for PatternNode {
 
                 Ok(PatternNode {
                     id: DUMMY_NODE_ID,
-                    kind: PatternKind::UnnamedStruct(None, fields),
+                    kind: PatternKind::UnnamedStruct(PatternUnnamedStructNode {
+                        path: None,
+                        fields,
+                    }),
                 })
             }
             _ => {
@@ -107,7 +116,7 @@ impl Parse for PatternNode {
 
                         Ok(PatternNode {
                             id: DUMMY_NODE_ID,
-                            kind: PatternKind::NamedStruct(path, fields),
+                            kind: PatternKind::NamedStruct(PatternNamedStructNode { path, fields }),
                         })
                     }
                     TokenKind::LeftParens => {
@@ -127,7 +136,10 @@ impl Parse for PatternNode {
 
                         Ok(PatternNode {
                             id: DUMMY_NODE_ID,
-                            kind: PatternKind::UnnamedStruct(Some(path), fields),
+                            kind: PatternKind::UnnamedStruct(PatternUnnamedStructNode {
+                                path: Some(path),
+                                fields,
+                            }),
                         })
                     }
                     _ => Ok(PatternNode {

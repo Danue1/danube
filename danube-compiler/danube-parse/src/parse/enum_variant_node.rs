@@ -1,5 +1,7 @@
 use crate::{Context, Parse};
-use danube_ast::{EnumVariantKind, EnumVariantNode, IdentNode, TypeNode, DUMMY_NODE_ID};
+use danube_ast::{
+    EnumNamedVariantNode, EnumVariantKind, EnumVariantNode, IdentNode, TypeNode, DUMMY_NODE_ID,
+};
 use danube_diagnostics::MessageBuilder;
 use danube_token::TokenKind;
 
@@ -41,7 +43,7 @@ impl Parse for EnumVariantNode {
                     } else {
                         return context.report(MessageBuilder::error("Expected `:`").build());
                     };
-                    variants.push((ident, ty));
+                    variants.push(EnumNamedVariantNode { ident, ty });
 
                     if !symbol!(context.cursor => Comma) && symbol!(context.cursor => RightBrace) {
                         break;

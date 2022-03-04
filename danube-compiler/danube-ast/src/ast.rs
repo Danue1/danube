@@ -112,7 +112,13 @@ pub struct TypeNode {
 pub enum TypeKind {
     Tuple(Vec<TypeKind>),
     Path(PathNode),
-    Generic(PathNode, Vec<TypeKind>),
+    Generic(GenericTypeNode),
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct GenericTypeNode {
+    pub path: PathNode,
+    pub parameters: Vec<TypeKind>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -122,6 +128,15 @@ pub struct EnumNode {
     pub variants: Vec<EnumVariantNode>,
 }
 
+/// ident: Ident
+/// enum <Ident> {
+///    // kind: None
+///    <Ident>
+///    // kind: Some(EnumVariantKind::Unnamed)
+///    <Ident> { <Ident>: <Type> }
+///    // kind: Some(EnumVariantKind::Named)
+///    <Ident> ( <Type> )
+/// }
 #[derive(Debug, PartialEq, Clone)]
 pub struct EnumVariantNode {
     pub id: NodeId,
@@ -131,8 +146,17 @@ pub struct EnumVariantNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum EnumVariantKind {
+    /// ( (<Type>)* )
     Unnamed(Vec<TypeNode>),
-    Named(Vec<(IdentNode, TypeNode)>),
+    /// { (<Ident>: <Type>),* }
+    Named(Vec<EnumNamedVariantNode>),
+}
+
+/// <Ident>: <Type>
+#[derive(Debug, PartialEq, Clone)]
+pub struct EnumNamedVariantNode {
+    pub ident: IdentNode,
+    pub ty: TypeNode,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -226,15 +250,33 @@ pub enum PatternKind {
     /// ..
     Rest,
     /// 1, 2.3, 'c', "har"
-    Literal(Symbol, LiteralKind),
+    Literal(LiteralNode),
     /// foo, foo::bar
     Path(PathNode),
     /// Foo { a, b }
-    NamedStruct(PathNode, Vec<(PathNode, Option<PatternNode>)>),
+    NamedStruct(PatternNamedStructNode),
     /// Foo(a, b)
-    UnnamedStruct(Option<PathNode>, Vec<PatternNode>),
+    UnnamedStruct(PatternUnnamedStructNode),
     /// [foo, bar]
     Slice(Vec<PatternNode>),
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct LiteralNode {
+    pub symbol: Symbol,
+    pub kind: LiteralKind,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct PatternNamedStructNode {
+    pub path: PathNode,
+    pub fields: Vec<(PathNode, Option<PatternNode>)>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct PatternUnnamedStructNode {
+    pub path: Option<PathNode>,
+    pub fields: Vec<PatternNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -252,14 +294,14 @@ pub struct ExpressionNode {
 #[derive(Debug, PartialEq, Clone)]
 pub enum ExpressionKind {
     // Binding
-    Let(PatternNode, Box<ExpressionNode>),
+    Let(LetExpressionNode),
 
     // Prefix
     Negate(Box<ExpressionNode>),
     Not(Box<ExpressionNode>),
 
     // Atomic
-    Literal(Symbol, LiteralKind),
+    Literal(LiteralNode),
     Conditional(ConditionNode),
     Loop(LoopNode),
     While(WhileNode),
@@ -281,6 +323,12 @@ pub enum ExpressionKind {
 
     // Binary
     Binary(BinaryExpressionNode),
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct LetExpressionNode {
+    pub pattern: PatternNode,
+    pub value: Box<ExpressionNode>,
 }
 
 #[derive(Debug, PartialEq, Clone)]

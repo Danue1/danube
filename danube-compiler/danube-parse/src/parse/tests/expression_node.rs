@@ -1,6 +1,7 @@
 use danube_ast::{
     BlockNode, ConditionBranch, ConditionNode, ExpressionKind, ExpressionNode, ForNode, IdentNode,
-    LoopNode, MatchBranch, MatchNode, PathNode, PatternKind, PatternNode, WhileNode, DUMMY_NODE_ID,
+    LiteralNode, LoopNode, MatchBranch, MatchNode, PathNode, PatternKind, PatternNode, WhileNode,
+    DUMMY_NODE_ID,
 };
 use danube_token::{LiteralKind, Symbol};
 
@@ -115,7 +116,10 @@ assert_node! {
             source,
             Ok(ExpressionNode {
                 id: DUMMY_NODE_ID,
-                kind: ExpressionKind::Literal(Symbol::intern("a"), LiteralKind::Char),
+                kind: ExpressionKind::Literal(LiteralNode {
+                    symbol: Symbol::intern("a"),
+                    kind: LiteralKind::Char,
+                }),
             }),
         );
     }
@@ -128,7 +132,10 @@ assert_node! {
             source,
             Ok(ExpressionNode {
                 id: DUMMY_NODE_ID,
-                kind: ExpressionKind::Literal(Symbol::intern("123"), LiteralKind::Integer),
+                kind: ExpressionKind::Literal(LiteralNode {
+                    symbol: Symbol::intern("123"),
+                    kind: LiteralKind::Integer,
+                }),
             }),
         );
     }
@@ -141,7 +148,10 @@ assert_node! {
             source,
             Ok(ExpressionNode {
                 id: DUMMY_NODE_ID,
-                kind: ExpressionKind::Literal(Symbol::intern("123.456"), LiteralKind::Float),
+                kind: ExpressionKind::Literal(LiteralNode {
+                    symbol: Symbol::intern("123.456"),
+                    kind: LiteralKind::Float,
+                }),
             }),
         );
     }
@@ -154,7 +164,10 @@ assert_node! {
             source,
             Ok(ExpressionNode {
                 id: DUMMY_NODE_ID,
-                kind: ExpressionKind::Literal(Symbol::intern("foo"), LiteralKind::String),
+                kind: ExpressionKind::Literal(LiteralNode {
+                    symbol: Symbol::intern("foo"),
+                    kind: LiteralKind::String,
+                }),
             }),
         );
     }
@@ -326,7 +339,10 @@ assert_node! {
                     branches: vec![MatchBranch {
                         pattern: PatternNode {
                             id: DUMMY_NODE_ID,
-                            kind: PatternKind::Literal(Symbol::intern("1"), LiteralKind::Integer,),
+                            kind: PatternKind::Literal(LiteralNode {
+                                symbol: Symbol::intern("1"),
+                                kind: LiteralKind::Integer,
+                            }),
                         },
                         block: BlockNode {
                             id: DUMMY_NODE_ID,

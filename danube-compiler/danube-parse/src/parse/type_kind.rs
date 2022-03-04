@@ -1,5 +1,5 @@
 use crate::{Context, Parse};
-use danube_ast::{PathNode, TypeKind};
+use danube_ast::{GenericTypeNode, PathNode, TypeKind};
 use danube_diagnostics::MessageBuilder;
 use danube_token::TokenKind;
 
@@ -41,7 +41,7 @@ impl Parse for TypeKind {
                 }
 
                 if symbol!(context.cursor => RightChevron) {
-                    Ok(TypeKind::Generic(path, parameters))
+                    Ok(TypeKind::Generic(GenericTypeNode { path, parameters }))
                 } else {
                     context.report(MessageBuilder::error("Expected `>`").build())
                 }

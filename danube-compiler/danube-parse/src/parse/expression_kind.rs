@@ -4,8 +4,8 @@ use crate::{Context, Parse};
 use danube_ast::{
     BinaryExpressionNode, BinaryOperatorKind, BlockNode, ClosureNode, ConditionBranch,
     ConditionNode, ExpressionKind, ExpressionNode, FieldNode, ForNode, FunctionCallNode, IdentNode,
-    IndexNode, LoopNode, MatchBranch, MatchNode, MethodCallNode, PathNode, PatternNode,
-    StatementNode, TupleNode, TypeNode, WhileNode, DUMMY_NODE_ID,
+    IndexNode, LetExpressionNode, LiteralNode, LoopNode, MatchBranch, MatchNode, MethodCallNode,
+    PathNode, PatternNode, StatementNode, TupleNode, TypeNode, WhileNode, DUMMY_NODE_ID,
 };
 use danube_diagnostics::MessageBuilder;
 use danube_token::{keywords, TokenKind};
@@ -64,7 +64,10 @@ impl Parse for AtomicExpressionKind {
 
                 context.cursor.next();
 
-                parse_postfix_expression_kind(context, ExpressionKind::Literal(symbol, kind))
+                parse_postfix_expression_kind(
+                    context,
+                    ExpressionKind::Literal(LiteralNode { symbol, kind }),
+                )
             }
             // If
             TokenKind::Identifier(keywords::If) => {
@@ -83,7 +86,10 @@ impl Parse for AtomicExpressionKind {
                                 let expression = ExpressionNode::parse(context)?;
                                 Box::new(ExpressionNode {
                                     id: DUMMY_NODE_ID,
-                                    kind: ExpressionKind::Let(pattern, Box::new(expression)),
+                                    kind: ExpressionKind::Let(LetExpressionNode {
+                                        pattern,
+                                        value: Box::new(expression),
+                                    }),
                                 })
                             } else {
                                 Box::new(ExpressionNode::parse(context)?)
