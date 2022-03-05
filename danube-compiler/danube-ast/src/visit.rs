@@ -1,6 +1,13 @@
 use crate::ast::*;
+use danube_diagnostics::Message;
+pub trait VisitContext {
+    fn report(&self, message: Message);
+}
 #[allow(unused_variables)]
-pub trait Visit<'ast>: Sized {
+pub trait Visit<'ast>: Sized
+where
+    Self::Context: VisitContext,
+{
     type Context;
     fn visit_package_node(&mut self, context: &Self::Context, package_node: &'ast PackageNode) {
         walk_package_node(self, context, package_node);
@@ -321,7 +328,9 @@ pub fn walk_package_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     package_node: &'ast PackageNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     for attributes in package_node.attributes.iter() {
         visitor.visit_attribute_node(context, attributes);
     }
@@ -334,7 +343,9 @@ pub fn walk_attribute_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     attribute_node: &'ast AttributeNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_path_node(context, &attribute_node.path);
     for args in attribute_node.args.iter() {
         visitor.visit_attribute_argument_node(context, args);
@@ -345,7 +356,9 @@ pub fn walk_attribute_argument_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     attribute_argument_node: &'ast AttributeArgumentNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_ident_node(context, &attribute_argument_node.ident);
     if let Some(ref value) = attribute_argument_node.value {
         visitor.visit_expression_node(context, value);
@@ -356,7 +369,9 @@ pub fn walk_path_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     path_node: &'ast PathNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     for segments in path_node.segments.iter() {
         visitor.visit_ident_node(context, segments);
     }
@@ -366,14 +381,18 @@ pub fn walk_ident_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     ident_node: &'ast IdentNode,
-) {
+) where
+    V::Context: VisitContext,
+{
 }
 #[allow(unused_variables)]
 pub fn walk_item_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     item_node: &'ast ItemNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     for attributes in item_node.attributes.iter() {
         visitor.visit_attribute_node(context, attributes);
     }
@@ -385,7 +404,9 @@ fn walk_item_kind<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     item_kind: &'ast ItemKind,
-) {
+) where
+    V::Context: VisitContext,
+{
     match item_kind {
         ItemKind::Mod(node) => {
             visitor.visit_mod_node(context, node);
@@ -421,10 +442,13 @@ pub fn walk_mod_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     mod_node: &'ast ModNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     for attributes in mod_node.attributes.iter() {
         visitor.visit_attribute_node(context, attributes);
     }
+    visitor.visit_ident_node(context, &mod_node.ident);
     for items in mod_node.items.iter() {
         visitor.visit_item_node(context, items);
     }
@@ -434,7 +458,9 @@ pub fn walk_use_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     use_node: &'ast UseNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_path_node(context, &use_node.path);
 }
 #[allow(unused_variables)]
@@ -442,7 +468,9 @@ fn walk_visibility_kind<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     visibility_kind: &'ast VisibilityKind,
-) {
+) where
+    V::Context: VisitContext,
+{
     match visibility_kind {
         VisibilityKind::Current => {}
         VisibilityKind::Public => {}
@@ -456,7 +484,9 @@ pub fn walk_struct_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     struct_node: &'ast StructNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_ident_node(context, &struct_node.ident);
     for generics in struct_node.generics.iter() {
         visitor.visit_generic_node(context, generics);
@@ -470,7 +500,9 @@ pub fn walk_generic_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     generic_node: &'ast GenericNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_ident_node(context, &generic_node.ident);
     for traits in generic_node.traits.iter() {
         visitor.visit_path_node(context, traits);
@@ -484,7 +516,9 @@ fn walk_struct_field_kind<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     struct_field_kind: &'ast StructFieldKind,
-) {
+) where
+    V::Context: VisitContext,
+{
     match struct_field_kind {
         StructFieldKind::Unnamed(nodes) => {
             for node in nodes {
@@ -503,7 +537,9 @@ pub fn walk_unnamed_struct_field<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     unnamed_struct_field: &'ast UnnamedStructField,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_visibility_kind(context, &unnamed_struct_field.visibility);
     visitor.visit_type_node(context, &unnamed_struct_field.ty);
 }
@@ -512,7 +548,9 @@ pub fn walk_named_struct_field<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     named_struct_field: &'ast NamedStructField,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_visibility_kind(context, &named_struct_field.visibility);
     visitor.visit_ident_node(context, &named_struct_field.ident);
     visitor.visit_type_node(context, &named_struct_field.ty);
@@ -522,7 +560,9 @@ fn walk_immutability_kind<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     immutability_kind: &'ast ImmutabilityKind,
-) {
+) where
+    V::Context: VisitContext,
+{
     match immutability_kind {
         ImmutabilityKind::Nope => {}
         ImmutabilityKind::Yes => {}
@@ -533,7 +573,9 @@ pub fn walk_type_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     type_node: &'ast TypeNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_immutability_kind(context, &type_node.immutability);
     visitor.visit_type_kind(context, &type_node.kind);
 }
@@ -542,7 +584,9 @@ fn walk_type_kind<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     type_kind: &'ast TypeKind,
-) {
+) where
+    V::Context: VisitContext,
+{
     match type_kind {
         TypeKind::Tuple(nodes) => {
             for node in nodes {
@@ -562,7 +606,9 @@ pub fn walk_generic_type_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     generic_type_node: &'ast GenericTypeNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_path_node(context, &generic_type_node.path);
     for parameters in generic_type_node.parameters.iter() {
         visitor.visit_type_kind(context, parameters);
@@ -573,7 +619,9 @@ pub fn walk_enum_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     enum_node: &'ast EnumNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_ident_node(context, &enum_node.ident);
     for generics in enum_node.generics.iter() {
         visitor.visit_generic_node(context, generics);
@@ -587,7 +635,9 @@ pub fn walk_enum_variant_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     enum_variant_node: &'ast EnumVariantNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_ident_node(context, &enum_variant_node.ident);
     if let Some(ref kind) = enum_variant_node.kind {
         visitor.visit_enum_variant_kind(context, kind);
@@ -598,7 +648,9 @@ fn walk_enum_variant_kind<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     enum_variant_kind: &'ast EnumVariantKind,
-) {
+) where
+    V::Context: VisitContext,
+{
     match enum_variant_kind {
         EnumVariantKind::Unnamed(nodes) => {
             for node in nodes {
@@ -617,7 +669,9 @@ pub fn walk_enum_named_variant_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     enum_named_variant_node: &'ast EnumNamedVariantNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_ident_node(context, &enum_named_variant_node.ident);
     visitor.visit_type_node(context, &enum_named_variant_node.ty);
 }
@@ -626,7 +680,9 @@ pub fn walk_function_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     function_node: &'ast FunctionNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_ident_node(context, &function_node.ident);
     for generics in function_node.generics.iter() {
         visitor.visit_generic_node(context, generics);
@@ -649,7 +705,9 @@ pub fn walk_function_parameter_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     function_parameter_node: &'ast FunctionParameterNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_ident_node(context, &function_parameter_node.argument_label);
     if let Some(ref parameter_label) = function_parameter_node.parameter_label {
         visitor.visit_ident_node(context, parameter_label);
@@ -661,7 +719,9 @@ pub fn walk_block_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     block_node: &'ast BlockNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     for statements in block_node.statements.iter() {
         visitor.visit_statement_node(context, statements);
     }
@@ -671,7 +731,9 @@ pub fn walk_statement_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     statement_node: &'ast StatementNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_statement_kind(context, &statement_node.kind);
 }
 #[allow(unused_variables)]
@@ -679,7 +741,9 @@ fn walk_statement_kind<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     statement_kind: &'ast StatementKind,
-) {
+) where
+    V::Context: VisitContext,
+{
     match statement_kind {
         StatementKind::Semicolon => {}
         StatementKind::Break => {}
@@ -708,7 +772,9 @@ pub fn walk_assign_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     assign_node: &'ast AssignNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_assign_kind(context, &assign_node.kind);
     visitor.visit_expression_node(context, &assign_node.lhs);
     visitor.visit_expression_node(context, &assign_node.rhs);
@@ -718,7 +784,9 @@ fn walk_assign_kind<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     assign_kind: &'ast AssignKind,
-) {
+) where
+    V::Context: VisitContext,
+{
     match assign_kind {
         AssignKind::Assign => {}
         AssignKind::Add => {}
@@ -741,7 +809,9 @@ pub fn walk_let_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     let_node: &'ast LetNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_immutability_kind(context, &let_node.immutability);
     visitor.visit_pattern_node(context, &let_node.pattern);
     if let Some(ref ty) = let_node.ty {
@@ -756,7 +826,9 @@ pub fn walk_pattern_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     pattern_node: &'ast PatternNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_pattern_kind(context, &pattern_node.kind);
 }
 #[allow(unused_variables)]
@@ -764,7 +836,9 @@ fn walk_pattern_kind<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     pattern_kind: &'ast PatternKind,
-) {
+) where
+    V::Context: VisitContext,
+{
     match pattern_kind {
         PatternKind::Wildcard => {}
         PatternKind::Rest => {}
@@ -792,14 +866,18 @@ pub fn walk_literal_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     literal_node: &'ast LiteralNode,
-) {
+) where
+    V::Context: VisitContext,
+{
 }
 #[allow(unused_variables)]
 pub fn walk_pattern_named_struct_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     pattern_named_struct_node: &'ast PatternNamedStructNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_path_node(context, &pattern_named_struct_node.path);
     for fields in pattern_named_struct_node.fields.iter() {
         visitor.visit_pattern_named_struct_field_node(context, fields);
@@ -810,7 +888,9 @@ pub fn walk_pattern_named_struct_field_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     pattern_named_struct_field_node: &'ast PatternNamedStructFieldNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_path_node(context, &pattern_named_struct_field_node.path);
     if let Some(ref pattern) = pattern_named_struct_field_node.pattern {
         visitor.visit_pattern_node(context, pattern);
@@ -821,7 +901,9 @@ pub fn walk_pattern_unnamed_struct_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     pattern_unnamed_struct_node: &'ast PatternUnnamedStructNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     if let Some(ref path) = pattern_unnamed_struct_node.path {
         visitor.visit_path_node(context, path);
     }
@@ -834,7 +916,9 @@ pub fn walk_type_alias_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     type_alias_node: &'ast TypeAliasNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_ident_node(context, &type_alias_node.ident);
     if let Some(ref ty) = type_alias_node.ty {
         visitor.visit_type_node(context, ty);
@@ -845,7 +929,9 @@ pub fn walk_expression_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     expression_node: &'ast ExpressionNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_expression_kind(context, &expression_node.kind);
 }
 #[allow(unused_variables)]
@@ -853,7 +939,9 @@ fn walk_expression_kind<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     expression_kind: &'ast ExpressionKind,
-) {
+) where
+    V::Context: VisitContext,
+{
     match expression_kind {
         ExpressionKind::Let(node) => {
             visitor.visit_let_expression_node(context, node);
@@ -927,7 +1015,9 @@ pub fn walk_let_expression_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     let_expression_node: &'ast LetExpressionNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_pattern_node(context, &let_expression_node.pattern);
     visitor.visit_expression_node(context, &let_expression_node.value);
 }
@@ -936,7 +1026,9 @@ pub fn walk_condition_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     condition_node: &'ast ConditionNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     for branches in condition_node.branches.iter() {
         visitor.visit_condition_branch(context, branches);
     }
@@ -949,7 +1041,9 @@ pub fn walk_condition_branch<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     condition_branch: &'ast ConditionBranch,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_expression_node(context, &condition_branch.expression);
     visitor.visit_block_node(context, &condition_branch.block);
 }
@@ -958,7 +1052,9 @@ pub fn walk_loop_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     loop_node: &'ast LoopNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_block_node(context, &loop_node.block);
 }
 #[allow(unused_variables)]
@@ -966,7 +1062,9 @@ pub fn walk_while_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     while_node: &'ast WhileNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_condition_branch(context, &while_node.branch);
 }
 #[allow(unused_variables)]
@@ -974,7 +1072,9 @@ pub fn walk_for_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     for_node: &'ast ForNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_pattern_node(context, &for_node.pattern);
     visitor.visit_expression_node(context, &for_node.iter);
     visitor.visit_block_node(context, &for_node.block);
@@ -984,7 +1084,9 @@ pub fn walk_match_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     match_node: &'ast MatchNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_expression_node(context, &match_node.expression);
     for branches in match_node.branches.iter() {
         visitor.visit_match_branch(context, branches);
@@ -995,7 +1097,9 @@ pub fn walk_match_branch<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     match_branch: &'ast MatchBranch,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_pattern_node(context, &match_branch.pattern);
     visitor.visit_block_node(context, &match_branch.block);
 }
@@ -1004,7 +1108,9 @@ pub fn walk_closure_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     closure_node: &'ast ClosureNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     for parameters in closure_node.parameters.iter() {
         visitor.visit_closure_parameter_node(context, parameters);
     }
@@ -1018,7 +1124,9 @@ pub fn walk_closure_parameter_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     closure_parameter_node: &'ast ClosureParameterNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_ident_node(context, &closure_parameter_node.ident);
     if let Some(ref ty) = closure_parameter_node.ty {
         visitor.visit_type_node(context, ty);
@@ -1029,7 +1137,9 @@ pub fn walk_tuple_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     tuple_node: &'ast TupleNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     for arguments in tuple_node.arguments.iter() {
         visitor.visit_expression_node(context, arguments);
     }
@@ -1039,7 +1149,9 @@ pub fn walk_index_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     index_node: &'ast IndexNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_expression_node(context, &index_node.expression);
     visitor.visit_expression_node(context, &index_node.index);
 }
@@ -1048,7 +1160,9 @@ pub fn walk_binary_expression_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     binary_expression_node: &'ast BinaryExpressionNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_binary_operator_kind(context, &binary_expression_node.kind);
     visitor.visit_expression_node(context, &binary_expression_node.lhs);
     visitor.visit_expression_node(context, &binary_expression_node.rhs);
@@ -1058,7 +1172,9 @@ pub fn walk_field_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     field_node: &'ast FieldNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_expression_node(context, &field_node.expression);
     visitor.visit_ident_node(context, &field_node.field);
 }
@@ -1067,7 +1183,9 @@ pub fn walk_function_call_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     function_call_node: &'ast FunctionCallNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_expression_node(context, &function_call_node.expression);
     for arguments in function_call_node.arguments.iter() {
         visitor.visit_argument_node(context, arguments);
@@ -1078,7 +1196,9 @@ pub fn walk_method_call_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     method_call_node: &'ast MethodCallNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_ident_node(context, &method_call_node.ident);
     for arguments in method_call_node.arguments.iter() {
         visitor.visit_argument_node(context, arguments);
@@ -1089,7 +1209,9 @@ pub fn walk_argument_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     argument_node: &'ast ArgumentNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     if let Some(ref ident) = argument_node.ident {
         visitor.visit_ident_node(context, ident);
     }
@@ -1100,7 +1222,9 @@ fn walk_binary_operator_kind<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     binary_operator_kind: &'ast BinaryOperatorKind,
-) {
+) where
+    V::Context: VisitContext,
+{
     match binary_operator_kind {
         BinaryOperatorKind::Add => {}
         BinaryOperatorKind::Sub => {}
@@ -1128,7 +1252,9 @@ pub fn walk_trait_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     trait_node: &'ast TraitNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_ident_node(context, &trait_node.ident);
     for generics in trait_node.generics.iter() {
         visitor.visit_generic_node(context, generics);
@@ -1145,7 +1271,9 @@ pub fn walk_constant_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     constant_node: &'ast ConstantNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     visitor.visit_pattern_node(context, &constant_node.pattern);
     visitor.visit_type_node(context, &constant_node.ty);
     if let Some(ref expression) = constant_node.expression {
@@ -1157,7 +1285,9 @@ pub fn walk_implement_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     implement_node: &'ast ImplementNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     for generics in implement_node.generics.iter() {
         visitor.visit_generic_node(context, generics);
     }
@@ -1177,7 +1307,9 @@ pub fn walk_implement_item_node<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     implement_item_node: &'ast ImplementItemNode,
-) {
+) where
+    V::Context: VisitContext,
+{
     for attributes in implement_item_node.attributes.iter() {
         visitor.visit_attribute_node(context, attributes);
     }
@@ -1188,7 +1320,9 @@ fn walk_implement_item_kind<'ast, V: Visit<'ast>>(
     visitor: &mut V,
     context: &V::Context,
     implement_item_kind: &'ast ImplementItemKind,
-) {
+) where
+    V::Context: VisitContext,
+{
     match implement_item_kind {
         ImplementItemKind::Type(node) => {
             visitor.visit_type_alias_node(context, node);

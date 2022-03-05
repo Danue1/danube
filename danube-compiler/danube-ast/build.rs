@@ -161,14 +161,24 @@ fn build_visit(input: File) -> TokenStream {
                                                 //
                                             }
                                             _ => {
-                                                let visit_name = Ident::new(
-                                                    format!("visit_{}", snake_case(ident.as_str()))
-                                                        .as_str(),
-                                                    Span::call_site(),
-                                                );
-                                                fields.extend(quote! {
-                                                    visitor.#visit_name(context, &#name.#field_name);
-                                                })
+                                                match ident.as_str() {
+                                                    "bool" => {
+                                                        //
+                                                    }
+                                                    _ => {
+                                                        let visit_name = Ident::new(
+                                                            format!(
+                                                                "visit_{}",
+                                                                snake_case(ident.as_str())
+                                                            )
+                                                            .as_str(),
+                                                            Span::call_site(),
+                                                        );
+                                                        fields.extend(quote! {
+                                                            visitor.#visit_name(context, &#name.#field_name);
+                                                        });
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -188,7 +198,8 @@ fn build_visit(input: File) -> TokenStream {
                 }
                 walks.extend(quote! {
                     #[allow(unused_variables)]
-                    pub fn #walk_name<'ast, V: Visit<'ast>>(visitor: &mut V, context: &V::Context, #name: &'ast #struct_name) {
+                    pub fn #walk_name<'ast, V: Visit<'ast>>(visitor: &mut V, context: &V::Context, #name: &'ast #struct_name)
+                    where V::Context: VisitContext, {
                         #fields
                     }
                 });
@@ -367,7 +378,9 @@ fn build_visit(input: File) -> TokenStream {
 
                 walks.extend(quote! {
                     #[allow(unused_variables)]
-                    fn #walk_name<'ast, V: Visit<'ast>>(visitor: &mut V, context: &V::Context, #name: &'ast #enum_name) {
+                    fn #walk_name<'ast, V: Visit<'ast>>(visitor: &mut V, context: &V::Context, #name: &'ast #enum_name)
+                    where V::Context: VisitContext,
+                    {
                         match #name {
                             #variants
                         }
@@ -385,9 +398,16 @@ fn build_visit(input: File) -> TokenStream {
         // ! DO NOT EDIT
 
         use crate::ast::*;
+        use danube_diagnostics::Message;
+
+        pub trait VisitContext {
+            fn report(&self, message: Message);
+        }
 
         #[allow(unused_variables)]
-        pub trait Visit<'ast>: Sized {
+        pub trait Visit<'ast>: Sized
+        where Self::Context: VisitContext
+        {
             type Context;
 
             #visits

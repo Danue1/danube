@@ -2,10 +2,10 @@ use crate::keywords;
 use std::collections::HashMap;
 use std::sync::Mutex;
 
-#[derive(PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
+#[derive(PartialEq, PartialOrd, Eq, Ord, Clone, Copy, Hash)]
 pub struct Symbol(pub(crate) SymbolIndex);
 
-#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
+#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy, Hash)]
 pub struct SymbolIndex {
     pub(crate) index: usize,
 }

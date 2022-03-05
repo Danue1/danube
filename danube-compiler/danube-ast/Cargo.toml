@@ -5,6 +5,7 @@ authors = ["Danuel <public.danuel@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+danube-diagnostics = { path = "../danube-diagnostics" }
 danube-token = { path = "../danube-token" }
 danube-index = { path = "../danube-index" }
 

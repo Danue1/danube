@@ -13,6 +13,7 @@ name = "danube-ast"
 version = "0.1.0"
 dependencies = [
  "convert_case",
+ "danube-diagnostics",
  "danube-index",
  "danube-token",
  "proc-macro2",
@@ -87,6 +88,8 @@ version = "0.1.0"
 dependencies = [
  "danube-ast",
  "danube-dependency-graph",
+ "danube-diagnostics",
+ "danube-token",
 ]
 
 [[package]]
