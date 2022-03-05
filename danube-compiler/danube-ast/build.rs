@@ -406,7 +406,7 @@ fn build_visit(input: File) -> TokenStream {
 
         #[allow(unused_variables)]
         pub trait Visit<'ast>: Sized
-        where Self::Context: VisitContext
+        where Self::Context: VisitContext,
         {
             type Context;
 
