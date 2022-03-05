@@ -1,5 +1,5 @@
 use crate::{Context, Parse};
-use danube_ast::{ConstantNode, ExpressionNode, PatternNode, TypeNode};
+use danube_ast::{ConstantNode, ExpressionNode, PatternNode, TypeNode, DUMMY_NODE_ID};
 use danube_diagnostics::MessageBuilder;
 
 impl Parse for ConstantNode {
@@ -20,6 +20,7 @@ impl Parse for ConstantNode {
 
         if symbol!(context.cursor => Semicolon) {
             Ok(ConstantNode {
+                id: DUMMY_NODE_ID,
                 pattern,
                 ty,
                 expression,

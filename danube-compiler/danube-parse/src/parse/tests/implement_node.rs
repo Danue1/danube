@@ -9,6 +9,7 @@ assert_node! {
         assert_eq!(
             source,
             Ok(ImplementNode {
+                id: DUMMY_NODE_ID,
                 generics: vec![],
                 trait_ident: None,
                 target: PathNode {
@@ -30,6 +31,7 @@ assert_node! {
         assert_eq!(
             source,
             Ok(ImplementNode {
+                id: DUMMY_NODE_ID,
                 generics: vec![GenericNode {
                     id: DUMMY_NODE_ID,
                     ident: IdentNode {
@@ -59,6 +61,7 @@ assert_node! {
         assert_eq!(
             source,
             Ok(ImplementNode {
+                id: DUMMY_NODE_ID,
                 generics: vec![GenericNode {
                     id: DUMMY_NODE_ID,
                     ident: IdentNode {
@@ -96,6 +99,7 @@ assert_node! {
         assert_eq!(
             source,
             Ok(ImplementNode {
+                id: DUMMY_NODE_ID,
                 generics: vec![],
                 trait_ident: Some(PathNode {
                     segments: vec![IdentNode {
@@ -122,6 +126,7 @@ assert_node! {
         assert_eq!(
             source,
             Ok(ImplementNode {
+                id: DUMMY_NODE_ID,
                 generics: vec![],
                 trait_ident: Some(PathNode {
                     segments: vec![IdentNode {

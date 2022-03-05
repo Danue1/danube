@@ -1,6 +1,6 @@
 use super::attribute_node::ItemAttributeNodeList;
 use crate::{Context, Parse};
-use danube_ast::{IdentNode, ItemNode, ModNode};
+use danube_ast::{IdentNode, ItemNode, ModNode, DUMMY_NODE_ID};
 use danube_diagnostics::MessageBuilder;
 use danube_token::TokenKind;
 
@@ -15,6 +15,8 @@ impl Parse for ModNode {
                 context.cursor.next();
 
                 Ok(ModNode {
+                    id: DUMMY_NODE_ID,
+                    is_inline: false,
                     attributes,
                     ident,
                     items: vec![],
@@ -42,6 +44,8 @@ impl Parse for ModNode {
                 }
 
                 Ok(ModNode {
+                    id: DUMMY_NODE_ID,
+                    is_inline: true,
                     attributes,
                     ident,
                     items,

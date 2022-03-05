@@ -1,7 +1,7 @@
 use super::generic_node::GenericNodeList;
 use super::implement_item_node::ImplementItemNodeList;
 use crate::{Context, Parse};
-use danube_ast::{IdentNode, PathNode, TraitNode};
+use danube_ast::{IdentNode, PathNode, TraitNode, DUMMY_NODE_ID};
 use danube_diagnostics::MessageBuilder;
 
 impl Parse for TraitNode {
@@ -33,6 +33,7 @@ impl Parse for TraitNode {
         let items = ImplementItemNodeList::parse(context)?;
 
         Ok(TraitNode {
+            id: DUMMY_NODE_ID,
             ident,
             generics,
             inheritances,

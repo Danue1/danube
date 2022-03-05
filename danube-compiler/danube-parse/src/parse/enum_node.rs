@@ -1,6 +1,6 @@
 use super::generic_node::GenericNodeList;
 use crate::{Context, Parse};
-use danube_ast::{EnumNode, EnumVariantNode, IdentNode};
+use danube_ast::{EnumNode, EnumVariantNode, IdentNode, DUMMY_NODE_ID};
 use danube_diagnostics::MessageBuilder;
 use danube_token::TokenKind;
 
@@ -16,6 +16,7 @@ impl Parse for EnumNode {
                 context.cursor.next();
 
                 Ok(EnumNode {
+                    id: DUMMY_NODE_ID,
                     ident,
                     generics,
                     variants: vec![],
@@ -35,6 +36,7 @@ impl Parse for EnumNode {
                 }
 
                 Ok(EnumNode {
+                    id: DUMMY_NODE_ID,
                     ident,
                     generics,
                     variants,

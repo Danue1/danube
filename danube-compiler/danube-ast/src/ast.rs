@@ -35,7 +35,6 @@ pub struct IdentNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ItemNode {
-    pub id: NodeId,
     pub attributes: Vec<AttributeNode>,
     pub visibility: VisibilityKind,
     pub kind: ItemKind,
@@ -56,6 +55,8 @@ pub enum ItemKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ModNode {
+    pub id: NodeId,
+    pub is_inline: bool,
     pub attributes: Vec<AttributeNode>,
     pub ident: IdentNode,
     pub items: Vec<ItemNode>,
@@ -63,6 +64,7 @@ pub struct ModNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct UseNode {
+    pub id: NodeId,
     pub path: PathNode,
 }
 
@@ -75,6 +77,7 @@ pub enum VisibilityKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct StructNode {
+    pub id: NodeId,
     pub ident: IdentNode,
     pub generics: Vec<GenericNode>,
     pub fields: Option<StructFieldKind>,
@@ -135,6 +138,7 @@ pub struct GenericTypeNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct EnumNode {
+    pub id: NodeId,
     pub ident: IdentNode,
     pub generics: Vec<GenericNode>,
     pub variants: Vec<EnumVariantNode>,
@@ -173,6 +177,7 @@ pub struct EnumNamedVariantNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct FunctionNode {
+    pub id: NodeId,
     pub ident: IdentNode,
     pub generics: Vec<GenericNode>,
     pub self_type: Option<ImmutabilityKind>,
@@ -299,6 +304,7 @@ pub struct PatternUnnamedStructNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct TypeAliasNode {
+    pub id: NodeId,
     pub ident: IdentNode,
     pub ty: Option<TypeNode>,
 }
@@ -474,6 +480,7 @@ pub enum BinaryOperatorKind {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct TraitNode {
+    pub id: NodeId,
     pub ident: IdentNode,
     pub generics: Vec<GenericNode>,
     pub inheritances: Vec<PathNode>,
@@ -482,6 +489,7 @@ pub struct TraitNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ConstantNode {
+    pub id: NodeId,
     pub pattern: PatternNode,
     pub ty: TypeNode,
     pub expression: Option<ExpressionNode>,
@@ -489,6 +497,7 @@ pub struct ConstantNode {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct ImplementNode {
+    pub id: NodeId,
     pub generics: Vec<GenericNode>,
     pub trait_ident: Option<PathNode>,
     pub target: PathNode,

@@ -1,6 +1,6 @@
 use super::generic_node::GenericNodeList;
 use crate::{Context, Parse};
-use danube_ast::{IdentNode, StructFieldKind, StructNode};
+use danube_ast::{IdentNode, StructFieldKind, StructNode, DUMMY_NODE_ID};
 
 impl Parse for StructNode {
     type Output = StructNode;
@@ -11,6 +11,7 @@ impl Parse for StructNode {
         let fields = StructFieldKind::parse(context)?;
 
         Ok(StructNode {
+            id: DUMMY_NODE_ID,
             ident,
             generics,
             fields,

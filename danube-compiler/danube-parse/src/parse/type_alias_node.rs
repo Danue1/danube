@@ -1,5 +1,5 @@
 use crate::{Context, Parse};
-use danube_ast::{IdentNode, TypeAliasNode, TypeNode};
+use danube_ast::{IdentNode, TypeAliasNode, TypeNode, DUMMY_NODE_ID};
 use danube_diagnostics::MessageBuilder;
 
 impl Parse for TypeAliasNode {
@@ -13,6 +13,7 @@ impl Parse for TypeAliasNode {
 
             if symbol!(context.cursor => Semicolon) {
                 Ok(TypeAliasNode {
+                    id: DUMMY_NODE_ID,
                     ident,
                     ty: Some(ty),
                 })
@@ -20,7 +21,11 @@ impl Parse for TypeAliasNode {
                 context.report(MessageBuilder::error("Expected `;`").build())
             }
         } else {
-            Ok(TypeAliasNode { ident, ty: None })
+            Ok(TypeAliasNode {
+                id: DUMMY_NODE_ID,
+                ident,
+                ty: None,
+            })
         }
     }
 }

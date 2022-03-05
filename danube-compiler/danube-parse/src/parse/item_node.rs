@@ -2,7 +2,7 @@ use super::attribute_node::ItemAttributeNodeList;
 use crate::{Context, Parse};
 use danube_ast::{
     ConstantNode, EnumNode, FunctionNode, ImplementNode, ItemKind, ItemNode, ModNode, StructNode,
-    TraitNode, TypeAliasNode, UseNode, VisibilityKind, DUMMY_NODE_ID,
+    TraitNode, TypeAliasNode, UseNode, VisibilityKind,
 };
 use danube_diagnostics::MessageBuilder;
 use danube_token::keywords;
@@ -90,7 +90,6 @@ impl Parse for ItemNode {
         };
 
         Ok(Some(ItemNode {
-            id: DUMMY_NODE_ID,
             attributes,
             visibility,
             kind,

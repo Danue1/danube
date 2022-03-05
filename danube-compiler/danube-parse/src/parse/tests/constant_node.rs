@@ -12,6 +12,7 @@ assert_node! {
         assert_eq!(
             source,
             Ok(ConstantNode {
+                id: DUMMY_NODE_ID,
                 pattern: PatternNode {
                     id: DUMMY_NODE_ID,
                     kind: PatternKind::Path(PathNode {
@@ -43,6 +44,7 @@ assert_node! {
         assert_eq!(
             source,
             Ok(ConstantNode {
+                id: DUMMY_NODE_ID,
                 pattern: PatternNode {
                     id: DUMMY_NODE_ID,
                     kind: PatternKind::Path(PathNode {

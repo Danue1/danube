@@ -1,7 +1,7 @@
 use super::function_parameter_node::FunctionParameterNodeList;
 use super::generic_node::GenericNodeList;
 use crate::{Context, Parse};
-use danube_ast::{BlockNode, FunctionNode, IdentNode, TypeNode};
+use danube_ast::{BlockNode, FunctionNode, IdentNode, TypeNode, DUMMY_NODE_ID};
 
 impl Parse for FunctionNode {
     type Output = FunctionNode;
@@ -18,6 +18,7 @@ impl Parse for FunctionNode {
         };
 
         Ok(FunctionNode {
+            id: DUMMY_NODE_ID,
             ident,
             generics,
             self_type,

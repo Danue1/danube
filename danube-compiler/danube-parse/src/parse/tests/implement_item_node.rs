@@ -16,6 +16,7 @@ assert_node! {
                 id: DUMMY_NODE_ID,
                 attributes: vec![],
                 kind: ImplementItemKind::Type(TypeAliasNode {
+                    id: DUMMY_NODE_ID,
                     ident: IdentNode {
                         id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("Foo"),
@@ -36,6 +37,7 @@ assert_node! {
                 id: DUMMY_NODE_ID,
                 attributes: vec![],
                 kind: ImplementItemKind::Type(TypeAliasNode {
+                    id: DUMMY_NODE_ID,
                     ident: IdentNode {
                         id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("Foo"),
@@ -65,6 +67,7 @@ assert_node! {
                 id: DUMMY_NODE_ID,
                 attributes: vec![],
                 kind: ImplementItemKind::Constant(ConstantNode {
+                    id: DUMMY_NODE_ID,
                     pattern: PatternNode {
                         id: DUMMY_NODE_ID,
                         kind: PatternKind::Path(PathNode {
@@ -100,6 +103,7 @@ assert_node! {
                 id: DUMMY_NODE_ID,
                 attributes: vec![],
                 kind: ImplementItemKind::Constant(ConstantNode {
+                    id: DUMMY_NODE_ID,
                     pattern: PatternNode {
                         id: DUMMY_NODE_ID,
                         kind: PatternKind::Path(PathNode {
@@ -143,6 +147,7 @@ assert_node! {
                 id: DUMMY_NODE_ID,
                 attributes: vec![],
                 kind: ImplementItemKind::Function(FunctionNode {
+                    id: DUMMY_NODE_ID,
                     ident: IdentNode {
                         id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("foo"),
@@ -167,6 +172,7 @@ assert_node! {
                 id: DUMMY_NODE_ID,
                 attributes: vec![],
                 kind: ImplementItemKind::Function(FunctionNode {
+                    id: DUMMY_NODE_ID,
                     ident: IdentNode {
                         id: DUMMY_NODE_ID,
                         symbol: Symbol::intern("foo"),

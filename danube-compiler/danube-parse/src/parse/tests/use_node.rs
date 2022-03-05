@@ -9,6 +9,7 @@ assert_node! {
         assert_eq!(
             source,
             Ok(UseNode {
+                id: DUMMY_NODE_ID,
                 path: PathNode {
                     segments: vec![IdentNode {
                         id: DUMMY_NODE_ID,
@@ -26,6 +27,7 @@ assert_node! {
         assert_eq!(
             source,
             Ok(UseNode {
+                id: DUMMY_NODE_ID,
                 path: PathNode {
                     segments: vec![
                         IdentNode {

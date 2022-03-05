@@ -12,6 +12,7 @@ assert_node! {
         assert_eq!(
             source,
             Ok(FunctionNode {
+                id: DUMMY_NODE_ID,
                 ident: IdentNode {
                     id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("foo"),
@@ -32,6 +33,7 @@ assert_node! {
         assert_eq!(
             source,
             Ok(FunctionNode {
+                id: DUMMY_NODE_ID,
                 ident: IdentNode {
                     id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("foo"),
@@ -55,6 +57,7 @@ assert_node! {
         assert_eq!(
             source,
             Ok(FunctionNode {
+                id: DUMMY_NODE_ID,
                 ident: IdentNode {
                     id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("foo"),
@@ -84,6 +87,7 @@ assert_node! {
         assert_eq!(
             source,
             Ok(FunctionNode {
+                id: DUMMY_NODE_ID,
                 ident: IdentNode {
                     id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("foo"),
@@ -104,6 +108,7 @@ assert_node! {
         assert_eq!(
             source,
             Ok(FunctionNode {
+                id: DUMMY_NODE_ID,
                 ident: IdentNode {
                     id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("foo"),
@@ -124,6 +129,7 @@ assert_node! {
         assert_eq!(
             source,
             Ok(FunctionNode {
+                id: DUMMY_NODE_ID,
                 ident: IdentNode {
                     id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("foo"),
@@ -161,6 +167,7 @@ assert_node! {
         assert_eq!(
             source,
             Ok(FunctionNode {
+                id: DUMMY_NODE_ID,
                 ident: IdentNode {
                     id: DUMMY_NODE_ID,
                     symbol: Symbol::intern("foo"),
