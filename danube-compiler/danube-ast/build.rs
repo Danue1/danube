@@ -11,18 +11,33 @@ const INPUT: &'static str = include_str!("./src/ast.rs");
 fn main() -> std::io::Result<()> {
     let input = parse_file(INPUT).unwrap();
 
-    std::fs::write("./src/visit.rs", build_visit(input.clone()).to_string()).unwrap();
+    std::fs::write(
+        "./src/visit.rs",
+        build_trait(input.clone(), Mode::Visit).to_string(),
+    )
+    .unwrap();
+    std::fs::write(
+        "./src/fold.rs",
+        build_trait(input.clone(), Mode::Fold).to_string(),
+    )
+    .unwrap();
 
     Command::new("rustfmt")
         .arg("./src/visit.rs")
+        .arg("./src/fold.rs")
         .spawn()?
         .wait()?;
 
     Ok(())
 }
 
-fn build_visit(input: File) -> TokenStream {
-    let mut visits = quote! {};
+enum Mode {
+    Visit,
+    Fold,
+}
+
+fn build_trait(input: File, mode: Mode) -> TokenStream {
+    let mut trait_fns = quote! {};
     let mut walks = quote! {};
 
     for item in input.items {
@@ -33,14 +48,30 @@ fn build_visit(input: File) -> TokenStream {
                     snake_case(&struct_name.to_string()).as_str(),
                     Span::call_site(),
                 );
-                let visit_name = Ident::new(format!("visit_{}", name).as_str(), Span::call_site());
+                let visit_name = match mode {
+                    Mode::Visit => {
+                        Ident::new(format!("visit_{}", name).as_str(), Span::call_site());
+                    }
+                    Mode::Fold => Ident::new(format!("fold_{}", name).as_str(), Span::call_site()),
+                };
                 let walk_name = Ident::new(format!("walk_{}", name).as_str(), Span::call_site());
 
-                visits.extend(quote! {
-                    fn #visit_name(&mut self, context: &Self::Context, #name: &'ast #struct_name) {
-                        #walk_name(self, context, #name);
+                match mode {
+                    Mode::Visit => {
+                        trait_fns.extend(quote! {
+                            fn #visit_name(&mut self, context: &Self::Context, #name: &'ast #struct_name) {
+                                #walk_name(self, context, #name);
+                            }
+                        });
                     }
-                });
+                    Mode::Fold => {
+                        trait_fns.extend(quote! {
+                            fn #visit_name(&mut self, context: &Self::Context, #name: &'ast mut #struct_name) {
+                                #walk_name(self, context, #name);
+                            }
+                        });
+                    }
+                }
 
                 let mut fields = quote! {};
                 match struct_.fields {
@@ -63,25 +94,46 @@ fn build_visit(input: File) -> TokenStream {
                                                             match argument {
                                                                 syn::GenericArgument::Type(
                                                                     ref ty,
-                                                                ) => {
-                                                                    let visit_name = Ident::new(
-                                                                        format!(
-                                                                            "visit_{}",
-                                                                            snake_case(
-                                                                                quote! { #ty }
-                                                                                    .to_string()
-                                                                                    .as_str()
+                                                                ) => match mode {
+                                                                    Mode::Visit => {
+                                                                        let visit_name = Ident::new(
+                                                                            format!(
+                                                                                "visit_{}",
+                                                                                snake_case(
+                                                                                    quote! { #ty }
+                                                                                        .to_string()
+                                                                                        .as_str()
+                                                                                )
                                                                             )
-                                                                        )
-                                                                        .as_str(),
-                                                                        Span::call_site(),
-                                                                    );
-                                                                    fields.extend(quote! {
-                                                                        if let Some(ref #field_name) = #name.#field_name {
-                                                                            visitor.#visit_name(context, #field_name);
-                                                                        }
-                                                                    });
-                                                                }
+                                                                            .as_str(),
+                                                                            Span::call_site(),
+                                                                        );
+                                                                        fields.extend(quote! {
+                                                                            if let Some(ref #field_name) = #name.#field_name {
+                                                                                visitor.#visit_name(context, #field_name);
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                    Mode::Fold => {
+                                                                        let fold_name = Ident::new(
+                                                                            format!(
+                                                                                "fold_{}",
+                                                                                snake_case(
+                                                                                    quote! { #ty }
+                                                                                        .to_string()
+                                                                                        .as_str(),
+                                                                                ),
+                                                                            )
+                                                                            .as_str(),
+                                                                            Span::call_site(),
+                                                                        );
+                                                                        fields.extend(quote! {
+                                                                            if let Some(ref mut #field_name) = #name.#field_name {
+                                                                                folder.#fold_name(context, #field_name);
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                },
                                                                 _ => {
                                                                     //
                                                                 }
@@ -98,23 +150,46 @@ fn build_visit(input: File) -> TokenStream {
                                                     for argument in node.args.iter() {
                                                         match argument {
                                                             syn::GenericArgument::Type(ref ty) => {
-                                                                let visit_name = Ident::new(
-                                                                    format!(
-                                                                        "visit_{}",
-                                                                        snake_case(
-                                                                            quote! { #ty }
-                                                                                .to_string()
-                                                                                .as_str()
-                                                                        )
-                                                                    )
-                                                                    .as_str(),
-                                                                    Span::call_site(),
-                                                                );
-                                                                fields.extend(quote! {
-                                                                    for #field_name in #name.#field_name.iter() {
-                                                                        visitor.#visit_name(context, #field_name);
+                                                                match mode {
+                                                                    Mode::Visit => {
+                                                                        let visit_name = Ident::new(
+                                                                            format!(
+                                                                                "visit_{}",
+                                                                                snake_case(
+                                                                                    quote! { #ty }
+                                                                                        .to_string()
+                                                                                        .as_str(),
+                                                                                ),
+                                                                            )
+                                                                            .as_str(),
+                                                                            Span::call_site(),
+                                                                        );
+                                                                        fields.extend(quote! {
+                                                                            for #field_name in #name.#field_name.iter() {
+                                                                                visitor.#visit_name(context, #field_name);
+                                                                            }
+                                                                        });
                                                                     }
-                                                                });
+                                                                    Mode::Fold => {
+                                                                        let fold_name = Ident::new(
+                                                                            format!(
+                                                                                "fold_{}",
+                                                                                snake_case(
+                                                                                    quote! { #ty }
+                                                                                        .to_string()
+                                                                                        .as_str(),
+                                                                                ),
+                                                                            )
+                                                                            .as_str(),
+                                                                            Span::call_site(),
+                                                                        );
+                                                                        fields.extend(quote! {
+                                                                            for #field_name in #name.#field_name.iter_mut() {
+                                                                                folder.#fold_name(context, #field_name);
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                }
                                                             }
                                                             _ => {
                                                                 //
@@ -131,21 +206,42 @@ fn build_visit(input: File) -> TokenStream {
                                                     for argument in node.args.iter() {
                                                         match argument {
                                                             syn::GenericArgument::Type(ref ty) => {
-                                                                let visit_name = Ident::new(
-                                                                    format!(
-                                                                        "visit_{}",
-                                                                        snake_case(
-                                                                            quote! { #ty }
-                                                                                .to_string()
-                                                                                .as_str()
-                                                                        )
-                                                                    )
-                                                                    .as_str(),
-                                                                    Span::call_site(),
-                                                                );
-                                                                fields.extend(quote! {
-                                                                    visitor.#visit_name(context, &#name.#field_name);
-                                                                });
+                                                                match mode {
+                                                                    Mode::Visit => {
+                                                                        let visit_name = Ident::new(
+                                                                            format!(
+                                                                                "visit_{}",
+                                                                                snake_case(
+                                                                                    quote! { #ty }
+                                                                                        .to_string()
+                                                                                        .as_str(),
+                                                                                ),
+                                                                            )
+                                                                            .as_str(),
+                                                                            Span::call_site(),
+                                                                        );
+                                                                        fields.extend(quote! {
+                                                                            visitor.#visit_name(context, &#name.#field_name);
+                                                                        });
+                                                                    }
+                                                                    Mode::Fold => {
+                                                                        let fold_name = Ident::new(
+                                                                            format!(
+                                                                                "fold_{}",
+                                                                                snake_case(
+                                                                                    quote! { #ty }
+                                                                                        .to_string()
+                                                                                        .as_str(),
+                                                                                ),
+                                                                            )
+                                                                            .as_str(),
+                                                                            Span::call_site(),
+                                                                        );
+                                                                        fields.extend(quote! {
+                                                                            folder.#fold_name(context, &mut #name.#field_name);
+                                                                        });
+                                                                    }
+                                                                }
                                                             }
                                                             _ => {
                                                                 //
@@ -165,19 +261,34 @@ fn build_visit(input: File) -> TokenStream {
                                                     "bool" => {
                                                         //
                                                     }
-                                                    _ => {
-                                                        let visit_name = Ident::new(
-                                                            format!(
-                                                                "visit_{}",
-                                                                snake_case(ident.as_str())
-                                                            )
-                                                            .as_str(),
-                                                            Span::call_site(),
-                                                        );
-                                                        fields.extend(quote! {
-                                                            visitor.#visit_name(context, &#name.#field_name);
-                                                        });
-                                                    }
+                                                    _ => match mode {
+                                                        Mode::Visit => {
+                                                            let visit_name = Ident::new(
+                                                                format!(
+                                                                    "visit_{}",
+                                                                    snake_case(ident.as_str()),
+                                                                )
+                                                                .as_str(),
+                                                                Span::call_site(),
+                                                            );
+                                                            fields.extend(quote! {
+                                                                visitor.#visit_name(context, &#name.#field_name);
+                                                            });
+                                                        }
+                                                        Mode::Fold => {
+                                                            let fold_name = Ident::new(
+                                                                format!(
+                                                                    "fold_{}",
+                                                                    snake_case(ident.as_str()),
+                                                                )
+                                                                .as_str(),
+                                                                Span::call_site(),
+                                                            );
+                                                            fields.extend(quote! {
+                                                                folder.#fold_name(context, &mut #name.#field_name);
+                                                            });
+                                                        }
+                                                    },
                                                 }
                                             }
                                         }
@@ -196,13 +307,26 @@ fn build_visit(input: File) -> TokenStream {
                         //
                     }
                 }
-                walks.extend(quote! {
-                    #[allow(unused_variables)]
-                    pub fn #walk_name<'ast, V: Visit<'ast>>(visitor: &mut V, context: &V::Context, #name: &'ast #struct_name)
-                    where V::Context: VisitContext, {
-                        #fields
+                match mode {
+                    Mode::Visit => {
+                        walks.extend(quote! {
+                            #[allow(unused_variables)]
+                            pub fn #walk_name<'ast, V: Visit<'ast>>(visitor: &mut V, context: &V::Context, #name: &'ast #struct_name)
+                            where V::Context: Context, {
+                                #fields
+                            }
+                        });
                     }
-                });
+                    Mode::Fold => {
+                        walks.extend(quote! {
+                            #[allow(unused_variables)]
+                            pub fn #walk_name<'ast, F: Fold<'ast>>(folder: &mut F, context: &F::Context, #name: &'ast mut #struct_name)
+                            where F::Context: Context, {
+                                #fields
+                            }
+                        });
+                    }
+                }
             }
             Item::Enum(enum_) => {
                 let enum_name = enum_.ident;
@@ -210,14 +334,30 @@ fn build_visit(input: File) -> TokenStream {
                     snake_case(&enum_name.to_string()).as_str(),
                     Span::call_site(),
                 );
-                let visit_name = Ident::new(format!("visit_{}", name).as_str(), Span::call_site());
+                let visit_name = match mode {
+                    Mode::Visit => {
+                        Ident::new(format!("visit_{}", name).as_str(), Span::call_site());
+                    }
+                    Mode::Fold => Ident::new(format!("fold_{}", name).as_str(), Span::call_site()),
+                };
                 let walk_name = Ident::new(format!("walk_{}", name).as_str(), Span::call_site());
 
-                visits.extend(quote! {
-                    fn #visit_name(&mut self, context: &Self::Context, #name: &'ast #enum_name) {
-                        #walk_name(self, context, #name);
+                match mode {
+                    Mode::Visit => {
+                        trait_fns.extend(quote! {
+                            fn #visit_name(&mut self, context: &Self::Context, #name: &'ast #enum_name) {
+                                #walk_name(self, context, #name);
+                            }
+                        });
                     }
-                });
+                    Mode::Fold => {
+                        trait_fns.extend(quote! {
+                            fn #visit_name(&mut self, context: &Self::Context, #name: &'ast mut #enum_name) {
+                                #walk_name(self, context, #name);
+                            }
+                        });
+                    }
+                }
 
                 let mut variants = quote! {};
                 for variant in enum_.variants {
@@ -250,27 +390,50 @@ fn build_visit(input: File) -> TokenStream {
                                                             match argument {
                                                                 syn::GenericArgument::Type(
                                                                     ref ty,
-                                                                ) => {
-                                                                    let visit_name = Ident::new(
-                                                                        format!(
-                                                                            "visit_{}",
-                                                                            snake_case(
-                                                                                quote! { #ty }
-                                                                                    .to_string()
-                                                                                    .as_str()
+                                                                ) => match mode {
+                                                                    Mode::Visit => {
+                                                                        let visit_name = Ident::new(
+                                                                            format!(
+                                                                                "visit_{}",
+                                                                                snake_case(
+                                                                                    quote! { #ty }
+                                                                                        .to_string()
+                                                                                        .as_str(),
+                                                                                ),
                                                                             )
-                                                                        )
-                                                                        .as_str(),
-                                                                        Span::call_site(),
-                                                                    );
-                                                                    variants.extend(quote! {
-                                                                        #enum_name::#variant_name(node) => {
-                                                                            if let Some(node) = node {
-                                                                                visitor.#visit_name(context, node);
-                                                                            }
-                                                                        },
-                                                                    });
-                                                                }
+                                                                            .as_str(),
+                                                                            Span::call_site(),
+                                                                        );
+                                                                        variants.extend(quote! {
+                                                                            #enum_name::#variant_name(node) => {
+                                                                                if let Some(node) = node {
+                                                                                    visitor.#visit_name(context, node);
+                                                                                }
+                                                                            },
+                                                                        });
+                                                                    }
+                                                                    Mode::Fold => {
+                                                                        let fold_name = Ident::new(
+                                                                            format!(
+                                                                                "fold_{}",
+                                                                                snake_case(
+                                                                                    quote! { #ty }
+                                                                                        .to_string()
+                                                                                        .as_str(),
+                                                                                ),
+                                                                            )
+                                                                            .as_str(),
+                                                                            Span::call_site(),
+                                                                        );
+                                                                        variants.extend(quote! {
+                                                                            #enum_name::#variant_name(node) => {
+                                                                                if let Some(node) = node {
+                                                                                    folder.#fold_name(context, node);
+                                                                                }
+                                                                            },
+                                                                        });
+                                                                    }
+                                                                },
                                                                 _ => {
                                                                     //
                                                                 }
@@ -287,25 +450,50 @@ fn build_visit(input: File) -> TokenStream {
                                                     for argument in node.args.iter() {
                                                         match argument {
                                                             syn::GenericArgument::Type(ref ty) => {
-                                                                let visit_name = Ident::new(
-                                                                    format!(
-                                                                        "visit_{}",
-                                                                        snake_case(
-                                                                            quote! { #ty }
-                                                                                .to_string()
-                                                                                .as_str()
-                                                                        )
-                                                                    )
-                                                                    .as_str(),
-                                                                    Span::call_site(),
-                                                                );
-                                                                variants.extend(quote! {
-                                                                    #enum_name::#variant_name(nodes) => {
-                                                                        for node in nodes {
-                                                                            visitor.#visit_name(context, node);
-                                                                        }
+                                                                match mode {
+                                                                    Mode::Visit => {
+                                                                        let visit_name = Ident::new(
+                                                                            format!(
+                                                                                "visit_{}",
+                                                                                snake_case(
+                                                                                    quote! { #ty }
+                                                                                        .to_string()
+                                                                                        .as_str(),
+                                                                                ),
+                                                                            )
+                                                                            .as_str(),
+                                                                            Span::call_site(),
+                                                                        );
+                                                                        variants.extend(quote! {
+                                                                            #enum_name::#variant_name(nodes) => {
+                                                                                for node in nodes.iter() {
+                                                                                    visitor.#visit_name(context, node);
+                                                                                }
+                                                                            }
+                                                                        });
                                                                     }
-                                                                });
+                                                                    Mode::Fold => {
+                                                                        let fold_name = Ident::new(
+                                                                            format!(
+                                                                                "fold_{}",
+                                                                                snake_case(
+                                                                                    quote! { #ty }
+                                                                                        .to_string()
+                                                                                        .as_str(),
+                                                                                ),
+                                                                            )
+                                                                            .as_str(),
+                                                                            Span::call_site(),
+                                                                        );
+                                                                        variants.extend(quote! {
+                                                                            #enum_name::#variant_name(nodes) => {
+                                                                                for node in nodes.iter_mut() {
+                                                                                    folder.#fold_name(context, node);
+                                                                                }
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                }
                                                             }
                                                             _ => {
                                                                 //
@@ -322,23 +510,46 @@ fn build_visit(input: File) -> TokenStream {
                                                     for argument in node.args.iter() {
                                                         match argument {
                                                             syn::GenericArgument::Type(ref ty) => {
-                                                                let visit_name = Ident::new(
-                                                                    format!(
-                                                                        "visit_{}",
-                                                                        snake_case(
-                                                                            quote! { #ty }
-                                                                                .to_string()
-                                                                                .as_str()
-                                                                        )
-                                                                    )
-                                                                    .as_str(),
-                                                                    Span::call_site(),
-                                                                );
-                                                                variants.extend(quote! {
-                                                                    #enum_name::#variant_name(node) => {
-                                                                        visitor.#visit_name(context, node);
+                                                                match mode {
+                                                                    Mode::Visit => {
+                                                                        let visit_name = Ident::new(
+                                                                            format!(
+                                                                                "visit_{}",
+                                                                                snake_case(
+                                                                                    quote! { #ty }
+                                                                                        .to_string()
+                                                                                        .as_str(),
+                                                                                ),
+                                                                            )
+                                                                            .as_str(),
+                                                                            Span::call_site(),
+                                                                        );
+                                                                        variants.extend(quote! {
+                                                                            #enum_name::#variant_name(node) => {
+                                                                                visitor.#visit_name(context, node);
+                                                                            }
+                                                                        });
                                                                     }
-                                                                });
+                                                                    Mode::Fold => {
+                                                                        let fold_name = Ident::new(
+                                                                            format!(
+                                                                                "fold_{}",
+                                                                                snake_case(
+                                                                                    quote! { #ty }
+                                                                                        .to_string()
+                                                                                        .as_str(),
+                                                                                ),
+                                                                            )
+                                                                            .as_str(),
+                                                                            Span::call_site(),
+                                                                        );
+                                                                        variants.extend(quote! {
+                                                                            #enum_name::#variant_name(node) => {
+                                                                                folder.#fold_name(context, node);
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                }
                                                             }
                                                             _ => {
                                                                 //
@@ -350,18 +561,38 @@ fn build_visit(input: File) -> TokenStream {
                                                     //
                                                 }
                                             },
-                                            _ => {
-                                                let visit_name = Ident::new(
-                                                    format!("visit_{}", snake_case(ident.as_str()))
+                                            _ => match mode {
+                                                Mode::Visit => {
+                                                    let visit_name = Ident::new(
+                                                        format!(
+                                                            "visit_{}",
+                                                            snake_case(ident.as_str()),
+                                                        ),
                                                         .as_str(),
-                                                    Span::call_site(),
-                                                );
-                                                variants.extend(quote! {
-                                                    #enum_name::#variant_name(node) => {
-                                                        visitor.#visit_name(context, node);
-                                                    }
-                                                })
-                                            }
+                                                        Span::call_site(),
+                                                    );
+                                                    variants.extend(quote! {
+                                                        #enum_name::#variant_name(node) => {
+                                                            visitor.#visit_name(context, node);
+                                                        }
+                                                    });
+                                                }
+                                                Mode::Fold => {
+                                                    let fold_name = Ident::new(
+                                                        format!(
+                                                            "fold_{}",
+                                                            snake_case(ident.as_str()),
+                                                        ),
+                                                        .as_str(),
+                                                        Span::call_site(),
+                                                    );
+                                                    variants.extend(quote! {
+                                                        #enum_name::#variant_name(node) => {
+                                                            folder.#fold_name(context, node);
+                                                        }
+                                                    });
+                                                }
+                                            },
                                         }
                                     }
                                     _ => {
@@ -376,16 +607,32 @@ fn build_visit(input: File) -> TokenStream {
                     }
                 }
 
-                walks.extend(quote! {
-                    #[allow(unused_variables)]
-                    fn #walk_name<'ast, V: Visit<'ast>>(visitor: &mut V, context: &V::Context, #name: &'ast #enum_name)
-                    where V::Context: VisitContext,
-                    {
-                        match #name {
-                            #variants
-                        }
+                match mode {
+                    Mode::Visit => {
+                        walks.extend(quote! {
+                            #[allow(unused_variables)]
+                            fn #walk_name<'ast, V: Visit<'ast>>(visitor: &mut V, context: &V::Context, #name: &'ast #enum_name)
+                            where V::Context: Context,
+                            {
+                                match #name {
+                                    #variants
+                                }
+                            }
+                        });
                     }
-                });
+                    Mode::Fold => {
+                        walks.extend(quote! {
+                            #[allow(unused_variables)]
+                            fn #walk_name<'ast, F: Fold<'ast>>(folder: &mut F, context: &F::Context, #name: &'ast mut #enum_name)
+                            where F::Context: Context,
+                            {
+                                match #name {
+                                    #variants
+                                }
+                            }
+                        });
+                    }
+                }
             }
             _ => {
                 //
@@ -393,27 +640,47 @@ fn build_visit(input: File) -> TokenStream {
         }
     }
 
-    quote! {
-        // ! AUTOGENERATED
-        // ! DO NOT EDIT
+    match mode {
+        Mode::Visit => {
+            quote! {
+                // ! AUTOGENERATED
+                // ! DO NOT EDIT
 
-        use crate::ast::*;
-        use danube_diagnostics::Message;
+                use crate::ast::*;
+                use crate::Context;
 
-        pub trait VisitContext {
-            fn report(&self, message: Message);
+                #[allow(unused_variables)]
+                pub trait Visit<'ast>: Sized
+                where Self::Context: Context,
+                {
+                    type Context;
+
+                    #trait_fns
+                }
+
+                #walks
+            }
         }
+        Mode::Fold => {
+            quote! {
+                // ! AUTOGENERATED
+                // ! DO NOT EDIT
 
-        #[allow(unused_variables)]
-        pub trait Visit<'ast>: Sized
-        where Self::Context: VisitContext,
-        {
-            type Context;
+                use crate::ast::*;
+                use crate::Context;
 
-            #visits
+                #[allow(unused_variables)]
+                pub trait Fold<'ast>: Sized
+                where Self::Context: Context,
+                {
+                    type Context;
+
+                    #trait_fns
+                }
+
+                #walks
+            }
         }
-
-        #walks
     }
 }
 
