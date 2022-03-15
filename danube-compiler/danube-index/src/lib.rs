@@ -25,17 +25,17 @@ macro_rules! newtype_index {
 }
 
 #[derive(Debug, Default)]
-pub struct NextIndex<T: Default + From<usize>> {
+pub struct Resolver<T: Default + From<usize>> {
     index: usize,
     _marker: std::marker::PhantomData<T>,
 }
 
-impl<T: Default + From<usize>> NextIndex<T> {
+impl<T: Default + From<usize>> Resolver<T> {
     pub fn new() -> Self {
-        NextIndex::default()
+        Resolver::default()
     }
 
-    pub fn id(&mut self) -> T {
+    pub fn next_id(&mut self) -> T {
         let index = self.index;
         self.index += 1;
         T::from(index)

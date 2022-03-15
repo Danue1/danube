@@ -1,10 +1,6 @@
 use crate::ast::*;
-use crate::Context;
 #[allow(unused_variables)]
-pub trait Fold<'ast>: Sized
-where
-    Self::Context: Context,
-{
+pub trait Fold<'ast>: Sized {
     type Context;
     fn fold_package_node(&mut self, context: &Self::Context, package_node: &'ast mut PackageNode) {
         walk_package_node(self, context, package_node);
@@ -337,9 +333,7 @@ pub fn walk_package_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     package_node: &'ast mut PackageNode,
-) where
-    F::Context: Context,
-{
+) {
     for attributes in package_node.attributes.iter_mut() {
         folder.fold_attribute_node(context, attributes);
     }
@@ -352,9 +346,7 @@ pub fn walk_attribute_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     attribute_node: &'ast mut AttributeNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_path_node(context, &mut attribute_node.path);
     for args in attribute_node.args.iter_mut() {
         folder.fold_attribute_argument_node(context, args);
@@ -365,9 +357,7 @@ pub fn walk_attribute_argument_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     attribute_argument_node: &'ast mut AttributeArgumentNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_ident_node(context, &mut attribute_argument_node.ident);
     if let Some(ref mut value) = attribute_argument_node.value {
         folder.fold_expression_node(context, value);
@@ -378,9 +368,7 @@ pub fn walk_path_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     path_node: &'ast mut PathNode,
-) where
-    F::Context: Context,
-{
+) {
     for segments in path_node.segments.iter_mut() {
         folder.fold_ident_node(context, segments);
     }
@@ -390,18 +378,14 @@ pub fn walk_ident_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     ident_node: &'ast mut IdentNode,
-) where
-    F::Context: Context,
-{
+) {
 }
 #[allow(unused_variables)]
 pub fn walk_item_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     item_node: &'ast mut ItemNode,
-) where
-    F::Context: Context,
-{
+) {
     for attributes in item_node.attributes.iter_mut() {
         folder.fold_attribute_node(context, attributes);
     }
@@ -413,9 +397,7 @@ fn walk_item_kind<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     item_kind: &'ast mut ItemKind,
-) where
-    F::Context: Context,
-{
+) {
     match item_kind {
         ItemKind::Mod(node) => {
             folder.fold_mod_node(context, node);
@@ -451,9 +433,7 @@ pub fn walk_mod_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     mod_node: &'ast mut ModNode,
-) where
-    F::Context: Context,
-{
+) {
     for attributes in mod_node.attributes.iter_mut() {
         folder.fold_attribute_node(context, attributes);
     }
@@ -467,9 +447,7 @@ pub fn walk_use_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     use_node: &'ast mut UseNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_path_node(context, &mut use_node.path);
 }
 #[allow(unused_variables)]
@@ -477,9 +455,7 @@ fn walk_visibility_kind<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     visibility_kind: &'ast mut VisibilityKind,
-) where
-    F::Context: Context,
-{
+) {
     match visibility_kind {
         VisibilityKind::Current => {}
         VisibilityKind::Public => {}
@@ -493,9 +469,7 @@ pub fn walk_struct_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     struct_node: &'ast mut StructNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_ident_node(context, &mut struct_node.ident);
     for generics in struct_node.generics.iter_mut() {
         folder.fold_generic_node(context, generics);
@@ -509,9 +483,7 @@ pub fn walk_generic_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     generic_node: &'ast mut GenericNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_ident_node(context, &mut generic_node.ident);
     for traits in generic_node.traits.iter_mut() {
         folder.fold_path_node(context, traits);
@@ -525,9 +497,7 @@ fn walk_struct_field_kind<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     struct_field_kind: &'ast mut StructFieldKind,
-) where
-    F::Context: Context,
-{
+) {
     match struct_field_kind {
         StructFieldKind::Unnamed(nodes) => {
             for node in nodes.iter_mut() {
@@ -546,9 +516,7 @@ pub fn walk_unnamed_struct_field<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     unnamed_struct_field: &'ast mut UnnamedStructField,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_visibility_kind(context, &mut unnamed_struct_field.visibility);
     folder.fold_type_node(context, &mut unnamed_struct_field.ty);
 }
@@ -557,9 +525,7 @@ pub fn walk_named_struct_field<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     named_struct_field: &'ast mut NamedStructField,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_visibility_kind(context, &mut named_struct_field.visibility);
     folder.fold_ident_node(context, &mut named_struct_field.ident);
     folder.fold_type_node(context, &mut named_struct_field.ty);
@@ -569,9 +535,7 @@ fn walk_immutability_kind<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     immutability_kind: &'ast mut ImmutabilityKind,
-) where
-    F::Context: Context,
-{
+) {
     match immutability_kind {
         ImmutabilityKind::Nope => {}
         ImmutabilityKind::Yes => {}
@@ -582,9 +546,7 @@ pub fn walk_type_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     type_node: &'ast mut TypeNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_immutability_kind(context, &mut type_node.immutability);
     folder.fold_type_kind(context, &mut type_node.kind);
 }
@@ -593,9 +555,7 @@ fn walk_type_kind<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     type_kind: &'ast mut TypeKind,
-) where
-    F::Context: Context,
-{
+) {
     match type_kind {
         TypeKind::Tuple(nodes) => {
             for node in nodes.iter_mut() {
@@ -615,9 +575,7 @@ pub fn walk_generic_type_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     generic_type_node: &'ast mut GenericTypeNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_path_node(context, &mut generic_type_node.path);
     for parameters in generic_type_node.parameters.iter_mut() {
         folder.fold_type_kind(context, parameters);
@@ -628,9 +586,7 @@ pub fn walk_enum_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     enum_node: &'ast mut EnumNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_ident_node(context, &mut enum_node.ident);
     for generics in enum_node.generics.iter_mut() {
         folder.fold_generic_node(context, generics);
@@ -644,9 +600,7 @@ pub fn walk_enum_variant_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     enum_variant_node: &'ast mut EnumVariantNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_ident_node(context, &mut enum_variant_node.ident);
     if let Some(ref mut kind) = enum_variant_node.kind {
         folder.fold_enum_variant_kind(context, kind);
@@ -657,9 +611,7 @@ fn walk_enum_variant_kind<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     enum_variant_kind: &'ast mut EnumVariantKind,
-) where
-    F::Context: Context,
-{
+) {
     match enum_variant_kind {
         EnumVariantKind::Unnamed(nodes) => {
             for node in nodes.iter_mut() {
@@ -678,9 +630,7 @@ pub fn walk_enum_named_variant_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     enum_named_variant_node: &'ast mut EnumNamedVariantNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_ident_node(context, &mut enum_named_variant_node.ident);
     folder.fold_type_node(context, &mut enum_named_variant_node.ty);
 }
@@ -689,9 +639,7 @@ pub fn walk_function_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     function_node: &'ast mut FunctionNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_ident_node(context, &mut function_node.ident);
     for generics in function_node.generics.iter_mut() {
         folder.fold_generic_node(context, generics);
@@ -714,9 +662,7 @@ pub fn walk_function_parameter_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     function_parameter_node: &'ast mut FunctionParameterNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_ident_node(context, &mut function_parameter_node.argument_label);
     if let Some(ref mut parameter_label) = function_parameter_node.parameter_label {
         folder.fold_ident_node(context, parameter_label);
@@ -728,9 +674,7 @@ pub fn walk_block_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     block_node: &'ast mut BlockNode,
-) where
-    F::Context: Context,
-{
+) {
     for statements in block_node.statements.iter_mut() {
         folder.fold_statement_node(context, statements);
     }
@@ -740,9 +684,7 @@ pub fn walk_statement_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     statement_node: &'ast mut StatementNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_statement_kind(context, &mut statement_node.kind);
 }
 #[allow(unused_variables)]
@@ -750,9 +692,7 @@ fn walk_statement_kind<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     statement_kind: &'ast mut StatementKind,
-) where
-    F::Context: Context,
-{
+) {
     match statement_kind {
         StatementKind::Semicolon => {}
         StatementKind::Break => {}
@@ -781,9 +721,7 @@ pub fn walk_assign_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     assign_node: &'ast mut AssignNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_assign_kind(context, &mut assign_node.kind);
     folder.fold_expression_node(context, &mut assign_node.lhs);
     folder.fold_expression_node(context, &mut assign_node.rhs);
@@ -793,9 +731,7 @@ fn walk_assign_kind<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     assign_kind: &'ast mut AssignKind,
-) where
-    F::Context: Context,
-{
+) {
     match assign_kind {
         AssignKind::Assign => {}
         AssignKind::Add => {}
@@ -818,9 +754,7 @@ pub fn walk_let_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     let_node: &'ast mut LetNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_immutability_kind(context, &mut let_node.immutability);
     folder.fold_pattern_node(context, &mut let_node.pattern);
     if let Some(ref mut ty) = let_node.ty {
@@ -835,9 +769,7 @@ pub fn walk_pattern_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     pattern_node: &'ast mut PatternNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_pattern_kind(context, &mut pattern_node.kind);
 }
 #[allow(unused_variables)]
@@ -845,9 +777,7 @@ fn walk_pattern_kind<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     pattern_kind: &'ast mut PatternKind,
-) where
-    F::Context: Context,
-{
+) {
     match pattern_kind {
         PatternKind::Wildcard => {}
         PatternKind::Rest => {}
@@ -875,18 +805,14 @@ pub fn walk_literal_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     literal_node: &'ast mut LiteralNode,
-) where
-    F::Context: Context,
-{
+) {
 }
 #[allow(unused_variables)]
 pub fn walk_pattern_named_struct_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     pattern_named_struct_node: &'ast mut PatternNamedStructNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_path_node(context, &mut pattern_named_struct_node.path);
     for fields in pattern_named_struct_node.fields.iter_mut() {
         folder.fold_pattern_named_struct_field_node(context, fields);
@@ -897,9 +823,7 @@ pub fn walk_pattern_named_struct_field_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     pattern_named_struct_field_node: &'ast mut PatternNamedStructFieldNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_path_node(context, &mut pattern_named_struct_field_node.path);
     if let Some(ref mut pattern) = pattern_named_struct_field_node.pattern {
         folder.fold_pattern_node(context, pattern);
@@ -910,9 +834,7 @@ pub fn walk_pattern_unnamed_struct_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     pattern_unnamed_struct_node: &'ast mut PatternUnnamedStructNode,
-) where
-    F::Context: Context,
-{
+) {
     if let Some(ref mut path) = pattern_unnamed_struct_node.path {
         folder.fold_path_node(context, path);
     }
@@ -925,9 +847,7 @@ pub fn walk_type_alias_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     type_alias_node: &'ast mut TypeAliasNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_ident_node(context, &mut type_alias_node.ident);
     if let Some(ref mut ty) = type_alias_node.ty {
         folder.fold_type_node(context, ty);
@@ -938,9 +858,7 @@ pub fn walk_expression_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     expression_node: &'ast mut ExpressionNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_expression_kind(context, &mut expression_node.kind);
 }
 #[allow(unused_variables)]
@@ -948,9 +866,7 @@ fn walk_expression_kind<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     expression_kind: &'ast mut ExpressionKind,
-) where
-    F::Context: Context,
-{
+) {
     match expression_kind {
         ExpressionKind::Let(node) => {
             folder.fold_let_expression_node(context, node);
@@ -1024,9 +940,7 @@ pub fn walk_let_expression_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     let_expression_node: &'ast mut LetExpressionNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_pattern_node(context, &mut let_expression_node.pattern);
     folder.fold_expression_node(context, &mut let_expression_node.value);
 }
@@ -1035,9 +949,7 @@ pub fn walk_condition_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     condition_node: &'ast mut ConditionNode,
-) where
-    F::Context: Context,
-{
+) {
     for branches in condition_node.branches.iter_mut() {
         folder.fold_condition_branch(context, branches);
     }
@@ -1050,9 +962,7 @@ pub fn walk_condition_branch<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     condition_branch: &'ast mut ConditionBranch,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_expression_node(context, &mut condition_branch.expression);
     folder.fold_block_node(context, &mut condition_branch.block);
 }
@@ -1061,9 +971,7 @@ pub fn walk_loop_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     loop_node: &'ast mut LoopNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_block_node(context, &mut loop_node.block);
 }
 #[allow(unused_variables)]
@@ -1071,9 +979,7 @@ pub fn walk_while_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     while_node: &'ast mut WhileNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_condition_branch(context, &mut while_node.branch);
 }
 #[allow(unused_variables)]
@@ -1081,9 +987,7 @@ pub fn walk_for_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     for_node: &'ast mut ForNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_pattern_node(context, &mut for_node.pattern);
     folder.fold_expression_node(context, &mut for_node.iter);
     folder.fold_block_node(context, &mut for_node.block);
@@ -1093,9 +997,7 @@ pub fn walk_match_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     match_node: &'ast mut MatchNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_expression_node(context, &mut match_node.expression);
     for branches in match_node.branches.iter_mut() {
         folder.fold_match_branch(context, branches);
@@ -1106,9 +1008,7 @@ pub fn walk_match_branch<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     match_branch: &'ast mut MatchBranch,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_pattern_node(context, &mut match_branch.pattern);
     folder.fold_block_node(context, &mut match_branch.block);
 }
@@ -1117,9 +1017,7 @@ pub fn walk_closure_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     closure_node: &'ast mut ClosureNode,
-) where
-    F::Context: Context,
-{
+) {
     for parameters in closure_node.parameters.iter_mut() {
         folder.fold_closure_parameter_node(context, parameters);
     }
@@ -1133,9 +1031,7 @@ pub fn walk_closure_parameter_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     closure_parameter_node: &'ast mut ClosureParameterNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_ident_node(context, &mut closure_parameter_node.ident);
     if let Some(ref mut ty) = closure_parameter_node.ty {
         folder.fold_type_node(context, ty);
@@ -1146,9 +1042,7 @@ pub fn walk_tuple_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     tuple_node: &'ast mut TupleNode,
-) where
-    F::Context: Context,
-{
+) {
     for arguments in tuple_node.arguments.iter_mut() {
         folder.fold_expression_node(context, arguments);
     }
@@ -1158,9 +1052,7 @@ pub fn walk_index_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     index_node: &'ast mut IndexNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_expression_node(context, &mut index_node.expression);
     folder.fold_expression_node(context, &mut index_node.index);
 }
@@ -1169,9 +1061,7 @@ pub fn walk_binary_expression_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     binary_expression_node: &'ast mut BinaryExpressionNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_binary_operator_kind(context, &mut binary_expression_node.kind);
     folder.fold_expression_node(context, &mut binary_expression_node.lhs);
     folder.fold_expression_node(context, &mut binary_expression_node.rhs);
@@ -1181,9 +1071,7 @@ pub fn walk_field_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     field_node: &'ast mut FieldNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_expression_node(context, &mut field_node.expression);
     folder.fold_ident_node(context, &mut field_node.field);
 }
@@ -1192,9 +1080,7 @@ pub fn walk_function_call_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     function_call_node: &'ast mut FunctionCallNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_expression_node(context, &mut function_call_node.expression);
     for arguments in function_call_node.arguments.iter_mut() {
         folder.fold_argument_node(context, arguments);
@@ -1205,9 +1091,7 @@ pub fn walk_method_call_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     method_call_node: &'ast mut MethodCallNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_ident_node(context, &mut method_call_node.ident);
     for arguments in method_call_node.arguments.iter_mut() {
         folder.fold_argument_node(context, arguments);
@@ -1218,9 +1102,7 @@ pub fn walk_argument_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     argument_node: &'ast mut ArgumentNode,
-) where
-    F::Context: Context,
-{
+) {
     if let Some(ref mut ident) = argument_node.ident {
         folder.fold_ident_node(context, ident);
     }
@@ -1231,9 +1113,7 @@ fn walk_binary_operator_kind<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     binary_operator_kind: &'ast mut BinaryOperatorKind,
-) where
-    F::Context: Context,
-{
+) {
     match binary_operator_kind {
         BinaryOperatorKind::Add => {}
         BinaryOperatorKind::Sub => {}
@@ -1261,9 +1141,7 @@ pub fn walk_trait_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     trait_node: &'ast mut TraitNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_ident_node(context, &mut trait_node.ident);
     for generics in trait_node.generics.iter_mut() {
         folder.fold_generic_node(context, generics);
@@ -1280,9 +1158,7 @@ pub fn walk_constant_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     constant_node: &'ast mut ConstantNode,
-) where
-    F::Context: Context,
-{
+) {
     folder.fold_pattern_node(context, &mut constant_node.pattern);
     folder.fold_type_node(context, &mut constant_node.ty);
     if let Some(ref mut expression) = constant_node.expression {
@@ -1294,9 +1170,7 @@ pub fn walk_implement_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     implement_node: &'ast mut ImplementNode,
-) where
-    F::Context: Context,
-{
+) {
     for generics in implement_node.generics.iter_mut() {
         folder.fold_generic_node(context, generics);
     }
@@ -1316,9 +1190,7 @@ pub fn walk_implement_item_node<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     implement_item_node: &'ast mut ImplementItemNode,
-) where
-    F::Context: Context,
-{
+) {
     for attributes in implement_item_node.attributes.iter_mut() {
         folder.fold_attribute_node(context, attributes);
     }
@@ -1329,9 +1201,7 @@ fn walk_implement_item_kind<'ast, F: Fold<'ast>>(
     folder: &mut F,
     context: &F::Context,
     implement_item_kind: &'ast mut ImplementItemKind,
-) where
-    F::Context: Context,
-{
+) {
     match implement_item_kind {
         ImplementItemKind::Type(node) => {
             folder.fold_type_alias_node(context, node);

@@ -50,7 +50,7 @@ fn build_trait(input: File, mode: Mode) -> TokenStream {
                 );
                 let visit_name = match mode {
                     Mode::Visit => {
-                        Ident::new(format!("visit_{}", name).as_str(), Span::call_site());
+                        Ident::new(format!("visit_{}", name).as_str(), Span::call_site())
                     }
                     Mode::Fold => Ident::new(format!("fold_{}", name).as_str(), Span::call_site()),
                 };
@@ -311,8 +311,7 @@ fn build_trait(input: File, mode: Mode) -> TokenStream {
                     Mode::Visit => {
                         walks.extend(quote! {
                             #[allow(unused_variables)]
-                            pub fn #walk_name<'ast, V: Visit<'ast>>(visitor: &mut V, context: &V::Context, #name: &'ast #struct_name)
-                            where V::Context: Context, {
+                            pub fn #walk_name<'ast, V: Visit<'ast>>(visitor: &mut V, context: &V::Context, #name: &'ast #struct_name) {
                                 #fields
                             }
                         });
@@ -320,8 +319,7 @@ fn build_trait(input: File, mode: Mode) -> TokenStream {
                     Mode::Fold => {
                         walks.extend(quote! {
                             #[allow(unused_variables)]
-                            pub fn #walk_name<'ast, F: Fold<'ast>>(folder: &mut F, context: &F::Context, #name: &'ast mut #struct_name)
-                            where F::Context: Context, {
+                            pub fn #walk_name<'ast, F: Fold<'ast>>(folder: &mut F, context: &F::Context, #name: &'ast mut #struct_name) {
                                 #fields
                             }
                         });
@@ -336,7 +334,7 @@ fn build_trait(input: File, mode: Mode) -> TokenStream {
                 );
                 let visit_name = match mode {
                     Mode::Visit => {
-                        Ident::new(format!("visit_{}", name).as_str(), Span::call_site());
+                        Ident::new(format!("visit_{}", name).as_str(), Span::call_site())
                     }
                     Mode::Fold => Ident::new(format!("fold_{}", name).as_str(), Span::call_site()),
                 };
@@ -567,7 +565,7 @@ fn build_trait(input: File, mode: Mode) -> TokenStream {
                                                         format!(
                                                             "visit_{}",
                                                             snake_case(ident.as_str()),
-                                                        ),
+                                                        )
                                                         .as_str(),
                                                         Span::call_site(),
                                                     );
@@ -582,7 +580,7 @@ fn build_trait(input: File, mode: Mode) -> TokenStream {
                                                         format!(
                                                             "fold_{}",
                                                             snake_case(ident.as_str()),
-                                                        ),
+                                                        )
                                                         .as_str(),
                                                         Span::call_site(),
                                                     );
@@ -611,9 +609,7 @@ fn build_trait(input: File, mode: Mode) -> TokenStream {
                     Mode::Visit => {
                         walks.extend(quote! {
                             #[allow(unused_variables)]
-                            fn #walk_name<'ast, V: Visit<'ast>>(visitor: &mut V, context: &V::Context, #name: &'ast #enum_name)
-                            where V::Context: Context,
-                            {
+                            fn #walk_name<'ast, V: Visit<'ast>>(visitor: &mut V, context: &V::Context, #name: &'ast #enum_name) {
                                 match #name {
                                     #variants
                                 }
@@ -623,9 +619,7 @@ fn build_trait(input: File, mode: Mode) -> TokenStream {
                     Mode::Fold => {
                         walks.extend(quote! {
                             #[allow(unused_variables)]
-                            fn #walk_name<'ast, F: Fold<'ast>>(folder: &mut F, context: &F::Context, #name: &'ast mut #enum_name)
-                            where F::Context: Context,
-                            {
+                            fn #walk_name<'ast, F: Fold<'ast>>(folder: &mut F, context: &F::Context, #name: &'ast mut #enum_name) {
                                 match #name {
                                     #variants
                                 }
@@ -647,12 +641,9 @@ fn build_trait(input: File, mode: Mode) -> TokenStream {
                 // ! DO NOT EDIT
 
                 use crate::ast::*;
-                use crate::Context;
 
                 #[allow(unused_variables)]
-                pub trait Visit<'ast>: Sized
-                where Self::Context: Context,
-                {
+                pub trait Visit<'ast>: Sized {
                     type Context;
 
                     #trait_fns
@@ -667,12 +658,9 @@ fn build_trait(input: File, mode: Mode) -> TokenStream {
                 // ! DO NOT EDIT
 
                 use crate::ast::*;
-                use crate::Context;
 
                 #[allow(unused_variables)]
-                pub trait Fold<'ast>: Sized
-                where Self::Context: Context,
-                {
+                pub trait Fold<'ast>: Sized {
                     type Context;
 
                     #trait_fns
