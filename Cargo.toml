@@ -1,27 +1,3 @@
 [workspace]
-members = [
-  "danube-compiler/danube-ast",
-  "danube-compiler/danube-ast-lowering",
-  "danube-compiler/danube-codegen",
-  "danube-compiler/danube-compile",
-  "danube-compiler/danube-dependency-graph",
-  "danube-compiler/danube-diagnostics",
-  "danube-compiler/danube-hir",
-  "danube-compiler/danube-hir-lowering",
-  "danube-compiler/danube-index",
-  "danube-compiler/danube-lex",
-  "danube-compiler/danube-lir",
-  "danube-compiler/danube-mir",
-  "danube-compiler/danube-mir-lowering",
-  "danube-compiler/danube-name-resolution",
-  "danube-compiler/danube-parse",
-  "danube-compiler/danube-span",
-  "danube-compiler/danube-token",
-  "danube-compiler/danube-typecheck",
-  "danube-runtime/danube-repl",
-  "danube-runtime/danube-runtime-javascript",
-  "danube-runtime/danube-runtime-jvm",
-  "danube-runtime/danube-runtime-native",
-  "danube-runtime/danube-runtime-wasm",
-  "danube-runtime/danube-vm",
-]
+resolver = "2"
+members = ["compiler/danubec"]

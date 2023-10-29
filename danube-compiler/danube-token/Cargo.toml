@@ -1,9 +1,0 @@
-[package]
-name = "danube-token"
-version = "0.1.0"
-authors = ["Danuel <public.danuel@gmail.com>"]
-edition = "2021"
-
-[dependencies]
-danube-span = { path = "../danube-span" }
-lazy_static = "1.4.0"

@@ -1,0 +1,8 @@
+[package]
+name = "danubec"
+version = "0.1.0"
+authors = ["Danuel <public.danuel@gmail.com>"]
+edition = "2021"
+
+[dependencies]
+danubec-compile = { path = "../danubec-compile" }
