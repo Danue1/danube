@@ -6,9 +6,30 @@ version = 3
 name = "danubec"
 version = "0.1.0"
 dependencies = [
- "danubec-compile",
+ "danubec-ast",
+ "danubec-lex",
+ "danubec-parse",
 ]
 
 [[package]]
-name = "danubec-compile"
+name = "danubec-ast"
+version = "0.1.0"
+
+[[package]]
+name = "danubec-lex"
+version = "0.1.0"
+dependencies = [
+ "danubec-token",
+]
+
+[[package]]
+name = "danubec-parse"
+version = "0.1.0"
+dependencies = [
+ "danubec-ast",
+ "danubec-token",
+]
+
+[[package]]
+name = "danubec-token"
 version = "0.1.0"

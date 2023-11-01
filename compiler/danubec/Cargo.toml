@@ -5,4 +5,6 @@ authors = ["Danuel <public.danuel@gmail.com>"]
 edition = "2021"
 
 [dependencies]
-danubec-compile = { path = "../danubec-compile" }
+danubec-ast = { path = "../danubec-ast" }
+danubec-lex = { path = "../danubec-lex" }
+danubec-parse = { path = "../danubec-parse" }

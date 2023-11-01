@@ -5,3 +5,4 @@ authors = ["Danuel <public.danuel@gmail.com>"]
 edition = "2021"
 
 [dependencies]
+danubec-token = { path = "../danubec-token" }
