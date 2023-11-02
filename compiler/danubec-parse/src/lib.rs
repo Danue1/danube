@@ -1,18 +1,19 @@
-mod ast;
-mod cursor;
-mod error;
+#[macro_use]
+mod context;
+mod parse;
 
-use cursor::Cursor;
-use danubec_ast::Ast;
-use danubec_token::Token;
-use error::ParseError;
+use context::{Context, State};
+use danubec_syntax_kind::SyntaxKind;
+use rowan::GreenNode;
 
+#[derive(Debug)]
 pub struct Parse;
 
 impl Parse {
-    pub fn parse(tokens: &[Token]) -> Result<Ast, ParseError> {
-        use ast::Parse;
-
-        Ast::parse(&mut Cursor::new(tokens))
+    pub fn parse(mut tokens: Vec<(SyntaxKind, String)>) -> GreenNode {
+        tokens.reverse();
+        let mut context = Context::new(tokens);
+        context.ast();
+        context.builder.finish()
     }
 }

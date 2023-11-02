@@ -88,8 +88,16 @@ let character: Character = Character { name: "Hello, World!" };
 ## Enum
 
 ```danube
-enum PrimitiveType = S | I | B;
-enum PrimitiveType = S(String) | I(int) | B(bool);
+enum PrimitiveType {
+  S,
+  I,
+  B,
+}
+enum PrimitiveType {
+  S(String),
+  I(int),
+  B(bool),
+}
 ```
 
 ### Enum Instantiation

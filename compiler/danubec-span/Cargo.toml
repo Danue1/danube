@@ -1,7 +1,0 @@
-[package]
-name = "danubec-span"
-version = "0.1.0"
-authors = ["Danuel <public.danuel@gmail.com>"]
-edition = "2021"
-
-[dependencies]

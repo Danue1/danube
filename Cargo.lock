@@ -3,12 +3,25 @@
 version = 3
 
 [[package]]
+name = "autocfg"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
+
+[[package]]
+name = "countme"
+version = "3.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7704b5fdd17b18ae31c4c1da5a2e0305a2bf17b5249300a9ee9ed7b72114c636"
+
+[[package]]
 name = "danubec"
 version = "0.1.0"
 dependencies = [
  "danubec-ast",
  "danubec-lex",
  "danubec-parse",
+ "danubec-syntax-node",
 ]
 
 [[package]]
@@ -19,17 +32,70 @@ version = "0.1.0"
 name = "danubec-lex"
 version = "0.1.0"
 dependencies = [
- "danubec-token",
+ "danubec-syntax-kind",
 ]
 
 [[package]]
 name = "danubec-parse"
 version = "0.1.0"
 dependencies = [
- "danubec-ast",
- "danubec-token",
+ "danubec-syntax-kind",
+ "danubec-syntax-node",
+ "rowan",
 ]
 
 [[package]]
-name = "danubec-token"
+name = "danubec-syntax-kind"
 version = "0.1.0"
+dependencies = [
+ "rowan",
+]
+
+[[package]]
+name = "danubec-syntax-node"
+version = "0.1.0"
+dependencies = [
+ "danubec-ast",
+ "danubec-syntax-kind",
+ "rowan",
+]
+
+[[package]]
+name = "hashbrown"
+version = "0.12.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
+
+[[package]]
+name = "memoffset"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5a634b1c61a95585bd15607c6ab0c4e5b226e695ff2800ba0cdccddf208c406c"
+dependencies = [
+ "autocfg",
+]
+
+[[package]]
+name = "rowan"
+version = "0.15.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "906057e449592587bf6724f00155bf82a6752c868d78a8fb3aa41f4e6357cfe8"
+dependencies = [
+ "countme",
+ "hashbrown",
+ "memoffset",
+ "rustc-hash",
+ "text-size",
+]
+
+[[package]]
+name = "rustc-hash"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "08d43f7aa6b08d49f382cde6a7982047c3426db949b1424bc4b7ec9ae12c6ce2"
+
+[[package]]
+name = "text-size"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f18aa187839b2bdb1ad2fa35ead8c4c2976b64e4363c386d45ac0f7ee85c9233"

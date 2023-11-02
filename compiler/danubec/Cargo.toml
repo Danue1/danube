@@ -8,3 +8,4 @@ edition = "2021"
 danubec-ast = { path = "../danubec-ast" }
 danubec-lex = { path = "../danubec-lex" }
 danubec-parse = { path = "../danubec-parse" }
+danubec-syntax-node = { path = "../danubec-syntax-node" }

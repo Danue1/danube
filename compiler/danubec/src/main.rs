@@ -1,5 +1,6 @@
 use danubec_lex::Lex;
 use danubec_parse::Parse;
+use danubec_syntax_node::node::AstNode;
 
 // TODO: 의존성 패키지 스캔
 // TODO: 파일 일기
@@ -11,8 +12,9 @@ use danubec_parse::Parse;
 pub fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let source = include_str!("../fixtures/main.dnb");
     let tokens = Lex::lex(source);
-    let ast = Parse::parse(tokens.as_slice());
-    dbg!(ast);
+    let node = Parse::parse(tokens);
+    let ast = AstNode::lower(node);
+    dbg!(&ast);
 
     Ok(())
 }

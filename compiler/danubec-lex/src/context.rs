@@ -1,10 +1,10 @@
-use danubec_token::{Token, TokenKind, EOF};
+use danubec_syntax_kind::SyntaxKind;
 use std::ops::Range;
 
 pub struct Context<'lex> {
     index: usize,
     source: &'lex str,
-    tokens: Vec<Token<'lex>>,
+    tokens: Vec<(SyntaxKind, String)>,
 }
 
 impl<'lex> Context<'lex> {
@@ -16,21 +16,18 @@ impl<'lex> Context<'lex> {
         }
     }
 
-    pub fn bump(&mut self, kind: TokenKind) {
+    pub fn bump(&mut self, kind: SyntaxKind) {
         let len = self.peek().map(|c| c.len_utf8()).unwrap_or(0);
-        self.tokens.push(Token {
-            kind,
-            source: &self.source[self.index..self.index + len],
-        });
-        self.index += len;
+        self.bump_with(kind, self.index..self.index + len);
     }
 
-    pub fn bump_with(&mut self, kind: TokenKind, range: Range<usize>) {
+    pub fn bump_with(&mut self, kind: SyntaxKind, range: Range<usize>) {
         self.index = range.end;
-        self.tokens.push(Token {
-            kind,
-            source: &self.source[range],
-        });
+        self.tokens.push((kind, self.source[range].to_owned()));
+    }
+
+    pub fn slice(&self, range: Range<usize>) -> &'lex str {
+        &self.source[range]
     }
 
     #[inline]
@@ -44,12 +41,10 @@ impl<'lex> Context<'lex> {
     }
 
     #[inline]
-    pub fn build(mut self) -> Vec<Token<'lex>> {
-        self.tokens.push(EOF);
+    pub fn build(self) -> Vec<(SyntaxKind, String)> {
         self.tokens
     }
 
-    #[inline]
     pub const fn index(&self) -> usize {
         self.index
     }

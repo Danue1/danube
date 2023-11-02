@@ -1,7 +1,8 @@
 [package]
-name = "danubec-token"
+name = "danubec-syntax-kind"
 version = "0.1.0"
 authors = ["Danuel <public.danuel@gmail.com>"]
 edition = "2021"
 
 [dependencies]
+rowan = "0.15.13"
