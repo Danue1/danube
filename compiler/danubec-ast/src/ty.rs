@@ -1,28 +1,28 @@
 use crate::{NamedField, Path};
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub struct Ty {
     pub kind: TypeKind,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub enum TypeKind {
     Unnamed(UnnamedTypeKind),
     Named(NamedTypeKind),
     Path(PathTypeKind),
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub struct UnnamedTypeKind {
     pub fields: Vec<Ty>,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub struct NamedTypeKind {
     pub fields: Vec<NamedField>,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub struct PathTypeKind {
     pub path: Path,
 }

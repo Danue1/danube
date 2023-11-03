@@ -1,9 +1,9 @@
 use danubec_syntax_kind::SyntaxKind;
-use rowan::{Checkpoint, GreenNodeBuilder};
+use rowan::{Checkpoint, GreenNode, GreenNodeBuilder};
 
 pub struct Context {
-    pub tokens: Vec<(SyntaxKind, String)>,
-    pub builder: GreenNodeBuilder<'static>,
+    tokens: Vec<(SyntaxKind, String)>,
+    builder: GreenNodeBuilder<'static>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -54,6 +54,20 @@ impl Context {
         }
     }
 
+    pub fn peek_text(&self) -> &str {
+        match self.tokens.last() {
+            Some((_, text)) => text.as_str(),
+            None => "",
+        }
+    }
+
+    pub fn look_ahead(&self, nth: usize) -> SyntaxKind {
+        match self.tokens.get(self.tokens.len() - nth - 1) {
+            Some((kind, _)) => *kind,
+            None => SyntaxKind::EOF,
+        }
+    }
+
     #[inline]
     pub fn is_eof(&self) -> bool {
         self.peek() == SyntaxKind::EOF
@@ -63,6 +77,11 @@ impl Context {
         while self.peek().is_whitespace() {
             self.bump();
         }
+    }
+
+    #[inline]
+    pub fn finish(self) -> GreenNode {
+        self.builder.finish()
     }
 }
 
@@ -84,7 +103,9 @@ macro_rules! guard {
     ($context:ident, $match:ident, $kind:ident) => {
         guard!($context, $match, $kind, bump);
     };
-    ($context:ident, $match:ident, $kind:ident, $bump:ident) => {
+    ($context:ident, $match:ident, $kind:ident, $bump:ident) => {{
+        use danubec_syntax_kind::SyntaxKind;
+
         match $context.peek() {
             SyntaxKind::$match => {
                 $context.start_node(SyntaxKind::$kind.into());
@@ -92,7 +113,7 @@ macro_rules! guard {
             }
             _ => return crate::State::Continue,
         }
-    };
+    }};
 }
 
 #[macro_export]

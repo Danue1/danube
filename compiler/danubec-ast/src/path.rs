@@ -1,6 +1,6 @@
 use crate::Ident;
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub struct Path {
     pub segments: Vec<Ident>,
 }

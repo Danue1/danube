@@ -40,9 +40,9 @@ pub enum SyntaxKind {
     EQUAL,         // =
 
     // Literals
-    NUMBER, // 123
-    STRING, // "hello"
-    CHAR,   // 'a'
+    NUMERIC, // /\d+/
+    STRING,  // /".*"/
+    CHAR,    // /'.*'/
 
     // Keyword
     IDENT_KEYWORD,         // hello
@@ -76,6 +76,13 @@ pub enum SyntaxKind {
     AST_NODE,
     STRUCT_ITEM_NODE,
     ENUM_ITEM_NODE,
+    CONST_ITEM_NODE,
+    EXPRESSION_NODE,
+    EXPRESSION_LITERAL_BOOL_NODE,
+    EXPRESSION_LITERAL_CHAR_NODE,
+    EXPRESSION_LITERAL_INTEGER_NODE,
+    EXPRESSION_LITERAL_FLOAT_NODE,
+    EXPRESSION_LITERAL_STRING_NODE,
     ENUM_VARIANT_KIND_NODE,
     TYPE_NODE,
     NAMED_FIELDS_NODE,
@@ -148,7 +155,7 @@ impl SyntaxKind {
     }
 
     pub const fn is_literal(self) -> bool {
-        matches!(self, NUMBER | STRING | CHAR)
+        matches!(self, NUMERIC | STRING | CHAR)
     }
 
     pub const fn is_keyword(self) -> bool {

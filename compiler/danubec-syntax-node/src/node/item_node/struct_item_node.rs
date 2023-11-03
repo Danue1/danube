@@ -2,19 +2,19 @@ use crate::{IdentNode, SyntaxNode, TypeNode, VisibilityNode};
 use danubec_ast::{NamedField, StructFields, StructItem, UnnamedField};
 use danubec_syntax_kind::SyntaxKind;
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub struct StructItemNode(pub SyntaxNode);
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub enum StructFieldsNode {
     Named(Vec<SyntaxNode>),
     Unnamed(Vec<SyntaxNode>),
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub struct NamedStructFieldNode(pub SyntaxNode);
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub struct UnnamedStructFieldNode(pub SyntaxNode);
 
 impl StructItemNode {

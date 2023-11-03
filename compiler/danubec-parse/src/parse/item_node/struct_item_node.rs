@@ -5,8 +5,9 @@ impl crate::Context {
     pub fn struct_item_node(&mut self) -> State {
         guard!(self, STRUCT_KEYWORD, STRUCT_ITEM_NODE);
         self.skip_whitespace();
-        self.ident_node();
-        self.skip_whitespace();
+        if self.ident_node() == State::Stop {
+            self.skip_whitespace();
+        }
         if self.named_fields_node() == State::Continue {
             if self.unnamed_fields_node() == State::Continue {
                 self.skip_whitespace();
@@ -34,7 +35,7 @@ impl crate::Context {
         }
 
         self.finish_node();
-        State::Continue
+        State::Stop
     }
 }
 

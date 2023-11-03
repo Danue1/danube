@@ -1,22 +1,25 @@
-use crate::context::State;
+use crate::State;
 use danubec_syntax_kind::SyntaxKind;
 
 impl crate::Context {
     pub fn enum_item_node(&mut self) -> State {
         guard!(self, ENUM_KEYWORD, ENUM_ITEM_NODE);
         self.skip_whitespace();
-        self.ident_node();
-        self.skip_whitespace();
-        expect!(self, SyntaxKind::LEFT_BRACE);
-        self.skip_whitespace();
+        if self.ident_node() == State::Stop {
+            self.skip_whitespace();
+        }
+        if expect!(self, SyntaxKind::LEFT_BRACE) {
+            self.skip_whitespace();
+        }
 
         while !self.is_eof() {
             if expect!(self, SyntaxKind::RIGHT_BRACE) {
                 break;
             }
 
-            self.enum_variant_kind_node();
-            self.skip_whitespace();
+            if self.enum_variant_kind_node() == State::Stop {
+                self.skip_whitespace();
+            }
             if expect!(self, SyntaxKind::COMMA) {
                 self.skip_whitespace();
             }

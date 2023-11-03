@@ -2,7 +2,7 @@ use super::SyntaxNode;
 use danubec_ast::Ident;
 use danubec_syntax_kind::SyntaxKind;
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub struct IdentNode(pub SyntaxNode);
 
 impl IdentNode {

@@ -1,12 +1,12 @@
 use crate::{Ident, NamedField, UnnamedField};
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub struct StructItem {
     pub name: Ident,
     pub fields: Option<StructFields>,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub enum StructFields {
     Named(Vec<NamedField>),
     Unnamed(Vec<UnnamedField>),

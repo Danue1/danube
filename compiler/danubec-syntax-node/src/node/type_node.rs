@@ -3,19 +3,19 @@ use crate::PathNode;
 use danubec_ast::{PathTypeKind, Ty, TypeKind, UnnamedTypeKind};
 use danubec_syntax_kind::SyntaxKind;
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub struct TypeNode(pub SyntaxNode);
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub enum TypeKindNode {
     Unnamed(Vec<SyntaxNode>),
     Path(SyntaxNode),
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub struct UnnamedTypeKindNode(pub SyntaxNode);
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub struct PathTypeKindNode(pub SyntaxNode);
 
 impl TypeNode {

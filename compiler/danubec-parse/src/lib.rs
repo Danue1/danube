@@ -16,6 +16,6 @@ impl Parse {
         tokens.reverse();
         let mut context = Context::new(tokens);
         context.ast();
-        context.builder.finish()
+        context.finish()
     }
 }

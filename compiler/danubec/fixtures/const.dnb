@@ -1,26 +1,3 @@
-struct Foo;
-struct Foo(i32);
-struct Foo(i32,);
-struct Foo { }
-struct Foo { bar: i32 }
-struct Foo { bar: i32, }
-
-enum Foo { }
-enum Foo { Bar }
-enum Foo { Bar, }
-enum Foo { Bar() }
-enum Foo { Bar(), }
-enum Foo { Bar(i32) }
-enum Foo { Bar(i32), }
-enum Foo { Bar(i32,) }
-enum Foo { Bar(i32,), }
-enum Foo { Bar { } }
-enum Foo { Bar { }, }
-enum Foo { Bar { baz: i32 } }
-enum Foo { Bar { baz: i32 }, }
-enum Foo { Bar { baz: i32, } }
-enum Foo { Bar { baz: i32, }, }
-
 const FOO: i32 = 0;
 const FOO: i32 = 0.1;
 const FOO: i32 = true;

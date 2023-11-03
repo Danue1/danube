@@ -1,5 +1,4 @@
 use crate::State;
-use danubec_syntax_kind::SyntaxKind;
 
 impl crate::Context {
     pub fn ident_node(&mut self) -> State {

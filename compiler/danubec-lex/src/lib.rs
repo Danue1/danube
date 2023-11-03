@@ -49,7 +49,7 @@ impl Lex {
                         //
                     }
                     let end = context.index();
-                    context.bump_with(SyntaxKind::NUMBER, start..end);
+                    context.bump_with(SyntaxKind::NUMERIC, start..end);
                 }
                 '"' => {
                     let start = context.index();
@@ -162,11 +162,11 @@ mod tests {
         assert_eq!(
             tokens,
             vec![
-                (SyntaxKind::NUMBER, "123".to_owned()),
+                (SyntaxKind::NUMERIC, "123".to_owned()),
                 (SyntaxKind::WHITESPACE, " ".to_owned()),
-                (SyntaxKind::NUMBER, "456".to_owned()),
+                (SyntaxKind::NUMERIC, "456".to_owned()),
                 (SyntaxKind::DOT, ".".to_owned()),
-                (SyntaxKind::NUMBER, "789".to_owned()),
+                (SyntaxKind::NUMERIC, "789".to_owned()),
             ],
         );
     }

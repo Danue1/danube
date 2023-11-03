@@ -1,5 +1,7 @@
+pub mod expression_node;
 pub mod ident_node;
 pub mod item_node;
+pub mod literal_node;
 pub mod path_node;
 pub mod type_node;
 pub mod visibility_node;
@@ -7,8 +9,10 @@ pub mod visibility_node;
 use crate::SyntaxError;
 use danubec_ast::Ast;
 use danubec_syntax_kind::SyntaxKind;
+pub use expression_node::*;
 pub use ident_node::*;
 pub use item_node::*;
+pub use literal_node::*;
 pub use path_node::*;
 pub use rowan::GreenNode;
 pub use type_node::*;
@@ -16,7 +20,7 @@ pub use visibility_node::*;
 
 pub type SyntaxNode = rowan::SyntaxNode<danubec_syntax_kind::SyntaxKind>;
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub struct AstNode(SyntaxNode);
 
 macro_rules! impl_cast {
@@ -36,6 +40,7 @@ macro_rules! impl_cast {
 impl_cast!(AstNode, AST_NODE);
 impl_cast!(StructItemNode, STRUCT_ITEM_NODE);
 impl_cast!(EnumItemNode, ENUM_ITEM_NODE);
+impl_cast!(ConstItemNode, CONST_ITEM_NODE);
 impl_cast!(NamedStructFieldNode, NAMED_FIELD_NODE);
 impl_cast!(UnnamedStructFieldNode, UNNAMED_FIELD_NODE);
 impl_cast!(EnumVariantNode, ENUM_VARIANT_KIND_NODE);

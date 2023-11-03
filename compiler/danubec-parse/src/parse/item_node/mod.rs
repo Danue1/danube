@@ -1,3 +1,4 @@
+mod const_item_node;
 mod enum_item_node;
 mod struct_item_node;
 
@@ -6,7 +7,11 @@ use danubec_syntax_kind::SyntaxKind;
 
 impl crate::Context {
     pub fn item_node(&mut self) -> crate::State {
-        one_of!(self.struct_item_node(), self.enum_item_node())
+        one_of!(
+            self.struct_item_node(),
+            self.enum_item_node(),
+            self.const_item_node()
+        )
     }
 
     pub fn named_field_node(&mut self) -> State {

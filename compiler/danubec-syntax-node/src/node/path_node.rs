@@ -2,7 +2,7 @@ use super::SyntaxNode;
 use crate::IdentNode;
 use danubec_ast::Path;
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub struct PathNode(pub SyntaxNode);
 
 impl PathNode {

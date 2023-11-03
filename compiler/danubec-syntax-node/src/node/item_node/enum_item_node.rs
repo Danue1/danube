@@ -2,13 +2,13 @@ use crate::{IdentNode, NamedStructFieldNode, SyntaxNode, UnnamedStructFieldNode}
 use danubec_ast::{EnumItem, EnumVariant, EnumVariantKind};
 use danubec_syntax_kind::SyntaxKind;
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub struct EnumItemNode(pub SyntaxNode);
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub struct EnumVariantNode(pub SyntaxNode);
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq)]
 pub enum EnumVariantKindNode {
     Unnamed(Vec<SyntaxNode>),
     Named(Vec<SyntaxNode>),
