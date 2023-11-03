@@ -7,9 +7,10 @@ impl crate::Context {
         self.skip_whitespace();
         self.ident_node();
         self.skip_whitespace();
-        if self.named_struct_fields_node() == State::Continue
-            && self.unnamed_struct_fields_node() == State::Continue
-        {
+        if self.named_fields_node() == State::Continue {
+            if self.unnamed_fields_node() == State::Continue {
+                self.skip_whitespace();
+            }
             expect!(self, SyntaxKind::SEMICOLON);
         }
 
@@ -17,8 +18,8 @@ impl crate::Context {
         State::Stop
     }
 
-    pub fn named_struct_fields_node(&mut self) -> State {
-        guard!(self, LEFT_BRACE, NAMED_STRUCT_FIELDS_NODE);
+    pub fn named_fields_node(&mut self) -> State {
+        guard!(self, LEFT_BRACE, NAMED_FIELDS_NODE);
         self.skip_whitespace();
 
         while !self.is_eof() {
@@ -26,7 +27,7 @@ impl crate::Context {
                 break;
             }
 
-            if self.named_struct_field_node() == State::Continue {
+            if self.named_field_node() == State::Continue {
                 self.unexpected_token();
             }
             self.skip_whitespace();
@@ -35,72 +36,11 @@ impl crate::Context {
         self.finish_node();
         State::Continue
     }
-
-    pub fn named_struct_field_node(&mut self) -> State {
-        guard!(self, IDENT_KEYWORD, NAMED_STRUCT_FIELD_NODE, ident_node);
-        self.skip_whitespace();
-        expect!(self, SyntaxKind::COLON);
-        self.skip_whitespace();
-        self.type_node();
-        self.skip_whitespace();
-        expect!(self, SyntaxKind::COMMA);
-
-        self.finish_node();
-        State::Stop
-    }
-
-    pub fn unnamed_struct_fields_node(&mut self) -> State {
-        guard!(self, LEFT_PAREN, UNNAMED_STRUCT_FIELDS_NODE);
-        self.skip_whitespace();
-
-        while !self.is_eof() {
-            if expect!(self, SyntaxKind::RIGHT_PAREN) {
-                self.skip_whitespace();
-                expect!(self, SyntaxKind::SEMICOLON);
-                break;
-            }
-
-            if self.unnamed_struct_field_node() == State::Continue {
-                self.unexpected_token();
-            }
-            self.skip_whitespace();
-            if expect!(self, SyntaxKind::COMMA) {
-                self.skip_whitespace();
-            }
-        }
-
-        self.finish_node();
-        State::Stop
-    }
-
-    pub fn unnamed_struct_field_node(&mut self) -> State {
-        let checkpoint = self.checkpoint();
-        if self.type_node() == State::Continue {
-            State::Continue
-        } else {
-            self.start_node_at(checkpoint, SyntaxKind::UNNAMED_STRUCT_FIELD_NODE);
-            self.finish_node();
-            State::Stop
-        }
-    }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use danubec_syntax_node::SyntaxNode;
-
-    macro_rules! assert_node {
-        ($tokens:expr, $text:expr,) => {
-            let mut tokens = $tokens;
-            tokens.reverse();
-            let mut context = crate::Context::new(tokens);
-            context.ast();
-            let node = SyntaxNode::new_root(context.builder.finish());
-            dbg!(&node);
-            assert_eq!(format!("{:#?}", node), $text);
-        };
-    }
+    use danubec_syntax_kind::SyntaxKind;
 
     #[test]
     fn test_zero_item_node() {
@@ -141,7 +81,7 @@ mod tests {
     IDENT_NODE@7..10
       IDENT_KEYWORD@7..10 "Foo"
     WHITESPACE@10..11 " "
-    NAMED_STRUCT_FIELDS_NODE@11..14
+    NAMED_FIELDS_NODE@11..14
       LEFT_BRACE@11..12 "{"
       WHITESPACE@12..13 " "
       RIGHT_BRACE@13..14 "}"
@@ -173,10 +113,10 @@ mod tests {
     IDENT_NODE@7..10
       IDENT_KEYWORD@7..10 "Foo"
     WHITESPACE@10..11 " "
-    NAMED_STRUCT_FIELDS_NODE@11..23
+    NAMED_FIELDS_NODE@11..23
       LEFT_BRACE@11..12 "{"
       WHITESPACE@12..13 " "
-      NAMED_STRUCT_FIELD_NODE@13..22
+      NAMED_FIELD_NODE@13..22
         IDENT_NODE@13..16
           IDENT_KEYWORD@13..16 "bar"
         COLON@16..17 ":"
@@ -217,10 +157,10 @@ mod tests {
     IDENT_NODE@7..10
       IDENT_KEYWORD@7..10 "Foo"
     WHITESPACE@10..11 " "
-    NAMED_STRUCT_FIELDS_NODE@11..24
+    NAMED_FIELDS_NODE@11..24
       LEFT_BRACE@11..12 "{"
       WHITESPACE@12..13 " "
-      NAMED_STRUCT_FIELD_NODE@13..22
+      NAMED_FIELD_NODE@13..22
         IDENT_NODE@13..16
           IDENT_KEYWORD@13..16 "bar"
         COLON@16..17 ":"
@@ -254,10 +194,10 @@ mod tests {
     WHITESPACE@6..7 " "
     IDENT_NODE@7..10
       IDENT_KEYWORD@7..10 "Foo"
-    UNNAMED_STRUCT_FIELDS_NODE@10..13
+    UNNAMED_FIELDS_NODE@10..12
       LEFT_PAREN@10..11 "("
       RIGHT_PAREN@11..12 ")"
-      SEMICOLON@12..13 ";"
+    SEMICOLON@12..13 ";"
 "#,
         );
     }
@@ -280,16 +220,16 @@ mod tests {
     WHITESPACE@6..7 " "
     IDENT_NODE@7..10
       IDENT_KEYWORD@7..10 "Foo"
-    UNNAMED_STRUCT_FIELDS_NODE@10..16
+    UNNAMED_FIELDS_NODE@10..15
       LEFT_PAREN@10..11 "("
-      UNNAMED_STRUCT_FIELD_NODE@11..14
+      UNNAMED_FIELD_NODE@11..14
         TYPE_NODE@11..14
           PATH_TYPE_KIND_NODE@11..14
             PATH_NODE@11..14
               IDENT_NODE@11..14
                 IDENT_KEYWORD@11..14 "i32"
       RIGHT_PAREN@14..15 ")"
-      SEMICOLON@15..16 ";"
+    SEMICOLON@15..16 ";"
 "#,
         );
     }
@@ -313,9 +253,9 @@ mod tests {
     WHITESPACE@6..7 " "
     IDENT_NODE@7..10
       IDENT_KEYWORD@7..10 "Foo"
-    UNNAMED_STRUCT_FIELDS_NODE@10..17
+    UNNAMED_FIELDS_NODE@10..16
       LEFT_PAREN@10..11 "("
-      UNNAMED_STRUCT_FIELD_NODE@11..14
+      UNNAMED_FIELD_NODE@11..14
         TYPE_NODE@11..14
           PATH_TYPE_KIND_NODE@11..14
             PATH_NODE@11..14
@@ -323,7 +263,7 @@ mod tests {
                 IDENT_KEYWORD@11..14 "i32"
       COMMA@14..15 ","
       RIGHT_PAREN@15..16 ")"
-      SEMICOLON@16..17 ";"
+    SEMICOLON@16..17 ";"
 "#,
         );
     }

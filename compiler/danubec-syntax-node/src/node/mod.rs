@@ -35,8 +35,10 @@ macro_rules! impl_cast {
 
 impl_cast!(AstNode, AST_NODE);
 impl_cast!(StructItemNode, STRUCT_ITEM_NODE);
-impl_cast!(NamedStructFieldNode, NAMED_STRUCT_FIELD_NODE);
-impl_cast!(UnnamedStructFieldNode, UNNAMED_STRUCT_FIELD_NODE);
+impl_cast!(EnumItemNode, ENUM_ITEM_NODE);
+impl_cast!(NamedStructFieldNode, NAMED_FIELD_NODE);
+impl_cast!(UnnamedStructFieldNode, UNNAMED_FIELD_NODE);
+impl_cast!(EnumVariantNode, ENUM_VARIANT_KIND_NODE);
 impl_cast!(TypeNode, TYPE_NODE);
 impl_cast!(UnnamedTypeKindNode, UNNAMED_TYPE_KIND_NODE);
 impl_cast!(PathTypeKindNode, PATH_TYPE_KIND_NODE);

@@ -1,12 +1,6 @@
-use super::{ident_node::IdentNode, SyntaxNode};
-use crate::{type_node::TypeNode, VisibilityNode};
-use danubec_ast::{Item, NamedField, StructFields, StructItem, UnnamedField};
+use crate::{IdentNode, SyntaxNode, TypeNode, VisibilityNode};
+use danubec_ast::{NamedField, StructFields, StructItem, UnnamedField};
 use danubec_syntax_kind::SyntaxKind;
-
-#[derive(Debug, PartialEq, Eq, Hash)]
-pub enum ItemNode {
-    Struct(StructItemNode),
-}
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct StructItemNode(pub SyntaxNode);
@@ -22,22 +16,6 @@ pub struct NamedStructFieldNode(pub SyntaxNode);
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct UnnamedStructFieldNode(pub SyntaxNode);
-
-impl ItemNode {
-    pub fn cast(node: SyntaxNode) -> Option<Self> {
-        if let Some(item) = StructItemNode::cast(node) {
-            Some(Self::Struct(item))
-        } else {
-            None
-        }
-    }
-
-    pub fn lower(self) -> Item {
-        match self {
-            Self::Struct(item) => Item::Struct(item.lower()),
-        }
-    }
-}
 
 impl StructItemNode {
     pub fn name(&self) -> Option<IdentNode> {
@@ -62,15 +40,15 @@ impl StructFieldsNode {
     pub fn cast(node: SyntaxNode) -> Option<Self> {
         match node.kind() {
             // { a: i32, b: i32 }
-            SyntaxKind::NAMED_STRUCT_FIELDS_NODE => Some(Self::Named(
+            SyntaxKind::NAMED_FIELDS_NODE => Some(Self::Named(
                 node.children()
-                    .filter(|node| node.kind() == SyntaxKind::NAMED_STRUCT_FIELD_NODE)
+                    .filter(|node| node.kind() == SyntaxKind::NAMED_FIELD_NODE)
                     .collect(),
             )),
             // (i32, i32)
-            SyntaxKind::UNNAMED_STRUCT_FIELDS_NODE => Some(Self::Unnamed(
+            SyntaxKind::UNNAMED_FIELDS_NODE => Some(Self::Unnamed(
                 node.children()
-                    .filter(|node| node.kind() == SyntaxKind::UNNAMED_STRUCT_FIELD_NODE)
+                    .filter(|node| node.kind() == SyntaxKind::UNNAMED_FIELD_NODE)
                     .collect(),
             )),
             _ => None,

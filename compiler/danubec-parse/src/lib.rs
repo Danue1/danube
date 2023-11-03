@@ -1,4 +1,6 @@
 #[macro_use]
+mod macros;
+#[macro_use]
 mod context;
 mod parse;
 

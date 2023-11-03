@@ -1,4 +1,4 @@
-use crate::{Ident, NamedField, Ty, UnnamedField};
+use crate::{Ident, NamedField, UnnamedField};
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct EnumItem {
@@ -9,7 +9,7 @@ pub struct EnumItem {
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct EnumVariant {
     pub name: Ident,
-    pub ty: Option<Ty>,
+    pub kind: Option<EnumVariantKind>,
 }
 
 #[derive(Debug, PartialEq, Eq, Hash)]
@@ -21,5 +21,11 @@ pub enum EnumVariantKind {
 impl EnumItem {
     pub const fn new(name: Ident, variants: Vec<EnumVariant>) -> Self {
         Self { name, variants }
+    }
+}
+
+impl EnumVariant {
+    pub const fn new(name: Ident, kind: Option<EnumVariantKind>) -> Self {
+        Self { name, kind }
     }
 }
