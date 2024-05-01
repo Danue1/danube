@@ -1,8 +1,0 @@
-[package]
-name = "danubec-lex"
-version = "0.1.0"
-authors = ["Danuel <public.danuel@gmail.com>"]
-edition = "2021"
-
-[dependencies]
-danubec-syntax-kind = { path = "../danubec-syntax-kind" }

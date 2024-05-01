@@ -1,3 +1,0 @@
-pub trait From<T> {
-    fn from(t: T) -> Self;
-}

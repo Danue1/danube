@@ -1,6 +1,0 @@
-struct Foo;
-struct Foo(i32);
-struct Foo(i32,);
-struct Foo { }
-struct Foo { bar: i32 }
-struct Foo { bar: i32, }

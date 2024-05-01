@@ -1,3 +1,0 @@
-pub fn identity<T>(t: T) -> T {
-    t
-}
