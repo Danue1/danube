@@ -11,7 +11,90 @@ fn main() {
 }
 ```
 
-The syntax can be found in [docs/Syntax.md](./docs/Syntax.md).
+## Syntax
+
+### Variables
+
+```danube
+let x = 10;
+let mut name = "Danube";
+```
+
+### Conditions
+
+```danube
+if x > 5 {
+  println!("Hello, Danube!");
+} else {
+  println!("Hello, World!");
+}
+```
+
+### Loops
+
+```danube
+for i in 1..5 {
+  println!(i);
+}
+```
+
+### Function Declarations and Calling
+
+```danube
+fn add(a: u8, b: u8) -> u8 {
+  a + b
+}
+
+add(1, 2); // 3
+```
+
+### Struct Declarations and Instantiation
+
+```danube
+struct User {
+  name: String,
+}
+
+impl User {
+  fn name(self) -> String {
+    self.name
+  }
+}
+
+let user = User {
+  name: "Danuel",
+}
+
+println!(user.name());
+```
+
+### Module System
+
+```danube
+// math.dnb
+pub fn add(a: u8, b: u8) -> u8 {
+  a + b
+}
+
+// main.dnb
+use math::add;
+
+add(1, 2); // 3
+```
+
+### Context Receivers
+
+```danube
+fn say[f: Debug](user: User) {
+  f.debug("Hello, ${user.name}!");
+}
+
+impl User {
+  pub fn say[f: Debug](self) {
+    f.debug("Hello, ${self.name}");
+  }
+}
+```
 
 ## Special Thanks
 
