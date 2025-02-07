@@ -1,0 +1,34 @@
+---
+source: compiler/danubec_lex/src/lib.rs
+expression: tokens
+---
+[
+    (
+        FN,
+        "fn",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        LET,
+        "let",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        TRUE,
+        "true",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        FALSE,
+        "false",
+    ),
+]

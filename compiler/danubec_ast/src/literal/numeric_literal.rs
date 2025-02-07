@@ -1,5 +1,14 @@
 crate::ast_node! {
-    struct NumericLiteral;
+    enum NumericLiteral {
+        Decimal(DecimalNumericLiteral),
+        Binary(BinaryNumericLiteral),
+        Octal(OctalNumericLiteral),
+        Hex(HexNumericLiteral),
+    }
+}
+
+crate::ast_node! {
+    struct DecimalNumericLiteral;
 
     node integer -> IntegerPart;
     node fraction -> FractionPart;
@@ -7,69 +16,51 @@ crate::ast_node! {
 }
 
 crate::ast_node! {
+    struct BinaryNumericLiteral;
+
+    token prefix -> NUMERIC_LITERAL_PREFIX;
+    node fragment -> NumericFragment;
+}
+
+crate::ast_node! {
+    struct OctalNumericLiteral;
+
+    token prefix -> NUMERIC_LITERAL_PREFIX;
+    node fragment -> NumericFragment;
+}
+
+crate::ast_node! {
+    struct HexNumericLiteral;
+
+    token prefix -> NUMERIC_LITERAL_PREFIX;
+    node fragment -> NumericFragment;
+}
+
+crate::ast_node! {
     struct IntegerPart;
 
-    node sign -> NumberSign;
-    node encoding -> NumberEncoding;
-    node fragments -> NumberFragment;
+    node fragment -> NumericFragment;
 }
 
 crate::ast_node! {
     struct FractionPart;
 
     token dot -> DOT;
-    node fragments -> NumberFragment;
-    node exponent -> Exponent;
+    node fragment -> NumericFragment;
 }
 
 crate::ast_node! {
     struct Exponent;
 
     token e -> E;
-    node sign -> NumberSign;
-    node fragments -> NumberFragment;
-}
-
-crate::ast_node! {
-    enum NumberEncoding {
-        Binary(Binary),
-        Octal(Octal),
-        Hexadecimal(Hexadecimal),
-    }
-
-    node binary -> Binary;
-    node octal -> Octal;
-    node hexadecimal -> Hexadecimal;
-}
-
-crate::ast_node! {
-    struct Binary;
-
-    token zero -> Raw;
-}
-
-crate::ast_node! {
-    struct Octal;
-
-    token zero -> Raw;
-}
-
-crate::ast_node! {
-    struct Hexadecimal;
-
-    node raw -> Raw;
-}
-
-crate::ast_node! {
-    struct NumberSign;
-
     token minus -> HYPHEN;
     token plus -> PLUS;
+    node fragment -> NumericFragment;
 }
 
 crate::ast_node! {
-    struct NumberFragment;
+    struct NumericFragment;
 
-    token digit -> Raw;
-    token underscore -> UNDERSCORE;
+    tokens digits -> NUMERIC;
+    tokens underscores -> UNDERSCORE;
 }

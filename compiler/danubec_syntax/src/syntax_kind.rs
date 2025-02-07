@@ -3,6 +3,7 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum SyntaxKind {
     // Tokens
+    UNEXPECTED,
     /// ` `
     WHITESPACE,
     /// `\n`
@@ -11,7 +12,7 @@ pub enum SyntaxKind {
     TAB,
     /// `~`
     TILDE,
-    /// `~`
+    /// `\``
     BACKTICK,
     /// `!`
     EXCLAMATION,
@@ -73,13 +74,26 @@ pub enum SyntaxKind {
     DOUBLE_QUOTE,
     /// `'`
     SINGLE_QUOTE,
+
     /// `->`
     HYPHEN__RIGHT_CHEVRON,
 
+    /// `[a-zA-Z]+`
+    ALPHABETIC,
+    /// `[0-9]+`
+    NUMERIC,
+    /// `0b` | `0B` | `0o` | `0O` | `0x` | `0X`
+    NUMERIC_LITERAL_PREFIX,
+
+    /// `fn`
     FN,
+    /// `let`
     LET,
+    /// `true`
     TRUE,
+    /// `false`
     FALSE,
+    /// `e` | `E`
     E,
 
     // Nodes
@@ -113,15 +127,14 @@ pub enum SyntaxKind {
     StringLiteral,
     CharLiteralFragment,
     CharLiteralEscapeSequence,
+    BinaryNumericLiteral,
+    OctalNumericLiteral,
+    DecimalNumericLiteral,
+    HexNumericLiteral,
     IntegerPart,
     FractionPart,
     Exponent,
-    NumberEncoding,
-    NumberSign,
-    NumberFragment,
-    Binary,
-    Octal,
-    Hexadecimal,
+    NumericFragment,
     StringLiteralFragment,
     Escape,
     Interpolation,

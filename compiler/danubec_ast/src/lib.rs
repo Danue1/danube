@@ -1,3 +1,5 @@
+#![warn(clippy::all)]
+
 pub mod definition;
 pub mod expression;
 pub mod identifier;

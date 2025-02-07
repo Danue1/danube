@@ -1,0 +1,74 @@
+---
+source: compiler/danubec_lex/src/lib.rs
+expression: tokens
+---
+[
+    (
+        NUMERIC,
+        "123",
+    ),
+    (
+        DOT,
+        ".",
+    ),
+    (
+        NUMERIC,
+        "456",
+    ),
+    (
+        ALPHABETIC,
+        "e",
+    ),
+    (
+        PLUS,
+        "+",
+    ),
+    (
+        NUMERIC,
+        "789",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        NUMERIC,
+        "0",
+    ),
+    (
+        ALPHABETIC,
+        "b",
+    ),
+    (
+        NUMERIC,
+        "1010",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        NUMERIC,
+        "0",
+    ),
+    (
+        ALPHABETIC,
+        "o",
+    ),
+    (
+        NUMERIC,
+        "123",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        NUMERIC,
+        "0",
+    ),
+    (
+        ALPHABETIC,
+        "xABC",
+    ),
+]
