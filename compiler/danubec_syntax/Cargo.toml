@@ -1,0 +1,7 @@
+[package]
+name = "danubec_syntax"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rowan = { workspace = true }

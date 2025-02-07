@@ -1,3 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["compiler/danubec"]
+members = ["compiler/danubec", "compiler/danubec_ast", "compiler/danubec_syntax"]
+
+[workspace.dependencies]
+rowan = "0.16.1"
