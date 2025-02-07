@@ -4,3 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+danubec_syntax = { path = "../danubec_syntax" }
+rowan = { workspace = true }

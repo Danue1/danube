@@ -2,6 +2,7 @@
 #[repr(u16)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum SyntaxKind {
+    // Tokens
     /// ` `
     WHITESPACE,
     /// `\n`
@@ -72,6 +73,61 @@ pub enum SyntaxKind {
     DOUBLE_QUOTE,
     /// `'`
     SINGLE_QUOTE,
+    /// `->`
+    HYPHEN__RIGHT_CHEVRON,
 
+    FN,
+    LET,
+    TRUE,
+    FALSE,
+    E,
+
+    // Nodes
     Root,
+
+    Definition,
+    FunctionDefinition,
+
+    Type,
+    PathType,
+
+    Statement,
+    DefinitionStatement,
+    ExpressionStatement,
+    LetStatement,
+    SemicolonStatement,
+
+    Expression,
+    AssignmentExpression,
+    BlockExpression,
+    LetExpression,
+    LiteralExpression,
+
+    FunctionParameter,
+
+    Literal,
+    ArrayLiteral,
+    BooleanLiteral,
+    CharLiteral,
+    NumericLiteral,
+    StringLiteral,
+    CharLiteralFragment,
+    CharLiteralEscapeSequence,
+    IntegerPart,
+    FractionPart,
+    Exponent,
+    NumberEncoding,
+    NumberSign,
+    NumberFragment,
+    Binary,
+    Octal,
+    Hexadecimal,
+    StringLiteralFragment,
+    Escape,
+    Interpolation,
+
+    Name,
+    Identifier,
+
+    Raw,
 }

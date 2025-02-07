@@ -15,6 +15,10 @@ version = "0.1.0"
 [[package]]
 name = "danubec_ast"
 version = "0.1.0"
+dependencies = [
+ "danubec_syntax",
+ "rowan",
+]
 
 [[package]]
 name = "danubec_syntax"
