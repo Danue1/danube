@@ -2,7 +2,7 @@ crate::ast_node! {
     struct FunctionDefinition;
 
     token fn_token -> FN;
-    node name -> Name;
+    node name -> Identifier;
     token left_paren -> LEFT_PAREN;
     nodes parameters -> FunctionParameter;
     token right_paren -> RIGHT_PAREN;
@@ -15,7 +15,7 @@ crate::ast_node! {
 crate::ast_node! {
     struct FunctionParameter;
 
-    node name -> Name;
+    node name -> Identifier;
     token colon -> COLON;
     node ty -> Type;
     token comma -> COMMA;

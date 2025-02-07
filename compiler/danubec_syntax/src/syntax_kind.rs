@@ -77,6 +77,56 @@ pub enum SyntaxKind {
 
     /// `->`
     HYPHEN__RIGHT_CHEVRON,
+    /// `::`
+    COLON__COLON,
+
+    // Assignment operators
+    /// `+=`
+    PLUS__EQUAL,
+    /// `+|=`
+    PLUS__PIPE__EQUAL,
+    /// `+%=`
+    PLUS__PERCENT__EQUAL,
+    /// `-=`
+    HYPHEN__EQUAL,
+    /// `-|=`
+    HYPHEN__PIPE__EQUAL,
+    /// `-%=`
+    HYPHEN__PERCENT__EQUAL,
+    /// `*=`
+    ASTERISK__EQUAL,
+    /// `*|=`
+    ASTERISK__PIPE__EQUAL,
+    /// `*%=`
+    ASTERISK__PERCENT__EQUAL,
+    /// `**=`
+    ASTERISK__ASTERISK__EQUAL,
+    /// `**|=`
+    ASTERISK__ASTERISK__PIPE__EQUAL,
+    /// `**%=`
+    ASTERISK__ASTERISK__PERCENT__EQUAL,
+    /// `/=`
+    SLASH__EQUAL,
+    /// `%=`
+    PERCENT__EQUAL,
+    /// `^=`
+    CARET__EQUAL,
+    /// `&=`
+    AMPERSAND__EQUAL,
+    /// `&&=`
+    AMPERSAND__AMPERSAND__EQUAL,
+    /// `|=`
+    PIPE__EQUAL,
+    /// `||=`
+    PIPE__PIPE__EQUAL,
+    /// `<<=`
+    LEFT_CHEVRON__LEFT_CHEVRON__EQUAL,
+    /// `<<|=`
+    LEFT_CHEVRON__LEFT_CHEVRON__PIPE__EQUAL,
+    /// `>>=`
+    RIGHT_CHEVRON__RIGHT_CHEVRON__EQUAL,
+    /// `>>>=`
+    RIGHT_CHEVRON__RIGHT_CHEVRON__RIGHT_CHEVRON__EQUAL,
 
     /// `[a-zA-Z]+`
     ALPHABETIC,
@@ -99,19 +149,19 @@ pub enum SyntaxKind {
     // Nodes
     Root,
 
-    Definition,
+    // Definition
     FunctionDefinition,
 
-    Type,
+    // Type,
     PathType,
 
-    Statement,
+    // Statement,
     DefinitionStatement,
     ExpressionStatement,
     LetStatement,
     SemicolonStatement,
 
-    Expression,
+    // Expression,
     AssignmentExpression,
     BlockExpression,
     LetExpression,
@@ -119,14 +169,11 @@ pub enum SyntaxKind {
 
     FunctionParameter,
 
-    Literal,
+    // Literal,
     ArrayLiteral,
     BooleanLiteral,
     CharLiteral,
-    NumericLiteral,
     StringLiteral,
-    CharLiteralFragment,
-    CharLiteralEscapeSequence,
     BinaryNumericLiteral,
     OctalNumericLiteral,
     DecimalNumericLiteral,
@@ -135,12 +182,13 @@ pub enum SyntaxKind {
     FractionPart,
     Exponent,
     NumericFragment,
-    StringLiteralFragment,
     Escape,
     Interpolation,
 
-    Name,
     Identifier,
+    AssignmentOperator,
 
     Raw,
+    Trivia,
+    Error,
 }

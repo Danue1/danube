@@ -1,5 +1,6 @@
 use danubec_syntax::SyntaxKind;
 
+#[derive(Clone)]
 pub struct Lex<'lex> {
     source: &'lex str,
     index: usize,
@@ -8,6 +9,11 @@ pub struct Lex<'lex> {
 impl<'lex> Lex<'lex> {
     pub fn new(source: &'lex str) -> Self {
         Self { source, index: 0 }
+    }
+
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.source.len() == self.index
     }
 }
 

@@ -4,7 +4,6 @@ pub mod definition;
 pub mod expression;
 pub mod identifier;
 pub mod literal;
-pub mod name;
 pub mod raw;
 pub mod root;
 pub mod statement;
@@ -14,7 +13,6 @@ pub use definition::*;
 pub use expression::*;
 pub use identifier::*;
 pub use literal::*;
-pub use name::*;
 pub use r#type::*;
 pub use raw::*;
 pub use root::*;
@@ -24,7 +22,13 @@ use danubec_syntax::*;
 
 #[macro_export]
 macro_rules! ast_node {
-    (struct $node:ident; $($rest:tt)*) => {
+    (
+        $(#[$meta:meta])*
+        struct $node:ident;
+
+        $($rest:tt)*
+    ) => {
+        $(#[$meta])*
         #[derive(Debug, Clone, PartialEq, Eq, Hash)]
         pub struct $node(crate::SyntaxNode);
 
@@ -54,7 +58,13 @@ macro_rules! ast_node {
 
         crate::ast_node!(impl $node { $($rest)* });
     };
-    (enum $node:ident { $($variant:ident,)+ } $($rest:tt)*) => {
+    (
+        $(#[$meta:meta])*
+        enum $node:ident { $($variant:ident,)+ }
+
+        $($rest:tt)*
+    ) => {
+        $(#[$meta])*
         #[derive(Debug, Clone, PartialEq, Eq, Hash)]
         pub enum $node {
             $($variant(crate::$variant),)+
@@ -89,7 +99,13 @@ macro_rules! ast_node {
 
         crate::ast_node!(impl $node { $($rest)* });
     };
-    (enum $node:ident { $($variant:ident($definition:ident),)+ } $($rest:tt)*) => {
+    (
+        $(#[$meta:meta])*
+        enum $node:ident { $($variant:ident($definition:ident),)+ }
+
+        $($rest:tt)*
+    ) => {
+        $(#[$meta])*
         #[derive(Debug, Clone, PartialEq, Eq, Hash)]
         pub enum $node {
             $($variant(crate::$definition),)+
