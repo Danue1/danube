@@ -1,13 +1,14 @@
 # Danube Programming Language
 
-Danube is a programming language strongly inspired by [Rust](https://github.com/rust-lang/rust/), but it is an interpreter language without a lifetime and ownership model.
+Danube: For A New Era Language Standard.
+
+It supports the basic features that are refined with reference to the trial and failure of existing languages.
 
 ## Hello, World!
 
 ```danube
 fn main() {
-  let message = "Hello, World!";
-  println(message);
+  println("Hello, World!");
 }
 ```
 
@@ -24,9 +25,9 @@ let mut name = "Danube";
 
 ```danube
 if x > 5 {
-  println!("Hello, Danube!");
+  println("Hello, Danube!");
 } else {
-  println!("Hello, World!");
+  println("Hello, World!");
 }
 ```
 
@@ -34,7 +35,15 @@ if x > 5 {
 
 ```danube
 for i in 1..5 {
-  println!(i);
+  println("For! {i}");
+}
+
+while condition {
+  println("While!");
+}
+
+loop {
+  println("Loops!");
 }
 ```
 
@@ -56,7 +65,7 @@ struct User {
 }
 
 impl User {
-  fn name(self) -> String {
+  fn name(self) -> str {
     self.name
   }
 }
@@ -65,7 +74,7 @@ let user = User {
   name: "Danuel",
 }
 
-println!(user.name());
+println(user.name());
 ```
 
 ### Module System
@@ -80,18 +89,68 @@ pub fn add(a: u8, b: u8) -> u8 {
 use math::add;
 
 add(1, 2); // 3
+math::add(1, 2); // 3
 ```
 
-### Context Receivers
+### Context Parameters
 
 ```danube
-fn say[f: Debug](user: User) {
-  f.debug("Hello, ${user.name}!");
+fn say(|f: mut Debug|, user: User) {
+  f.debug("Hello, {user.name}!");
 }
 
 impl User {
-  pub fn say[f: Debug](self) {
-    f.debug("Hello, ${self.name}");
+  pub fn say(self, |f: mut Debug|) {
+    f.debug("Hello, {self.name}");
+  }
+}
+
+impl<T1> T1 {
+  fn with<U>(self, f: (|T1|) -> U) -> U {
+    f(|self|)
+  }
+}
+
+// Formatter has a Debug trait.
+Formatter::new().with(fn (|formatter|) {
+  let user = User::new("Danuel");
+
+  // 1 will be same as 2
+  say(user); // 1
+  say(|formatter|, user); // 2
+})
+```
+
+### Traits
+
+```danube
+trait Identity {
+  fn identity(self) -> Id;
+}
+
+struct User {
+  id: Id,
+}
+
+impl Identity for User {
+  fn identity(self) -> Id {
+    self.id
+  }
+}
+```
+
+### Effect System
+
+```danube
+trait ^DivByZero {
+  fn on_div_by_zero() -> u8;
+}
+
+fn div(a: u8, b: u8): ^DivByZero -> u8 {
+  if b == 0 {
+    ^DivByZero::on_div_by_zero()
+  } else {
+    a / b
   }
 }
 ```
