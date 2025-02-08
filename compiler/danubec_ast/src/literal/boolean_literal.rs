@@ -1,4 +1,4 @@
-crate::ast_node! {
+ast_node! {
     struct BooleanLiteral;
 
     token true_token -> TRUE;

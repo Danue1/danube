@@ -10,7 +10,7 @@ pub use char_literal::*;
 pub use numeric_literal::*;
 pub use string_literal::*;
 
-crate::ast_node! {
+ast_node! {
     enum Literal {
         Array(ArrayLiteral),
         Boolean(BooleanLiteral),

@@ -1,4 +1,4 @@
-crate::ast_node! {
+ast_node! {
     struct LetExpression;
 
     token let_token -> LET;

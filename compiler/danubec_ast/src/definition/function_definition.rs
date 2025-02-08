@@ -1,4 +1,4 @@
-crate::ast_node! {
+ast_node! {
     struct FunctionDefinition;
 
     token fn_token -> FN;
@@ -12,7 +12,7 @@ crate::ast_node! {
     node body -> BlockExpression;
 }
 
-crate::ast_node! {
+ast_node! {
     struct FunctionParameter;
 
     node name -> Identifier;

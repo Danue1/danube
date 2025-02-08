@@ -8,7 +8,7 @@ pub use expression_statement::*;
 pub use let_statement::*;
 pub use semicolon_statement::*;
 
-crate::ast_node! {
+ast_node! {
     enum Statement {
         Definition(DefinitionStatement),
         Expression(ExpressionStatement),

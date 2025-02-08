@@ -8,7 +8,7 @@ pub use block_expression::*;
 pub use let_expression::*;
 pub use literal_expression::*;
 
-crate::ast_node! {
+ast_node! {
     enum Expression {
         Assignment(AssignmentExpression),
         Block(BlockExpression),

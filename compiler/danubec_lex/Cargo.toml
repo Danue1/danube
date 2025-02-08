@@ -5,4 +5,4 @@ edition = "2021"
 
 [dependencies]
 danubec_syntax = { path = "../danubec_syntax" }
-insta = { workspace = true }
+insta.workspace = true

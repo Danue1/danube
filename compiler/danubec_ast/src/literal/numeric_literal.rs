@@ -1,4 +1,4 @@
-crate::ast_node! {
+ast_node! {
     enum NumericLiteral {
         Decimal(DecimalNumericLiteral),
         Binary(BinaryNumericLiteral),
@@ -7,7 +7,7 @@ crate::ast_node! {
     }
 }
 
-crate::ast_node! {
+ast_node! {
     struct DecimalNumericLiteral;
 
     node integer -> IntegerPart;
@@ -15,41 +15,41 @@ crate::ast_node! {
     node exponent -> Exponent;
 }
 
-crate::ast_node! {
+ast_node! {
     struct BinaryNumericLiteral;
 
     token prefix -> NUMERIC_LITERAL_PREFIX;
     node fragment -> NumericFragment;
 }
 
-crate::ast_node! {
+ast_node! {
     struct OctalNumericLiteral;
 
     token prefix -> NUMERIC_LITERAL_PREFIX;
     node fragment -> NumericFragment;
 }
 
-crate::ast_node! {
+ast_node! {
     struct HexNumericLiteral;
 
     token prefix -> NUMERIC_LITERAL_PREFIX;
     node fragment -> NumericFragment;
 }
 
-crate::ast_node! {
+ast_node! {
     struct IntegerPart;
 
     node fragment -> NumericFragment;
 }
 
-crate::ast_node! {
+ast_node! {
     struct FractionPart;
 
     token dot -> DOT;
     node fragment -> NumericFragment;
 }
 
-crate::ast_node! {
+ast_node! {
     struct Exponent;
 
     token e -> E;
@@ -58,7 +58,7 @@ crate::ast_node! {
     node fragment -> NumericFragment;
 }
 
-crate::ast_node! {
+ast_node! {
     struct NumericFragment;
 
     tokens digits -> NUMERIC;

@@ -1,4 +1,4 @@
-crate::ast_node! {
+ast_node! {
     struct AssignmentExpression;
 
     node lhs -> Expression;

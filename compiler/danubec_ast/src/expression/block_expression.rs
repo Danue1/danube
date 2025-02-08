@@ -1,4 +1,4 @@
-crate::ast_node! {
+ast_node! {
     struct BlockExpression;
 
     token left_brace -> LEFT_BRACE;
