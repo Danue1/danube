@@ -3,22 +3,8 @@
 #[macro_use]
 mod macros;
 
-pub mod definition;
-pub mod expression;
-pub mod identifier;
-pub mod literal;
-pub mod raw;
-pub mod root;
-pub mod statement;
-pub mod r#type;
+pub mod node;
 
-pub use definition::*;
-pub use expression::*;
-pub use identifier::*;
-pub use literal::*;
-pub use r#type::*;
-pub use raw::*;
-pub use root::*;
-pub use statement::*;
+pub use node::*;
 
 use danubec_syntax::*;
