@@ -38,47 +38,6 @@ macro_rules! ast_node {
     };
     (
         $(#[$meta:meta])*
-        enum $node:ident { $($variant:ident,)+ }
-
-        $($rest:tt)*
-    ) => {
-        $(#[$meta])*
-        #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-        pub enum $node {
-            $($variant(crate::$variant),)+
-        }
-
-        impl rowan::ast::AstNode for crate::$node {
-            type Language = crate::Danube;
-
-            fn can_cast(kind: <Self::Language as rowan::Language>::Kind) -> bool
-            where
-                Self: Sized,
-            {
-                false || $(crate::$variant::can_cast(kind))||+
-            }
-
-            fn cast(node: rowan::SyntaxNode<Self::Language>) -> Option<Self>
-            where
-                Self: Sized,
-            {
-                $(if let Some(node) = crate::$variant::cast(node.clone()) {
-                    return Some(Self::$variant(node));
-                })+
-                None
-            }
-
-            fn syntax(&self) -> &rowan::SyntaxNode<Self::Language> {
-                match self {
-                    $(Self::$variant(node) => node.syntax(),)+
-                }
-            }
-        }
-
-        ast_node!(impl $node { $($rest)* });
-    };
-    (
-        $(#[$meta:meta])*
         enum $node:ident { $($variant:ident($definition:ident),)+ }
 
         $($rest:tt)*
@@ -96,7 +55,7 @@ macro_rules! ast_node {
             where
                 Self: Sized,
             {
-                false || $(crate::$definition::can_cast(kind))||+
+                $(crate::$definition::can_cast(kind))||+
             }
 
             fn cast(node: rowan::SyntaxNode<Self::Language>) -> Option<Self>

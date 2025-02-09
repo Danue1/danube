@@ -9,12 +9,23 @@ pub use let_expression::*;
 pub use literal_expression::*;
 
 ast_node! {
+    /// ```
+    /// Expression =
+    /// | AssignmentKind
+    /// ```
     struct Expression;
 
     node kind -> ExpressionKind;
 }
 
 ast_node! {
+    /// ```
+    /// ExpressionKind =
+    /// | AssignmentExpression
+    /// | BlockExpression
+    /// | LetExpression
+    /// | LiteralExpression
+    /// ```
     enum ExpressionKind {
         Assignment(AssignmentExpression),
         Block(BlockExpression),

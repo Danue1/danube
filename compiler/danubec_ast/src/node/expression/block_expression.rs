@@ -1,4 +1,8 @@
 ast_node! {
+    /// ```
+    /// BlockExpression =
+    /// | "{" _ Statement* _ "}"
+    /// ```
     struct BlockExpression;
 
     token left_brace -> LEFT_BRACE;

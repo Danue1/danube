@@ -1,8 +1,9 @@
 ast_node! {
-    /// - pub
-    /// - pub(crate)
-    /// - pub(super)
-    /// - pub(in some::module)
+    /// ```
+    /// Visibility =
+    /// | "pub"
+    /// | "pub" _ "(" _ VisibilityKind _ ")"
+    /// ```
     struct Visibility;
 
     token public -> PUB;
@@ -12,6 +13,12 @@ ast_node! {
 }
 
 ast_node! {
+    /// ```
+    /// VisibilityKind =
+    /// | VisibilityCrate
+    /// | VisibilitySuper
+    /// | VisibilityIn
+    /// ```
     enum VisibilityKind {
         Crate(VisibilityCrate),
         Super(VisibilitySuper),
@@ -20,18 +27,30 @@ ast_node! {
 }
 
 ast_node! {
+    /// ```
+    /// VisibilityCrate =
+    /// | "crate"
+    /// ```
     struct VisibilityCrate;
 
     token crate_token -> CRATE;
 }
 
 ast_node! {
+    /// ```
+    /// VisibilitySuper =
+    /// | "super"
+    /// ```
     struct VisibilitySuper;
 
     token super_token -> SUPER;
 }
 
 ast_node! {
+    /// ```
+    /// VisibilityIn =
+    /// | "in" _ Identifier
+    /// ```
     struct VisibilityIn;
 
     token in_token -> IN;

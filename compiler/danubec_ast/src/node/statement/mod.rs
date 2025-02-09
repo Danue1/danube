@@ -9,12 +9,23 @@ pub use let_statement::*;
 pub use semicolon_statement::*;
 
 ast_node! {
+    /// ```
+    /// Statement =
+    /// | StatementKind
+    /// ```
     struct Statement;
 
     node kind -> StatementKind;
 }
 
 ast_node! {
+    /// ```
+    /// StatementKind =
+    /// | DefinitionStatement
+    /// | ExpressionStatement
+    /// | LetStatement
+    /// | SemicolonStatement
+    /// ```
     enum StatementKind {
         Definition(DefinitionStatement),
         Expression(ExpressionStatement),

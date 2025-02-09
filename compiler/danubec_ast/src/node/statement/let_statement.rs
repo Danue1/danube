@@ -1,4 +1,11 @@
 ast_node! {
+    /// ```
+    /// LetStatement =
+    /// | "let" _ Identifier _ ";"
+    /// | "let" _ Identifier _ "=" _ Expression _ ";"
+    /// | "let" _ Identifier _ ":" _ Type _ ";"
+    /// | "let" _ Identifier _ ":" _ Type _ "=" _ Expression _ ";"
+    /// ```
     struct LetStatement;
 
     token let_token -> LET;

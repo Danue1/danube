@@ -6,6 +6,7 @@ use danubec_syntax::SyntaxKind;
 impl crate::Context {
     pub fn definitions(&mut self, lex: &mut Lex) {
         while !lex.is_empty() {
+            self.trivia(lex);
             if self.definition(lex) {
                 self.trivia(lex);
             } else {

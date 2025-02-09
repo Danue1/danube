@@ -5,6 +5,7 @@ pub mod literal;
 pub mod raw;
 pub mod root;
 pub mod statement;
+pub mod trivia;
 pub mod r#type;
 pub mod visibility;
 
@@ -16,4 +17,5 @@ pub use r#type::*;
 pub use raw::*;
 pub use root::*;
 pub use statement::*;
+pub use trivia::*;
 pub use visibility::*;

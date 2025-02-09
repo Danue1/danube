@@ -1,4 +1,8 @@
 ast_node! {
+    /// ```
+    /// LetExpression =
+    /// | "let" _ Identifier _ "=" _ Expression
+    /// ```
     struct LetExpression;
 
     token let_token -> LET;

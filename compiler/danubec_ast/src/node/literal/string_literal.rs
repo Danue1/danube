@@ -1,4 +1,8 @@
 ast_node! {
+    /// ```
+    /// StringLiteral =
+    /// | "\"" StringLiteralFragment* "\""
+    /// ```
     struct StringLiteral;
 
     tokens double_quotes -> DOUBLE_QUOTE;
@@ -6,6 +10,12 @@ ast_node! {
 }
 
 ast_node! {
+    /// ```
+    /// StringLiteralFragment =
+    /// | Raw
+    /// | Escape
+    /// | Interpolation
+    /// ```
     enum StringLiteralFragment {
         Raw(Raw),
         Escape(Escape),
@@ -14,6 +24,10 @@ ast_node! {
 }
 
 ast_node! {
+    /// ```
+    /// Escape =
+    /// | "\\" Raw
+    /// ```
     struct Escape;
 
     token backslash -> BACKSLASH;
@@ -21,6 +35,10 @@ ast_node! {
 }
 
 ast_node! {
+    /// ```
+    /// Interpolation =
+    /// | "{" _ Expression _ "}"
+    /// ```
     struct Interpolation;
 
     token left_brace -> LEFT_BRACE;

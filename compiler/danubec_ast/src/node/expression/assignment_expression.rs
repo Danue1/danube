@@ -1,4 +1,8 @@
 ast_node! {
+    /// ```
+    /// AssignmentExpression =
+    /// | Expression _ "=" _ Expression
+    /// ```
     struct AssignmentExpression;
 
     node lhs -> Expression;

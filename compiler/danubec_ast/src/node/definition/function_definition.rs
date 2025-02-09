@@ -1,4 +1,11 @@
 ast_node! {
+    /// ```
+    /// FunctionDefinition =
+    /// | "fn" _ Identifier _  "(" _ FunctionParameter* _ ")" _ ";"
+    /// | "fn" _ Identifier _  "(" _ FunctionParameter* _ ")" _ "->" _ Type _ ";"
+    /// | "fn" _ Identifier _  "(" _ FunctionParameter* _ ")" _ BlockExpression
+    /// | "fn" _ Identifier _  "(" _ FunctionParameter* _ ")" _ "->" _ Type _ BlockExpression
+    /// ```
     struct FunctionDefinition;
 
     token fn_token -> FN;
@@ -13,6 +20,10 @@ ast_node! {
 }
 
 ast_node! {
+    /// ```
+    /// FunctionParameter =
+    /// | Identifier _ ":" _ Type (_ ",")?
+    /// ```
     struct FunctionParameter;
 
     node name -> Identifier;

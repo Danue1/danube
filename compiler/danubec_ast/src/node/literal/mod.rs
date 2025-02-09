@@ -11,6 +11,14 @@ pub use numeric_literal::*;
 pub use string_literal::*;
 
 ast_node! {
+    /// ```
+    /// Literal =
+    /// | ArrayLiteral
+    /// | BooleanLiteral
+    /// | CharLiteral
+    /// | NumericLiteral
+    /// | StringLiteral
+    /// ```
     enum Literal {
         Array(ArrayLiteral),
         Boolean(BooleanLiteral),

@@ -192,6 +192,7 @@ pub enum SyntaxKind {
     NumericFragment,
     Escape,
     Interpolation,
+    ArrayLiteralElement,
 
     Visibility,
     VisibilityCrate,
