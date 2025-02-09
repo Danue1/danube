@@ -6,6 +6,7 @@ pub mod raw;
 pub mod root;
 pub mod statement;
 pub mod r#type;
+pub mod visibility;
 
 pub use definition::*;
 pub use expression::*;
@@ -15,3 +16,4 @@ pub use r#type::*;
 pub use raw::*;
 pub use root::*;
 pub use statement::*;
+pub use visibility::*;

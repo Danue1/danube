@@ -97,6 +97,10 @@ impl<'lex> Iterator for Lex<'lex> {
                     "let" => token!(LET),
                     "true" => token!(TRUE),
                     "false" => token!(FALSE),
+                    "pub" => token!(PUB),
+                    "crate" => token!(CRATE),
+                    "super" => token!(SUPER),
+                    "in" => token!(IN),
                     _ => token!(ALPHABETIC),
                 }
             }
@@ -107,7 +111,7 @@ impl<'lex> Iterator for Lex<'lex> {
 
 #[test]
 fn keywords() {
-    let source = "fn let true false";
+    let source = "fn let true false pub crate super in";
     let lex = Lex::new(source);
     let tokens: Vec<_> = lex.collect();
 

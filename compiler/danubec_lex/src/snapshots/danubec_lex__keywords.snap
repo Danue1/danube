@@ -31,4 +31,36 @@ expression: tokens
         FALSE,
         "false",
     ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        PUB,
+        "pub",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        CRATE,
+        "crate",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        SUPER,
+        "super",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        IN,
+        "in",
+    ),
 ]

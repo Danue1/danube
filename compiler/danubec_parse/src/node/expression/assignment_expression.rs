@@ -8,7 +8,7 @@ impl crate::Context {
             self.start_node_at(checkpoint, SyntaxKind::AssignmentExpression);
 
             self.trivia(lex);
-            self.assignement_operator(lex);
+            self.assignment_operator(lex);
             expect!(self, lex, SyntaxKind::EQUAL);
 
             self.trivia(lex);
@@ -22,7 +22,7 @@ impl crate::Context {
         }
     }
 
-    fn assignement_operator(&mut self, lex: &mut Lex) -> bool {
+    fn assignment_operator(&mut self, lex: &mut Lex) -> bool {
         macro_rules! match_operator {
             ($(($($punctuation:ident),+) => $kind:ident,)+) => {
                 let checkpoint = self.checkpoint();
@@ -76,7 +76,7 @@ fn assignement_expression() {
         let mut context = crate::Context::new();
         let mut lex = Lex::new(source);
         context.start_node(SyntaxKind::Root);
-        context.assignement_operator(&mut lex);
+        context.assignment_operator(&mut lex);
         context.finish_node();
         let node = context.finish();
 

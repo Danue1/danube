@@ -6,3 +6,4 @@ mod root;
 mod statement;
 mod trivia;
 mod r#type;
+mod visibility;

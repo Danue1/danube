@@ -145,23 +145,31 @@ pub enum SyntaxKind {
     FALSE,
     /// `e` | `E`
     E,
+    /// `pub`
+    PUB,
+    /// `crate`
+    CRATE,
+    /// `super`
+    SUPER,
+    /// `in`
+    IN,
 
     // Nodes
     Root,
 
-    // Definition
+    Definition,
     FunctionDefinition,
 
-    // Type,
+    Type,
     PathType,
 
-    // Statement,
+    Statement,
     DefinitionStatement,
     ExpressionStatement,
     LetStatement,
     SemicolonStatement,
 
-    // Expression,
+    Expression,
     AssignmentExpression,
     BlockExpression,
     LetExpression,
@@ -184,6 +192,11 @@ pub enum SyntaxKind {
     NumericFragment,
     Escape,
     Interpolation,
+
+    Visibility,
+    VisibilityCrate,
+    VisibilitySuper,
+    VisibilityIn,
 
     Identifier,
     AssignmentOperator,
