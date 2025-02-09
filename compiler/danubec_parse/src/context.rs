@@ -67,21 +67,21 @@ macro_rules! expect {
     ($context:expr, $lex:expr, $kind:ident, $($pat:pat,)+) => {{
         let mut lex = $lex.clone();
         let mut source = String::new();
-        let mut stopped = true;
+        let mut matched = true;
         let mut count = 0;
 
         $(
-            if stopped {
+            if matched {
                 if let Some(($pat, text)) = lex.next() {
                     source.push_str(text);
                     count += 1;
                 } else {
-                    stopped = false;
+                    matched = false;
                 }
             }
         )+
 
-        if stopped {
+        if matched {
             $context.token(SyntaxKind::$kind, &source);
 
             for _ in 0..count {
@@ -89,7 +89,34 @@ macro_rules! expect {
             }
         }
 
-        stopped
+        matched
+    }};
+    ($context:expr, $lex:expr, $kind:ident -> $($source:pat,)+) => {{
+        let mut lex = $lex.clone();
+        let mut source = String::new();
+        let mut matched = true;
+        let mut count = 0;
+
+        $(
+            if matched {
+                if let Some((_, text @ $source)) = lex.next() {
+                    source.push_str(text);
+                    count += 1;
+                } else {
+                    matched = false;
+                }
+            }
+        )+
+
+        if matched {
+            $context.token(SyntaxKind::$kind, &source);
+
+            for _ in 0..count {
+                $lex.next();
+            }
+        }
+
+        matched
     }};
 }
 

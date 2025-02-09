@@ -1,12 +1,22 @@
 ast_node! {
     /// ```
     /// NumericLiteral =
+    /// | NumericLiteralKind
+    /// ```
+    struct NumericLiteral;
+
+    node kind -> NumericLiteralKind;
+}
+
+ast_node! {
+    /// ```
+    /// NumericLiteralKind =
     /// | DecimalNumericLiteral
     /// | BinaryNumericLiteral
     /// | OctalNumericLiteral
     /// | HexNumericLiteral
     /// ```
-    enum NumericLiteral {
+    enum NumericLiteralKind {
         Decimal(DecimalNumericLiteral),
         Binary(BinaryNumericLiteral),
         Octal(OctalNumericLiteral),
@@ -19,14 +29,14 @@ ast_node! {
     /// DecimalNumericLiteral =
     /// | IntegerPart
     /// | IntegerPart FractionPart
-    /// | IntegerPart Exponent
-    /// | IntegerPart FractionPart Exponent
+    /// | IntegerPart ExponentPart
+    /// | IntegerPart FractionPart ExponentPart
     /// ```
     struct DecimalNumericLiteral;
 
     node integer -> IntegerPart;
     node fraction -> FractionPart;
-    node exponent -> Exponent;
+    node exponent -> ExponentPart;
 }
 
 ast_node! {
@@ -85,7 +95,7 @@ ast_node! {
 
 ast_node! {
     /// ```
-    /// Exponent =
+    /// ExponentPart =
     /// | "e" NumericFragment
     /// | "e" "-" NumericFragment
     /// | "e" "+" NumericFragment
@@ -93,15 +103,18 @@ ast_node! {
     /// | "E" "-" NumericFragment
     /// | "E" "+" NumericFragment
     /// ```
-    struct Exponent;
+    struct ExponentPart;
 
     token e -> E;
-    token minus -> HYPHEN;
-    token plus -> PLUS;
+    token sign -> ExponentPartSign;
     node fragment -> NumericFragment;
 }
 
 ast_node! {
+    /// ```
+    /// NumericFragment =
+    /// | [0-9]+
+    /// | [0-9]+ ("_" [0-9]+)+
     struct NumericFragment;
 
     tokens digits -> NUMERIC;
