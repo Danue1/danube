@@ -1,5 +1,5 @@
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// StringLiteral =
     /// | "\"" StringLiteralFragment* "\""
     /// ```
@@ -10,7 +10,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// StringLiteralFragment =
     /// | Raw
     /// | Escape
@@ -24,7 +24,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// Escape =
     /// | "\\" Raw
     /// ```
@@ -35,7 +35,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// Interpolation =
     /// | "{" _ Expression _ "}"
     /// ```

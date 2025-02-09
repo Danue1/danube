@@ -11,7 +11,7 @@ pub use let_expression::*;
 pub use literal_expression::*;
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// Expression =
     /// | AssignmentKind
     /// ```
@@ -21,7 +21,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// ExpressionKind =
     /// | AssignmentExpression
     /// | BinaryExpression

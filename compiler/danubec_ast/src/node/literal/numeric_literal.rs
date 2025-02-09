@@ -1,5 +1,5 @@
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// NumericLiteral =
     /// | NumericLiteralKind
     /// ```
@@ -9,7 +9,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// NumericLiteralKind =
     /// | DecimalNumericLiteral
     /// | BinaryNumericLiteral
@@ -25,7 +25,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// DecimalNumericLiteral =
     /// | IntegerPart
     /// | IntegerPart FractionPart
@@ -40,7 +40,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// BinaryNumericLiteral =
     /// | "0b" NumericFragment
     /// ```
@@ -51,7 +51,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// OctalNumericLiteral =
     /// | "0o" NumericFragment
     /// ```
@@ -62,7 +62,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// HexNumericLiteral =
     /// | "0x" NumericFragment
     /// ```
@@ -73,7 +73,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// IntegerPart =
     /// | NumericFragment
     /// ```
@@ -83,7 +83,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// FractionPart =
     /// | "." NumericFragment
     /// ```
@@ -94,7 +94,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// ExponentPart =
     /// | "e" NumericFragment
     /// | "e" "-" NumericFragment
@@ -111,7 +111,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// NumericFragment =
     /// | [0-9]+
     /// | [0-9]+ ("_" [0-9]+)+

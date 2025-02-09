@@ -1,5 +1,5 @@
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// LiteralExpression =
     /// | Literal
     /// ```

@@ -1,5 +1,5 @@
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// AssignmentExpression =
     /// | Expression _ AssignmentOperator _ Expression
     /// ```
@@ -11,7 +11,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// AssignmentOperator =
     /// | "="
     /// | "+="

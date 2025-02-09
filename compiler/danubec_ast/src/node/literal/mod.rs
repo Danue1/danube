@@ -11,7 +11,7 @@ pub use numeric_literal::*;
 pub use string_literal::*;
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// Literal =
     /// | ArrayLiteral
     /// | BooleanLiteral

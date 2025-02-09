@@ -9,7 +9,7 @@ pub use let_statement::*;
 pub use semicolon_statement::*;
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// Statement =
     /// | StatementKind
     /// ```
@@ -19,7 +19,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// StatementKind =
     /// | DefinitionStatement
     /// | ExpressionStatement

@@ -1,5 +1,5 @@
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// Visibility =
     /// | "pub"
     /// | "pub" _ "(" _ VisibilityKind _ ")"
@@ -13,7 +13,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// VisibilityKind =
     /// | VisibilityCrate
     /// | VisibilitySuper
@@ -27,7 +27,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// VisibilityCrate =
     /// | "crate"
     /// ```
@@ -37,7 +37,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// VisibilitySuper =
     /// | "super"
     /// ```
@@ -47,7 +47,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// VisibilityIn =
     /// | "in" _ Identifier
     /// ```

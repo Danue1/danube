@@ -1,5 +1,5 @@
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// LetStatement =
     /// | "let" _ Identifier _ ";"
     /// | "let" _ Identifier _ "=" _ Expression _ ";"

@@ -1,5 +1,5 @@
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// ArrayLiteral =
     /// | "[" _ ArrayLiteralElement* _ "]"
     /// ```
@@ -11,7 +11,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// ArrayLiteralElement =
     /// | Expression
     /// | Expression _ ","

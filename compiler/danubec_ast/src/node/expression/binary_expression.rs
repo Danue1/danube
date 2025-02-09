@@ -1,5 +1,5 @@
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// BinaryExpression =
     /// | Expression _ "+" _ Expression
     /// | Expression _ "-" _ Expression
@@ -14,7 +14,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// BinaryOperator =
     /// | "||"
     ///

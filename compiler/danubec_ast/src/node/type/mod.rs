@@ -3,7 +3,7 @@ pub mod path_type;
 pub use path_type::*;
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// Type =
     /// | PathType
     /// ```
@@ -13,7 +13,7 @@ ast_node! {
 }
 
 ast_node! {
-    /// ```
+    /// ```ebnf
     /// TypeKind =
     /// | Path
     /// ```
