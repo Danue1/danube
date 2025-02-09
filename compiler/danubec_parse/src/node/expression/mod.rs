@@ -122,18 +122,23 @@ impl crate::Context {
 
             (Some(SyntaxKind::AMPERSAND), Some(SyntaxKind::AMPERSAND), _, _) => P3,
 
+            (Some(SyntaxKind::EQUAL), Some(SyntaxKind::EQUAL), _, _) => P4,
+            (Some(SyntaxKind::EXCLAMATION), Some(SyntaxKind::EQUAL), _, _) => P4,
+            (Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::EQUAL), _, _) => P7,
+            (Some(SyntaxKind::LEFT_CHEVRON), _, _, _) => P7,
+            (Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::EQUAL), _, _) => P7,
+            (Some(SyntaxKind::RIGHT_CHEVRON), _, _, _) => P7,
+
             (Some(SyntaxKind::PIPE), _, _, _) => P4,
 
             (Some(SyntaxKind::CARET), _, _, _) => P5,
 
             (Some(SyntaxKind::AMPERSAND), _, _, _) => P6,
 
+            (Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::PIPE), _) => P7,
             (Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::LEFT_CHEVRON), _, _) => P7,
-            (Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::EQUAL), _, _) => P7,
-            (Some(SyntaxKind::LEFT_CHEVRON), _, _, _) => P7,
             (Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), _) => P7,
             (Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), _, _) => P7,
-            (Some(SyntaxKind::RIGHT_CHEVRON), _, _, _) => P7,
 
             (Some(SyntaxKind::PLUS), Some(SyntaxKind::PIPE), _, _) => P8,
             (Some(SyntaxKind::PLUS), Some(SyntaxKind::PERCENT), _, _) => P8,

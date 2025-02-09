@@ -155,6 +155,30 @@ pub enum SyntaxKind {
     RIGHT_CHEVRON__RIGHT_CHEVRON__RIGHT_CHEVRON__EQUAL,
 
     // Binary operators
+    /// `||`
+    PIPE__PIPE,
+
+    /// `&&`
+    AMPERSAND__AMPERSAND,
+
+    /// `==`
+    EQUAL__EQUAL,
+    /// `!=`
+    EXCLAMATION__EQUAL,
+    /// `<=`
+    LEFT_CHEVRON__EQUAL,
+    /// `>=`
+    RIGHT_CHEVRON__EQUAL,
+
+    /// `<<|`
+    LEFT_CHEVRON__LEFT_CHEVRON__PIPE,
+    /// `<<`
+    LEFT_CHEVRON__LEFT_CHEVRON,
+    /// `>>>`
+    RIGHT_CHEVRON__RIGHT_CHEVRON__RIGHT_CHEVRON,
+    /// `>>`
+    RIGHT_CHEVRON__RIGHT_CHEVRON,
+
     /// `+|`
     PLUS__PIPE,
     /// `+%`
@@ -163,6 +187,7 @@ pub enum SyntaxKind {
     HYPHEN__PIPE,
     /// `-%`
     HYPHEN__PERCENT,
+
     /// `*|`
     ASTERISK__PIPE,
     /// `*%`
@@ -173,22 +198,6 @@ pub enum SyntaxKind {
     ASTERISK__ASTERISK__PIPE,
     /// `**%`
     ASTERISK__ASTERISK__PERCENT,
-    /// `&&`
-    AMPERSAND__AMPERSAND,
-    /// `||`
-    PIPE__PIPE,
-    /// `<=`
-    LEFT_CHEVRON__EQUAL,
-    /// `<<`
-    LEFT_CHEVRON__LEFT_CHEVRON,
-    /// `<<|`
-    LEFT_CHEVRON__LEFT_CHEVRON__PIPE,
-    /// `>=`
-    RIGHT_CHEVRON__EQUAL,
-    /// `>>`
-    RIGHT_CHEVRON__RIGHT_CHEVRON,
-    /// `>>>`
-    RIGHT_CHEVRON__RIGHT_CHEVRON__RIGHT_CHEVRON,
 
     // Nodes in the parser
     Root,

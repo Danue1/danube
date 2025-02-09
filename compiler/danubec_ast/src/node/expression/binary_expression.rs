@@ -17,18 +17,23 @@ ast_node! {
     ///
     /// | "&&"
     ///
+    /// | "=="
+    /// | "!="
+    /// | "<="
+    /// | "<"
+    /// | ">="
+    /// | ">"
+    ///
     /// | "|"
     ///
     /// | "^"
     ///
     /// | "&"
     ///
-    /// | "<<"
-    /// | "<="
     /// | "<<|"
-    /// | ">>"
+    /// | "<<"
     /// | ">>>"
-    /// | ">="
+    /// | ">>"
     ///
     /// | "+|"
     /// | "+%"
@@ -52,18 +57,23 @@ ast_node! {
 
     token ampersand__ampersand -> AMPERSAND__AMPERSAND;
 
+    token equal__equal -> EQUAL__EQUAL;
+    token exclamation__equal -> EXCLAMATION__EQUAL;
+    token left_chevron__equal -> LEFT_CHEVRON__EQUAL;
+    token left_chevron -> LEFT_CHEVRON;
+    token right_chevron__equal -> RIGHT_CHEVRON__EQUAL;
+    token right_chevron -> RIGHT_CHEVRON;
+
     token pipe -> PIPE;
 
     token caret -> CARET;
 
     token ampersand -> AMPERSAND;
 
+    token left_chevron__left_chevron__pipe -> LEFT_CHEVRON__LEFT_CHEVRON__PIPE;
     token left_chevron__left_chevron -> LEFT_CHEVRON__LEFT_CHEVRON;
-    token left_chevron__equal -> LEFT_CHEVRON__EQUAL;
-    token left_chevron -> LEFT_CHEVRON;
-    token right_chevron__right_chevron -> RIGHT_CHEVRON__RIGHT_CHEVRON;
     token right_chevron__right_chevron__right_chevron -> RIGHT_CHEVRON__RIGHT_CHEVRON__RIGHT_CHEVRON;
-    token right_chevron__equal -> RIGHT_CHEVRON__EQUAL;
+    token right_chevron__right_chevron -> RIGHT_CHEVRON__RIGHT_CHEVRON;
 
     token plus__pipe -> PLUS__PIPE;
     token plus__percent -> PLUS__PERCENT;
