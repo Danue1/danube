@@ -38,10 +38,10 @@ impl crate::Context {
 fn let_statement() {
     for source in [
         "let a;",
-        // "let b = false;",
-        // "let c: i32 = false;",
-        // "let d: i32;",
-        // "let e: i32 = false;",
+        "let b = false;",
+        "let c: i32 = false;",
+        "let d: i32;",
+        "let e: i32 = false;",
     ] {
         let mut context = crate::Context::new();
         let mut lex = Lex::new(source);

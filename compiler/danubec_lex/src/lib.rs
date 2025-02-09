@@ -15,6 +15,20 @@ impl<'lex> Lex<'lex> {
     pub fn is_empty(&self) -> bool {
         self.source.len() == self.index
     }
+
+    pub fn peek(&self) -> Option<(SyntaxKind, &'lex str)> {
+        self.clone().next()
+    }
+
+    pub fn matches<F>(&mut self, f: F) -> bool
+    where
+        F: FnOnce(SyntaxKind, &'lex str) -> bool,
+    {
+        match self.peek() {
+            Some((kind, source)) => f(kind, source),
+            None => false,
+        }
+    }
 }
 
 impl<'lex> Iterator for Lex<'lex> {

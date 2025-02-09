@@ -2,8 +2,7 @@
 #[repr(u16)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum SyntaxKind {
-    // Tokens
-    UNEXPECTED,
+    // Tokens in the lexer
     /// ` `
     WHITESPACE,
     /// `\n`
@@ -75,6 +74,31 @@ pub enum SyntaxKind {
     /// `'`
     SINGLE_QUOTE,
 
+    /// `[a-zA-Z]+`
+    ALPHABETIC,
+    /// `[0-9]+`
+    NUMERIC,
+
+    /// `fn`
+    FN,
+    /// `let`
+    LET,
+    /// `true`
+    TRUE,
+    /// `false`
+    FALSE,
+    /// `pub`
+    PUB,
+    /// `crate`
+    CRATE,
+    /// `super`
+    SUPER,
+    /// `in`
+    IN,
+
+    UNEXPECTED,
+
+    // Tokens in the parser
     /// `->`
     HYPHEN__RIGHT_CHEVRON,
     /// `::`
@@ -128,33 +152,43 @@ pub enum SyntaxKind {
     /// `>>>=`
     RIGHT_CHEVRON__RIGHT_CHEVRON__RIGHT_CHEVRON__EQUAL,
 
-    /// `[a-zA-Z]+`
-    ALPHABETIC,
-    /// `[0-9]+`
-    NUMERIC,
-    /// `0b` | `0B` | `0o` | `0O` | `0x` | `0X`
-    NUMERIC_LITERAL_PREFIX,
+    // Binary operators
+    /// `+|`
+    PLUS__PIPE,
+    /// `+%`
+    PLUS__PERCENT,
+    /// `-|`
+    HYPHEN__PIPE,
+    /// `-%`
+    HYPHEN__PERCENT,
+    /// `*|`
+    ASTERISK__PIPE,
+    /// `*%`
+    ASTERISK__PERCENT,
+    /// `**`
+    ASTERISK__ASTERISK,
+    /// `**|`
+    ASTERISK__ASTERISK__PIPE,
+    /// `**%`
+    ASTERISK__ASTERISK__PERCENT,
+    /// `&&`
+    AMPERSAND__AMPERSAND,
+    /// `||`
+    PIPE__PIPE,
+    /// `<=`
+    LEFT_CHEVRON__EQUAL,
+    /// `<<`
+    LEFT_CHEVRON__LEFT_CHEVRON,
+    /// `<<|`
+    LEFT_CHEVRON__LEFT_CHEVRON__PIPE,
+    /// `>=`
+    RIGHT_CHEVRON__EQUAL,
+    /// `>>`
+    RIGHT_CHEVRON__RIGHT_CHEVRON,
+    /// `>>>`
+    RIGHT_CHEVRON__RIGHT_CHEVRON__RIGHT_CHEVRON,
 
-    /// `fn`
-    FN,
-    /// `let`
-    LET,
-    /// `true`
-    TRUE,
-    /// `false`
-    FALSE,
-    /// `e` | `E`
-    E,
-    /// `pub`
-    PUB,
-    /// `crate`
-    CRATE,
-    /// `super`
-    SUPER,
-    /// `in`
-    IN,
-
-    // Nodes
+    // Nodes in the parser
     Root,
 
     Definition,
@@ -174,6 +208,7 @@ pub enum SyntaxKind {
     BlockExpression,
     LetExpression,
     LiteralExpression,
+    BinaryExpression,
 
     FunctionParameter,
 
@@ -195,6 +230,10 @@ pub enum SyntaxKind {
     Escape,
     Interpolation,
     ArrayLiteralElement,
+    /// `0b` | `0B` | `0o` | `0O` | `0x` | `0X`
+    NUMERIC_LITERAL_PREFIX,
+    /// `e` | `E`
+    E,
 
     Visibility,
     VisibilityCrate,
@@ -203,6 +242,7 @@ pub enum SyntaxKind {
 
     Identifier,
     AssignmentOperator,
+    BinaryOperator,
 
     Raw,
     Trivia,

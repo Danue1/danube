@@ -104,6 +104,43 @@ macro_rules! ast_node {
 
         ast_node!($($rest)*);
     };
+    (node [$index:expr] $method:ident -> $ty:ident; $($rest:tt)*) => {
+        pub fn $method(&self) -> Option<crate::$ty> {
+            use rowan::ast::AstNode;
+
+            self.syntax()
+                .children()
+                .nth($index)
+                .and_then(crate::$ty::cast)
+        }
+
+        ast_node!($($rest)*);
+    };
+    (node $method:ident -> $ty:ident before $before:ident; $($rest:tt)*) => {
+        pub fn $method(&self) -> Option<crate::$ty> {
+            use rowan::ast::AstNode;
+
+            self.syntax()
+                .children()
+                .take_while(|node| !crate::$before::can_cast(node.kind()))
+                .find_map(crate::$ty::cast)
+        }
+
+        ast_node!($($rest)*);
+    };
+    (node $method:ident -> $ty:ident after $after:ident; $($rest:tt)*) => {
+        pub fn $method(&self) -> Option<crate::$ty> {
+            use rowan::ast::AstNode;
+
+            self.syntax()
+                .children()
+                .skip_while(|node| !crate::$after::can_cast(node.kind()))
+                .skip(1)
+                .find_map(crate::$ty::cast)
+        }
+
+        ast_node!($($rest)*);
+    };
     (nodes $method:ident -> $ty:ident; $($rest:tt)*) => {
         pub fn $method(&self) -> impl Iterator<Item = crate::$ty> + '_ {
             use rowan::ast::AstNode;

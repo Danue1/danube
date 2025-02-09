@@ -1,18 +1,19 @@
+use crate::pratt::Bp;
 use danubec_lex::Lex;
-use danubec_syntax::SyntaxKind;
+use danubec_syntax::{Checkpoint, SyntaxKind};
 
 impl crate::Context {
-    pub fn assignment_expression(&mut self, lex: &mut Lex) -> bool {
-        let checkpoint = self.checkpoint();
-        if self.expression(lex) {
+    pub fn assignment_expression(
+        &mut self,
+        lex: &mut Lex,
+        checkpoint: Checkpoint,
+        binding_power: Bp,
+    ) -> bool {
+        if self.assignment_operator(lex) {
             self.start_node_at(checkpoint, SyntaxKind::AssignmentExpression);
 
             self.trivia(lex);
-            self.assignment_operator(lex);
-            expect!(self, lex, SyntaxKind::EQUAL);
-
-            self.trivia(lex);
-            self.expression(lex);
+            self.expression_bp(lex, binding_power);
 
             self.finish_node();
 
@@ -59,6 +60,8 @@ impl crate::Context {
             (CARET, EQUAL) => CARET__EQUAL,
             (AMPERSAND, EQUAL) => AMPERSAND__EQUAL,
             (AMPERSAND, AMPERSAND, EQUAL) => AMPERSAND__AMPERSAND__EQUAL,
+            (PIPE, EQUAL) => PIPE__EQUAL,
+            (PIPE, PIPE, EQUAL) => PIPE__PIPE__EQUAL,
             (LEFT_CHEVRON, LEFT_CHEVRON, EQUAL) => LEFT_CHEVRON__LEFT_CHEVRON__EQUAL,
             (LEFT_CHEVRON, LEFT_CHEVRON, PIPE, EQUAL) => LEFT_CHEVRON__LEFT_CHEVRON__PIPE__EQUAL,
             (RIGHT_CHEVRON, RIGHT_CHEVRON, EQUAL) => RIGHT_CHEVRON__RIGHT_CHEVRON__EQUAL,
@@ -68,10 +71,10 @@ impl crate::Context {
 }
 
 #[test]
-fn assignement_expression() {
+fn assignment_expression() {
     for source in [
         "=", "+=", "+|=", "+%=", "-=", "-|=", "-%=", "*=", "*|=", "*%=", "**=", "**|=", "**%=",
-        "/=", "%=", "^=", "&=", "&&=", "<<=", "<<|=", ">>=", ">>>=",
+        "/=", "%=", "^=", "&=", "&&=", "|=", "||=", "<<=", "<<|=", ">>=", ">>>=",
     ] {
         let mut context = crate::Context::new();
         let mut lex = Lex::new(source);

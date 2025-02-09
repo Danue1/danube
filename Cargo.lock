@@ -3,6 +3,10 @@
 version = 4
 
 [[package]]
+name = "bit_mask"
+version = "0.1.0"
+
+[[package]]
 name = "console"
 version = "0.15.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -44,6 +48,7 @@ dependencies = [
 name = "danubec_parse"
 version = "0.1.0"
 dependencies = [
+ "bit_mask",
  "danubec_lex",
  "danubec_syntax",
  "insta",
