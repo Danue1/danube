@@ -1,10 +1,7 @@
 ast_node! {
     /// ```ebnf
     /// BinaryExpression =
-    /// | Expression _ "+" _ Expression
-    /// | Expression _ "-" _ Expression
-    /// | Expression _ "*" _ Expression
-    /// | Expression _ "/" _ Expression
+    /// | Expression _ BinaryOperator _ Expression
     /// ```
     struct BinaryExpression;
 

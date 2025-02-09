@@ -1,10 +1,25 @@
 ast_node! {
     /// ```ebnf
     /// FunctionDefinition =
-    /// | "fn" _ Identifier _  "(" _ FunctionParameter* _ ")" _ ";"
-    /// | "fn" _ Identifier _  "(" _ FunctionParameter* _ ")" _ "->" _ Type _ ";"
-    /// | "fn" _ Identifier _  "(" _ FunctionParameter* _ ")" _ BlockExpression
-    /// | "fn" _ Identifier _  "(" _ FunctionParameter* _ ")" _ "->" _ Type _ BlockExpression
+    /// | "fn" _ Identifier _  "(" _ ")" _ ";"
+    /// | "fn" _ Identifier _  "(" _ FunctionParameter _ ")" _ ";"
+    /// | "fn" _ Identifier _  "(" _ ( FunctionParameter _ "," )+ _ ")" _ ";"
+    /// | "fn" _ Identifier _  "(" _ ( FunctionParameter _ "," )+ FunctionParameter _ ")" _ ";"
+    ///
+    /// | "fn" _ Identifier _  "(" _ ")" _ "->" _ Type _ ";"
+    /// | "fn" _ Identifier _  "(" _ FunctionParameter _ ")" _ "->" _ Type _ ";"
+    /// | "fn" _ Identifier _  "(" _ ( FunctionParameter _ "," )+ _ ")" _ "->" _ Type _ ";"
+    /// | "fn" _ Identifier _  "(" _ ( FunctionParameter _ "," )+ FunctionParameter _ ")" _ "->" _ Type _ ";"
+    ///
+    /// | "fn" _ Identifier _  "(" _ ")" _ BlockExpression
+    /// | "fn" _ Identifier _  "(" _ FunctionParameter _ ")" _ BlockExpression
+    /// | "fn" _ Identifier _  "(" _ ( FunctionParameter _ "," )+ _ ")" _ BlockExpression
+    /// | "fn" _ Identifier _  "(" _ ( FunctionParameter _ "," )+ FunctionParameter _ ")" _ BlockExpression
+    ///
+    /// | "fn" _ Identifier _  "(" _ ")" _ "->" _ Type _ BlockExpression
+    /// | "fn" _ Identifier _  "(" _ FunctionParameter _ ")" _ "->" _ Type _ BlockExpression
+    /// | "fn" _ Identifier _  "(" _ ( FunctionParameter _ "," )+ _ ")" _ "->" _ Type _ BlockExpression
+    /// | "fn" _ Identifier _  "(" _ ( FunctionParameter _ "," )+ FunctionParameter _ ")" _ "->" _ Type _ BlockExpression
     /// ```
     struct FunctionDefinition;
 
@@ -22,7 +37,7 @@ ast_node! {
 ast_node! {
     /// ```ebnf
     /// FunctionParameter =
-    /// | Identifier _ ":" _ Type (_ ",")?
+    /// | Identifier _ ":" _ Type
     /// ```
     struct FunctionParameter;
 

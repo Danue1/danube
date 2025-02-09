@@ -1,7 +1,9 @@
 ast_node! {
     /// ```ebnf
     /// BlockExpression =
-    /// | "{" _ Statement* _ "}"
+    /// | "{" _ "}"
+    /// | "{" _ Statement _ "}"
+    /// | "{" _ Statement ( _ Statement )+ _ "}"
     /// ```
     struct BlockExpression;
 

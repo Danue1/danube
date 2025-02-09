@@ -1,7 +1,11 @@
 ast_node! {
     /// ```ebnf
     /// ArrayLiteral =
-    /// | "[" _ ArrayLiteralElement* _ "]"
+    /// | "[" _ "]"
+    /// | "[" _ ArrayLiteralElement _ "]"
+    /// | "[" _ ArrayLiteralElement _ "," _ "]"
+    /// | "[" ( _ ArrayLiteralElement _ "," )+ _ "]"
+    /// | "[" ( _ ArrayLiteralElement _ "," )+ _ ArrayLiteralElement _ "]"
     /// ```
     struct ArrayLiteral;
 
@@ -14,7 +18,6 @@ ast_node! {
     /// ```ebnf
     /// ArrayLiteralElement =
     /// | Expression
-    /// | Expression _ ","
     /// ```
     struct ArrayLiteralElement;
 

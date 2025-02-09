@@ -2,11 +2,14 @@ ast_node! {
     /// ```ebnf
     /// TypeDefinition =
     /// | "type" _ Identifier _ "=" _ Type _ ";"
-    /// | "type" _ Identifier _ "<" _ TypeParameters _ ">" _ "=" _ Type _ ";"
+    /// | "type" _ Identifier _ "<" _ ">" _ "=" _ Type _ ";"
+    /// | "type" _ Identifier _ "<" _ TypeParameter _ ">" _ "=" _ Type _ ";"
+    /// | "type" _ Identifier _ "<" _ ( TypeParameter _ "," )+ _ ">" _ "=" _ Type _ ";"
+    /// | "type" _ Identifier _ "<" _ ( TypeParameter _ "," )+ _ TypeParameter _ ">" _ "=" _ Type _ ";"
     /// ```
     struct TypeDefinition;
 
-    token ty -> TYPE;
+    token ty_token -> TYPE;
     node identifier -> Identifier;
     token left_chevron -> LEFT_CHEVRON;
     nodes type_parameter -> TypeParameter;
@@ -20,10 +23,10 @@ ast_node! {
     /// ```ebnf
     /// TypeParameter =
     /// | Identifier
-    /// | Identifier _ ","
+    /// | Identifier _ ":"
     /// | Identifier _ ":" _ Type
-    /// | Identifier _ "," _ Type _ ","
-    /// | Identifier _ ":" _ Type ( "+" _ Type )+ _ ","
+    /// | Identifier _ ":" ( _ Type _ "+" )+
+    /// | Identifier _ ":" ( _ Type _ "+" )+ _ Type
     /// ```
     struct TypeParameter;
 
