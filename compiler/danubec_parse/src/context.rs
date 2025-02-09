@@ -128,4 +128,26 @@ macro_rules! consume_while {
             $lex.next();
         }
     }};
+    ($context:expr, $lex:expr, $kind:ident, $pat:pat) => {{
+        let mut lex = $lex.clone();
+        let mut source = String::new();
+        let mut count = 0;
+        let mut matched = false;
+
+        while let Some(($pat, text)) = lex.next() {
+            source.push_str(text);
+            count += 1;
+            matched = true;
+        }
+
+        if matched {
+            $context.token(SyntaxKind::$kind, &source);
+
+            for _ in 0..count {
+                $lex.next();
+            }
+        }
+
+        matched
+    }};
 }
