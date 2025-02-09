@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bit_mask = { path = "../bit_mask" }
-danubec_lex = { path = "../danubec_lex" }
-danubec_syntax = { path = "../danubec_syntax" }
+bit_mask.path = "../bit_mask"
+danubec_lex.path = "../danubec_lex"
+danubec_syntax.path = "../danubec_syntax"
 insta.workspace = true

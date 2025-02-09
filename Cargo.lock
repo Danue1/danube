@@ -37,6 +37,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "danubec_ast_lowering"
+version = "0.1.0"
+
+[[package]]
+name = "danubec_hir"
+version = "0.1.0"
+
+[[package]]
 name = "danubec_lex"
 version = "0.1.0"
 dependencies = [

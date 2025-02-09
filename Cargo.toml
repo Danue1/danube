@@ -4,6 +4,8 @@ members = [
   "compiler/bit_mask",
   "compiler/danubec",
   "compiler/danubec_ast",
+  "compiler/danubec_ast_lowering",
+  "compiler/danubec_hir",
   "compiler/danubec_lex",
   "compiler/danubec_parse",
   "compiler/danubec_syntax",
