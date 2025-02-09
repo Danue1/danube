@@ -73,7 +73,7 @@ impl crate::Context {
     fn infix_binding_power(&self, lex: &mut Lex) -> (Bp, Bp) {
         macro_rules! match_operator {
             ($(
-                ($kind1:pat, $kind2:pat, $kind3:pat, $kind4:pat) => ($left:expr, $right:expr),
+                ($kind1:pat, $kind2:pat, $kind3:pat, $kind4:pat) => $order:ident,
             )+) => {
                 let mut lex = lex.clone();
                 let kind1 = lex.next().map(|(kind, _)| kind);
@@ -83,73 +83,73 @@ impl crate::Context {
 
                 match (kind1, kind2, kind3, kind4) {
                     $(
-                        ($kind1, $kind2, $kind3, $kind4) => (Bp($left), Bp($right)),
+                        ($kind1, $kind2, $kind3, $kind4) => Bp::$order,
                     )+
-                    _ => (Bp(0), Bp(0)),
+                    _ => Bp::P0,
                 }
             };
         }
 
         match_operator! {
             // Assignment operators
-            (Some(SyntaxKind::EQUAL), _, _, _) => (1, 2),
-            (Some(SyntaxKind::PLUS), Some(SyntaxKind::EQUAL), _, _) => (1, 2),
-            (Some(SyntaxKind::PLUS), Some(SyntaxKind::PIPE), Some(SyntaxKind::EQUAL), _) => (1, 2),
-            (Some(SyntaxKind::PLUS), Some(SyntaxKind::PERCENT), Some(SyntaxKind::EQUAL), _) => (1, 2),
-            (Some(SyntaxKind::HYPHEN), Some(SyntaxKind::EQUAL), _, _) => (1, 2),
-            (Some(SyntaxKind::HYPHEN), Some(SyntaxKind::PIPE), Some(SyntaxKind::EQUAL), _) => (1, 2),
-            (Some(SyntaxKind::HYPHEN), Some(SyntaxKind::PERCENT), Some(SyntaxKind::EQUAL), _) => (1, 2),
-            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::EQUAL), _, _) => (1, 2),
-            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PIPE), Some(SyntaxKind::EQUAL), _) => (1, 2),
-            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PERCENT), Some(SyntaxKind::EQUAL), _) => (1, 2),
-            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::ASTERISK), Some(SyntaxKind::EQUAL), _) => (1, 2),
-            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PIPE), Some(SyntaxKind::EQUAL)) => (1, 2),
-            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PERCENT), Some(SyntaxKind::EQUAL)) => (1, 2),
-            (Some(SyntaxKind::SLASH), Some(SyntaxKind::EQUAL), _, _) => (1, 2),
-            (Some(SyntaxKind::PERCENT), Some(SyntaxKind::EQUAL), _, _) => (1, 2),
-            (Some(SyntaxKind::CARET), Some(SyntaxKind::EQUAL), _, _) => (1, 2),
-            (Some(SyntaxKind::AMPERSAND), Some(SyntaxKind::EQUAL), _, _) => (1, 2),
-            (Some(SyntaxKind::AMPERSAND), Some(SyntaxKind::AMPERSAND), Some(SyntaxKind::EQUAL), _) => (1, 2),
-            (Some(SyntaxKind::PIPE), Some(SyntaxKind::EQUAL), _, _) => (1, 2),
-            (Some(SyntaxKind::PIPE), Some(SyntaxKind::PIPE), Some(SyntaxKind::EQUAL), _) => (1, 2),
-            (Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::EQUAL), _) => (1, 2),
-            (Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::PIPE), Some(SyntaxKind::EQUAL)) => (1, 2),
-            (Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::EQUAL), _) => (1, 2),
-            (Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::EQUAL)) => (1, 2),
+            (Some(SyntaxKind::EQUAL), _, _, _) => P1,
+            (Some(SyntaxKind::PLUS), Some(SyntaxKind::EQUAL), _, _) => P1,
+            (Some(SyntaxKind::PLUS), Some(SyntaxKind::PIPE), Some(SyntaxKind::EQUAL), _) => P1,
+            (Some(SyntaxKind::PLUS), Some(SyntaxKind::PERCENT), Some(SyntaxKind::EQUAL), _) => P1,
+            (Some(SyntaxKind::HYPHEN), Some(SyntaxKind::EQUAL), _, _) => P1,
+            (Some(SyntaxKind::HYPHEN), Some(SyntaxKind::PIPE), Some(SyntaxKind::EQUAL), _) => P1,
+            (Some(SyntaxKind::HYPHEN), Some(SyntaxKind::PERCENT), Some(SyntaxKind::EQUAL), _) => P1,
+            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::EQUAL), _, _) => P1,
+            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PIPE), Some(SyntaxKind::EQUAL), _) => P1,
+            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PERCENT), Some(SyntaxKind::EQUAL), _) => P1,
+            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::ASTERISK), Some(SyntaxKind::EQUAL), _) => P1,
+            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PIPE), Some(SyntaxKind::EQUAL)) => P1,
+            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PERCENT), Some(SyntaxKind::EQUAL)) => P1,
+            (Some(SyntaxKind::SLASH), Some(SyntaxKind::EQUAL), _, _) => P1,
+            (Some(SyntaxKind::PERCENT), Some(SyntaxKind::EQUAL), _, _) => P1,
+            (Some(SyntaxKind::CARET), Some(SyntaxKind::EQUAL), _, _) => P1,
+            (Some(SyntaxKind::AMPERSAND), Some(SyntaxKind::EQUAL), _, _) => P1,
+            (Some(SyntaxKind::AMPERSAND), Some(SyntaxKind::AMPERSAND), Some(SyntaxKind::EQUAL), _) => P1,
+            (Some(SyntaxKind::PIPE), Some(SyntaxKind::EQUAL), _, _) => P1,
+            (Some(SyntaxKind::PIPE), Some(SyntaxKind::PIPE), Some(SyntaxKind::EQUAL), _) => P1,
+            (Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::EQUAL), _) => P1,
+            (Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::PIPE), Some(SyntaxKind::EQUAL)) => P1,
+            (Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::EQUAL), _) => P1,
+            (Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::EQUAL)) => P1,
 
             // Binary operators
-            (Some(SyntaxKind::PIPE), Some(SyntaxKind::PIPE), _, _) => (3, 4),
+            (Some(SyntaxKind::PIPE), Some(SyntaxKind::PIPE), _, _) => P2,
 
-            (Some(SyntaxKind::AMPERSAND), Some(SyntaxKind::AMPERSAND), _, _) => (5, 6),
+            (Some(SyntaxKind::AMPERSAND), Some(SyntaxKind::AMPERSAND), _, _) => P3,
 
-            (Some(SyntaxKind::PIPE), _, _, _) => (7, 8),
+            (Some(SyntaxKind::PIPE), _, _, _) => P4,
 
-            (Some(SyntaxKind::CARET), _, _, _) => (9, 10),
+            (Some(SyntaxKind::CARET), _, _, _) => P5,
 
-            (Some(SyntaxKind::AMPERSAND), _, _, _) => (11, 12),
+            (Some(SyntaxKind::AMPERSAND), _, _, _) => P6,
 
-            (Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::LEFT_CHEVRON), _, _) => (13, 14),
-            (Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::EQUAL), _, _) => (13, 14),
-            (Some(SyntaxKind::LEFT_CHEVRON), _, _, _) => (13, 14),
-            (Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), _) => (13, 14),
-            (Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), _, _) => (13, 14),
-            (Some(SyntaxKind::RIGHT_CHEVRON), _, _, _) => (13, 14),
+            (Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::LEFT_CHEVRON), _, _) => P7,
+            (Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::EQUAL), _, _) => P7,
+            (Some(SyntaxKind::LEFT_CHEVRON), _, _, _) => P7,
+            (Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), _) => P7,
+            (Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), _, _) => P7,
+            (Some(SyntaxKind::RIGHT_CHEVRON), _, _, _) => P7,
 
-            (Some(SyntaxKind::PLUS), Some(SyntaxKind::PIPE), _, _) => (15, 16),
-            (Some(SyntaxKind::PLUS), Some(SyntaxKind::PERCENT), _, _) => (15, 16),
-            (Some(SyntaxKind::PLUS), _, _, _) => (15, 16),
-            (Some(SyntaxKind::HYPHEN), Some(SyntaxKind::PIPE), _, _) => (15, 16),
-            (Some(SyntaxKind::HYPHEN), Some(SyntaxKind::PERCENT), _, _) => (15, 16),
-            (Some(SyntaxKind::HYPHEN), _, _, _) => (15, 16),
+            (Some(SyntaxKind::PLUS), Some(SyntaxKind::PIPE), _, _) => P8,
+            (Some(SyntaxKind::PLUS), Some(SyntaxKind::PERCENT), _, _) => P8,
+            (Some(SyntaxKind::PLUS), _, _, _) => P8,
+            (Some(SyntaxKind::HYPHEN), Some(SyntaxKind::PIPE), _, _) => P8,
+            (Some(SyntaxKind::HYPHEN), Some(SyntaxKind::PERCENT), _, _) => P8,
+            (Some(SyntaxKind::HYPHEN), _, _, _) => P8,
 
-            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PIPE), _, _) => (17, 18),
-            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PERCENT), _, _) => (17, 18),
-            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PIPE), _) => (17, 18),
-            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PERCENT), _) => (17, 18),
-            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::ASTERISK), _, _) => (17, 18),
-            (Some(SyntaxKind::ASTERISK), _, _, _) => (17, 18),
-            (Some(SyntaxKind::SLASH), _, _, _) => (17, 18),
-            (Some(SyntaxKind::PERCENT), _, _, _) => (17, 18),
+            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PIPE), _, _) => P9,
+            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PERCENT), _, _) => P9,
+            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PIPE), _) => P9,
+            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PERCENT), _) => P9,
+            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::ASTERISK), _, _) => P9,
+            (Some(SyntaxKind::ASTERISK), _, _, _) => P9,
+            (Some(SyntaxKind::SLASH), _, _, _) => P9,
+            (Some(SyntaxKind::PERCENT), _, _, _) => P9,
         }
     }
 
