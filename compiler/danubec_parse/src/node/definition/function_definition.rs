@@ -33,15 +33,12 @@ impl crate::Context {
 
             self.trivia(lex);
 
-            while !expect!(self, lex, SyntaxKind::RIGHT_PAREN) {
+            while self.function_parameter(lex) {
                 self.trivia(lex);
-
-                if self.function_parameter(lex) {
-                    self.trivia(lex);
-                } else {
-                    break;
-                }
             }
+
+            self.trivia(lex);
+            expect!(self, lex, SyntaxKind::RIGHT_PAREN);
 
             self.finish_node();
 

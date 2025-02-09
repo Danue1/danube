@@ -1,11 +1,14 @@
 pub mod function_definition;
+pub mod type_definition;
 
 pub use function_definition::*;
+pub use type_definition::*;
 
 ast_node! {
     /// ```ebnf
     /// Definition =
-    /// | (Visibility _)? DefinitionKind
+    /// | DefinitionKind
+    /// | Visibility _ DefinitionKind
     /// ```
     struct Definition;
 
@@ -16,5 +19,6 @@ ast_node! {
 ast_node! {
     enum DefinitionKind {
         Function(FunctionDefinition),
+        Type(TypeDefinition),
     }
 }

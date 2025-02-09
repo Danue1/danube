@@ -95,6 +95,8 @@ pub enum SyntaxKind {
     SUPER,
     /// `in`
     IN,
+    /// `type`
+    TYPE,
 
     UNEXPECTED,
 
@@ -193,6 +195,7 @@ pub enum SyntaxKind {
 
     Definition,
     FunctionDefinition,
+    TypeDefinition,
 
     Type,
     PathType,
@@ -243,6 +246,7 @@ pub enum SyntaxKind {
     Identifier,
     AssignmentOperator,
     BinaryOperator,
+    TypeParameter,
 
     Raw,
     Trivia,

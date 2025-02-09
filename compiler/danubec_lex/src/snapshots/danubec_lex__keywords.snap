@@ -63,4 +63,12 @@ expression: tokens
         IN,
         "in",
     ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        TYPE,
+        "type",
+    ),
 ]

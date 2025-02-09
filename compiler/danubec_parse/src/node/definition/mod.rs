@@ -1,4 +1,5 @@
 mod function_definition;
+mod type_definition;
 
 use danubec_lex::Lex;
 use danubec_syntax::SyntaxKind;
@@ -32,6 +33,6 @@ impl crate::Context {
     }
 
     pub fn definition_kind(&mut self, lex: &mut Lex) -> bool {
-        self.function_definition(lex)
+        self.function_definition(lex) || self.type_definition(lex)
     }
 }
