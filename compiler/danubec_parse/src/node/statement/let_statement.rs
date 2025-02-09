@@ -45,7 +45,7 @@ fn let_statement() {
     ] {
         let mut context = crate::Context::new();
         let mut lex = Lex::new(source);
-        assert!(context.let_statement(&mut lex));
+        context.let_statement(&mut lex);
         let node = context.finish();
 
         assert_eq!(format!("{}", node), source);

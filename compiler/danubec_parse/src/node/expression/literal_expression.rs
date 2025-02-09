@@ -6,7 +6,6 @@ impl crate::Context {
         let checkpoint = self.checkpoint();
         if self.literal(lex) {
             self.start_node_at(checkpoint, SyntaxKind::LiteralExpression);
-
             self.finish_node();
 
             true

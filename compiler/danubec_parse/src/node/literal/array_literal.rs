@@ -35,9 +35,7 @@ fn array_literal() {
     for source in ["[]", "[false]", "[true, false]", "[true, false,]"] {
         let mut context = crate::Context::new();
         let mut lex = Lex::new(source);
-        context.start_node(SyntaxKind::Root);
         context.array_literal(&mut lex);
-        context.finish_node();
         let node = context.finish();
 
         assert_eq!(format!("{}", node), source);

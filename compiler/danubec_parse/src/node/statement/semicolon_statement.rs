@@ -14,3 +14,15 @@ impl crate::Context {
         }
     }
 }
+
+#[test]
+fn semicolon_statement() {
+    for source in [";"] {
+        let mut context = crate::Context::new();
+        let mut lex = Lex::new(source);
+        context.semicolon_statement(&mut lex);
+        let node = context.finish();
+
+        assert_eq!(format!("{}", node), source);
+    }
+}

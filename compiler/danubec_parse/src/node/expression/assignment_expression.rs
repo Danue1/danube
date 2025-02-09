@@ -75,9 +75,7 @@ fn assignement_expression() {
     ] {
         let mut context = crate::Context::new();
         let mut lex = Lex::new(source);
-        context.start_node(SyntaxKind::Root);
         context.assignment_operator(&mut lex);
-        context.finish_node();
         let node = context.finish();
 
         assert_eq!(format!("{}", node), source);

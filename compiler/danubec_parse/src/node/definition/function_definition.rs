@@ -100,9 +100,7 @@ fn function_parameters() {
     for source in ["(a: i32)", "(a: i32, b: i32)", "(a: i32, b: i32,)"] {
         let mut context = crate::Context::new();
         let mut lex = Lex::new(source);
-        context.start_node(SyntaxKind::Root);
         context.function_parameters(&mut lex);
-        context.finish_node();
         let node = context.finish();
 
         assert_eq!(format!("{}", node), source);
@@ -114,9 +112,7 @@ fn function_return_type() {
     for source in ["-> i32"] {
         let mut context = crate::Context::new();
         let mut lex = Lex::new(source);
-        context.start_node(SyntaxKind::Root);
         context.function_return_type(&mut lex);
-        context.finish_node();
         let node = context.finish();
 
         assert_eq!(format!("{}", node), source);

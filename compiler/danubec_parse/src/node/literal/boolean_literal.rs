@@ -20,9 +20,7 @@ fn boolean_literal() {
     for source in ["true", "false"] {
         let mut context = crate::Context::new();
         let mut lex = Lex::new(source);
-        context.start_node(SyntaxKind::Root);
         context.boolean_literal(&mut lex);
-        context.finish_node();
         let node = context.finish();
 
         assert_eq!(format!("{}", node), source);
