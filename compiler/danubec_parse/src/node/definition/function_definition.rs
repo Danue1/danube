@@ -10,10 +10,16 @@ impl crate::Context {
             self.identifier(lex);
 
             self.trivia(lex);
+            self.type_parameters(lex);
+
+            self.trivia(lex);
             self.function_parameters(lex);
 
             self.trivia(lex);
             self.function_return_type(lex);
+
+            self.trivia(lex);
+            self.where_clause(lex);
 
             self.trivia(lex);
             self.function_body(lex);

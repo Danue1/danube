@@ -71,4 +71,12 @@ expression: tokens
         TYPE,
         "type",
     ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        WHERE,
+        "where",
+    ),
 ]

@@ -97,6 +97,8 @@ pub enum SyntaxKind {
     IN,
     /// `type`
     TYPE,
+    /// `where`
+    WHERE,
 
     UNEXPECTED,
 
@@ -256,6 +258,9 @@ pub enum SyntaxKind {
     AssignmentOperator,
     BinaryOperator,
     TypeParameter,
+    TypeConstraint,
+    TypeConstraintParameter,
+    WhereClause,
 
     Raw,
     Trivia,

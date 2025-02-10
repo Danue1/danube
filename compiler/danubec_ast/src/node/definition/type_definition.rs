@@ -32,6 +32,44 @@ ast_node! {
 
     node identifier -> Identifier;
     token colon -> COLON;
-    node ty -> Type;
+    nodes types -> Type;
     token comma -> COMMA;
+}
+
+ast_node! {
+    /// WhereClause =
+    /// | "where"
+    /// | "where" _ TypeConstraint
+    /// | "where" _ ( TypeConstraint _ "," )+ _ TypeConstraint
+    struct WhereClause;
+
+    token where_token -> WHERE;
+    nodes type_constraints -> TypeConstraint;
+}
+
+ast_node! {
+    /// ```ebnf
+    /// TypeConstraint =
+    /// | Type
+    /// | Type _ ":" _ TypeConstraintParameter
+    /// ```
+    struct TypeConstraint;
+
+    node lhs -> Type;
+    token colon -> COLON;
+    node rhs -> TypeConstraintParameter;
+    token plus -> PLUS;
+}
+
+ast_node! {
+    /// ```ebnf
+    /// TypeConstraintParameter =
+    /// | Type
+    /// | ( Type _ "+" )+
+    /// | ( Type _ "+" )+ _ Type
+    /// ```
+    struct TypeConstraintParameter;
+
+    nodes types -> Type;
+    token plus -> PLUS;
 }
