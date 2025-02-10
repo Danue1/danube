@@ -1,22 +1,27 @@
 ast_node! {
     /// ```ebnf
     /// ImplDefinition =
-    /// | "impl" TargetType "{" _ "}"
-    /// | "impl" TargetType "{" _ ImplItemKind _ "}"
-    /// | "impl" TargetType "{" ( _ ImplItemKind )+ _ "}"
-    /// | "impl" TargetType "{" ( _ ImplItemKind )+ _ ImplItemKind _ "}"
-    /// |
-    /// | "impl" Type "for" TargetType "{" _ "}"
-    /// | "impl" Type "for" TargetType "{" _ ImplItemKind _ "}"
-    /// | "impl" Type "for" TargetType "{" ( _ ImplItemKind )+ _ "}"
-    /// | "impl" Type "for" TargetType "{" ( _ ImplItemKind )+ _ ImplItemKind _ "}"
+    /// | "impl" Type "{" _ "}"
+    /// | "impl" Type "{" _ ImplItemKinds _ "}"
+    /// | "impl" Type "for" Type "{" _ "}"
+    /// | "impl" Type "for" Type "{" _ ImplItemKinds _ "}"
+    ///
+    /// | "impl" TypeParameters Type "{" _ "}"
+    /// | "impl" TypeParameters Type "{" _ ImplItemKinds _ "}"
+    /// | "impl" TypeParameters Type WhereClause "{" _ "}"
+    /// | "impl" TypeParameters Type WhereClause "{" _ ImplItemKinds _ "}"
+    ///
+    /// | "impl" TypeParameters Type "for" Type "{" _ "}"
+    /// | "impl" TypeParameters Type "for" Type "{" _ ImplItemKinds _ "}"
+    /// | "impl" TypeParameters Type "for" Type WhereClause "{" _ "}"
+    /// | "impl" TypeParameters Type "for" Type WhereClause "{" _ ImplItemKinds _ "}"
     /// ```
     struct ImplDefinition;
 
     token impl_token -> IMPL;
-    node ty -> Type;
+    nodes type_parameters -> TypeParameter;
+    nodes types -> Type;
     token for_token -> FOR;
-    node target_ty -> TargetType;
     token left_brace -> LEFT_BRACE;
     nodes items -> ImplItemKind;
     token right_brace -> RIGHT_BRACE;
@@ -24,6 +29,10 @@ ast_node! {
 
 ast_node! {
     /// ```ebnf
+    /// ImplItemKinds =
+    /// | ImplItemKind
+    /// | ( ImplItemKind _ )+ ImplItemKind
+    ///
     /// ImplItemKind =
     /// | FunctionDefinition
     /// | TypeDefinition
@@ -36,14 +45,4 @@ ast_node! {
         Const(ConstDefinition),
         Static(StaticDefinition),
     }
-}
-
-ast_node! {
-    /// ```ebnf
-    /// TargetType =
-    /// | Type
-    /// ```
-    struct TargetType;
-
-    node ty -> Type;
 }

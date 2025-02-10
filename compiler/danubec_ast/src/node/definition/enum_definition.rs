@@ -23,6 +23,7 @@ ast_node! {
     struct EnumVariant;
 
     node identifier -> Identifier;
+    node kind -> EnumVariantKind;
 }
 
 ast_node! {

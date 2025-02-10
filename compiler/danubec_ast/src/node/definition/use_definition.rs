@@ -40,9 +40,9 @@ ast_node! {
     /// ```
     struct UseTreeIdent;
 
-    node identifier -> Identifier;
+    node lhs -> Identifier;
     token as_token -> AS;
-    node alias -> Identifier;
+    node rhs -> Identifier;
 }
 
 ast_node! {

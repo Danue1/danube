@@ -303,7 +303,6 @@ pub enum SyntaxKind {
     StructBodyNamedField,
     StructBodyUnnamed,
     StructBodyUnnamedField,
-    TargetType,
     UseTreeBarrel,
     UseTreeIdent,
     UseTreeNested,
