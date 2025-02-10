@@ -79,4 +79,100 @@ expression: tokens
         WHERE,
         "where",
     ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        STRUCT,
+        "struct",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        ENUM,
+        "enum",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        TRAIT,
+        "trait",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        IMPL,
+        "impl",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        CONST,
+        "const",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        STATIC,
+        "static",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        USE,
+        "use",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        MOD,
+        "mod",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        SELF,
+        "self",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        SELF_UPPERCASE,
+        "Self",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        AS,
+        "as",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        FOR,
+        "for",
+    ),
 ]

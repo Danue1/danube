@@ -16,18 +16,6 @@ ast_node! {
     /// | "fn" _ Identifier _ TypeParameters _ FunctionParameters _ FunctionReturnType _ WhereClause _ ";"
     /// | "fn" _ Identifier _ TypeParameters _ FunctionParameters _ FunctionReturnType _ WhereClause _ BlockExpression
     ///
-    /// TypeParameters =
-    /// | "<" _ ">"
-    /// | "<" _ TypeParameter _ ">"
-    /// | "<" _ ( TypeParameter _ "," )+ _ ">"
-    /// | "<" _ ( TypeParameter _ "," )+ TypeParameter _ ">"
-    ///
-    /// FunctionParameters =
-    /// | "(" _ ")"
-    /// | "(" _ FunctionParameter _ ")"
-    /// | "(" _ ( FunctionParameter _ "," )+ _ ")"
-    /// | "(" _ ( FunctionParameter _ "," )+ FunctionParameter _ ")"
-    ///
     /// FunctionReturnType =
     /// | "->" _ Type
     /// ```
@@ -49,6 +37,12 @@ ast_node! {
 
 ast_node! {
     /// ```ebnf
+    /// FunctionParameters =
+    /// | "(" _ ")"
+    /// | "(" _ FunctionParameter _ ")"
+    /// | "(" _ ( FunctionParameter _ "," )+ _ ")"
+    /// | "(" _ ( FunctionParameter _ "," )+ FunctionParameter _ ")"
+    ///
     /// FunctionParameter =
     /// | Identifier _ ":" _ Type
     /// ```

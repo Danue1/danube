@@ -117,6 +117,18 @@ impl<'lex> Iterator for Lex<'lex> {
                     "in" => token!(IN),
                     "type" => token!(TYPE),
                     "where" => token!(WHERE),
+                    "struct" => token!(STRUCT),
+                    "enum" => token!(ENUM),
+                    "trait" => token!(TRAIT),
+                    "impl" => token!(IMPL),
+                    "const" => token!(CONST),
+                    "static" => token!(STATIC),
+                    "use" => token!(USE),
+                    "mod" => token!(MOD),
+                    "self" => token!(SELF),
+                    "Self" => token!(SELF_UPPERCASE),
+                    "as" => token!(AS),
+                    "for" => token!(FOR),
                     _ => token!(ALPHABETIC),
                 }
             }
@@ -127,7 +139,7 @@ impl<'lex> Iterator for Lex<'lex> {
 
 #[test]
 fn keywords() {
-    let source = "fn let true false pub crate super in type where";
+    let source = "fn let true false pub crate super in type where struct enum trait impl const static use mod self Self as for";
     let lex = Lex::new(source);
     let tokens: Vec<_> = lex.collect();
 

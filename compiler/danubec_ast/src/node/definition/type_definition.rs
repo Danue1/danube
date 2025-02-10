@@ -21,6 +21,12 @@ ast_node! {
 
 ast_node! {
     /// ```ebnf
+    /// TypeParameters =
+    /// | "<" _ ">"
+    /// | "<" _ TypeParameter _ ">"
+    /// | "<" _ ( TypeParameter _ "," )+ _ ">"
+    /// | "<" _ ( TypeParameter _ "," )+ TypeParameter _ ">"
+    ///
     /// TypeParameter =
     /// | Identifier
     /// | Identifier _ ":"

@@ -99,6 +99,30 @@ pub enum SyntaxKind {
     TYPE,
     /// `where`
     WHERE,
+    /// `struct`
+    STRUCT,
+    /// `enum`
+    ENUM,
+    /// `trait`
+    TRAIT,
+    /// `impl`
+    IMPL,
+    /// `const`
+    CONST,
+    /// `static`
+    STATIC,
+    /// `use`
+    USE,
+    /// `mod`
+    MOD,
+    /// `self`
+    SELF,
+    /// `Self`
+    SELF_UPPERCASE,
+    /// `as`
+    AS,
+    /// `for`
+    FOR,
 
     UNEXPECTED,
 
@@ -207,6 +231,14 @@ pub enum SyntaxKind {
     Definition,
     FunctionDefinition,
     TypeDefinition,
+    StructDefinition,
+    EnumDefinition,
+    TraitDefinition,
+    ImplDefinition,
+    ConstDefinition,
+    StaticDefinition,
+    UseDefinition,
+    ModuleDefinition,
 
     Type,
     PathType,
@@ -261,6 +293,20 @@ pub enum SyntaxKind {
     TypeConstraint,
     TypeConstraintParameter,
     WhereClause,
+    EnumVariant,
+    EnumVariantNamed,
+    EnumVariantNamedField,
+    EnumVariantUnnamed,
+    EnumVariantUnnamedField,
+    EnumVariantSequence,
+    StructBodyNamed,
+    StructBodyNamedField,
+    StructBodyUnnamed,
+    StructBodyUnnamedField,
+    TargetType,
+    UseTreeBarrel,
+    UseTreeIdent,
+    UseTreeNested,
 
     Raw,
     Trivia,
