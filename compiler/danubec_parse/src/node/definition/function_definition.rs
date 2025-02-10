@@ -7,6 +7,7 @@ impl crate::Context {
         if expect!(self, lex, SyntaxKind::FN) {
             self.start_node_at(checkpoint, SyntaxKind::FunctionDefinition);
 
+            self.trivia(lex);
             self.identifier(lex);
 
             self.trivia(lex);
@@ -94,7 +95,34 @@ impl crate::Context {
     }
 
     fn function_body(&mut self, lex: &mut Lex) -> bool {
-        self.block_expression(lex) || expect!(self, lex, SyntaxKind::SEMICOLON)
+        let checkpoint = self.checkpoint();
+        if self.block_expression(lex) {
+            self.start_node_at(checkpoint, SyntaxKind::Expression);
+            self.finish_node();
+
+            true
+        } else {
+            expect!(self, lex, SyntaxKind::SEMICOLON)
+        }
+    }
+}
+
+#[test]
+fn function() {
+    for source in [
+        "fn foo();",
+        "fn foo() {}",
+        "fn foo() -> i32 {}",
+        "fn foo() -> i32 { 1 }",
+    ] {
+        let mut context = crate::Context::new();
+        let mut lex = Lex::new(source);
+        context.function_definition(&mut lex);
+        let node = context.finish();
+
+        dbg!(&node);
+
+        assert_eq!(format!("{}", node), source);
     }
 }
 

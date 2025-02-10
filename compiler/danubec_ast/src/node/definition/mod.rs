@@ -17,6 +17,11 @@ ast_node! {
 }
 
 ast_node! {
+    /// ```ebnf
+    /// DefinitionKind =
+    /// | FunctionDefinition
+    /// | TypeDefinition
+    /// ```
     enum DefinitionKind {
         Function(FunctionDefinition),
         Type(TypeDefinition),
