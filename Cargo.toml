@@ -1,7 +1,6 @@
 [workspace]
 resolver = "2"
 members = [
-  "compiler/bit_mask",
   "compiler/danubec",
   "compiler/danubec_ast",
   "compiler/danubec_ast_lowering",
@@ -9,6 +8,8 @@ members = [
   "compiler/danubec_lex",
   "compiler/danubec_parse",
   "compiler/danubec_syntax",
+  "crates/arena",
+  "crates/bit_mask",
 ]
 
 [workspace.dependencies]
