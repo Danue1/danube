@@ -255,6 +255,7 @@ pub enum SyntaxKind {
     LetExpression,
     LiteralExpression,
     BinaryExpression,
+    UnaryExpression,
 
     FunctionParameter,
 
@@ -289,6 +290,7 @@ pub enum SyntaxKind {
     Identifier,
     AssignmentOperator,
     BinaryOperator,
+    UnaryOperator,
     TypeParameter,
     TypeConstraint,
     TypeConstraintParameter,

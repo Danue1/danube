@@ -3,6 +3,7 @@ mod binary_expression;
 mod block_expression;
 mod let_expression;
 mod literal_expression;
+mod unary_expression;
 
 use crate::{tokens::Tokens, Bp};
 use danubec_lex::Lex;
@@ -24,11 +25,20 @@ const PATH_FIRST: Tokens = tokens![
     LEFT_CHEVRON, // <abc>::def
 ];
 
+const UNARY_FIRST: Tokens = tokens![
+    HYPHEN,      // -1
+    EXCLAMATION, // !true
+    TILDE,       // ~1
+];
+
 const EXPR_FIRST: Tokens = tokens![
     LET, // let a = 1;
 ];
 
-const LHS_FIRST: Tokens = LITERAL_FIRST.concat(PATH_FIRST).concat(EXPR_FIRST);
+const LHS_FIRST: Tokens = LITERAL_FIRST
+    .concat(PATH_FIRST)
+    .concat(UNARY_FIRST)
+    .concat(EXPR_FIRST);
 
 impl crate::Context {
     pub fn expression(&mut self, lex: &mut Lex) -> bool {
@@ -64,7 +74,10 @@ impl crate::Context {
 
     fn expression_lhs(&mut self, lex: &mut Lex) -> bool {
         if lex.matches(|kind, _| LHS_FIRST.contains(kind)) {
-            self.literal_expression(lex) || self.block_expression(lex) || self.let_expression(lex)
+            self.literal_expression(lex)
+                || self.unary_expression(lex)
+                || self.block_expression(lex)
+                || self.let_expression(lex)
         } else {
             false
         }
