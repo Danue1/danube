@@ -19,6 +19,8 @@ ast_node! {
     /// ```
     enum UseTreeKind {
         Barrel(UseTreeBarrel),
+        Ident(UseTreeIdent),
+        Nested(UseTreeNested),
     }
 }
 

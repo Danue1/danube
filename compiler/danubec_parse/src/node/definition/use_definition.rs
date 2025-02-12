@@ -72,6 +72,7 @@ impl crate::Context {
             if expect!(
                 self,
                 lex,
+                token ->
                 COLON__COLON,
                 SyntaxKind::COLON,
                 SyntaxKind::COLON,

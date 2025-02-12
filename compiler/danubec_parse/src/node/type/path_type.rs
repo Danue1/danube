@@ -12,6 +12,7 @@ impl crate::Context {
             while expect!(
                 self,
                 lex,
+                token ->
                 COLON__COLON,
                 SyntaxKind::COLON,
                 SyntaxKind::COLON,

@@ -7,6 +7,7 @@ impl crate::Context {
         if expect!(
             self,
             lex,
+            node ->
             UnaryOperator,
             SyntaxKind::HYPHEN | SyntaxKind::EXCLAMATION | SyntaxKind::TILDE,
         ) {

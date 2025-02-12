@@ -11,6 +11,12 @@ impl crate::Context {
             self.identifier(lex);
 
             self.trivia(lex);
+            self.type_parameters(lex);
+
+            self.trivia(lex);
+            self.where_clause(lex);
+
+            self.trivia(lex);
             self.enum_body(lex);
 
             self.finish_node();
@@ -186,6 +192,10 @@ fn enum_definition() {
         "enum A { B(C) }",
         "enum A { B(C,) }",
         "enum A { B(C, D) }",
+        // Type parameters
+        "enum A<T> {}",
+        "enum A where T: Copy {}",
+        "enum A<T> where T: Copy {}",
     ] {
         let mut context = crate::Context::new();
         let mut lex = Lex::new(source);

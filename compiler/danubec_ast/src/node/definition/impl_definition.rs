@@ -20,8 +20,11 @@ ast_node! {
 
     token impl_token -> IMPL;
     nodes type_parameters -> TypeParameter;
+    // if types.len() == 1, then it is a target type.
+    // if types.len() == 2, then it is a (trait type, target type).
     nodes types -> Type;
     token for_token -> FOR;
+    node where_clause -> WhereClause;
     token left_brace -> LEFT_BRACE;
     nodes items -> ImplItemKind;
     token right_brace -> RIGHT_BRACE;

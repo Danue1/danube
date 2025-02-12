@@ -45,6 +45,9 @@ ast_node! {
 ast_node! {
     /// ```ebnf
     /// StructBodyNamedField =
+    /// | Identifier _ ":" _ Type
+    /// | Identifier _ ":" _ Type _ ","
+    ///
     /// | Visibility _ Identifier _ ":" _ Type
     /// | Visibility _ Identifier _ ":" _ Type _ ","
     /// ```
@@ -76,9 +79,11 @@ ast_node! {
     /// ```ebnf
     /// StructBodyUnnamedField =
     /// | Type
+    /// | Visibility _ Type
     /// ```
     struct StructBodyUnnamedField;
 
+    node visibility -> Visibility;
     node ty -> Type;
     token comma -> COMMA;
 }

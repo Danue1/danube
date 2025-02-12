@@ -4,6 +4,15 @@ ast_node! {
     /// | "enum" _ Identifier _ "{" _ "}"
     /// | "enum" _ Identifier _ "{" _ EnumVariants _ "}"
     ///
+    /// | "enum" _ TypeParameters _ Identifier _ "{" _ "}"
+    /// | "enum" _ TypeParameters _ Identifier _ "{" _ EnumVariants _ "}"
+    ///
+    /// | "enum" _ Identifier _ WhereClause _ "{" _ "}"
+    /// | "enum" _ Identifier _ WhereClause _ "{" _ EnumVariants _ "}"
+    ///
+    /// | "enum" _ TypeParameters _ Identifier _ WhereClause _ "{" _ "}"
+    /// | "enum" _ TypeParameters _ Identifier _ WhereClause _ "{" _ EnumVariants _ "}"
+    ///
     /// EnumVariants =
     /// | EnumVariant
     /// | ( EnumVariant _ "," )+
@@ -12,6 +21,12 @@ ast_node! {
     struct EnumDefinition;
 
     token enum_token -> ENUM;
+    node identifier -> Identifier;
+    nodes type_parameters -> TypeParameter;
+    node where_clause -> WhereClause;
+    token left_brace -> LEFT_BRACE;
+    nodes variants -> EnumVariant;
+    token right_brace -> RIGHT_BRACE;
 }
 
 ast_node! {

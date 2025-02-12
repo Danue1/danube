@@ -64,7 +64,7 @@ macro_rules! expect {
             _ => false,
         }
     };
-    ($context:expr, $lex:expr, $kind:ident, $($pat:pat,)+) => {{
+    ($context:expr, $lex:expr, token -> $kind:ident, $($pat:pat,)+) => {{
         let mut lex = $lex.clone();
         let mut source = String::new();
         let mut matched = true;
@@ -83,6 +83,32 @@ macro_rules! expect {
 
         if matched {
             $context.token(SyntaxKind::$kind, &source);
+
+            for _ in 0..count {
+                $lex.next();
+            }
+        }
+
+        matched
+    }};
+    ($context:expr, $lex:expr, node -> $kind:ident, $($pat:pat,)+) => {{
+        let mut lex = $lex.clone();
+        let mut matched = true;
+        let mut count = 0;
+
+        $(
+            if matched {
+                if let Some((kind @ $pat, text)) = lex.next() {
+                    $context.token(kind, text);
+                    count += 1;
+                } else {
+                    matched = false;
+                }
+            }
+        )+
+
+        if matched {
+            $context.start_node(SyntaxKind::$kind);
 
             for _ in 0..count {
                 $lex.next();

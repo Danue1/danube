@@ -12,7 +12,7 @@ ast_node! {
     token ty_token -> TYPE;
     node identifier -> Identifier;
     token left_chevron -> LEFT_CHEVRON;
-    nodes type_parameter -> TypeParameter;
+    nodes type_parameters -> TypeParameter;
     token right_chevron -> RIGHT_CHEVRON;
     token equal -> EQUAL;
     node ty -> Type;

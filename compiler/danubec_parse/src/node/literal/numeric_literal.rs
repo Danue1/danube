@@ -114,6 +114,7 @@ impl crate::Context {
         expect!(
             self,
             lex,
+            token ->
             ExponentPartSign,
             SyntaxKind::PLUS | SyntaxKind::HYPHEN,
         )

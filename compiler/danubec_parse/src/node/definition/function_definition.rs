@@ -81,6 +81,7 @@ impl crate::Context {
         if expect!(
             self,
             lex,
+            token ->
             HYPHEN__RIGHT_CHEVRON,
             SyntaxKind::HYPHEN,
             SyntaxKind::RIGHT_CHEVRON,

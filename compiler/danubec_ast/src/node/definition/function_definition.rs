@@ -48,7 +48,7 @@ ast_node! {
     /// ```
     struct FunctionParameter;
 
-    node name -> Identifier;
+    node identifier -> Identifier;
     token colon -> COLON;
     node ty -> Type;
     token comma -> COMMA;

@@ -29,7 +29,7 @@ impl crate::Context {
                 let checkpoint = self.checkpoint();
 
                 if $(
-                    expect!(self, lex, $kind, $(SyntaxKind::$punctuation,)+)
+                    expect!(self, lex, token -> $kind, $(SyntaxKind::$punctuation,)+)
                 )||+ {
                     self.start_node_at(checkpoint, SyntaxKind::BinaryOperator);
                     self.finish_node();

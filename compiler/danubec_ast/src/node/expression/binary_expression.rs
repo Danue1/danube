@@ -6,7 +6,7 @@ ast_node! {
     struct BinaryExpression;
 
     node lhs -> Expression before BinaryOperator;
-    token operator -> BinaryOperator;
+    node operator -> BinaryOperator;
     node rhs -> Expression after BinaryOperator;
 }
 
