@@ -31,6 +31,7 @@ ast_node! {
     token right_paren -> RIGHT_PAREN;
     token hyphen__right_chevron -> HYPHEN__RIGHT_CHEVRON;
     node return_type -> Type;
+    node where_clause -> WhereClause;
     token semicolon -> SEMICOLON;
     node body -> BlockExpression;
 }
