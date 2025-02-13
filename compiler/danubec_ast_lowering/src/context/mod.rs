@@ -1,10 +1,8 @@
 pub mod namespace;
-pub mod next_id;
 pub mod scope;
 pub mod symbol;
 
 pub use namespace::*;
-pub use next_id::*;
 pub use scope::*;
 pub use symbol::*;
 
@@ -17,7 +15,6 @@ pub struct Context {
     namespaces: HashMap<String, Namespace>,
     scopes: Vec<Scope>,
     bodies: Arena<BodyId, Body>,
-    next_id: NextId,
 }
 
 impl Context {
@@ -26,13 +23,7 @@ impl Context {
             namespaces: HashMap::new(),
             scopes: vec![Scope::new()],
             bodies: Arena::new(),
-            next_id: NextId::new(),
         }
-    }
-
-    #[inline]
-    pub fn next_id(&mut self) -> Symbol {
-        self.next_id.next()
     }
 
     #[inline]

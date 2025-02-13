@@ -5,5 +5,6 @@ edition = "2021"
 
 [dependencies]
 danubec_arena.path = "../danubec_arena"
+danubec_ast.path = "../danubec_ast"
 danubec_hir.path = "../danubec_hir"
 danubec_middle.path = "../danubec_middle"

@@ -1,7 +1,6 @@
 [package]
-name = "danubec"
+name = "danubec_diagnostic"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-danubec_compile.path = "../danubec_compile"

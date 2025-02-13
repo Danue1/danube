@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 bit_mask.path = "../../crates/bit_mask"
+danubec_ast.path = "../danubec_ast"
 danubec_lex.path = "../danubec_lex"
 danubec_syntax.path = "../danubec_syntax"
 insta.workspace = true

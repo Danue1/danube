@@ -1,3 +1,5 @@
+#![warn(clippy::all)]
+
 #[macro_export]
 macro_rules! new_monotonic {
     ($symbol:ident) => {
