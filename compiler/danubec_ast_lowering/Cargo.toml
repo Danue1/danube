@@ -4,4 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-arena.path = "../../crates/arena"
+danubec_arena.path = "../danubec_arena"
+danubec_hir.path = "../danubec_hir"
+danubec_middle.path = "../danubec_middle"

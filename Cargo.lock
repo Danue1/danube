@@ -3,10 +3,6 @@
 version = 4
 
 [[package]]
-name = "arena"
-version = "0.1.0"
-
-[[package]]
 name = "bit_mask"
 version = "0.1.0"
 
@@ -33,6 +29,10 @@ name = "danubec"
 version = "0.1.0"
 
 [[package]]
+name = "danubec_arena"
+version = "0.1.0"
+
+[[package]]
 name = "danubec_ast"
 version = "0.1.0"
 dependencies = [
@@ -44,12 +44,18 @@ dependencies = [
 name = "danubec_ast_lowering"
 version = "0.1.0"
 dependencies = [
- "arena",
+ "danubec_arena",
+ "danubec_hir",
+ "danubec_middle",
 ]
 
 [[package]]
 name = "danubec_hir"
 version = "0.1.0"
+dependencies = [
+ "danubec_arena",
+ "danubec_monotonic",
+]
 
 [[package]]
 name = "danubec_lex"
@@ -60,6 +66,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "danubec_middle"
+version = "0.1.0"
+dependencies = [
+ "danubec_hir",
+]
+
+[[package]]
+name = "danubec_monotonic"
+version = "0.1.0"
+
+[[package]]
 name = "danubec_parse"
 version = "0.1.0"
 dependencies = [
@@ -68,10 +85,6 @@ dependencies = [
  "danubec_syntax",
  "insta",
 ]
-
-[[package]]
-name = "danubec_symbol"
-version = "0.1.0"
 
 [[package]]
 name = "danubec_syntax"

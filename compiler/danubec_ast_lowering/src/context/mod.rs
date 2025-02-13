@@ -8,8 +8,9 @@ pub use next_id::*;
 pub use scope::*;
 pub use symbol::*;
 
-use crate::node::{Body, BodyId};
-use arena::Arena;
+use crate::node::Body;
+use danubec_arena::Arena;
+use danubec_hir::BodyId;
 use std::collections::HashMap;
 
 pub struct Context {

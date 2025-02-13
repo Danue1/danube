@@ -1,15 +1,16 @@
 [workspace]
 resolver = "2"
 members = [
-  "compiler/danubec",
-  "compiler/danubec_ast",
+  "compiler/danubec_arena",
   "compiler/danubec_ast_lowering",
+  "compiler/danubec_ast",
   "compiler/danubec_hir",
   "compiler/danubec_lex",
+  "compiler/danubec_middle",
+  "compiler/danubec_monotonic",
   "compiler/danubec_parse",
-  "compiler/danubec_symbol",
   "compiler/danubec_syntax",
-  "crates/arena",
+  "compiler/danubec",
   "crates/bit_mask",
 ]
 
