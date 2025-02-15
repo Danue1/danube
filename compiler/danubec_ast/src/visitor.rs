@@ -93,6 +93,10 @@ pub trait Visitor: Sized {
         walk_expression(self, node);
     }
 
+    fn visit_use_tree(&mut self, node: crate::UseTree) {
+        walk_use_tree(self, node);
+    }
+
     fn visit_use_tree_kind(&mut self, node: crate::UseTreeKind) {
         walk_use_tree_kind(self, node);
     }
@@ -136,6 +140,10 @@ pub trait Visitor: Sized {
 
     fn visit_use_tree_nested(&mut self, node: crate::UseTreeNested) {
         walk_use_tree_nested(self, node);
+    }
+
+    fn visit_use_tree_ident_prefix(&mut self, node: crate::UseTreeIdentPrefix) {
+        walk_use_tree_ident_prefix(self, node);
     }
 
     fn visit_path_type(&mut self, node: crate::PathType) {
@@ -330,6 +338,18 @@ pub trait Visitor: Sized {
     fn visit_numeric_fragment(&mut self, node: crate::NumericFragment) {
         //
     }
+
+    fn visit_path(&mut self, node: crate::Path) {
+        walk_path(self, node);
+    }
+
+    fn visit_path_segment(&mut self, node: crate::PathSegment) {
+        walk_path_segment(self, node);
+    }
+
+    fn visit_type_argument(&mut self, node: crate::TypeArgument) {
+        walk_type_argument(self, node);
+    }
 }
 
 macro_rules! visit_optional {
@@ -428,7 +448,7 @@ pub fn walk_static_definition<V: Visitor>(visitor: &mut V, node: crate::StaticDe
 }
 
 pub fn walk_use_definition<V: Visitor>(visitor: &mut V, node: crate::UseDefinition) {
-    visit_optional!(visitor.visit_use_tree_kind(node.kind()));
+    visit_optional!(visitor.visit_use_tree(node.tree()));
 }
 
 pub fn walk_module_definition<V: Visitor>(visitor: &mut V, node: crate::ModuleDefinition) {
@@ -535,13 +555,18 @@ pub fn walk_expression_kind<V: Visitor>(visitor: &mut V, node: crate::Expression
     }
 }
 
+pub fn walk_use_tree<V: Visitor>(visitor: &mut V, node: crate::UseTree) {
+    visit_optional!(visitor.visit_path(node.path()));
+    visit_optional!(visitor.visit_use_tree_kind(node.kind()));
+}
+
 pub fn walk_use_tree_ident<V: Visitor>(visitor: &mut V, node: crate::UseTreeIdent) {
-    visit_optional!(visitor.visit_identifier(node.lhs()));
-    visit_optional!(visitor.visit_identifier(node.rhs()));
+    visit_optional!(visitor.visit_identifier(node.identifier()));
+    visit_optional!(visitor.visit_use_tree_ident_prefix(node.prefix()));
 }
 
 pub fn walk_use_tree_nested<V: Visitor>(visitor: &mut V, node: crate::UseTreeNested) {
-    visit_each!(visitor.visit_use_tree_kind(node.kinds()));
+    visit_each!(visitor.visit_use_tree(node.trees()));
 }
 
 pub fn walk_statement_kind<V: Visitor>(visitor: &mut V, node: crate::StatementKind) {
@@ -694,7 +719,7 @@ pub fn walk_string_literal_fragment<V: Visitor>(
 }
 
 pub fn walk_visibility_in<V: Visitor>(visitor: &mut V, node: crate::VisibilityIn) {
-    visit_optional!(visitor.visit_identifier(node.identifier()));
+    visit_optional!(visitor.visit_path(node.path()));
 }
 
 pub fn walk_numeric_literal_kind<V: Visitor>(visitor: &mut V, node: crate::NumericLiteralKind) {
@@ -745,4 +770,21 @@ pub fn walk_fraction_part<V: Visitor>(visitor: &mut V, node: crate::FractionPart
 
 pub fn walk_exponent_part<V: Visitor>(visitor: &mut V, node: crate::ExponentPart) {
     visit_optional!(visitor.visit_numeric_fragment(node.fragment()));
+}
+
+pub fn walk_path<V: Visitor>(visitor: &mut V, node: crate::Path) {
+    visit_each!(visitor.visit_path_segment(node.segments()));
+}
+
+pub fn walk_path_segment<V: Visitor>(visitor: &mut V, node: crate::PathSegment) {
+    visit_optional!(visitor.visit_identifier(node.identifier()));
+    visit_optional!(visitor.visit_type_argument(node.type_argument()));
+}
+
+pub fn walk_type_argument<V: Visitor>(visitor: &mut V, node: crate::TypeArgument) {
+    visit_each!(visitor.visit_type(node.types()));
+}
+
+pub fn walk_use_tree_ident_prefix<V: Visitor>(visitor: &mut V, node: crate::UseTreeIdentPrefix) {
+    visit_optional!(visitor.visit_identifier(node.identifier()));
 }

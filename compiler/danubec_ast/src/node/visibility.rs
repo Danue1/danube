@@ -54,6 +54,5 @@ ast_node! {
     struct VisibilityIn;
 
     token in_token -> IN;
-    // TODO: replace with Path
-    node identifier -> Identifier;
+    node path -> Path;
 }

@@ -16,6 +16,7 @@ impl<'lex> Lex<'lex> {
         self.source.len() == self.index
     }
 
+    #[inline]
     pub fn peek(&self) -> Option<(SyntaxKind, &'lex str)> {
         self.clone().next()
     }

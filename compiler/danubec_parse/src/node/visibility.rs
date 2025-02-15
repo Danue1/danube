@@ -20,8 +20,7 @@ impl crate::Context {
                 } else if expect!(self, lex, SyntaxKind::IN) {
                     self.start_node_at(checkpoint, SyntaxKind::VisibilityIn);
                     self.trivia(lex);
-                    // TODO: replace with Path
-                    self.identifier(lex);
+                    self.path(lex);
                     self.finish_node();
                 }
 

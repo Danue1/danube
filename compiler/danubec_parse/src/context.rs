@@ -109,6 +109,7 @@ macro_rules! expect {
 
         if matched {
             $context.start_node(SyntaxKind::$kind);
+            $context.finish_node();
 
             for _ in 0..count {
                 $lex.next();
