@@ -1,4 +1,4 @@
-use danubec_middle::{ast, hir, Environment, Namespace, Scope, ScopeKind};
+use danubec_middle::{ast, hir, Environment, NamespaceKind, RibKind, Scope};
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -19,7 +19,7 @@ impl DefinitionCollection {
         }
     }
 
-    pub fn with_scope<F, T>(&mut self, kind: ScopeKind, f: F) -> T
+    pub fn with_scope<F, T>(&mut self, kind: RibKind, f: F) -> T
     where
         F: FnOnce(&mut Self) -> T,
     {
@@ -42,7 +42,7 @@ impl ast::Visitor for DefinitionCollection {
         };
         self.definitions.insert(def_id, definition);
 
-        self.with_scope(ScopeKind::Module, |context| {
+        self.with_scope(RibKind::Module, |context| {
             ast::walk_module_definition(context, node);
         });
     }
@@ -55,9 +55,9 @@ impl ast::Visitor for DefinitionCollection {
             kind: hir::DefinitionKind::Struct(hir::StructDef { kind: None }),
         };
         self.definitions.insert(def_id, definition);
-        self.environment.define(Namespace::Type, ident, def_id);
+        self.environment.define(NamespaceKind::Type, ident, def_id);
 
-        self.with_scope(ScopeKind::Struct, |context| {
+        self.with_scope(RibKind::Struct, |context| {
             ast::walk_struct_definition(context, node);
         });
     }
