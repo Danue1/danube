@@ -34,7 +34,6 @@ impl crate::Context {
     }
 
     pub fn impl_body(&mut self, lex: &mut Lex) -> bool {
-        let checkpoint = self.checkpoint();
         if expect!(self, lex, SyntaxKind::LEFT_BRACE) {
             self.trivia(lex);
             while self.impl_item_kind(lex) {

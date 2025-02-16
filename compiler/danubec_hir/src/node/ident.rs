@@ -16,11 +16,8 @@ pub struct Ident(Hash);
 impl Ident {
     pub fn new(raw: String) -> Self {
         let hash = Hash::new(raw.clone());
-
-        unsafe {
-            let map = MAP.get_or_init(IdentMap::new);
-            map.insert(hash, raw);
-        }
+        let map = MAP.get_or_init(IdentMap::new);
+        map.insert(hash, raw);
 
         Ident(hash)
     }
@@ -28,7 +25,7 @@ impl Ident {
 
 impl std::fmt::Display for Ident {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let map = unsafe { MAP.get_or_init(IdentMap::new) };
+        let map = MAP.get_or_init(IdentMap::new);
         let raw = map.get(self.0).expect("failed to get ident");
 
         write!(f, "{}", raw)
@@ -37,7 +34,7 @@ impl std::fmt::Display for Ident {
 
 impl std::fmt::Debug for Ident {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let map = unsafe { MAP.get_or_init(IdentMap::new) };
+        let map = MAP.get_or_init(IdentMap::new);
         let raw = map.get(self.0).expect("failed to get ident");
 
         f.debug_struct("Ident")

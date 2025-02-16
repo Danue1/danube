@@ -1,9 +1,9 @@
 #![warn(clippy::all)]
 #![allow(unused)]
 
-mod node;
+mod definition;
 
-use node::*;
+use definition::*;
 
 use danubec_middle::Context;
 

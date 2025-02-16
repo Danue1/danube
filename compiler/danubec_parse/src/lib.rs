@@ -1,5 +1,4 @@
 #![warn(clippy::all)]
-#![allow(unused)]
 
 #[macro_use]
 pub mod context;
@@ -13,11 +12,10 @@ mod pratt;
 pub use context::*;
 
 use pratt::*;
-use tokens::*;
 
 use danubec_ast::Root;
 use danubec_lex::Lex;
-use danubec_syntax::{AstNode, SyntaxNode};
+use danubec_syntax::AstNode;
 
 pub fn parse(source: &str) -> Root {
     let mut context = Context::new();

@@ -105,7 +105,6 @@ impl crate::Context {
 
         match_operator! {
             // Assignment operators
-            (Some(SyntaxKind::EQUAL), _, _, _) => P1,
             (Some(SyntaxKind::PLUS), Some(SyntaxKind::EQUAL), _, _) => P1,
             (Some(SyntaxKind::PLUS), Some(SyntaxKind::PIPE), Some(SyntaxKind::EQUAL), _) => P1,
             (Some(SyntaxKind::PLUS), Some(SyntaxKind::PERCENT), Some(SyntaxKind::EQUAL), _) => P1,
@@ -138,9 +137,7 @@ impl crate::Context {
             (Some(SyntaxKind::EQUAL), Some(SyntaxKind::EQUAL), _, _) => P4,
             (Some(SyntaxKind::EXCLAMATION), Some(SyntaxKind::EQUAL), _, _) => P4,
             (Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::EQUAL), _, _) => P4,
-            (Some(SyntaxKind::LEFT_CHEVRON), _, _, _) => P4,
             (Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::EQUAL), _, _) => P4,
-            (Some(SyntaxKind::RIGHT_CHEVRON), _, _, _) => P4,
 
             (Some(SyntaxKind::PIPE), _, _, _) => P5,
 
@@ -168,6 +165,11 @@ impl crate::Context {
             (Some(SyntaxKind::ASTERISK), _, _, _) => P10,
             (Some(SyntaxKind::SLASH), _, _, _) => P10,
             (Some(SyntaxKind::PERCENT), _, _, _) => P10,
+
+            // Assignment operators
+            (Some(SyntaxKind::EQUAL), _, _, _) => P1,
+            (Some(SyntaxKind::LEFT_CHEVRON), _, _, _) => P4,
+            (Some(SyntaxKind::RIGHT_CHEVRON), _, _, _) => P4,
         }
     }
 
