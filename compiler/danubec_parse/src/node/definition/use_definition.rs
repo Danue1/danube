@@ -140,6 +140,8 @@ fn use_definition() {
         "use a::b;",
         "use a::{b};",
         "use a::{b,};",
+        "use a::{b::c,};",
+        "use a::{b as c,};",
         "use a::{b, c};",
         "use a::*;",
         "use a as b;",
@@ -147,6 +149,7 @@ fn use_definition() {
         "use {a};",
         "use {a,};",
         "use {a, b};",
+        "use {a, b::c};",
         "use {{a}};",
         "use ::a;",
         "use ::a::b;",
@@ -154,6 +157,8 @@ fn use_definition() {
         "use ::{a,};",
         "use ::{a, b};",
         "use ::{*};",
+        // TODO
+        // "use a::{self, b as c, c::d, e::*};",
     ] {
         let mut context = crate::Context::new();
         let mut lex = Lex::new(source);

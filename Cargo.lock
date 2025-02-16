@@ -84,6 +84,7 @@ version = "0.1.0"
 dependencies = [
  "danubec_arena",
  "danubec_monotonic",
+ "once_cell",
 ]
 
 [[package]]

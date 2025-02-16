@@ -59,7 +59,7 @@ where
 #[macro_export]
 macro_rules! new_arena {
     ($index:ident) => {
-        #[derive(Clone, Copy, PartialEq, Eq, Hash)]
+        #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
         pub struct $index(usize);
 
         impl $index {

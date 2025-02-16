@@ -1,14 +1,10 @@
 #![warn(clippy::all)]
 #![allow(unused)]
 
-#[macro_use]
-extern crate danubec_arena;
-
-#[macro_use]
-extern crate danubec_monotonic;
-
+pub mod hash;
 pub mod node;
 pub mod symbol;
 
+pub use hash::*;
 pub use node::*;
 pub use symbol::*;

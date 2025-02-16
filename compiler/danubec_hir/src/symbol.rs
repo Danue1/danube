@@ -1,8 +1,14 @@
-new_arena!(DefId);
-new_monotonic!(LocalDefId);
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct KrateId(u32);
 
-new_arena!(ModDefId);
-new_monotonic!(LocalModDefId);
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct HirId(u32);
 
-new_arena!(CrateId);
-new_arena!(BodyId);
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct DefId(u32);
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct ModDefId(DefId);
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct BodyId(HirId);

@@ -1,5 +1,8 @@
-use crate::DefId;
+use super::Ident;
+use crate::{KrateId, ModDefId};
+use std::collections::HashMap;
 
 pub struct Krate {
-    items: Vec<DefId>,
+    pub modules: Vec<ModDefId>,
+    pub children: HashMap<Ident, KrateId>,
 }

@@ -2,7 +2,7 @@
 
 use danubec_compile::CompileConfig;
 
-pub fn compile(working_directory: String, crates: Vec<String>) {
+pub fn build(working_directory: String, crates: Vec<String>) {
     let config = CompileConfig {
         working_directory,
         crates,
@@ -20,5 +20,5 @@ fn test_compile() {
         .to_string_lossy()
         .to_string();
     let crates = vec!["core".to_string()];
-    compile(working_directory, crates);
+    build(working_directory, crates);
 }

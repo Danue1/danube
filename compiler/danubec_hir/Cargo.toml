@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 danubec_arena.path = "../danubec_arena"
 danubec_monotonic.path = "../danubec_monotonic"
+once_cell.workspace = true

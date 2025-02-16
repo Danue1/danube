@@ -1,11 +1,11 @@
 #![warn(clippy::all)]
 #![allow(unused)]
 
-mod context;
 mod node;
 
-use context::*;
 use node::*;
+
+use danubec_middle::Context;
 
 pub fn lower_to_hir(context: &mut Context) {
     //

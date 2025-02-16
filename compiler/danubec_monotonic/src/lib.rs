@@ -7,10 +7,14 @@ macro_rules! new_monotonic {
         pub struct $symbol(usize);
 
         impl $symbol {
+            pub const ZERO: Self = Self(0);
+
+            pub const MAX: Self = Self(usize::MAX);
+
             pub fn new() -> Self {
                 use std::sync::atomic::{AtomicUsize, Ordering};
 
-                static COUNTER: AtomicUsize = AtomicUsize::new(0);
+                static COUNTER: AtomicUsize = AtomicUsize::new(1);
 
                 Self(COUNTER.fetch_add(1, Ordering::SeqCst))
             }
