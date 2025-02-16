@@ -5,8 +5,8 @@ edition = "2021"
 
 [dependencies]
 danubec_ast.path = "../danubec_ast"
+danubec_data_structure.path = "../danubec_data_structure"
 danubec_diagnostic.path = "../danubec_diagnostic"
-danubec_directory.path = "../danubec_directory"
 danubec_middle.path = "../danubec_middle"
 danubec_parse.path = "../danubec_parse"
 glob.workspace = true

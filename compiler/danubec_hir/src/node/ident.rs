@@ -1,4 +1,4 @@
-use crate::Hash;
+use danubec_data_structure::Hash;
 use std::{
     collections::HashMap,
     sync::{Mutex, OnceLock},

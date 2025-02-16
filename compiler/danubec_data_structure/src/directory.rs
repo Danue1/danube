@@ -1,15 +1,15 @@
-#![warn(clippy::all)]
-
-#[macro_use]
-extern crate danubec_diagnostic;
-
-use danubec_middle::Context;
 use std::{collections::HashMap, path::PathBuf};
 
 #[derive(Debug)]
 pub struct Directory<T> {
     files: HashMap<String, T>,
     directories: HashMap<String, Directory<T>>,
+}
+
+#[derive(Debug)]
+pub enum DirectoryError {
+    InvalidDirectory,
+    InvalidPath,
 }
 
 impl<T> Directory<T> {
@@ -20,17 +20,13 @@ impl<T> Directory<T> {
         }
     }
 
-    pub fn insert(&mut self, context: &mut Context, path: &PathBuf, value: T) {
+    pub fn insert(&mut self, path: &PathBuf, value: T) -> Result<(), DirectoryError> {
         let components: Vec<_> = path.iter().filter_map(|c| c.to_str()).collect();
-        if let Some((file, directories)) = components.split_last() {
+        if let Some((_, directories)) = components.split_last() {
             let mut current = self;
             for directory in directories {
                 if directory.is_empty() {
-                    return error!(
-                        context.diagnostic,
-                        "ICE: invalid directory ({})",
-                        path.display()
-                    );
+                    return Err(DirectoryError::InvalidDirectory);
                 }
                 current = current
                     .directories
@@ -43,8 +39,10 @@ impl<T> Directory<T> {
                 .to_string_lossy()
                 .to_string();
             current.files.insert(file, value);
+
+            Ok(())
         } else {
-            error!(context.diagnostic, "ICE: invalid path ({})", path.display());
+            Err(DirectoryError::InvalidPath)
         }
     }
 

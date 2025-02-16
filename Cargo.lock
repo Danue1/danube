@@ -3,10 +3,6 @@
 version = 4
 
 [[package]]
-name = "bit_mask"
-version = "0.1.0"
-
-[[package]]
 name = "console"
 version = "0.15.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -32,10 +28,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "danubec_arena"
-version = "0.1.0"
-
-[[package]]
 name = "danubec_ast"
 version = "0.1.0"
 dependencies = [
@@ -47,7 +39,6 @@ dependencies = [
 name = "danubec_ast_lowering"
 version = "0.1.0"
 dependencies = [
- "danubec_arena",
  "danubec_ast",
  "danubec_hir",
  "danubec_middle",
@@ -58,32 +49,26 @@ name = "danubec_compile"
 version = "0.1.0"
 dependencies = [
  "danubec_ast",
+ "danubec_data_structure",
  "danubec_diagnostic",
- "danubec_directory",
  "danubec_middle",
  "danubec_parse",
  "glob",
 ]
 
 [[package]]
-name = "danubec_diagnostic"
+name = "danubec_data_structure"
 version = "0.1.0"
 
 [[package]]
-name = "danubec_directory"
+name = "danubec_diagnostic"
 version = "0.1.0"
-dependencies = [
- "danubec_diagnostic",
- "danubec_middle",
- "glob",
-]
 
 [[package]]
 name = "danubec_hir"
 version = "0.1.0"
 dependencies = [
- "danubec_arena",
- "danubec_monotonic",
+ "danubec_data_structure",
  "once_cell",
 ]
 
@@ -105,15 +90,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "danubec_monotonic"
-version = "0.1.0"
-
-[[package]]
 name = "danubec_parse"
 version = "0.1.0"
 dependencies = [
- "bit_mask",
  "danubec_ast",
+ "danubec_data_structure",
  "danubec_lex",
  "danubec_syntax",
  "insta",

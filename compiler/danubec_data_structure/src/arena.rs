@@ -1,5 +1,3 @@
-#![warn(clippy::all)]
-
 pub trait Index: Copy + PartialEq + Eq + std::hash::Hash + 'static {
     fn from_usize(index: usize) -> Self;
 

@@ -1,9 +1,0 @@
-[package]
-name = "danubec_directory"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-danubec_diagnostic.path = "../danubec_diagnostic"
-danubec_middle.path = "../danubec_middle"
-glob.workspace = true

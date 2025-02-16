@@ -3,7 +3,7 @@
 #[macro_use]
 extern crate danubec_diagnostic;
 
-use danubec_directory::Directory;
+use danubec_data_structure::Directory;
 use danubec_middle::{ast, Context};
 
 pub struct CompileConfig {
@@ -38,7 +38,9 @@ fn load(context: &mut Context, directory: &mut Directory<ast::Root>, krate: &str
                         continue;
                     };
                     let ast = danubec_parse::parse(&source);
-                    directory.insert(context, &path.to_path_buf(), ast);
+                    directory
+                        .insert(&path.to_path_buf(), ast)
+                        .expect("failed to insert");
                 } else {
                     error!(
                         context.diagnostic,

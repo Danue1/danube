@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bit_mask.path = "../../crates/bit_mask"
 danubec_ast.path = "../danubec_ast"
+danubec_data_structure.path = "../danubec_data_structure"
 danubec_lex.path = "../danubec_lex"
 danubec_syntax.path = "../danubec_syntax"
 insta.workspace = true
