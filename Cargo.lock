@@ -101,6 +101,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "danubec_resolve"
+version = "0.1.0"
+dependencies = [
+ "danubec_middle",
+ "danubec_parse",
+]
+
+[[package]]
 name = "danubec_syntax"
 version = "0.1.0"
 dependencies = [

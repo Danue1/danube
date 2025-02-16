@@ -11,7 +11,7 @@ members = [
   "compiler/danubec_middle",
   "compiler/danubec_parse",
   "compiler/danubec_syntax",
-  "compiler/danubec",
+  "compiler/danubec", "compiler/danubec_resolve",
 ]
 
 [workspace.dependencies]
