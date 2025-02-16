@@ -8,13 +8,18 @@ pub struct Environment {
 
 #[derive(Debug)]
 pub struct Scope {
-    kind: ScopeKind,
-    types: HashMap<Ident, DefId>,
-    variables: HashMap<Ident, DefId>,
+    types: Rib,
+    variables: Rib,
+}
+
+#[derive(Debug)]
+pub struct Rib {
+    kind: RibKind,
+    map: HashMap<Ident, DefId>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ScopeKind {
+pub enum RibKind {
     Module,
     Function,
     Struct,
@@ -25,7 +30,7 @@ pub enum ScopeKind {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Namespace {
+pub enum NamespaceKind {
     Type,
     Variable,
 }
@@ -33,12 +38,12 @@ pub enum Namespace {
 impl Environment {
     pub fn new() -> Self {
         Self {
-            scopes: vec![Scope::new(ScopeKind::Module)],
+            scopes: vec![Scope::new(RibKind::Module)],
         }
     }
 
     #[inline]
-    pub fn push(&mut self, kind: ScopeKind) {
+    pub fn push(&mut self, kind: RibKind) {
         self.scopes.push(Scope::new(kind));
     }
 
@@ -47,13 +52,13 @@ impl Environment {
         self.scopes.pop();
     }
 
-    pub fn define(&mut self, namespace: Namespace, ident: Ident, def_id: DefId) {
+    pub fn define(&mut self, namespace: NamespaceKind, ident: Ident, def_id: DefId) {
         if let Some(scope) = self.scopes.last_mut() {
             scope.define(namespace, ident, def_id);
         }
     }
 
-    pub fn resolve(&self, namespace: Namespace, ident: Ident) -> Option<DefId> {
+    pub fn resolve(&self, namespace: NamespaceKind, ident: Ident) -> Option<DefId> {
         self.scopes
             .iter()
             .rev()
@@ -63,48 +68,67 @@ impl Environment {
 
 impl Scope {
     #[inline]
-    fn new(kind: ScopeKind) -> Self {
+    fn new(kind: RibKind) -> Self {
         Self {
-            kind,
-            types: HashMap::new(),
-            variables: HashMap::new(),
+            types: Rib::new(kind),
+            variables: Rib::new(kind),
         }
     }
 
     #[inline]
-    pub const fn kind(&self) -> ScopeKind {
+    fn define(&mut self, kind: NamespaceKind, ident: Ident, def_id: DefId) {
+        self[kind].define(ident, def_id);
+    }
+
+    #[inline]
+    fn resolve(&self, kind: NamespaceKind, ident: Ident) -> Option<DefId> {
+        self[kind].resolve(&ident)
+    }
+}
+
+impl std::ops::Index<NamespaceKind> for Scope {
+    type Output = Rib;
+
+    #[inline]
+    fn index(&self, namespace: NamespaceKind) -> &Self::Output {
+        match namespace {
+            NamespaceKind::Type => &self.types,
+            NamespaceKind::Variable => &self.variables,
+        }
+    }
+}
+
+impl std::ops::IndexMut<NamespaceKind> for Scope {
+    #[inline]
+    fn index_mut(&mut self, namespace: NamespaceKind) -> &mut Self::Output {
+        match namespace {
+            NamespaceKind::Type => &mut self.types,
+            NamespaceKind::Variable => &mut self.variables,
+        }
+    }
+}
+
+impl Rib {
+    #[inline]
+    fn new(kind: RibKind) -> Self {
+        Self {
+            kind,
+            map: HashMap::new(),
+        }
+    }
+
+    #[inline]
+    pub const fn kind(&self) -> RibKind {
         self.kind
     }
 
     #[inline]
-    fn define(&mut self, namespace: Namespace, ident: Ident, def_id: DefId) {
-        self[namespace].insert(ident, def_id);
+    fn define(&mut self, ident: Ident, def_id: DefId) {
+        self.map.insert(ident, def_id);
     }
 
     #[inline]
-    fn resolve(&self, namespace: Namespace, ident: Ident) -> Option<DefId> {
-        self[namespace].get(&ident).copied()
-    }
-}
-
-impl std::ops::Index<Namespace> for Scope {
-    type Output = HashMap<Ident, DefId>;
-
-    #[inline]
-    fn index(&self, namespace: Namespace) -> &Self::Output {
-        match namespace {
-            Namespace::Type => &self.types,
-            Namespace::Variable => &self.variables,
-        }
-    }
-}
-
-impl std::ops::IndexMut<Namespace> for Scope {
-    #[inline]
-    fn index_mut(&mut self, namespace: Namespace) -> &mut Self::Output {
-        match namespace {
-            Namespace::Type => &mut self.types,
-            Namespace::Variable => &mut self.variables,
-        }
+    fn resolve(&self, ident: &Ident) -> Option<DefId> {
+        self.map.get(ident).copied()
     }
 }
