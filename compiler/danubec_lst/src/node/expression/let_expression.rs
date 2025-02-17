@@ -1,12 +1,12 @@
 ast_node! {
     /// ```ebnf
     /// LetExpression =
-    /// | "let" _ Identifier _ "=" _ Expression
+    /// | "let" _ Pattern _ "=" _ Expression
     /// ```
     struct LetExpression;
 
     token let_token -> LET;
-    node lhs -> Identifier;
+    node pattern -> Pattern;
     token equal -> EQUAL;
-    node rhs -> Expression;
+    node expression -> Expression;
 }

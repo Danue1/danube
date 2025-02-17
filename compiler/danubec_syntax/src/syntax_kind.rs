@@ -225,6 +225,9 @@ pub enum SyntaxKind {
     /// `**%`
     ASTERISK__ASTERISK__PERCENT,
 
+    /// `..`
+    DOT__DOT,
+
     // Nodes in the parser
     Root,
 
@@ -260,6 +263,18 @@ pub enum SyntaxKind {
     LiteralExpression,
     BinaryExpression,
     UnaryExpression,
+
+    Pattern,
+    NeverPattern,
+    PlaceholderPattern,
+    PathPattern,
+    TuplePattern,
+    ArrayPattern,
+    LiteralPattern,
+    RestPattern,
+    OrPattern,
+    NamedPattern,
+    UnnamedPattern,
 
     FunctionParameter,
 
@@ -319,6 +334,10 @@ pub enum SyntaxKind {
     UseTreeBarrel,
     UseTreeIdent,
     UseTreeNested,
+    TuplePatternElement,
+    ArrayPatternElement,
+    NamedPatternElement,
+    UnnamedPatternElement,
 
     Raw,
     Trivia,

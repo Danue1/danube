@@ -118,7 +118,7 @@ pub fn lower_let_expression(
     let lhs = opt!(let_expression.lhs(), "ICE: lhs is missing");
     let lhs = lower_identifier(lhs)?;
 
-    let rhs = if let Some(rhs) = let_expression.rhs() {
+    let rhs = if let Some(rhs) = let_expression.expression() {
         Some(Box::new(lower_expression(rhs)?))
     } else {
         None

@@ -26,7 +26,7 @@ pub fn lower_statement_kind(
             Ok(ast::StatementKind::Expression(expression))
         }
         lst::StatementKind::Let(let_statement) => {
-            let lhs = opt!(let_statement.lhs(), "ICE: LHS not found");
+            let lhs = opt!(let_statement.pattern(), "ICE: LHS not found");
             let pattern = super::lower_identifier(lhs)?;
 
             let ty = if let Some(ty) = let_statement.ty() {
@@ -35,7 +35,7 @@ pub fn lower_statement_kind(
                 None
             };
 
-            let expression = if let Some(rhs) = let_statement.rhs() {
+            let expression = if let Some(rhs) = let_statement.expression() {
                 Some(lower_expression(rhs)?)
             } else {
                 None

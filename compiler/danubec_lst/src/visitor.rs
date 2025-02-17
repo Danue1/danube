@@ -375,6 +375,73 @@ pub trait Visitor: Sized {
     fn visit_target_type(&mut self, node: crate::TargetType) {
         walk_target_type(self, node);
     }
+
+    fn visit_pattern(&mut self, node: crate::Pattern) {
+        walk_pattern(self, node);
+    }
+
+    fn visit_pattern_kind(&mut self, node: crate::PatternKind) {
+        walk_pattern_kind(self, node);
+    }
+
+    #[inline]
+    fn visit_never_pattern(&mut self, node: crate::NeverPattern) {
+        //
+    }
+
+    #[inline]
+    fn visit_placeholder_pattern(&mut self, node: crate::PlaceholderPattern) {
+        //
+    }
+
+    fn visit_path_pattern(&mut self, node: crate::PathPattern) {
+        walk_path_pattern(self, node);
+    }
+
+    fn visit_tuple_pattern(&mut self, node: crate::TuplePattern) {
+        walk_tuple_pattern(self, node);
+    }
+
+    fn visit_tuple_pattern_element(&mut self, node: crate::TuplePatternElement) {
+        walk_tuple_pattern_element(self, node);
+    }
+
+    fn visit_array_pattern(&mut self, node: crate::ArrayPattern) {
+        walk_array_pattern(self, node);
+    }
+
+    fn visit_array_pattern_element(&mut self, node: crate::ArrayPatternElement) {
+        walk_array_pattern_element(self, node);
+    }
+
+    fn visit_literal_pattern(&mut self, node: crate::LiteralPattern) {
+        walk_literal_pattern(self, node);
+    }
+
+    #[inline]
+    fn visit_rest_pattern(&mut self, node: crate::RestPattern) {
+        //
+    }
+
+    fn visit_or_pattern(&mut self, node: crate::OrPattern) {
+        walk_or_pattern(self, node);
+    }
+
+    fn visit_named_pattern(&mut self, node: crate::NamedPattern) {
+        walk_named_pattern(self, node);
+    }
+
+    fn visit_named_pattern_element(&mut self, node: crate::NamedPatternElement) {
+        walk_named_pattern_element(self, node);
+    }
+
+    fn visit_unnamed_pattern(&mut self, node: crate::UnnamedPattern) {
+        walk_unnamed_pattern(self, node);
+    }
+
+    fn visit_unnamed_pattern_element(&mut self, node: crate::UnnamedPatternElement) {
+        walk_unnamed_pattern_element(self, node);
+    }
 }
 
 macro_rules! visit_optional {
@@ -676,8 +743,8 @@ pub fn walk_binary_expression<V: Visitor>(visitor: &mut V, node: crate::BinaryEx
 }
 
 pub fn walk_let_expression<V: Visitor>(visitor: &mut V, node: crate::LetExpression) {
-    visit_optional!(visitor.visit_identifier(node.lhs()));
-    visit_optional!(visitor.visit_expression(node.rhs()));
+    visit_optional!(visitor.visit_pattern(node.pattern()));
+    visit_optional!(visitor.visit_expression(node.expression()));
 }
 
 pub fn walk_literal_expression<V: Visitor>(visitor: &mut V, node: crate::LiteralExpression) {
@@ -698,9 +765,9 @@ pub fn walk_expression_statement<V: Visitor>(visitor: &mut V, node: crate::Expre
 }
 
 pub fn walk_let_statement<V: Visitor>(visitor: &mut V, node: crate::LetStatement) {
-    visit_optional!(visitor.visit_identifier(node.lhs()));
+    visit_optional!(visitor.visit_pattern(node.pattern()));
     visit_optional!(visitor.visit_type(node.ty()));
-    visit_optional!(visitor.visit_expression(node.rhs()));
+    visit_optional!(visitor.visit_expression(node.expression()));
 }
 
 pub fn walk_visibility<V: Visitor>(visitor: &mut V, node: crate::Visibility) {
@@ -842,4 +909,71 @@ pub fn walk_type_argument<V: Visitor>(visitor: &mut V, node: crate::TypeArgument
 
 pub fn walk_target_type<V: Visitor>(visitor: &mut V, node: crate::TargetType) {
     visit_optional!(visitor.visit_type(node.ty()));
+}
+
+pub fn walk_pattern<V: Visitor>(visitor: &mut V, node: crate::Pattern) {
+    visit_optional!(visitor.visit_pattern_kind(node.kind()));
+}
+
+pub fn walk_pattern_kind<V: Visitor>(visitor: &mut V, node: crate::PatternKind) {
+    match node {
+        crate::PatternKind::Never(node) => visitor.visit_never_pattern(node),
+        crate::PatternKind::Placeholder(node) => visitor.visit_placeholder_pattern(node),
+        crate::PatternKind::Path(node) => visitor.visit_path_pattern(node),
+        crate::PatternKind::Tuple(node) => visitor.visit_tuple_pattern(node),
+        crate::PatternKind::Array(node) => visitor.visit_array_pattern(node),
+        crate::PatternKind::Literal(node) => visitor.visit_literal_pattern(node),
+        crate::PatternKind::Rest(node) => visitor.visit_rest_pattern(node),
+        crate::PatternKind::Or(node) => visitor.visit_or_pattern(node),
+        crate::PatternKind::Named(node) => visitor.visit_named_pattern(node),
+        crate::PatternKind::Unnamed(node) => visitor.visit_unnamed_pattern(node),
+    }
+}
+
+pub fn walk_path_pattern<V: Visitor>(visitor: &mut V, node: crate::PathPattern) {
+    visit_optional!(visitor.visit_path(node.path()));
+}
+
+pub fn walk_tuple_pattern<V: Visitor>(visitor: &mut V, node: crate::TuplePattern) {
+    visit_each!(visitor.visit_tuple_pattern_element(node.elements()));
+}
+
+pub fn walk_tuple_pattern_element<V: Visitor>(visitor: &mut V, node: crate::TuplePatternElement) {
+    visit_optional!(visitor.visit_pattern(node.pattern()));
+}
+
+pub fn walk_array_pattern<V: Visitor>(visitor: &mut V, node: crate::ArrayPattern) {
+    visit_each!(visitor.visit_array_pattern_element(node.elements()));
+}
+
+pub fn walk_array_pattern_element<V: Visitor>(visitor: &mut V, node: crate::ArrayPatternElement) {
+    visit_optional!(visitor.visit_pattern(node.pattern()));
+}
+
+pub fn walk_literal_pattern<V: Visitor>(visitor: &mut V, node: crate::LiteralPattern) {
+    visit_optional!(visitor.visit_literal(node.literal()));
+}
+
+pub fn walk_or_pattern<V: Visitor>(visitor: &mut V, node: crate::OrPattern) {
+    visit_each!(visitor.visit_pattern(node.patterns()));
+}
+
+pub fn walk_named_pattern<V: Visitor>(visitor: &mut V, node: crate::NamedPattern) {
+    visit_optional!(visitor.visit_path(node.path()));
+    visit_each!(visitor.visit_named_pattern_element(node.elements()));
+}
+
+pub fn walk_named_pattern_element<V: Visitor>(visitor: &mut V, node: crate::NamedPatternElement) {
+    visit_optional!(visitor.visit_pattern(node.pattern()));
+}
+
+pub fn walk_unnamed_pattern<V: Visitor>(visitor: &mut V, node: crate::UnnamedPattern) {
+    visit_each!(visitor.visit_unnamed_pattern_element(node.elements()));
+}
+
+pub fn walk_unnamed_pattern_element<V: Visitor>(
+    visitor: &mut V,
+    node: crate::UnnamedPatternElement,
+) {
+    visit_optional!(visitor.visit_pattern(node.pattern()));
 }
