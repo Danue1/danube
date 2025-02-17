@@ -22,7 +22,9 @@ ast_node! {
 
     token enum_token -> ENUM;
     node identifier -> Identifier;
+    token left_chevron -> LEFT_CHEVRON;
     nodes type_parameters -> TypeParameter;
+    token right_chevron -> RIGHT_CHEVRON;
     node where_clause -> WhereClause;
     token left_brace -> LEFT_BRACE;
     nodes variants -> EnumVariant;

@@ -10,9 +10,11 @@ ast_node! {
 
     token struct_token -> STRUCT;
     node identifier -> Identifier;
+    token left_chevron -> LEFT_CHEVRON;
     nodes type_parameters -> TypeParameter;
+    token right_chevron -> RIGHT_CHEVRON;
     node where_clause -> WhereClause;
-    node body -> StructBodyKind;
+    node kind -> StructBodyKind;
 }
 
 ast_node! {

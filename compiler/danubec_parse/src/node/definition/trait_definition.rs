@@ -17,7 +17,7 @@ impl crate::Context {
             self.where_clause(lex);
 
             self.trivia(lex);
-            self.impl_body(lex);
+            self.associated_definitions(lex);
 
             self.finish_node();
 

@@ -250,6 +250,7 @@ pub enum SyntaxKind {
     SemicolonStatement,
 
     Expression,
+    ArrayExpression,
     AssignmentExpression,
     BlockExpression,
     LetExpression,
@@ -276,7 +277,7 @@ pub enum SyntaxKind {
     NumericFragment,
     Escape,
     Interpolation,
-    ArrayLiteralElement,
+    ArrayElement,
     /// `0b` | `0B` | `0o` | `0O` | `0x` | `0X`
     NUMERIC_LITERAL_PREFIX,
     /// `e` | `E`
@@ -288,6 +289,8 @@ pub enum SyntaxKind {
     VisibilityIn,
 
     Identifier,
+    TargetType,
+    AssociatedItem,
     Path,
     PathSegment,
     AssignmentOperator,

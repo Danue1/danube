@@ -2,10 +2,9 @@ ast_node! {
     /// ```ebnf
     /// TypeDefinition =
     /// | "type" _ Identifier _ "=" _ Type _ ";"
-    /// | "type" _ Identifier _ "<" _ ">" _ "=" _ Type _ ";"
-    /// | "type" _ Identifier _ "<" _ TypeParameter _ ">" _ "=" _ Type _ ";"
-    /// | "type" _ Identifier _ "<" _ ( TypeParameter _ "," )+ _ ">" _ "=" _ Type _ ";"
-    /// | "type" _ Identifier _ "<" _ ( TypeParameter _ "," )+ _ TypeParameter _ ">" _ "=" _ Type _ ";"
+    /// | "type" _ Identifier _ TypeParameters _ "=" _ Type _ ";"
+    /// | "type" _ Identifier _ WhereClause _ "=" _ Type _ ";"
+    /// | "type" _ Identifier _ TypeParameters _ WhereClause _ "=" _ Type _ ";"
     /// ```
     struct TypeDefinition;
 
@@ -14,6 +13,7 @@ ast_node! {
     token left_chevron -> LEFT_CHEVRON;
     nodes type_parameters -> TypeParameter;
     token right_chevron -> RIGHT_CHEVRON;
+    node where_clause -> WhereClause;
     token equal -> EQUAL;
     node ty -> Type;
     token semicolon -> SEMICOLON;

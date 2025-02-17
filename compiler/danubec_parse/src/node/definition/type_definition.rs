@@ -14,6 +14,9 @@ impl crate::Context {
             self.type_parameters(lex);
 
             self.trivia(lex);
+            self.where_clause(lex);
+
+            self.trivia(lex);
             self.type_body(lex);
 
             self.trivia(lex);

@@ -17,9 +17,11 @@ ast_node! {
 
     token trait_token -> TRAIT;
     node identifier -> Identifier;
+    token left_chevron -> LEFT_CHEVRON;
     nodes type_parameters -> TypeParameter;
+    token right_chevron -> RIGHT_CHEVRON;
     node where_clause -> WhereClause;
     token left_brace -> LEFT_BRACE;
-    nodes items -> ImplItemKind;
+    nodes items -> AssociatedItem;
     token right_brace -> RIGHT_BRACE;
 }

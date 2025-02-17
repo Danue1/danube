@@ -1,3 +1,4 @@
+pub mod array_expression;
 pub mod assignment_expression;
 pub mod binary_expression;
 pub mod block_expression;
@@ -5,6 +6,7 @@ pub mod let_expression;
 pub mod literal_expression;
 pub mod unary_expression;
 
+pub use array_expression::*;
 pub use assignment_expression::*;
 pub use binary_expression::*;
 pub use block_expression::*;
@@ -25,6 +27,7 @@ ast_node! {
 ast_node! {
     /// ```ebnf
     /// ExpressionKind =
+    ///  | ArrayExpression
     /// | AssignmentExpression
     /// | BinaryExpression
     /// | BlockExpression
@@ -33,6 +36,7 @@ ast_node! {
     /// | UnaryExpression
     /// ```
     enum ExpressionKind {
+        Array(ArrayExpression),
         Assignment(AssignmentExpression),
         Binary(BinaryExpression),
         Block(BlockExpression),

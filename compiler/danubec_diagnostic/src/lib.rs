@@ -31,6 +31,11 @@ impl Diagnostic {
             message: message.into(),
         });
     }
+
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.messages.is_empty()
+    }
 }
 
 impl std::fmt::Debug for Diagnostic {

@@ -2,10 +2,10 @@ use danubec_lex::Lex;
 use danubec_syntax::SyntaxKind;
 
 impl crate::Context {
-    pub fn array_literal(&mut self, lex: &mut Lex) -> bool {
+    pub fn array_expression(&mut self, lex: &mut Lex) -> bool {
         let checkpoint = self.checkpoint();
         if expect!(self, lex, SyntaxKind::LEFT_BRACKET) {
-            self.start_node_at(checkpoint, SyntaxKind::ArrayLiteral);
+            self.start_node_at(checkpoint, SyntaxKind::ArrayExpression);
             self.trivia(lex);
             while !expect!(self, lex, SyntaxKind::RIGHT_BRACKET) {
                 self.trivia(lex);
@@ -31,11 +31,11 @@ impl crate::Context {
 }
 
 #[test]
-fn array_literal() {
+fn array_expression() {
     for source in ["[]", "[false]", "[true, false]", "[true, false,]"] {
         let mut context = crate::Context::new();
         let mut lex = Lex::new(source);
-        context.array_literal(&mut lex);
+        context.array_expression(&mut lex);
         let node = context.finish();
 
         assert_eq!(format!("{}", node), source);

@@ -14,16 +14,22 @@ impl crate::Context {
             self.ty(lex);
 
             self.trivia(lex);
-            expect!(self, lex, SyntaxKind::FOR);
 
-            self.trivia(lex);
-            self.ty(lex);
+            let checkpoint = self.checkpoint();
+            if expect!(self, lex, SyntaxKind::FOR) {
+                self.start_node_at(checkpoint, SyntaxKind::TargetType);
+
+                self.trivia(lex);
+                self.ty(lex);
+
+                self.finish_node();
+            }
 
             self.trivia(lex);
             self.where_clause(lex);
 
             self.trivia(lex);
-            self.impl_body(lex);
+            self.associated_definitions(lex);
 
             self.finish_node();
 
@@ -33,10 +39,10 @@ impl crate::Context {
         }
     }
 
-    pub fn impl_body(&mut self, lex: &mut Lex) -> bool {
+    pub fn associated_definitions(&mut self, lex: &mut Lex) -> bool {
         if expect!(self, lex, SyntaxKind::LEFT_BRACE) {
             self.trivia(lex);
-            while self.impl_item_kind(lex) {
+            while self.associated_definition(lex) {
                 self.trivia(lex);
             }
 
@@ -49,11 +55,28 @@ impl crate::Context {
         }
     }
 
-    fn impl_item_kind(&mut self, lex: &mut Lex) -> bool {
-        self.function_definition(lex)
-            || self.type_definition(lex)
-            || self.const_definition(lex)
-            || self.static_definition(lex)
+    fn associated_definition(&mut self, lex: &mut Lex) -> bool {
+        let checkpoint = self.checkpoint();
+        let mut matched = false;
+        if self.visibility(lex) {
+            self.trivia(lex);
+            matched = true;
+        }
+
+        if self.associated_definition_kind(lex) {
+            matched = true;
+        }
+
+        if matched {
+            self.start_node_at(checkpoint, SyntaxKind::AssociatedItem);
+            self.finish_node();
+        }
+
+        matched
+    }
+
+    fn associated_definition_kind(&mut self, lex: &mut Lex) -> bool {
+        self.function_definition(lex) || self.type_definition(lex) || self.const_definition(lex)
     }
 }
 
@@ -64,7 +87,9 @@ fn impl_definition() {
         "impl A for B { fn a() { } }",
         "impl A for B { type a = B; }",
         "impl A for B { const a: B = 3; }",
-        "impl A for B { static a: B = 3; }",
+        "impl A for B { pub fn a() { } }",
+        "impl A for B { pub type a = B; }",
+        "impl A for B { pub const a: B = 3; }",
     ] {
         let mut context = crate::Context::new();
         let mut lex = Lex::new(source);

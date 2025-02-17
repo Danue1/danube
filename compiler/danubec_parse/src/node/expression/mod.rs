@@ -1,3 +1,4 @@
+mod array_expression;
 mod assignment_expression;
 mod binary_expression;
 mod block_expression;
@@ -32,7 +33,8 @@ const UNARY_FIRST: Tokens = tokens![
 ];
 
 const EXPR_FIRST: Tokens = tokens![
-    LET, // let a = 1;
+    LET,          // let a = 1;
+    LEFT_BRACKET, // [1, 2, 3]
 ];
 
 const LHS_FIRST: Tokens = LITERAL_FIRST
@@ -78,6 +80,7 @@ impl crate::Context {
                 || self.unary_expression(lex)
                 || self.block_expression(lex)
                 || self.let_expression(lex)
+                || self.array_expression(lex)
         } else {
             false
         }

@@ -85,8 +85,12 @@ pub trait Visitor: Sized {
         walk_enum_variant(self, node);
     }
 
-    fn visit_impl_item_kind(&mut self, node: crate::ImplItemKind) {
-        walk_impl_item_kind(self, node);
+    fn visit_associated_definition(&mut self, node: crate::AssociatedItem) {
+        walk_associated_definition(self, node);
+    }
+
+    fn visit_associated_item_kind(&mut self, node: crate::AssociatedItemKind) {
+        walk_associated_item_kind(self, node);
     }
 
     fn visit_expression(&mut self, node: crate::Expression) {
@@ -246,8 +250,12 @@ pub trait Visitor: Sized {
         walk_visibility_kind(self, node);
     }
 
-    fn visit_array_literal(&mut self, node: crate::ArrayLiteral) {
-        walk_array_literal(self, node);
+    fn visit_array_expression(&mut self, node: crate::ArrayExpression) {
+        walk_array_expression(self, node);
+    }
+
+    fn visit_array_element(&mut self, node: crate::ArrayElement) {
+        walk_array_element(self, node);
     }
 
     #[inline]
@@ -346,6 +354,10 @@ pub trait Visitor: Sized {
     fn visit_type_argument(&mut self, node: crate::TypeArgument) {
         walk_type_argument(self, node);
     }
+
+    fn visit_target_type(&mut self, node: crate::TargetType) {
+        walk_target_type(self, node);
+    }
 }
 
 macro_rules! visit_optional {
@@ -407,7 +419,7 @@ pub fn walk_struct_definition<V: Visitor>(visitor: &mut V, node: crate::StructDe
     visit_optional!(visitor.visit_identifier(node.identifier()));
     visit_each!(visitor.visit_type_parameter(node.type_parameters()));
     visit_optional!(visitor.visit_where_clause(node.where_clause()));
-    visit_optional!(visitor.visit_struct_body_kind(node.body()));
+    visit_optional!(visitor.visit_struct_body_kind(node.kind()));
 }
 
 pub fn walk_enum_definition<V: Visitor>(visitor: &mut V, node: crate::EnumDefinition) {
@@ -421,14 +433,15 @@ pub fn walk_trait_definition<V: Visitor>(visitor: &mut V, node: crate::TraitDefi
     visit_optional!(visitor.visit_identifier(node.identifier()));
     visit_each!(visitor.visit_type_parameter(node.type_parameters()));
     visit_optional!(visitor.visit_where_clause(node.where_clause()));
-    visit_each!(visitor.visit_impl_item_kind(node.items()));
+    visit_each!(visitor.visit_associated_definition(node.items()));
 }
 
 pub fn walk_impl_definition<V: Visitor>(visitor: &mut V, node: crate::ImplDefinition) {
     visit_each!(visitor.visit_type_parameter(node.type_parameters()));
-    visit_each!(visitor.visit_type(node.types()));
+    visit_optional!(visitor.visit_type(node.ty()));
+    visit_optional!(visitor.visit_target_type(node.target_type()));
     visit_optional!(visitor.visit_where_clause(node.where_clause()));
-    visit_each!(visitor.visit_impl_item_kind(node.items()));
+    visit_each!(visitor.visit_associated_definition(node.items()));
 }
 
 pub fn walk_const_definition<V: Visitor>(visitor: &mut V, node: crate::ConstDefinition) {
@@ -486,12 +499,16 @@ pub fn walk_enum_variant<V: Visitor>(visitor: &mut V, node: crate::EnumVariant) 
     visit_optional!(visitor.visit_enum_variant_kind(node.kind()));
 }
 
-pub fn walk_impl_item_kind<V: Visitor>(visitor: &mut V, node: crate::ImplItemKind) {
+pub fn walk_associated_definition<V: Visitor>(visitor: &mut V, node: crate::AssociatedItem) {
+    visit_optional!(visitor.visit_visibility(node.visibility()));
+    visit_optional!(visitor.visit_associated_item_kind(node.kind()));
+}
+
+pub fn walk_associated_item_kind<V: Visitor>(visitor: &mut V, node: crate::AssociatedItemKind) {
     match node {
-        crate::ImplItemKind::Function(node) => visitor.visit_function_definition(node),
-        crate::ImplItemKind::Type(node) => visitor.visit_type_definition(node),
-        crate::ImplItemKind::Const(node) => visitor.visit_const_definition(node),
-        crate::ImplItemKind::Static(node) => visitor.visit_static_definition(node),
+        crate::AssociatedItemKind::Function(node) => visitor.visit_function_definition(node),
+        crate::AssociatedItemKind::Type(node) => visitor.visit_type_definition(node),
+        crate::AssociatedItemKind::Const(node) => visitor.visit_const_definition(node),
     }
 }
 
@@ -540,6 +557,7 @@ pub fn walk_enum_variant_kind<V: Visitor>(visitor: &mut V, node: crate::EnumVari
 
 pub fn walk_expression_kind<V: Visitor>(visitor: &mut V, node: crate::ExpressionKind) {
     match node {
+        crate::ExpressionKind::Array(node) => visitor.visit_array_expression(node),
         crate::ExpressionKind::Assignment(assignment) => {
             visitor.visit_assignment_expression(assignment)
         }
@@ -670,7 +688,6 @@ pub fn walk_enum_variant_unnamed_field<V: Visitor>(
 
 pub fn walk_literal<V: Visitor>(visitor: &mut V, node: crate::Literal) {
     match node {
-        crate::Literal::Array(node) => visitor.visit_array_literal(node),
         crate::Literal::Boolean(node) => visitor.visit_boolean_literal(node),
         crate::Literal::Char(node) => visitor.visit_char_literal(node),
         crate::Literal::Numeric(node) => visitor.visit_numeric_literal(node),
@@ -686,8 +703,12 @@ pub fn walk_visibility_kind<V: Visitor>(visitor: &mut V, node: crate::Visibility
     }
 }
 
-pub fn walk_array_literal<V: Visitor>(visitor: &mut V, node: crate::ArrayLiteral) {
-    visit_each!(visitor.visit_expression(node.elements()));
+pub fn walk_array_expression<V: Visitor>(visitor: &mut V, node: crate::ArrayExpression) {
+    visit_each!(visitor.visit_array_element(node.elements()));
+}
+
+pub fn walk_array_element<V: Visitor>(visitor: &mut V, node: crate::ArrayElement) {
+    visit_optional!(visitor.visit_expression(node.expression()));
 }
 
 pub fn walk_char_literal<V: Visitor>(visitor: &mut V, node: crate::CharLiteral) {
@@ -778,4 +799,8 @@ pub fn walk_path_segment<V: Visitor>(visitor: &mut V, node: crate::PathSegment) 
 
 pub fn walk_type_argument<V: Visitor>(visitor: &mut V, node: crate::TypeArgument) {
     visit_each!(visitor.visit_type(node.types()));
+}
+
+pub fn walk_target_type<V: Visitor>(visitor: &mut V, node: crate::TargetType) {
+    visit_optional!(visitor.visit_type(node.ty()));
 }
