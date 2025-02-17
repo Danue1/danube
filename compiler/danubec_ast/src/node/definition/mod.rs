@@ -35,27 +35,27 @@ ast_node! {
 ast_node! {
     /// ```ebnf
     /// DefinitionKind =
-    /// | FunctionDefinition
-    /// | TypeDefinition
-    /// | StructDefinition
-    /// | EnumDefinition
-    /// | TraitDefinition
-    /// | ImplDefinition
     /// | ConstDefinition
-    /// | StaticDefinition
-    /// | UseDefinition
+    /// | EnumDefinition
+    /// | FunctionDefinition
+    /// | ImplDefinition
     /// | ModuleDefinition
+    /// | StaticDefinition
+    /// | StructDefinition
+    /// | TraitDefinition
+    /// | TypeDefinition
+    /// | UseDefinition
     /// ```
     enum DefinitionKind {
-        Function(FunctionDefinition),
-        Type(TypeDefinition),
-        Struct(StructDefinition),
-        Enum(EnumDefinition),
-        Trait(TraitDefinition),
-        Impl(ImplDefinition),
         Const(ConstDefinition),
-        Static(StaticDefinition),
-        Use(UseDefinition),
+        Enum(EnumDefinition),
+        Function(FunctionDefinition),
+        Impl(ImplDefinition),
         Module(ModuleDefinition),
+        Static(StaticDefinition),
+        Struct(StructDefinition),
+        Trait(TraitDefinition),
+        Type(TypeDefinition),
+        Use(UseDefinition),
     }
 }

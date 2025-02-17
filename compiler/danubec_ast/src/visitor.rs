@@ -142,10 +142,6 @@ pub trait Visitor: Sized {
         walk_use_tree_nested(self, node);
     }
 
-    fn visit_use_tree_ident_prefix(&mut self, node: crate::UseTreeIdentPrefix) {
-        walk_use_tree_ident_prefix(self, node);
-    }
-
     fn visit_path_type(&mut self, node: crate::PathType) {
         // TODO
     }
@@ -562,7 +558,6 @@ pub fn walk_use_tree<V: Visitor>(visitor: &mut V, node: crate::UseTree) {
 
 pub fn walk_use_tree_ident<V: Visitor>(visitor: &mut V, node: crate::UseTreeIdent) {
     visit_optional!(visitor.visit_identifier(node.identifier()));
-    visit_optional!(visitor.visit_use_tree_ident_prefix(node.prefix()));
 }
 
 pub fn walk_use_tree_nested<V: Visitor>(visitor: &mut V, node: crate::UseTreeNested) {
@@ -783,8 +778,4 @@ pub fn walk_path_segment<V: Visitor>(visitor: &mut V, node: crate::PathSegment) 
 
 pub fn walk_type_argument<V: Visitor>(visitor: &mut V, node: crate::TypeArgument) {
     visit_each!(visitor.visit_type(node.types()));
-}
-
-pub fn walk_use_tree_ident_prefix<V: Visitor>(visitor: &mut V, node: crate::UseTreeIdentPrefix) {
-    visit_optional!(visitor.visit_identifier(node.identifier()));
 }

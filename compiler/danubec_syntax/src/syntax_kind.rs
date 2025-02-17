@@ -312,7 +312,6 @@ pub enum SyntaxKind {
     UseTreeBarrel,
     UseTreeIdent,
     UseTreeNested,
-    UseTreeIdentPrefix,
 
     Raw,
     Trivia,

@@ -50,13 +50,12 @@ ast_node! {
 ast_node! {
     /// ```ebnf
     /// UseTreeIdent =
-    /// | Identifier
-    /// | Identifier _ UseTreeIdentPrefix
+    /// | "as" _ Identifier
     /// ```
     struct UseTreeIdent;
 
+    token as_token -> AS;
     node identifier -> Identifier;
-    node prefix -> UseTreeIdentPrefix;
 }
 
 ast_node! {
@@ -71,15 +70,4 @@ ast_node! {
     token left_brace -> LEFT_BRACE;
     nodes trees -> UseTree;
     token right_brace -> RIGHT_BRACE;
-}
-
-ast_node! {
-    /// ```ebnf
-    /// UseTreeIdentPrefix =
-    /// | "as" _ Identifier
-    /// ```
-    struct UseTreeIdentPrefix;
-
-    token as_token -> AS;
-    node identifier -> Identifier;
 }

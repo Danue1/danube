@@ -8,6 +8,9 @@ impl crate::Context {
             self.start_node_at(checkpoint, SyntaxKind::UseDefinition);
 
             self.trivia(lex);
+            expect!(self, lex, token -> COLON__COLON, SyntaxKind::COLON, SyntaxKind::COLON,);
+
+            self.trivia(lex);
             self.use_tree(lex);
 
             self.trivia(lex);
@@ -70,23 +73,18 @@ impl crate::Context {
 
     fn use_tree_ident(&mut self, lex: &mut Lex) -> bool {
         let checkpoint = self.checkpoint();
-        let mut matched = false;
-
-        if self.identifier(lex) {
-            self.trivia(lex);
-            matched = true;
-        }
-
-        if self.use_tree_ident_prefix(lex) {
-            matched = true;
-        }
-
-        if matched {
+        if expect!(self, lex, SyntaxKind::AS) {
             self.start_node_at(checkpoint, SyntaxKind::UseTreeIdent);
-            self.finish_node();
-        }
 
-        matched
+            self.trivia(lex);
+            self.identifier(lex);
+
+            self.finish_node();
+
+            true
+        } else {
+            false
+        }
     }
 
     fn use_tree_nested(&mut self, lex: &mut Lex) -> bool {
@@ -106,22 +104,6 @@ impl crate::Context {
 
             self.trivia(lex);
             expect!(self, lex, SyntaxKind::RIGHT_BRACE);
-
-            self.finish_node();
-
-            true
-        } else {
-            false
-        }
-    }
-
-    fn use_tree_ident_prefix(&mut self, lex: &mut Lex) -> bool {
-        let checkpoint = self.checkpoint();
-        if expect!(self, lex, SyntaxKind::AS) {
-            self.start_node_at(checkpoint, SyntaxKind::UseTreeIdentPrefix);
-
-            self.trivia(lex);
-            self.identifier(lex);
 
             self.finish_node();
 
