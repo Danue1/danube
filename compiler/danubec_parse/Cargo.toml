@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-danubec_ast.path = "../danubec_ast"
+danubec_lst.path = "../danubec_lst"
 danubec_data_structure.path = "../danubec_data_structure"
 danubec_lex.path = "../danubec_lex"
 danubec_syntax.path = "../danubec_syntax"

@@ -28,19 +28,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "danubec_ast"
-version = "0.1.0"
-dependencies = [
- "danubec_syntax",
- "rowan",
-]
-
-[[package]]
 name = "danubec_ast_lowering"
 version = "0.1.0"
 dependencies = [
- "danubec_ast",
  "danubec_hir",
+ "danubec_lst",
  "danubec_middle",
 ]
 
@@ -48,9 +40,9 @@ dependencies = [
 name = "danubec_compile"
 version = "0.1.0"
 dependencies = [
- "danubec_ast",
  "danubec_data_structure",
  "danubec_diagnostic",
+ "danubec_lst",
  "danubec_middle",
  "danubec_parse",
  "glob",
@@ -81,21 +73,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "danubec_lst"
+version = "0.1.0"
+dependencies = [
+ "danubec_syntax",
+ "rowan",
+]
+
+[[package]]
 name = "danubec_middle"
 version = "0.1.0"
 dependencies = [
- "danubec_ast",
  "danubec_diagnostic",
  "danubec_hir",
+ "danubec_lst",
 ]
 
 [[package]]
 name = "danubec_parse"
 version = "0.1.0"
 dependencies = [
- "danubec_ast",
  "danubec_data_structure",
  "danubec_lex",
+ "danubec_lst",
  "danubec_syntax",
  "insta",
 ]

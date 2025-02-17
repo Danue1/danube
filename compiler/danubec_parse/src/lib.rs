@@ -13,8 +13,8 @@ pub use context::*;
 
 use pratt::*;
 
-use danubec_ast::Root;
 use danubec_lex::Lex;
+use danubec_lst::Root;
 use danubec_syntax::AstNode;
 
 pub fn parse(source: &str) -> Root {

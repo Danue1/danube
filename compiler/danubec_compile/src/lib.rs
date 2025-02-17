@@ -4,7 +4,7 @@
 extern crate danubec_diagnostic;
 
 use danubec_data_structure::Directory;
-use danubec_middle::{ast, Context};
+use danubec_middle::{lst, Context};
 
 pub struct CompileConfig {
     pub working_directory: String,
@@ -23,7 +23,7 @@ impl CompileConfig {
     }
 }
 
-fn load(context: &mut Context, directory: &mut Directory<ast::Root>, krate: &str) {
+fn load(context: &mut Context, directory: &mut Directory<lst::Root>, krate: &str) {
     let pattern = format!("{}/{}/src/**/*.dnb", context.working_directory, krate);
     match glob::glob(&pattern) {
         Ok(paths) => {
@@ -37,9 +37,9 @@ fn load(context: &mut Context, directory: &mut Directory<ast::Root>, krate: &str
                         );
                         continue;
                     };
-                    let ast = danubec_parse::parse(&source);
+                    let lst = danubec_parse::parse(&source);
                     directory
-                        .insert(&path.to_path_buf(), ast)
+                        .insert(&path.to_path_buf(), lst)
                         .expect("failed to insert");
                 } else {
                     error!(

@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-danubec_ast.path = "../danubec_ast"
 danubec_diagnostic.path = "../danubec_diagnostic"
 danubec_hir.path = "../danubec_hir"
+danubec_lst.path = "../danubec_lst"
