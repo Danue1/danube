@@ -6,7 +6,10 @@ pub struct Statement {
 
 pub enum StatementKind {
     Definition(Definition),
-    Expression(Expression),
+    Expression {
+        expression: Expression,
+        semicolon: bool,
+    },
     Let {
         pattern: Pattern,
         ty: Option<Type>,

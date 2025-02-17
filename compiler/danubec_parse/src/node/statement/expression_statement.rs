@@ -6,6 +6,10 @@ impl crate::Context {
         let checkpoint = self.checkpoint();
         if self.expression(lex) {
             self.start_node_at(checkpoint, SyntaxKind::ExpressionStatement);
+
+            self.trivia(lex);
+            expect!(self, lex, SyntaxKind::SEMICOLON);
+
             self.finish_node();
 
             true
