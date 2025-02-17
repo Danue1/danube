@@ -1,8 +1,6 @@
 use super::Path;
-use danubec_syntax::SyntaxNode;
 
 pub struct Type {
-    pub syntax: SyntaxNode,
     pub kind: TypeKind,
 }
 

@@ -8,6 +8,7 @@ members = [
   "compiler/danubec_diagnostic",
   "compiler/danubec_hir",
   "compiler/danubec_lex",
+  "compiler/danubec_lst_lowering",
   "compiler/danubec_lst",
   "compiler/danubec_middle",
   "compiler/danubec_parse",

@@ -1,116 +1,138 @@
 use super::{Expression, Path, Statement, Type, Visibility};
 use danubec_symbol::Symbol;
-use danubec_syntax::SyntaxNode;
 
 pub struct Definition {
-    pub syntax: SyntaxNode,
     pub kind: DefinitionKind,
 }
 
 pub enum DefinitionKind {
-    Const(ConstDef),
-    Enum {
-        syntax: SyntaxNode,
-        visibility: Option<Visibility>,
+    Const {
+        visibility: Visibility,
         ident: Symbol,
-        types: Vec<Predicate>,
+        ty: Type,
+        expression: Expression,
+    },
+    Enum {
+        visibility: Visibility,
+        ident: Symbol,
+        type_parameters: Vec<TypeParameter>,
         predicates: Vec<Predicate>,
         variants: Vec<EnumVariant>,
     },
     Function(FunctionDef),
     Impl {
-        type_parameters: Vec<Predicate>,
+        type_parameters: Vec<TypeParameter>,
         trait_type: Option<Type>,
         target_type: Type,
         predicates: Vec<Predicate>,
-        definitions: Vec<AssociatedDefinition>,
+        definitions: Vec<ImplItem>,
     },
     Module {
-        visibility: Option<Visibility>,
+        visibility: Visibility,
         ident: Symbol,
         definitions: Vec<Definition>,
     },
     Static {
-        visibility: Option<Visibility>,
+        visibility: Visibility,
         ident: Symbol,
         ty: Type,
         expression: Expression,
     },
     Struct {
-        syntax: SyntaxNode,
-        visibility: Option<Visibility>,
+        visibility: Visibility,
         ident: Symbol,
-        type_parameters: Vec<Predicate>,
+        type_parameters: Vec<TypeParameter>,
         predicates: Vec<Predicate>,
         kind: StructKind,
     },
     Trait {
-        syntax: SyntaxNode,
-        visibility: Option<Visibility>,
+        visibility: Visibility,
         ident: Symbol,
-        type_parameters: Vec<Predicate>,
+        type_parameters: Vec<TypeParameter>,
         predicates: Vec<Predicate>,
-        definitions: Vec<AssociatedDefinition>,
+        definitions: Vec<TraitItem>,
     },
     Type {
-        visibility: Option<Visibility>,
+        visibility: Visibility,
         ident: Symbol,
-        type_parameters: Vec<Predicate>,
+        type_parameters: Vec<TypeParameter>,
         ty: Type,
     },
     Use {
-        visibility: Option<Visibility>,
+        visibility: Visibility,
         tree: UseTree,
     },
 }
 
-pub struct ConstDef {
-    pub syntax: SyntaxNode,
-    pub visibility: Option<Visibility>,
-    pub ident: Symbol,
-    pub ty: Type,
-    pub expression: Expression,
-}
-
 pub struct FunctionDef {
-    pub syntax: SyntaxNode,
-    pub visibility: Option<Visibility>,
+    pub visibility: Visibility,
     pub ident: Symbol,
-    pub type_parameters: Vec<Predicate>,
-    pub parameters: Vec<(Symbol, Type)>,
+    pub type_parameters: Vec<TypeParameter>,
+    pub parameters: Vec<Parameter>,
     pub return_type: Option<Type>,
     pub predicates: Vec<Predicate>,
     pub body: Vec<Statement>,
 }
 
-pub struct Predicate {
-    pub syntax: SyntaxNode,
+pub struct Parameter {
+    pub ident: Symbol,
     pub ty: Type,
-    pub bounds: Type,
+}
+
+pub struct TypeParameter {
+    pub ident: Symbol,
+    pub types: Vec<Type>,
+}
+
+pub struct Predicate {
+    pub ty: Type,
+    pub bounds: Vec<Type>,
 }
 
 pub struct EnumVariant {
-    pub syntax: SyntaxNode,
     pub ident: Symbol,
     pub kind: EnumVariantKind,
 }
 
 pub enum EnumVariantKind {
+    Unit,
     Named(Vec<(Symbol, Type)>),
     Unnamed(Vec<Type>),
-    Sequence(Vec<Expression>),
+    Sequence(Expression),
 }
 
-pub enum AssociatedDefinition {
+pub enum ImplItem {
+    Const {
+        visibility: Visibility,
+        ident: Symbol,
+        ty: Type,
+        expression: Expression,
+    },
     Function(FunctionDef),
     Type {
-        visibility: Option<Visibility>,
+        visibility: Visibility,
         ident: Symbol,
-        type_parameters: Vec<Predicate>,
+        type_parameters: Vec<TypeParameter>,
+        bounds: Vec<Predicate>,
+        ty: Type,
+    },
+}
+
+pub enum TraitItem {
+    Const {
+        visibility: Visibility,
+        ident: Symbol,
+        ty: Type,
+        expression: Option<Expression>,
+    },
+    Function(FunctionDef),
+    Type {
+        visibility: Visibility,
+        ident: Symbol,
+        type_parameters: Vec<TypeParameter>,
         bounds: Vec<Predicate>,
         ty: Option<Type>,
     },
-    Const(ConstDef),
 }
 
 pub enum StructKind {
@@ -119,7 +141,6 @@ pub enum StructKind {
 }
 
 pub struct UseTree {
-    pub syntax: SyntaxNode,
     pub path: Path,
     pub kind: UseTreeKind,
 }

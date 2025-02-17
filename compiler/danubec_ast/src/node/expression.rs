@@ -1,25 +1,25 @@
 use super::{Literal, Statement};
-use danubec_syntax::SyntaxNode;
+use danubec_symbol::Symbol;
 
 pub struct Expression {
-    pub syntax: SyntaxNode,
     pub kind: ExpressionKind,
 }
 
 pub enum ExpressionKind {
+    Array(Vec<Expression>),
     Assignment {
         lhs: Box<Expression>,
         operator: AssignmentOperator,
         rhs: Box<Expression>,
     },
     Binary {
-        left: Box<Expression>,
+        lhs: Box<Expression>,
         operator: BinaryOperator,
-        right: Box<Expression>,
+        rhs: Box<Expression>,
     },
     Block(Vec<Statement>),
     Let {
-        lhs: Box<Expression>,
+        lhs: Symbol,
         rhs: Option<Box<Expression>>,
     },
     Literal(Literal),

@@ -32,7 +32,6 @@ name = "danubec_ast"
 version = "0.1.0"
 dependencies = [
  "danubec_symbol",
- "danubec_syntax",
 ]
 
 [[package]]
@@ -93,6 +92,7 @@ dependencies = [
 name = "danubec_middle"
 version = "0.1.0"
 dependencies = [
+ "danubec_ast",
  "danubec_diagnostic",
  "danubec_hir",
  "danubec_lst",

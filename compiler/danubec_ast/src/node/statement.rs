@@ -1,8 +1,7 @@
-use super::{Definition, Expression, Path, Type};
-use danubec_syntax::SyntaxNode;
+use super::{Definition, Expression, Type};
+use danubec_symbol::Symbol;
 
 pub struct Statement {
-    pub syntax: SyntaxNode,
     pub kind: StatementKind,
 }
 
@@ -10,9 +9,9 @@ pub enum StatementKind {
     Definition(Definition),
     Expression(Expression),
     Let {
-        pattern: Path,
+        pattern: Symbol,
         ty: Option<Type>,
-        value: Option<Expression>,
+        expression: Option<Expression>,
     },
     Semicolon,
 }
