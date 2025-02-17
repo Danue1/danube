@@ -1,5 +1,4 @@
-use super::{Literal, Statement};
-use danubec_symbol::Symbol;
+use super::{Literal, Pattern, Statement};
 
 pub struct Expression {
     pub kind: ExpressionKind,
@@ -19,8 +18,8 @@ pub enum ExpressionKind {
     },
     Block(Vec<Statement>),
     Let {
-        lhs: Symbol,
-        rhs: Option<Box<Expression>>,
+        pattern: Pattern,
+        expression: Option<Box<Expression>>,
     },
     Literal(Literal),
     Unary {

@@ -17,10 +17,12 @@ ast_node! {
 ast_node! {
     /// ```ebnf
     /// NamedPatternElement =
-    /// | Pattern _ ","
+    /// | Path _ ":" _ Pattern _ ","
     /// ```
     struct NamedPatternElement;
 
+    node path -> Path;
+    token colon -> COLON;
     node pattern -> Pattern;
     token comma -> COMMA;
 }

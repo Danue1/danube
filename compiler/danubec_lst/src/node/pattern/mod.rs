@@ -35,11 +35,11 @@ ast_node! {
     /// PatternKind =
     /// | NeverPattern
     /// | PlaceholderPattern
+    /// | RestPattern
     /// | PathPattern
     /// | TuplePattern
     /// | ArrayPattern
     /// | LiteralPattern
-    /// | RestPattern
     /// | OrPattern
     /// | NamedPattern
     /// | UnnamedPattern
@@ -47,11 +47,11 @@ ast_node! {
     enum PatternKind {
         Never(NeverPattern),
         Placeholder(PlaceholderPattern),
+        Rest(RestPattern),
         Path(PathPattern),
         Tuple(TuplePattern),
         Array(ArrayPattern),
         Literal(LiteralPattern),
-        Rest(RestPattern),
         Or(OrPattern),
         Named(NamedPattern),
         Unnamed(UnnamedPattern),

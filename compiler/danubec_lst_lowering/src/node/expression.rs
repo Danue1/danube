@@ -1,7 +1,6 @@
-use super::{lower_identifier, lower_literal, lower_statement};
+use super::{lower_literal, lower_pattern, lower_statement};
 use danubec_diagnostic::Diagnostic;
 use danubec_middle::{ast, lst};
-use danubec_symbol::Symbol;
 use danubec_syntax::AstNode;
 
 pub fn lower_expression(expression: lst::Expression) -> Result<ast::Expression, Diagnostic> {
@@ -40,9 +39,12 @@ pub fn lower_expression_kind(
             Ok(ast::ExpressionKind::Block(block))
         }
         lst::ExpressionKind::Let(let_expression) => {
-            let (lhs, rhs) = lower_let_expression(let_expression)?;
+            let (pattern, expression) = lower_let_expression(let_expression)?;
 
-            Ok(ast::ExpressionKind::Let { lhs, rhs })
+            Ok(ast::ExpressionKind::Let {
+                pattern,
+                expression,
+            })
         }
         lst::ExpressionKind::Literal(literal) => {
             let literal = lower_literal_expression(literal)?;
@@ -114,17 +116,17 @@ pub fn lower_block_expression(
 
 pub fn lower_let_expression(
     let_expression: lst::LetExpression,
-) -> Result<(Symbol, Option<Box<ast::Expression>>), Diagnostic> {
-    let lhs = opt!(let_expression.lhs(), "ICE: lhs is missing");
-    let lhs = lower_identifier(lhs)?;
+) -> Result<(ast::Pattern, Option<Box<ast::Expression>>), Diagnostic> {
+    let pattern = opt!(let_expression.pattern(), "ICE: pattern is missing");
+    let pattern = lower_pattern(pattern)?;
 
-    let rhs = if let Some(rhs) = let_expression.expression() {
-        Some(Box::new(lower_expression(rhs)?))
+    let expression = if let Some(expression) = let_expression.expression() {
+        Some(Box::new(lower_expression(expression)?))
     } else {
         None
     };
 
-    Ok((lhs, rhs))
+    Ok((pattern, expression))
 }
 
 pub fn lower_literal_expression(

@@ -1,5 +1,4 @@
-use super::{Definition, Expression, Type};
-use danubec_symbol::Symbol;
+use super::{Definition, Expression, Pattern, Type};
 
 pub struct Statement {
     pub kind: StatementKind,
@@ -9,7 +8,7 @@ pub enum StatementKind {
     Definition(Definition),
     Expression(Expression),
     Let {
-        pattern: Symbol,
+        pattern: Pattern,
         ty: Option<Type>,
         expression: Option<Expression>,
     },
