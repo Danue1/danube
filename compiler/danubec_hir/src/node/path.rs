@@ -1,4 +1,5 @@
-use super::{Ident, Type};
+use super::Type;
+use danubec_symbol::Symbol;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Path {
@@ -7,7 +8,7 @@ pub struct Path {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PathSegment {
-    pub ident: Ident,
+    pub ident: Symbol,
     pub type_arguments: Vec<Type>,
 }
 

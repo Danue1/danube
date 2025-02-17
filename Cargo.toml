@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
   "compiler/danubec_ast_lowering",
+  "compiler/danubec_ast",
   "compiler/danubec_compile",
   "compiler/danubec_data_structure",
   "compiler/danubec_diagnostic",
@@ -11,6 +12,7 @@ members = [
   "compiler/danubec_middle",
   "compiler/danubec_parse",
   "compiler/danubec_resolve",
+  "compiler/danubec_symbol",
   "compiler/danubec_syntax",
   "compiler/danubec",
 ]

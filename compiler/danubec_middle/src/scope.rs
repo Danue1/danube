@@ -1,4 +1,5 @@
-use danubec_hir::{DefId, Ident};
+use danubec_hir::DefId;
+use danubec_symbol::Symbol;
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -15,7 +16,7 @@ pub struct Scope {
 #[derive(Debug)]
 pub struct Rib {
     kind: RibKind,
-    map: HashMap<Ident, DefId>,
+    map: HashMap<Symbol, DefId>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -52,17 +53,17 @@ impl Environment {
         self.scopes.pop();
     }
 
-    pub fn define(&mut self, namespace: NamespaceKind, ident: Ident, def_id: DefId) {
+    pub fn define(&mut self, namespace: NamespaceKind, name: Symbol, def_id: DefId) {
         if let Some(scope) = self.scopes.last_mut() {
-            scope.define(namespace, ident, def_id);
+            scope.define(namespace, name, def_id);
         }
     }
 
-    pub fn resolve(&self, namespace: NamespaceKind, ident: Ident) -> Option<DefId> {
+    pub fn resolve(&self, namespace: NamespaceKind, name: Symbol) -> Option<DefId> {
         self.scopes
             .iter()
             .rev()
-            .find_map(|scope| scope.resolve(namespace, ident))
+            .find_map(|scope| scope.resolve(namespace, name))
     }
 }
 
@@ -76,13 +77,13 @@ impl Scope {
     }
 
     #[inline]
-    fn define(&mut self, kind: NamespaceKind, ident: Ident, def_id: DefId) {
-        self[kind].define(ident, def_id);
+    fn define(&mut self, kind: NamespaceKind, name: Symbol, def_id: DefId) {
+        self[kind].define(name, def_id);
     }
 
     #[inline]
-    fn resolve(&self, kind: NamespaceKind, ident: Ident) -> Option<DefId> {
-        self[kind].resolve(&ident)
+    fn resolve(&self, kind: NamespaceKind, name: Symbol) -> Option<DefId> {
+        self[kind].resolve(&name)
     }
 }
 
@@ -123,12 +124,12 @@ impl Rib {
     }
 
     #[inline]
-    fn define(&mut self, ident: Ident, def_id: DefId) {
-        self.map.insert(ident, def_id);
+    fn define(&mut self, name: Symbol, def_id: DefId) {
+        self.map.insert(name, def_id);
     }
 
     #[inline]
-    fn resolve(&self, ident: &Ident) -> Option<DefId> {
-        self.map.get(ident).copied()
+    fn resolve(&self, name: &Symbol) -> Option<DefId> {
+        self.map.get(name).copied()
     }
 }

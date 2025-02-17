@@ -1,4 +1,5 @@
-use crate::{Ident, Path};
+use crate::Path;
+use danubec_symbol::Symbol;
 
 #[derive(Debug)]
 pub struct UseDef {
@@ -20,7 +21,7 @@ pub enum UseTreeKind {
 
 #[derive(Debug)]
 pub struct UseTreeIdent {
-    pub alias: Ident,
+    pub alias: Symbol,
 }
 
 #[derive(Debug)]
@@ -36,7 +37,7 @@ pub struct Import {
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum ImportKind {
-    Alias(Ident),
+    Alias(Symbol),
     Barrel,
 }
 
@@ -90,11 +91,11 @@ fn use_tree() {
         path: Path {
             segments: vec![
                 PathSegment {
-                    ident: Ident::new("foo"),
+                    ident: Symbol::new("foo"),
                     type_arguments: vec![],
                 },
                 PathSegment {
-                    ident: Ident::new("bar"),
+                    ident: Symbol::new("bar"),
                     type_arguments: vec![],
                 },
             ],
@@ -104,18 +105,18 @@ fn use_tree() {
                 UseTree {
                     path: Path {
                         segments: vec![PathSegment {
-                            ident: Ident::new("baz"),
+                            ident: Symbol::new("baz"),
                             type_arguments: vec![],
                         }],
                     },
                     kind: Some(UseTreeKind::Ident(UseTreeIdent {
-                        alias: Ident::new("qux"),
+                        alias: Symbol::new("qux"),
                     })),
                 },
                 UseTree {
                     path: Path {
                         segments: vec![PathSegment {
-                            ident: Ident::new("quux"),
+                            ident: Symbol::new("quux"),
                             type_arguments: vec![],
                         }],
                     },
@@ -132,34 +133,34 @@ fn use_tree() {
                 path: Path {
                     segments: vec![
                         PathSegment {
-                            ident: Ident::new("foo"),
+                            ident: Symbol::new("foo"),
                             type_arguments: vec![],
                         },
                         PathSegment {
-                            ident: Ident::new("bar"),
+                            ident: Symbol::new("bar"),
                             type_arguments: vec![],
                         },
                         PathSegment {
-                            ident: Ident::new("baz"),
+                            ident: Symbol::new("baz"),
                             type_arguments: vec![],
                         },
                     ],
                 },
-                kind: Some(ImportKind::Alias(Ident::new("qux"))),
+                kind: Some(ImportKind::Alias(Symbol::new("qux"))),
             },
             Import {
                 path: Path {
                     segments: vec![
                         PathSegment {
-                            ident: Ident::new("foo"),
+                            ident: Symbol::new("foo"),
                             type_arguments: vec![],
                         },
                         PathSegment {
-                            ident: Ident::new("bar"),
+                            ident: Symbol::new("bar"),
                             type_arguments: vec![],
                         },
                         PathSegment {
-                            ident: Ident::new("quux"),
+                            ident: Symbol::new("quux"),
                             type_arguments: vec![],
                         },
                     ],

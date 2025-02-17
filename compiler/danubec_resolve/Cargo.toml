@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 danubec_middle.path = "../danubec_middle"
 danubec_parse.path = "../danubec_parse"
+danubec_symbol.path = "../danubec_symbol"

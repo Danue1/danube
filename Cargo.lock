@@ -28,6 +28,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "danubec_ast"
+version = "0.1.0"
+dependencies = [
+ "danubec_symbol",
+ "danubec_syntax",
+]
+
+[[package]]
 name = "danubec_ast_lowering"
 version = "0.1.0"
 dependencies = [
@@ -61,6 +69,7 @@ name = "danubec_hir"
 version = "0.1.0"
 dependencies = [
  "danubec_data_structure",
+ "danubec_symbol",
  "once_cell",
 ]
 
@@ -87,6 +96,7 @@ dependencies = [
  "danubec_diagnostic",
  "danubec_hir",
  "danubec_lst",
+ "danubec_symbol",
 ]
 
 [[package]]
@@ -106,6 +116,14 @@ version = "0.1.0"
 dependencies = [
  "danubec_middle",
  "danubec_parse",
+ "danubec_symbol",
+]
+
+[[package]]
+name = "danubec_symbol"
+version = "0.1.0"
+dependencies = [
+ "danubec_data_structure",
 ]
 
 [[package]]

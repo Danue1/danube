@@ -1,8 +1,8 @@
-use crate::Ident;
+use danubec_symbol::Symbol;
 
 #[derive(Debug)]
 pub struct StructDef {
-    pub ident: Ident,
+    pub ident: Symbol,
     pub kind: Option<StructKind>,
 }
 

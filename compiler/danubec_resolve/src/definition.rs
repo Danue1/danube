@@ -1,4 +1,5 @@
 use danubec_middle::{hir, lst};
+use danubec_symbol::Symbol;
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -35,14 +36,14 @@ fn resolve_definition(
 
             hir::Definition {
                 kind: hir::DefinitionKind::Module(hir::ModuleDef {
-                    ident: hir::Ident::new(definition.identifier().unwrap().to_string().as_str()),
+                    ident: Symbol::new(definition.identifier().unwrap().to_string().as_str()),
                     definitions,
                 }),
             }
         }
         Some(lst::DefinitionKind::Struct(definition)) => hir::Definition {
             kind: hir::DefinitionKind::Struct(hir::StructDef {
-                ident: hir::Ident::new(definition.identifier().unwrap().to_string().as_str()),
+                ident: Symbol::new(definition.identifier().unwrap().to_string().as_str()),
                 kind: None,
             }),
         },
@@ -62,7 +63,7 @@ fn resolve_use_tree(tree: lst::UseTree) -> hir::UseTree {
     let kind = match tree.kind() {
         Some(lst::UseTreeKind::Barrel(_)) => Some(hir::UseTreeKind::Barrel),
         Some(lst::UseTreeKind::Ident(tree)) => Some(hir::UseTreeKind::Ident(hir::UseTreeIdent {
-            alias: hir::Ident::new(tree.identifier().unwrap().to_string().as_str()),
+            alias: Symbol::new(tree.identifier().unwrap().to_string().as_str()),
         })),
         Some(lst::UseTreeKind::Nested(tree)) => {
             Some(hir::UseTreeKind::Nested(hir::UseTreeNested {
@@ -80,7 +81,7 @@ fn resolve_path(path: lst::Path) -> hir::Path {
         segments: path
             .segments()
             .map(|segment| hir::PathSegment {
-                ident: hir::Ident::new(segment.identifier().unwrap().to_string().as_str()),
+                ident: Symbol::new(segment.identifier().unwrap().to_string().as_str()),
                 type_arguments: vec![],
             })
             .collect(),

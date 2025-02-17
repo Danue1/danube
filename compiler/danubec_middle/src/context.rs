@@ -1,11 +1,12 @@
 use crate::hir;
 use danubec_diagnostic::Diagnostic;
+use danubec_symbol::Symbol;
 use std::collections::HashMap;
 
 pub struct Context {
     pub working_directory: String,
 
-    pub ident_to_krate: HashMap<hir::Ident, hir::KrateId>,
+    pub ident_to_krate: HashMap<Symbol, hir::KrateId>,
     pub krates: HashMap<hir::KrateId, hir::Krate>,
     pub definitions: HashMap<hir::DefId, hir::Definition>,
     pub bodies: HashMap<hir::BodyId, hir::Body>,
