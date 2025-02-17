@@ -14,10 +14,10 @@ struct IdentMap {
 pub struct Ident(Hash);
 
 impl Ident {
-    pub fn new(raw: String) -> Self {
-        let hash = Hash::new(raw.clone());
+    pub fn new(raw: &str) -> Self {
+        let hash = Hash::new(raw);
         let map = MAP.get_or_init(IdentMap::new);
-        map.insert(hash, raw);
+        map.insert(hash, raw.to_owned());
 
         Ident(hash)
     }

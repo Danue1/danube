@@ -2,10 +2,12 @@ ast_node! {
     /// ```ebnf
     /// UseDefinition =
     /// | "use" _ UseTree _ ";"
+    /// | "use" _ "::" _ UseTree _ ";"
     /// ```
     struct UseDefinition;
 
     token use_token -> USE;
+    token colon_colon -> COLON__COLON;
     node tree -> UseTree;
     token semicolon -> SEMICOLON;
 }

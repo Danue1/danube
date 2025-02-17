@@ -2,7 +2,7 @@
 pub struct Hash(u64);
 
 impl Hash {
-    pub fn new(raw: String) -> Self {
+    pub fn new(raw: &str) -> Self {
         use std::hash::{DefaultHasher, Hash, Hasher};
 
         let mut hasher = DefaultHasher::new();
