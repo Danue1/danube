@@ -109,6 +109,27 @@ pub trait Visitor: Sized {
         walk_type_kind(self, node);
     }
 
+    fn visit_slice_type(&mut self, node: crate::SliceType) {
+        walk_slice_type(self, node);
+    }
+
+    fn visit_tuple_type(&mut self, node: crate::TupleType) {
+        walk_tuple_type(self, node);
+    }
+
+    fn visit_path_type(&mut self, node: crate::PathType) {
+        walk_path_type(self, node);
+    }
+
+    #[inline]
+    fn visit_never_type(&mut self, node: crate::NeverType) {
+        //
+    }
+
+    fn visit_tuple_type_element(&mut self, node: crate::TupleTypeElement) {
+        walk_tuple_type_element(self, node);
+    }
+
     fn visit_statement(&mut self, node: crate::Statement) {
         walk_statement(self, node);
     }
@@ -144,10 +165,6 @@ pub trait Visitor: Sized {
 
     fn visit_use_tree_nested(&mut self, node: crate::UseTreeNested) {
         walk_use_tree_nested(self, node);
-    }
-
-    fn visit_path_type(&mut self, node: crate::PathType) {
-        // TODO
     }
 
     fn visit_statement_kind(&mut self, node: crate::StatementKind) {
@@ -254,8 +271,8 @@ pub trait Visitor: Sized {
         walk_array_expression(self, node);
     }
 
-    fn visit_array_element(&mut self, node: crate::ArrayElement) {
-        walk_array_element(self, node);
+    fn visit_array_expression_element(&mut self, node: crate::ArrayExpressionElement) {
+        walk_array_expression_element(self, node);
     }
 
     #[inline]
@@ -526,8 +543,27 @@ pub fn walk_use_tree_kind<V: Visitor>(visitor: &mut V, node: crate::UseTreeKind)
 
 pub fn walk_type_kind<V: Visitor>(visitor: &mut V, node: crate::TypeKind) {
     match node {
+        crate::TypeKind::Never(node) => visitor.visit_never_type(node),
         crate::TypeKind::Path(node) => visitor.visit_path_type(node),
+        crate::TypeKind::Slice(node) => visitor.visit_slice_type(node),
+        crate::TypeKind::Tuple(node) => visitor.visit_tuple_type(node),
     }
+}
+
+pub fn walk_slice_type<V: Visitor>(visitor: &mut V, node: crate::SliceType) {
+    visit_optional!(visitor.visit_type(node.ty()));
+}
+
+pub fn walk_tuple_type<V: Visitor>(visitor: &mut V, node: crate::TupleType) {
+    visit_each!(visitor.visit_tuple_type_element(node.elements()));
+}
+
+pub fn walk_path_type<V: Visitor>(visitor: &mut V, node: crate::PathType) {
+    visit_optional!(visitor.visit_path(node.path()));
+}
+
+pub fn walk_tuple_type_element<V: Visitor>(visitor: &mut V, node: crate::TupleTypeElement) {
+    visit_optional!(visitor.visit_type(node.ty()));
 }
 
 pub fn walk_statement<V: Visitor>(visitor: &mut V, node: crate::Statement) {
@@ -704,10 +740,13 @@ pub fn walk_visibility_kind<V: Visitor>(visitor: &mut V, node: crate::Visibility
 }
 
 pub fn walk_array_expression<V: Visitor>(visitor: &mut V, node: crate::ArrayExpression) {
-    visit_each!(visitor.visit_array_element(node.elements()));
+    visit_each!(visitor.visit_array_expression_element(node.elements()));
 }
 
-pub fn walk_array_element<V: Visitor>(visitor: &mut V, node: crate::ArrayElement) {
+pub fn walk_array_expression_element<V: Visitor>(
+    visitor: &mut V,
+    node: crate::ArrayExpressionElement,
+) {
     visit_optional!(visitor.visit_expression(node.expression()));
 }
 

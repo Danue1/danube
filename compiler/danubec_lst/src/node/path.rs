@@ -2,7 +2,7 @@ ast_node! {
     /// ```ebnf
     /// Path =
     /// | PathSegment
-    /// | (PathSegment _ "::")+ PathSegment
+    /// | ( PathSegment _ "::" )+ PathSegment
     /// ```
     struct Path;
 

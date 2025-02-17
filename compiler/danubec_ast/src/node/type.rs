@@ -5,10 +5,9 @@ pub struct Type {
 }
 
 pub enum TypeKind {
-    // Array(ArrayType),
+    Never,
+    Slice(Box<Type>),
     // Function(FunctionType),
-    // Generic(GenericType),
     Path(Path),
-    // Pointer(PointerType),
-    // Tuple(TupleType),
+    Tuple(Vec<Type>),
 }

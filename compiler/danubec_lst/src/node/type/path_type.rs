@@ -1,7 +1,8 @@
 ast_node! {
     /// ```ebnf
     /// PathType =
-    /// | <TODO>
-    /// ```
+    /// | Path
     struct PathType;
+
+    node path -> Path;
 }

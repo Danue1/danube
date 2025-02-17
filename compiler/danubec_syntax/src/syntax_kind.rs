@@ -241,7 +241,10 @@ pub enum SyntaxKind {
     ModuleDefinition,
 
     Type,
+    NeverType,
     PathType,
+    SliceType,
+    TupleType,
 
     Statement,
     DefinitionStatement,
@@ -277,7 +280,8 @@ pub enum SyntaxKind {
     NumericFragment,
     Escape,
     Interpolation,
-    ArrayElement,
+    ArrayExpressionElement,
+    TupleTypeElement,
     /// `0b` | `0B` | `0o` | `0O` | `0x` | `0X`
     NUMERIC_LITERAL_PREFIX,
     /// `e` | `E`

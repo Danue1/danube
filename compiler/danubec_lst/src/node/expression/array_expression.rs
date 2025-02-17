@@ -10,7 +10,7 @@ ast_node! {
     struct ArrayExpression;
 
     token left_bracket -> LEFT_BRACKET;
-    nodes elements -> ArrayElement;
+    nodes elements -> ArrayExpressionElement;
     token right_bracket -> RIGHT_BRACKET;
 }
 
@@ -19,7 +19,7 @@ ast_node! {
     /// ArrayElement =
     /// | Expression
     /// ```
-    struct ArrayElement;
+    struct ArrayExpressionElement;
 
     node expression -> Expression;
     token comma -> COMMA;
