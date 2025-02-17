@@ -89,6 +89,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "danubec_lst_lowering"
+version = "0.1.0"
+dependencies = [
+ "danubec_diagnostic",
+ "danubec_middle",
+ "danubec_symbol",
+ "danubec_syntax",
+]
+
+[[package]]
 name = "danubec_middle"
 version = "0.1.0"
 dependencies = [

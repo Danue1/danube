@@ -1,0 +1,10 @@
+[package]
+name = "danubec_lst_lowering"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+danubec_diagnostic.path = "../danubec_diagnostic"
+danubec_middle.path = "../danubec_middle"
+danubec_symbol.path = "../danubec_symbol"
+danubec_syntax.path = "../danubec_syntax"
