@@ -300,13 +300,14 @@ pub enum SyntaxKind {
     AssignmentExpression,
     AwaitExpression,
     BinaryExpression,
-    CallExpression,
+    FunctionCallExpression,
     FieldExpression,
     IndexExpression,
     RangeExpression,
     StructExpression,
     TryExpression,
     YieldExpression,
+    MethodCallExpression,
 
     Pattern,
     NeverPattern,
@@ -391,6 +392,7 @@ pub enum SyntaxKind {
     Argument,
     RangeExpressionRhs,
     StructExpressionField,
+    IndexElement,
 
     Raw,
     Trivia,

@@ -14,4 +14,8 @@ impl Bp {
     pub const P8: (Self, Self) = (Bp(15), Bp(16));
     pub const P9: (Self, Self) = (Bp(17), Bp(18));
     pub const P10: (Self, Self) = (Bp(19), Bp(20));
+    pub const P11: (Self, Self) = (Bp(21), Bp(22));
+    pub const P12: (Self, Self) = (Bp(23), Bp(24));
+    pub const P13: (Self, Self) = (Bp(25), Bp(26));
+    pub const P14: (Self, Self) = (Bp(27), Bp(28));
 }

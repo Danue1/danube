@@ -1,19 +1,28 @@
 mod array_expression;
 mod assignment_expression;
+mod await_expression;
 mod binary_expression;
 mod block_expression;
 mod break_expression;
 mod continue_expression;
+mod field_expression;
 mod for_expression;
+mod function_call_expression;
 mod if_expression;
+mod index_expression;
 mod let_expression;
 mod literal_expression;
 mod loop_expression;
 mod match_expression;
+mod method_call_expression;
 mod path_expression;
+mod range_expression;
 mod return_expression;
+mod struct_expression;
+mod try_expression;
 mod unary_expression;
 mod while_expression;
+mod yield_expression;
 
 use crate::{tokens::Tokens, Bp};
 use danubec_lex::Lex;
@@ -79,6 +88,10 @@ const EXPR_FIRST: Tokens = tokens![
     LEFT_PAREN,
     // { 1, 2, 3 }
     LEFT_BRACE,
+    // ..
+    // ..foo
+    // ..=foo
+    DOT,
 ];
 
 const LHS_EXPRESSION_FIRST: Tokens = LITERAL_FIRST
@@ -134,11 +147,14 @@ impl crate::Context {
 
     fn expression_lhs(&mut self, lex: &mut Lex) -> bool {
         if lex.matches(|kind, _| LHS_EXPRESSION_FIRST.contains(kind)) {
+            let checkpoint = self.checkpoint();
+
             self.literal_expression(lex)
                 || self.unary_expression(lex)
                 || self.block_expression(lex)
                 || self.array_expression(lex)
                 || self.path_expression(lex)
+                || self.range_expression_rhs(lex, checkpoint)
         } else {
             false
         }
@@ -191,46 +207,56 @@ impl crate::Context {
             (Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::EQUAL)) => P1,
 
             // Binary operators
-            (Some(SyntaxKind::PIPE), Some(SyntaxKind::PIPE), _, _) => P2,
+            (Some(SyntaxKind::DOT), Some(SyntaxKind::DOT), Some(SyntaxKind::EQUAL), _) => P2,
+            (Some(SyntaxKind::DOT), Some(SyntaxKind::DOT), _, _) => P2,
 
-            (Some(SyntaxKind::AMPERSAND), Some(SyntaxKind::AMPERSAND), _, _) => P3,
+            (Some(SyntaxKind::PIPE), Some(SyntaxKind::PIPE), _, _) => P3,
 
-            (Some(SyntaxKind::EQUAL), Some(SyntaxKind::EQUAL), _, _) => P4,
-            (Some(SyntaxKind::EXCLAMATION), Some(SyntaxKind::EQUAL), _, _) => P4,
-            (Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::EQUAL), _, _) => P4,
-            (Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::EQUAL), _, _) => P4,
+            (Some(SyntaxKind::AMPERSAND), Some(SyntaxKind::AMPERSAND), _, _) => P4,
 
-            (Some(SyntaxKind::PIPE), _, _, _) => P5,
+            (Some(SyntaxKind::EQUAL), Some(SyntaxKind::EQUAL), _, _) => P5,
+            (Some(SyntaxKind::EXCLAMATION), Some(SyntaxKind::EQUAL), _, _) => P5,
+            (Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::EQUAL), _, _) => P5,
+            (Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::EQUAL), _, _) => P5,
 
-            (Some(SyntaxKind::CARET), _, _, _) => P6,
+            (Some(SyntaxKind::PIPE), _, _, _) => P6,
 
-            (Some(SyntaxKind::AMPERSAND), _, _, _) => P7,
+            (Some(SyntaxKind::CARET), _, _, _) => P7,
 
-            (Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::PIPE), _) => P8,
-            (Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::LEFT_CHEVRON), _, _) => P8,
-            (Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), _) => P8,
-            (Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), _, _) => P8,
+            (Some(SyntaxKind::AMPERSAND), _, _, _) => P8,
 
-            (Some(SyntaxKind::PLUS), Some(SyntaxKind::PIPE), _, _) => P9,
-            (Some(SyntaxKind::PLUS), Some(SyntaxKind::PERCENT), _, _) => P9,
-            (Some(SyntaxKind::PLUS), _, _, _) => P9,
-            (Some(SyntaxKind::HYPHEN), Some(SyntaxKind::PIPE), _, _) => P9,
-            (Some(SyntaxKind::HYPHEN), Some(SyntaxKind::PERCENT), _, _) => P9,
-            (Some(SyntaxKind::HYPHEN), _, _, _) => P9,
+            (Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::PIPE), _) => P9,
+            (Some(SyntaxKind::LEFT_CHEVRON), Some(SyntaxKind::LEFT_CHEVRON), _, _) => P9,
+            (Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), _) => P9,
+            (Some(SyntaxKind::RIGHT_CHEVRON), Some(SyntaxKind::RIGHT_CHEVRON), _, _) => P9,
 
-            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PIPE), _, _) => P10,
-            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PERCENT), _, _) => P10,
-            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PIPE), _) => P10,
-            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PERCENT), _) => P10,
-            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::ASTERISK), _, _) => P10,
-            (Some(SyntaxKind::ASTERISK), _, _, _) => P10,
-            (Some(SyntaxKind::SLASH), _, _, _) => P10,
-            (Some(SyntaxKind::PERCENT), _, _, _) => P10,
+            (Some(SyntaxKind::PLUS), Some(SyntaxKind::PIPE), _, _) => P10,
+            (Some(SyntaxKind::PLUS), Some(SyntaxKind::PERCENT), _, _) => P10,
+            (Some(SyntaxKind::PLUS), _, _, _) => P10,
+            (Some(SyntaxKind::HYPHEN), Some(SyntaxKind::PIPE), _, _) => P10,
+            (Some(SyntaxKind::HYPHEN), Some(SyntaxKind::PERCENT), _, _) => P10,
+            (Some(SyntaxKind::HYPHEN), _, _, _) => P10,
+
+            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PIPE), _, _) => P11,
+            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PERCENT), _, _) => P11,
+            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PIPE), _) => P11,
+            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::ASTERISK), Some(SyntaxKind::PERCENT), _) => P11,
+            (Some(SyntaxKind::ASTERISK), Some(SyntaxKind::ASTERISK), _, _) => P11,
+            (Some(SyntaxKind::ASTERISK), _, _, _) => P11,
+            (Some(SyntaxKind::SLASH), _, _, _) => P11,
+            (Some(SyntaxKind::PERCENT), _, _, _) => P11,
+
+            (Some(SyntaxKind::QUESTION), _, _, _) => P12,
+
+            (Some(SyntaxKind::LEFT_BRACKET), _, _, _) => P13,
+            (Some(SyntaxKind::LEFT_PAREN), _, _, _) => P13,
+
+            (Some(SyntaxKind::DOT), _, _, _) => P14,
 
             // Assignment operators
-            (Some(SyntaxKind::EQUAL), _, _, _) => P1,
-            (Some(SyntaxKind::LEFT_CHEVRON), _, _, _) => P4,
-            (Some(SyntaxKind::RIGHT_CHEVRON), _, _, _) => P4,
+            (Some(SyntaxKind::EQUAL), _, _, _) => P2,
+            (Some(SyntaxKind::LEFT_CHEVRON), _, _, _) => P5,
+            (Some(SyntaxKind::RIGHT_CHEVRON), _, _, _) => P5,
         }
     }
 
@@ -242,5 +268,22 @@ impl crate::Context {
     ) -> bool {
         self.assignment_expression(lex, checkpoint, binding_power)
             || self.binary_expression(lex, checkpoint, binding_power)
+            || self.range_expression_rhs(lex, checkpoint)
+            || self.infix_dot_expression(lex, checkpoint)
+            || self.index_expression(lex, checkpoint)
+            || self.function_call_expression(lex, checkpoint)
+            || self.try_expression(lex, checkpoint)
+    }
+
+    fn infix_dot_expression(&mut self, lex: &mut Lex, checkpoint: Checkpoint) -> bool {
+        if expect!(self, lex, SyntaxKind::DOT) {
+            let _ = self.await_expression(lex, checkpoint)
+                || self.yield_expression(lex, checkpoint)
+                || self.field_expression(lex, checkpoint);
+
+            true
+        } else {
+            false
+        }
     }
 }

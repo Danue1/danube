@@ -1,12 +1,12 @@
 ast_node! {
     /// ```ebnf
-    /// Expression =
+    /// FunctionCallExpression =
     /// | Expression _ "(" _ ")"
-    /// | Expression _ "(" _ Expression _ ")"
-    /// | Expression _ "(" ( _ Expression _ "," )+ _ ")"
-    /// | Expression _ "(" ( _ Expression _ "," )+ _ Expression _ ")"
+    /// | Expression _ "(" _ Argument _ ")"
+    /// | Expression _ "(" ( _ Argument _ "," )+ _ ")"
+    /// | Expression _ "(" ( _ Argument _ "," )+ _ Argument _ ")"
     /// ```
-    struct CallExpression;
+    struct FunctionCallExpression;
 
     node expression -> Expression;
     token left_paren -> LEFT_PAREN;
