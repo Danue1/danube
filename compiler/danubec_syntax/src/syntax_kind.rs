@@ -359,6 +359,7 @@ pub enum SyntaxKind {
     AssignmentOperator,
     BinaryOperator,
     UnaryOperator,
+    RangeOperator,
     TypeArgument,
     TypeParameter,
     TypeConstraint,
@@ -387,6 +388,9 @@ pub enum SyntaxKind {
     ForIterator,
     BinaryExpressionRhs,
     OrPatternRhs,
+    Argument,
+    RangeExpressionRhs,
+    StructExpressionField,
 
     Raw,
     Trivia,

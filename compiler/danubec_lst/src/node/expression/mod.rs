@@ -1,5 +1,6 @@
 pub mod array_expression;
 pub mod assignment_expression;
+pub mod await_expression;
 pub mod binary_expression;
 pub mod block_expression;
 pub mod break_expression;
@@ -14,13 +15,17 @@ pub mod literal_expression;
 pub mod loop_expression;
 pub mod match_expression;
 pub mod path_element;
+pub mod range_expression;
 pub mod return_expression;
 pub mod struct_expression;
+pub mod try_expression;
 pub mod unary_expression;
 pub mod while_expression;
+pub mod yield_expression;
 
 pub use array_expression::*;
 pub use assignment_expression::*;
+pub use await_expression::*;
 pub use binary_expression::*;
 pub use block_expression::*;
 pub use break_expression::*;
@@ -35,10 +40,13 @@ pub use literal_expression::*;
 pub use loop_expression::*;
 pub use match_expression::*;
 pub use path_element::*;
+pub use range_expression::*;
 pub use return_expression::*;
 pub use struct_expression::*;
+pub use try_expression::*;
 pub use unary_expression::*;
 pub use while_expression::*;
+pub use yield_expression::*;
 
 ast_node! {
     /// ```ebnf
@@ -98,13 +106,13 @@ ast_node! {
 
         Assignment(AssignmentExpression),
         Binary(BinaryExpression),
-        // Await(AwaitExpression),
-        // Call(CallExpression),
-        // Field(FieldExpression),
-        // Index(IndexExpression),
-        // Range(RangeExpression),
-        // Struct(StructExpression),
-        // Try(TryExpression),
-        // Yield(YieldExpression),
+        Await(AwaitExpression),
+        Call(CallExpression),
+        Field(FieldExpression),
+        Index(IndexExpression),
+        Range(RangeExpression),
+        Struct(StructExpression),
+        Try(TryExpression),
+        Yield(YieldExpression),
     }
 }
