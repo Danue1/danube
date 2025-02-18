@@ -56,6 +56,7 @@ pub fn lower_expression_kind(
 
             Ok(ast::ExpressionKind::Unary { operator, operand })
         }
+        _ => std::todo!(),
     }
 }
 

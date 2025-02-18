@@ -2,39 +2,83 @@ mod array_expression;
 mod assignment_expression;
 mod binary_expression;
 mod block_expression;
+mod break_expression;
+mod continue_expression;
+mod for_expression;
+mod if_expression;
 mod let_expression;
 mod literal_expression;
+mod loop_expression;
+mod match_expression;
+mod path_expression;
+mod return_expression;
 mod unary_expression;
+mod while_expression;
 
 use crate::{tokens::Tokens, Bp};
 use danubec_lex::Lex;
 use danubec_syntax::{Checkpoint, SyntaxKind};
 
 const LITERAL_FIRST: Tokens = tokens![
-    TRUE,         // true
-    FALSE,        // false
-    DOUBLE_QUOTE, // "abc"
-    SINGLE_QUOTE, // 'a'
-    NUMERIC,      // 123
+    // true
+    TRUE,
+    // false
+    FALSE,
+    // "abc"
+    DOUBLE_QUOTE,
+    // 'a'
+    SINGLE_QUOTE,
+    // 123
+    NUMERIC,
 ];
 
 const PATH_FIRST: Tokens = tokens![
-    ALPHABETIC,   // abc::def::ghi
-    SUPER,        // super::abc
-    CRATE,        // crate::abc
-    COLON,        // ::abc
-    LEFT_CHEVRON, // <abc>::def
+    // abc::def::ghi
+    ALPHABETIC,
+    // super::abc
+    SUPER,
+    // crate::abc
+    CRATE,
+    // ::abc
+    COLON,
+    // <abc>::def
+    LEFT_CHEVRON,
 ];
 
 const UNARY_FIRST: Tokens = tokens![
-    HYPHEN,      // -1
-    EXCLAMATION, // !true
-    TILDE,       // ~1
+    // -1
+    HYPHEN,
+    // !true
+    EXCLAMATION,
+    // ~1
+    TILDE,
 ];
 
 const EXPR_FIRST: Tokens = tokens![
-    LET,          // let a = 1;
-    LEFT_BRACKET, // [1, 2, 3]
+    // let a = 1;
+    LET,
+    // if true { 1 } else { 2 }
+    IF,
+    // match 1 { 1 => 2 }
+    MATCH,
+    // loop { 1 }
+    LOOP,
+    // while true { 1 }
+    WHILE,
+    // for a in b { 1 }
+    FOR,
+    // return 1
+    RETURN,
+    // break
+    BREAK,
+    // continue
+    CONTINUE,
+    // [1, 2, 3]
+    LEFT_BRACKET,
+    // (1, 2, 3)
+    LEFT_PAREN,
+    // { 1, 2, 3 }
+    LEFT_BRACE,
 ];
 
 const LHS_FIRST: Tokens = LITERAL_FIRST
@@ -43,6 +87,19 @@ const LHS_FIRST: Tokens = LITERAL_FIRST
     .concat(EXPR_FIRST);
 
 impl crate::Context {
+    pub fn expression_top(&mut self, lex: &mut Lex) -> bool {
+        self.let_expression(lex)
+            || self.if_expression(lex)
+            || self.match_expression(lex)
+            || self.loop_expression(lex)
+            || self.while_expression(lex)
+            || self.for_expression(lex)
+            || self.return_expression(lex)
+            || self.break_expression(lex)
+            || self.continue_expression(lex)
+            || self.expression(lex)
+    }
+
     pub fn expression(&mut self, lex: &mut Lex) -> bool {
         self.expression_bp(lex, Bp(1))
     }
@@ -79,8 +136,8 @@ impl crate::Context {
             self.literal_expression(lex)
                 || self.unary_expression(lex)
                 || self.block_expression(lex)
-                || self.let_expression(lex)
                 || self.array_expression(lex)
+                || self.path_expression(lex)
         } else {
             false
         }

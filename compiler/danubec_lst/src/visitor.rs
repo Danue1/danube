@@ -669,6 +669,7 @@ pub fn walk_expression_kind<V: Visitor>(visitor: &mut V, node: crate::Expression
         crate::ExpressionKind::Let(node) => visitor.visit_let_expression(node),
         crate::ExpressionKind::Literal(node) => visitor.visit_literal_expression(node),
         crate::ExpressionKind::Unary(node) => visitor.visit_unary_expression(node),
+        _ => std::todo!(),
     }
 }
 

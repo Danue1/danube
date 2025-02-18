@@ -130,6 +130,16 @@ impl<'lex> Iterator for Lex<'lex> {
                     "Self" => token!(SELF_UPPERCASE),
                     "as" => token!(AS),
                     "for" => token!(FOR),
+                    "if" => token!(IF),
+                    "else" => token!(ELSE),
+                    "match" => token!(MATCH),
+                    "loop" => token!(LOOP),
+                    "while" => token!(WHILE),
+                    "return" => token!(RETURN),
+                    "break" => token!(BREAK),
+                    "continue" => token!(CONTINUE),
+                    "await" => token!(AWAIT),
+                    "yield" => token!(YIELD),
                     _ => token!(ALPHABETIC),
                 }
             }

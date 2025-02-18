@@ -123,6 +123,26 @@ pub enum SyntaxKind {
     AS,
     /// `for`
     FOR,
+    /// `if`
+    IF,
+    /// `else`
+    ELSE,
+    /// `match`
+    MATCH,
+    /// `loop`
+    LOOP,
+    /// `while`
+    WHILE,
+    /// `return`
+    RETURN,
+    /// `break`
+    BREAK,
+    /// `continue`
+    CONTINUE,
+    /// `await`
+    AWAIT,
+    /// `yield`
+    YIELD,
 
     UNEXPECTED,
 
@@ -227,6 +247,10 @@ pub enum SyntaxKind {
 
     /// `..`
     DOT__DOT,
+    /// `..=`
+    DOT__DOT__EQUAL,
+    /// `=>`
+    EQUAL__RIGHT_CHEVRON,
 
     // Nodes in the parser
     Root,
@@ -256,13 +280,33 @@ pub enum SyntaxKind {
     SemicolonStatement,
 
     Expression,
-    ArrayExpression,
-    AssignmentExpression,
-    BlockExpression,
+    // Top-level expressions
+    BreakExpression,
+    ContinueExpression,
+    ForExpression,
+    IfExpression,
     LetExpression,
+    LoopExpression,
+    MatchExpression,
+    ReturnExpression,
+    WhileExpression,
+    // Innermost expressions
+    ArrayExpression,
+    BlockExpression,
     LiteralExpression,
-    BinaryExpression,
+    PathExpression,
     UnaryExpression,
+    // Infix expressions
+    AssignmentExpression,
+    AwaitExpression,
+    BinaryExpression,
+    CallExpression,
+    FieldExpression,
+    IndexExpression,
+    RangeExpression,
+    StructExpression,
+    TryExpression,
+    YieldExpression,
 
     Pattern,
     NeverPattern,
@@ -338,6 +382,9 @@ pub enum SyntaxKind {
     ArrayPatternElement,
     NamedPatternElement,
     UnnamedPatternElement,
+    ElseBranch,
+    MatchArm,
+    ForIterator,
 
     Raw,
     Trivia,

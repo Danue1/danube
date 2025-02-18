@@ -3,6 +3,7 @@ mod expression;
 mod identifier;
 mod literal;
 mod path;
+mod pattern;
 mod root;
 mod statement;
 mod trivia;

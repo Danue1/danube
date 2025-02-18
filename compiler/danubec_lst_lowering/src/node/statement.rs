@@ -19,11 +19,16 @@ pub fn lower_statement_kind(
 
             Ok(ast::StatementKind::Definition(definition))
         }
-        lst::StatementKind::Expression(expression) => {
-            let expression = opt!(expression.expression(), "ICE: Expression not found");
+        lst::StatementKind::Expression(statement) => {
+            let expression = opt!(statement.expression(), "ICE: Expression not found");
             let expression = lower_expression(expression)?;
 
-            Ok(ast::StatementKind::Expression(expression))
+            let semicolon = statement.semicolon().is_some();
+
+            Ok(ast::StatementKind::Expression {
+                expression,
+                semicolon,
+            })
         }
         lst::StatementKind::Let(let_statement) => {
             let pattern = opt!(let_statement.pattern(), "ICE: Pattern not found");

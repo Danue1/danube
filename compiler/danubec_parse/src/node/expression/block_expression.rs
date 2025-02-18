@@ -9,15 +9,12 @@ impl crate::Context {
 
             self.trivia(lex);
 
-            while !expect!(self, lex, SyntaxKind::RIGHT_BRACE) {
+            while self.statement(lex) {
                 self.trivia(lex);
-
-                if self.statement(lex) {
-                    self.trivia(lex);
-                } else {
-                    break;
-                }
             }
+
+            self.trivia(lex);
+            expect!(self, lex, SyntaxKind::RIGHT_BRACE);
 
             self.finish_node();
 
