@@ -8,7 +8,7 @@ impl crate::Context {
             self.start_node_at(checkpoint, SyntaxKind::ForExpression);
 
             self.trivia(lex);
-            self.expression(lex);
+            self.pattern(lex);
 
             self.trivia(lex);
             expect!(self, lex, SyntaxKind::IN);

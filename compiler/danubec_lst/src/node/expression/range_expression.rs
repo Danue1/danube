@@ -10,9 +10,9 @@ ast_node! {
     /// ```
     struct RangeExpression;
 
-    node start -> RangeExpressionRhs;
+    node start -> Expression;
     node range_operator -> RangeOperator;
-    node end -> Expression;
+    node end -> RangeExpressionRhs;
 }
 
 ast_node! {

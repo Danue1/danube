@@ -9,7 +9,7 @@ ast_node! {
 
     node expression -> Expression;
     token left_bracket -> LEFT_BRACKET;
-    node argument -> IndexElement;
+    node index -> IndexElement;
     token right_bracket -> RIGHT_BRACKET;
 }
 

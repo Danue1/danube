@@ -442,6 +442,116 @@ pub trait Visitor: Sized {
     fn visit_unnamed_pattern_element(&mut self, node: crate::UnnamedPatternElement) {
         walk_unnamed_pattern_element(self, node);
     }
+
+    fn visit_binary_expression_rhs(&mut self, node: crate::BinaryExpressionRhs) {
+        walk_binary_expression_rhs(self, node);
+    }
+
+    fn visit_or_pattern_rhs(&mut self, node: crate::OrPatternRhs) {
+        walk_or_pattern_rhs(self, node);
+    }
+
+    #[inline]
+    fn visit_break_expression(&mut self, node: crate::BreakExpression) {
+        //
+    }
+
+    #[inline]
+    fn visit_continue_expression(&mut self, node: crate::ContinueExpression) {
+        //
+    }
+
+    fn visit_for_expression(&mut self, node: crate::ForExpression) {
+        walk_for_expression(self, node);
+    }
+
+    fn visit_for_iterator(&mut self, node: crate::ForIterator) {
+        walk_for_iterator(self, node);
+    }
+
+    fn visit_if_expression(&mut self, node: crate::IfExpression) {
+        walk_if_expression(self, node);
+    }
+
+    fn visit_else_branch(&mut self, node: crate::ElseBranch) {
+        walk_else_branch(self, node);
+    }
+
+    fn visit_loop_expression(&mut self, node: crate::LoopExpression) {
+        walk_loop_expression(self, node);
+    }
+
+    fn visit_match_expression(&mut self, node: crate::MatchExpression) {
+        walk_match_expression(self, node);
+    }
+
+    fn visit_match_arm(&mut self, node: crate::MatchArm) {
+        walk_match_arm(self, node);
+    }
+
+    fn visit_return_expression(&mut self, node: crate::ReturnExpression) {
+        walk_return_expression(self, node);
+    }
+
+    fn visit_while_expression(&mut self, node: crate::WhileExpression) {
+        walk_while_expression(self, node);
+    }
+
+    fn visit_path_expression(&mut self, node: crate::PathExpression) {
+        walk_path_expression(self, node);
+    }
+
+    fn visit_await_expression(&mut self, node: crate::AwaitExpression) {
+        walk_await_expression(self, node);
+    }
+
+    fn visit_function_call_expression(&mut self, node: crate::FunctionCallExpression) {
+        walk_function_call_expression(self, node);
+    }
+
+    fn visit_argument(&mut self, node: crate::Argument) {
+        walk_argument(self, node);
+    }
+
+    fn visit_method_call_expression(&mut self, node: crate::MethodCallExpression) {
+        walk_method_call_expression(self, node);
+    }
+
+    fn visit_field_expression(&mut self, node: crate::FieldExpression) {
+        walk_field_expression(self, node);
+    }
+
+    fn visit_index_expression(&mut self, node: crate::IndexExpression) {
+        walk_index_expression(self, node);
+    }
+
+    fn visit_index_element(&mut self, node: crate::IndexElement) {
+        walk_index_element(self, node);
+    }
+
+    fn visit_range_expression(&mut self, node: crate::RangeExpression) {
+        walk_range_expression(self, node);
+    }
+
+    fn visit_range_express_rhs(&mut self, node: crate::RangeExpressionRhs) {
+        walk_range_express_rhs(self, node);
+    }
+
+    fn visit_struct_expression(&mut self, node: crate::StructExpression) {
+        walk_struct_expression(self, node);
+    }
+
+    fn visit_struct_expression_field(&mut self, node: crate::StructExpressionField) {
+        walk_struct_expression_field(self, node);
+    }
+
+    fn visit_try_expression(&mut self, node: crate::TryExpression) {
+        walk_try_expression(self, node);
+    }
+
+    fn visit_yield_expression(&mut self, node: crate::YieldExpression) {
+        walk_yield_expression(self, node);
+    }
 }
 
 macro_rules! visit_optional {
@@ -529,7 +639,7 @@ pub fn walk_impl_definition<V: Visitor>(visitor: &mut V, node: crate::ImplDefini
 }
 
 pub fn walk_const_definition<V: Visitor>(visitor: &mut V, node: crate::ConstDefinition) {
-    visit_optional!(visitor.visit_identifier(node.identifier()));
+    visit_optional!(visitor.visit_pattern(node.pattern()));
     visit_optional!(visitor.visit_type(node.ty()));
     visit_optional!(visitor.visit_expression(node.expression()));
 }
@@ -660,16 +770,33 @@ pub fn walk_enum_variant_kind<V: Visitor>(visitor: &mut V, node: crate::EnumVari
 
 pub fn walk_expression_kind<V: Visitor>(visitor: &mut V, node: crate::ExpressionKind) {
     match node {
-        crate::ExpressionKind::Array(node) => visitor.visit_array_expression(node),
-        crate::ExpressionKind::Assignment(assignment) => {
-            visitor.visit_assignment_expression(assignment)
-        }
-        crate::ExpressionKind::Binary(node) => visitor.visit_binary_expression(node),
-        crate::ExpressionKind::Block(node) => visitor.visit_block_expression(node),
+        crate::ExpressionKind::Break(node) => visitor.visit_break_expression(node),
+        crate::ExpressionKind::Continue(node) => visitor.visit_continue_expression(node),
+        crate::ExpressionKind::For(node) => visitor.visit_for_expression(node),
+        crate::ExpressionKind::If(node) => visitor.visit_if_expression(node),
         crate::ExpressionKind::Let(node) => visitor.visit_let_expression(node),
+        crate::ExpressionKind::Loop(node) => visitor.visit_loop_expression(node),
+        crate::ExpressionKind::Match(node) => visitor.visit_match_expression(node),
+        crate::ExpressionKind::Return(node) => visitor.visit_return_expression(node),
+        crate::ExpressionKind::While(node) => visitor.visit_while_expression(node),
+
+        crate::ExpressionKind::Array(node) => visitor.visit_array_expression(node),
+        crate::ExpressionKind::Block(node) => visitor.visit_block_expression(node),
         crate::ExpressionKind::Literal(node) => visitor.visit_literal_expression(node),
+        crate::ExpressionKind::Path(node) => visitor.visit_path_expression(node),
         crate::ExpressionKind::Unary(node) => visitor.visit_unary_expression(node),
-        _ => std::todo!(),
+
+        crate::ExpressionKind::Assignment(node) => visitor.visit_assignment_expression(node),
+        crate::ExpressionKind::Binary(node) => visitor.visit_binary_expression(node),
+        crate::ExpressionKind::Await(node) => visitor.visit_await_expression(node),
+        crate::ExpressionKind::FunctionCall(node) => visitor.visit_function_call_expression(node),
+        crate::ExpressionKind::MethodCall(node) => visitor.visit_method_call_expression(node),
+        crate::ExpressionKind::Field(node) => visitor.visit_field_expression(node),
+        crate::ExpressionKind::Index(node) => visitor.visit_index_expression(node),
+        crate::ExpressionKind::Range(node) => visitor.visit_range_expression(node),
+        crate::ExpressionKind::Struct(node) => visitor.visit_struct_expression(node),
+        crate::ExpressionKind::Try(node) => visitor.visit_try_expression(node),
+        crate::ExpressionKind::Yield(node) => visitor.visit_yield_expression(node),
     }
 }
 
@@ -740,8 +867,7 @@ pub fn walk_assignment_expression<V: Visitor>(visitor: &mut V, node: crate::Assi
 pub fn walk_binary_expression<V: Visitor>(visitor: &mut V, node: crate::BinaryExpression) {
     visit_optional!(visitor.visit_expression(node.lhs()));
     visit_optional!(visitor.visit_binary_operator(node.operator()));
-    // TODO
-    // visit_optional!(visitor.visit_expression(node.rhs()));
+    visit_optional!(visitor.visit_binary_expression_rhs(node.rhs()));
 }
 
 pub fn walk_let_expression<V: Visitor>(visitor: &mut V, node: crate::LetExpression) {
@@ -957,8 +1083,8 @@ pub fn walk_literal_pattern<V: Visitor>(visitor: &mut V, node: crate::LiteralPat
 }
 
 pub fn walk_or_pattern<V: Visitor>(visitor: &mut V, node: crate::OrPattern) {
-    // TODO
-    // visit_each!(visitor.visit_pattern(node.patterns()));
+    visit_optional!(visitor.visit_pattern(node.lhs()));
+    visit_optional!(visitor.visit_or_pattern_rhs(node.rhs()));
 }
 
 pub fn walk_named_pattern<V: Visitor>(visitor: &mut V, node: crate::NamedPattern) {
@@ -979,4 +1105,125 @@ pub fn walk_unnamed_pattern_element<V: Visitor>(
     node: crate::UnnamedPatternElement,
 ) {
     visit_optional!(visitor.visit_pattern(node.pattern()));
+}
+
+pub fn walk_binary_expression_rhs<V: Visitor>(visitor: &mut V, node: crate::BinaryExpressionRhs) {
+    visit_optional!(visitor.visit_expression(node.expression()));
+}
+
+pub fn walk_or_pattern_rhs<V: Visitor>(visitor: &mut V, node: crate::OrPatternRhs) {
+    visit_optional!(visitor.visit_pattern(node.pattern()));
+}
+
+pub fn walk_for_expression<V: Visitor>(visitor: &mut V, node: crate::ForExpression) {
+    visit_optional!(visitor.visit_pattern(node.pattern()));
+    visit_optional!(visitor.visit_for_iterator(node.iterator()));
+    visit_optional!(visitor.visit_block_expression(node.block()));
+}
+
+pub fn walk_for_iterator<V: Visitor>(visitor: &mut V, node: crate::ForIterator) {
+    visit_optional!(visitor.visit_expression(node.expression()));
+}
+
+pub fn walk_if_expression<V: Visitor>(visitor: &mut V, node: crate::IfExpression) {
+    visit_optional!(visitor.visit_expression(node.condition()));
+    visit_optional!(visitor.visit_block_expression(node.then_branch()));
+    visit_optional!(visitor.visit_else_branch(node.else_branch()));
+}
+
+pub fn walk_else_branch<V: Visitor>(visitor: &mut V, node: crate::ElseBranch) {
+    visit_optional!(visitor.visit_block_expression(node.block()));
+}
+
+pub fn walk_loop_expression<V: Visitor>(visitor: &mut V, node: crate::LoopExpression) {
+    visit_optional!(visitor.visit_block_expression(node.block()));
+}
+
+pub fn walk_match_expression<V: Visitor>(visitor: &mut V, node: crate::MatchExpression) {
+    visit_optional!(visitor.visit_expression(node.expression()));
+    visit_each!(visitor.visit_match_arm(node.arms()));
+}
+
+pub fn walk_match_arm<V: Visitor>(visitor: &mut V, node: crate::MatchArm) {
+    visit_optional!(visitor.visit_pattern(node.pattern()));
+    visit_optional!(visitor.visit_expression(node.expression()));
+}
+
+pub fn walk_return_expression<V: Visitor>(visitor: &mut V, node: crate::ReturnExpression) {
+    visit_optional!(visitor.visit_expression(node.expression()));
+}
+
+pub fn walk_while_expression<V: Visitor>(visitor: &mut V, node: crate::WhileExpression) {
+    visit_optional!(visitor.visit_expression(node.expression()));
+    visit_optional!(visitor.visit_block_expression(node.block()));
+}
+
+pub fn walk_path_expression<V: Visitor>(visitor: &mut V, node: crate::PathExpression) {
+    visit_optional!(visitor.visit_path(node.path()));
+}
+
+pub fn walk_await_expression<V: Visitor>(visitor: &mut V, node: crate::AwaitExpression) {
+    visit_optional!(visitor.visit_expression(node.expression()));
+}
+
+pub fn walk_function_call_expression<V: Visitor>(
+    visitor: &mut V,
+    node: crate::FunctionCallExpression,
+) {
+    visit_optional!(visitor.visit_expression(node.expression()));
+    visit_each!(visitor.visit_argument(node.arguments()));
+}
+
+pub fn walk_argument<V: Visitor>(visitor: &mut V, node: crate::Argument) {
+    visit_optional!(visitor.visit_expression(node.expression()));
+}
+
+pub fn walk_method_call_expression<V: Visitor>(visitor: &mut V, node: crate::MethodCallExpression) {
+    visit_optional!(visitor.visit_expression(node.expression()));
+    visit_optional!(visitor.visit_path_segment(node.path_segment()));
+    visit_each!(visitor.visit_argument(node.arguments()));
+}
+
+pub fn walk_field_expression<V: Visitor>(visitor: &mut V, node: crate::FieldExpression) {
+    visit_optional!(visitor.visit_expression(node.expression()));
+    visit_optional!(visitor.visit_identifier(node.identifier()));
+}
+
+pub fn walk_index_expression<V: Visitor>(visitor: &mut V, node: crate::IndexExpression) {
+    visit_optional!(visitor.visit_expression(node.expression()));
+    visit_optional!(visitor.visit_index_element(node.index()));
+}
+
+pub fn walk_index_element<V: Visitor>(visitor: &mut V, node: crate::IndexElement) {
+    visit_optional!(visitor.visit_expression(node.expression()));
+}
+
+pub fn walk_range_expression<V: Visitor>(visitor: &mut V, node: crate::RangeExpression) {
+    visit_optional!(visitor.visit_expression(node.start()));
+    visit_optional!(visitor.visit_range_express_rhs(node.end()));
+}
+
+pub fn walk_range_express_rhs<V: Visitor>(visitor: &mut V, node: crate::RangeExpressionRhs) {
+    visit_optional!(visitor.visit_expression(node.expression()));
+}
+
+pub fn walk_struct_expression<V: Visitor>(visitor: &mut V, node: crate::StructExpression) {
+    visit_optional!(visitor.visit_path(node.path()));
+    visit_each!(visitor.visit_struct_expression_field(node.fields()));
+}
+
+pub fn walk_struct_expression_field<V: Visitor>(
+    visitor: &mut V,
+    node: crate::StructExpressionField,
+) {
+    visit_optional!(visitor.visit_identifier(node.identifier()));
+    visit_optional!(visitor.visit_expression(node.expression()));
+}
+
+pub fn walk_try_expression<V: Visitor>(visitor: &mut V, node: crate::TryExpression) {
+    visit_optional!(visitor.visit_expression(node.expression()));
+}
+
+pub fn walk_yield_expression<V: Visitor>(visitor: &mut V, node: crate::YieldExpression) {
+    visit_optional!(visitor.visit_expression(node.expression()));
 }

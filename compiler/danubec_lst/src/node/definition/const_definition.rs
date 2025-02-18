@@ -5,8 +5,7 @@ ast_node! {
     struct ConstDefinition;
 
     token const_token -> CONST;
-    // TODO: Replace with Pattern
-    node identifier -> Identifier;
+    node pattern -> Pattern;
     token colon -> COLON;
     node ty -> Type;
     token equal -> EQUAL;
