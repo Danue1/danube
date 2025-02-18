@@ -12,7 +12,7 @@ pub enum PatternKind {
     Tuple(Vec<Pattern>),
     Array(Vec<Pattern>),
     Literal(Literal),
-    Or(Vec<Pattern>),
+    Or(Box<Pattern>, Box<Pattern>),
     Named(Path, Vec<(Path, Pattern)>),
     Unnamed(Path, Vec<Pattern>),
 }

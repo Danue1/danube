@@ -99,6 +99,7 @@ pub fn lower_binary_expression(
     let operator = lower_binary_operator(operator)?;
 
     let rhs = opt!(binary.rhs(), "ICE: rhs is missing");
+    let rhs = opt!(rhs.expression(), "ICE: expression is missing");
     let rhs = lower_expression(rhs)?;
 
     Ok((Box::new(lhs), operator, Box::new(rhs)))

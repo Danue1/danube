@@ -31,11 +31,8 @@ impl crate::Context {
 
     fn match_arm(&mut self, lex: &mut Lex) -> bool {
         let checkpoint = self.checkpoint();
-        if expect!(self, lex, SyntaxKind::MatchArm) {
+        if self.pattern(lex) {
             self.start_node_at(checkpoint, SyntaxKind::MatchArm);
-
-            self.trivia(lex);
-            self.pattern(lex);
 
             self.trivia(lex);
             expect!(self, lex, token -> EQUAL__RIGHT_CHEVRON, SyntaxKind::EQUAL, SyntaxKind::RIGHT_CHEVRON,);

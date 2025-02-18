@@ -49,12 +49,14 @@ pub fn lower_pattern_kind(pattern_kind: lst::PatternKind) -> Result<ast::Pattern
             Ok(ast::PatternKind::Literal(literal))
         }
         lst::PatternKind::Or(or) => {
-            let mut elements = vec![];
-            for pattern in or.patterns() {
-                elements.push(lower_pattern(pattern)?);
-            }
+            let lhs = opt!(or.lhs(), "ICE: LHS not found");
+            let lhs = lower_pattern(lhs)?;
 
-            Ok(ast::PatternKind::Or(elements))
+            let rhs = opt!(or.rhs(), "ICE: RHS not found");
+            let rhs = opt!(rhs.pattern(), "ICE: Pattern not found");
+            let rhs = lower_pattern(rhs)?;
+
+            Ok(ast::PatternKind::Or(Box::new(lhs), Box::new(rhs)))
         }
         lst::PatternKind::Named(named) => {
             let path = opt!(named.path(), "ICE: Path not found");

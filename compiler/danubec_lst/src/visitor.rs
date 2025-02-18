@@ -639,7 +639,7 @@ pub fn walk_impl_definition<V: Visitor>(visitor: &mut V, node: crate::ImplDefini
 }
 
 pub fn walk_const_definition<V: Visitor>(visitor: &mut V, node: crate::ConstDefinition) {
-    visit_optional!(visitor.visit_pattern(node.pattern()));
+    visit_optional!(visitor.visit_identifier(node.identifier()));
     visit_optional!(visitor.visit_type(node.ty()));
     visit_optional!(visitor.visit_expression(node.expression()));
 }
