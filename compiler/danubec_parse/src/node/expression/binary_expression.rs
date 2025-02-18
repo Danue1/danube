@@ -13,7 +13,11 @@ impl crate::Context {
             self.start_node_at(checkpoint, SyntaxKind::BinaryExpression);
 
             self.trivia(lex);
-            self.expression_bp(lex, binding_power);
+            let checkpoint = self.checkpoint();
+            if self.expression_bp(lex, binding_power) {
+                self.start_node_at(checkpoint, SyntaxKind::BinaryExpressionRhs);
+                self.finish_node();
+            }
 
             self.finish_node();
 

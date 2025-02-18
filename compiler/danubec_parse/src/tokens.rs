@@ -23,6 +23,6 @@ impl Tokens {
 #[macro_export]
 macro_rules! tokens {
     ($($kind:ident,)+) => {{
-        Tokens::new(&[$(SyntaxKind::$kind as usize,)+])
+        Tokens::new(&[$(danubec_syntax::SyntaxKind::$kind as usize,)+])
     }};
 }

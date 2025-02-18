@@ -4,7 +4,7 @@ use danubec_syntax::SyntaxKind;
 impl crate::Context {
     pub fn expression_statement(&mut self, lex: &mut Lex) -> bool {
         let checkpoint = self.checkpoint();
-        if self.expression_top(lex) {
+        if self.statement_expression(lex) {
             self.start_node_at(checkpoint, SyntaxKind::ExpressionStatement);
 
             self.trivia(lex);

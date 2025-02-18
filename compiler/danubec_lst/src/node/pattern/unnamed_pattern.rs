@@ -17,7 +17,7 @@ ast_node! {
 ast_node! {
     /// ```ebnf
     /// UnnamedPatternElement =
-    /// | Pattern _ ","
+    /// | Pattern
     /// ```
     struct UnnamedPatternElement;
 

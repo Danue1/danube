@@ -740,7 +740,8 @@ pub fn walk_assignment_expression<V: Visitor>(visitor: &mut V, node: crate::Assi
 pub fn walk_binary_expression<V: Visitor>(visitor: &mut V, node: crate::BinaryExpression) {
     visit_optional!(visitor.visit_expression(node.lhs()));
     visit_optional!(visitor.visit_binary_operator(node.operator()));
-    visit_optional!(visitor.visit_expression(node.rhs()));
+    // TODO
+    // visit_optional!(visitor.visit_expression(node.rhs()));
 }
 
 pub fn walk_let_expression<V: Visitor>(visitor: &mut V, node: crate::LetExpression) {
@@ -956,7 +957,8 @@ pub fn walk_literal_pattern<V: Visitor>(visitor: &mut V, node: crate::LiteralPat
 }
 
 pub fn walk_or_pattern<V: Visitor>(visitor: &mut V, node: crate::OrPattern) {
-    visit_each!(visitor.visit_pattern(node.patterns()));
+    // TODO
+    // visit_each!(visitor.visit_pattern(node.patterns()));
 }
 
 pub fn walk_named_pattern<V: Visitor>(visitor: &mut V, node: crate::NamedPattern) {

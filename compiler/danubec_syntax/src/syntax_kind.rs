@@ -385,6 +385,8 @@ pub enum SyntaxKind {
     ElseBranch,
     MatchArm,
     ForIterator,
+    BinaryExpressionRhs,
+    OrPatternRhs,
 
     Raw,
     Trivia,

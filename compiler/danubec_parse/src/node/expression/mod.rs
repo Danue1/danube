@@ -19,7 +19,7 @@ use crate::{tokens::Tokens, Bp};
 use danubec_lex::Lex;
 use danubec_syntax::{Checkpoint, SyntaxKind};
 
-const LITERAL_FIRST: Tokens = tokens![
+pub const LITERAL_FIRST: Tokens = tokens![
     // true
     TRUE,
     // false
@@ -32,7 +32,7 @@ const LITERAL_FIRST: Tokens = tokens![
     NUMERIC,
 ];
 
-const PATH_FIRST: Tokens = tokens![
+pub const PATH_FIRST: Tokens = tokens![
     // abc::def::ghi
     ALPHABETIC,
     // super::abc
@@ -81,13 +81,13 @@ const EXPR_FIRST: Tokens = tokens![
     LEFT_BRACE,
 ];
 
-const LHS_FIRST: Tokens = LITERAL_FIRST
+const LHS_EXPRESSION_FIRST: Tokens = LITERAL_FIRST
     .concat(PATH_FIRST)
     .concat(UNARY_FIRST)
     .concat(EXPR_FIRST);
 
 impl crate::Context {
-    pub fn expression_top(&mut self, lex: &mut Lex) -> bool {
+    pub fn statement_expression(&mut self, lex: &mut Lex) -> bool {
         self.let_expression(lex)
             || self.if_expression(lex)
             || self.match_expression(lex)
@@ -112,7 +112,8 @@ impl crate::Context {
 
             loop {
                 self.trivia(lex);
-                let (left_binding_power, right_binding_power) = self.infix_binding_power(lex);
+                let (left_binding_power, right_binding_power) =
+                    self.infix_expression_binding_power(lex);
                 if left_binding_power < binding_power {
                     break;
                 }
@@ -132,7 +133,7 @@ impl crate::Context {
     }
 
     fn expression_lhs(&mut self, lex: &mut Lex) -> bool {
-        if lex.matches(|kind, _| LHS_FIRST.contains(kind)) {
+        if lex.matches(|kind, _| LHS_EXPRESSION_FIRST.contains(kind)) {
             self.literal_expression(lex)
                 || self.unary_expression(lex)
                 || self.block_expression(lex)
@@ -143,7 +144,7 @@ impl crate::Context {
         }
     }
 
-    fn infix_binding_power(&self, lex: &mut Lex) -> (Bp, Bp) {
+    fn infix_expression_binding_power(&self, lex: &mut Lex) -> (Bp, Bp) {
         macro_rules! match_operator {
             ($(
                 ($kind1:pat, $kind2:pat, $kind3:pat, $kind4:pat) => $order:ident,

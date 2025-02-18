@@ -1,13 +1,23 @@
 ast_node! {
     /// ```ebnf
     /// BinaryExpression =
-    /// | Expression _ BinaryOperator _ Expression
+    /// | Expression _ BinaryOperator _ BinaryExpressionRhs
     /// ```
     struct BinaryExpression;
 
-    node lhs -> Expression before BinaryOperator;
+    node lhs -> Expression;
     node operator -> BinaryOperator;
-    node rhs -> Expression after BinaryOperator;
+    node rhs -> BinaryExpressionRhs;
+}
+
+ast_node! {
+    /// ```ebnf
+    /// BinaryExpressionRhs =
+    /// | Expression
+    /// ```
+    struct BinaryExpressionRhs;
+
+    node expression -> Expression;
 }
 
 ast_node! {
