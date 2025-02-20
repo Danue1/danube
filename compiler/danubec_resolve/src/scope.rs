@@ -162,15 +162,7 @@ impl<Definition> Environment<Definition> {
         // 2. Find nodes in imports.
         for import in &self[current_scope].imports {
             match import.kind {
-                ImportKind::Named(alias)
-                    if {
-                        if let Some(alias) = alias {
-                            alias == *name
-                        } else {
-                            import.path.last() == Some(name)
-                        }
-                    } =>
-                {
+                ImportKind::Named(alias) if import.last_name() == Some(name) => {
                     let Some((name_, rest_)) = import.path.split_first() else {
                         continue;
                     };
@@ -211,6 +203,16 @@ impl<Definition> Environment<Definition> {
         // 3. Find nodes in parent scope.
         if let Some(parent) = self[current_scope].parent {
             self.resolve_path(parent, path, nodes, visited);
+        }
+    }
+}
+
+impl Import {
+    pub fn last_name(&self) -> Option<&Symbol> {
+        match self.kind {
+            ImportKind::Named(Some(ref alias)) => Some(alias),
+            ImportKind::Named(None) => self.path.last(),
+            ImportKind::Glob => None,
         }
     }
 }
