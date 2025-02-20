@@ -90,27 +90,8 @@ impl<Definition> Environment<Definition> {
     }
 
     #[inline]
-    pub fn add_import_direct(&mut self, scope: ScopeIndex, path: Vec<Symbol>) {
-        self[scope].imports.push(Import {
-            path,
-            kind: ImportKind::Named(None),
-        });
-    }
-
-    #[inline]
-    pub fn add_import_alias(&mut self, scope: ScopeIndex, path: Vec<Symbol>, alias: Symbol) {
-        self[scope].imports.push(Import {
-            path,
-            kind: ImportKind::Named(Some(alias)),
-        });
-    }
-
-    #[inline]
-    pub fn add_import_glob(&mut self, scope: ScopeIndex, path: Vec<Symbol>) {
-        self[scope].imports.push(Import {
-            path,
-            kind: ImportKind::Glob,
-        });
+    pub fn add_import(&mut self, scope: ScopeIndex, import: Import) {
+        self[scope].imports.push(import);
     }
 
     pub fn resolve(&self, scope: ScopeIndex, path: &[Symbol]) -> Vec<Definition>
@@ -144,11 +125,10 @@ impl<Definition> Environment<Definition> {
             return;
         }
 
+        // 1. Find nodes in local symbols.
         let Some((name, rest)) = path.split_first() else {
             return;
         };
-
-        // 1. Find nodes in local symbols.
         if let Some(&node) = self[current_scope].symbols.get(name) {
             if rest.is_empty() {
                 nodes.insert(node);
@@ -162,7 +142,7 @@ impl<Definition> Environment<Definition> {
         // 2. Find nodes in imports.
         for import in &self[current_scope].imports {
             match import.kind {
-                ImportKind::Named(alias) if import.last_name() == Some(name) => {
+                ImportKind::Named(_) if import.last_name() == Some(name) => {
                     let Some((name_, rest_)) = import.path.split_first() else {
                         continue;
                     };
@@ -251,39 +231,47 @@ macro_rules! scope {
 #[macro_export]
 macro_rules! def {
     ($env:ident, $scope:ident, $symbol:literal, $node:expr) => {{
-        $env.add_definition(
-            $scope,
-            symbol!($symbol),
-            Node {
-                definition: $node,
-                scope: None,
-            },
-        )
-        .unwrap()
+        let node = Node {
+            definition: $node,
+            scope: None,
+        };
+        $env.add_definition($scope, symbol!($symbol), node).unwrap()
     }};
     ($env:ident, $scope:ident, $symbol:literal, $node:expr, $node_scope:expr) => {{
-        $env.add_definition(
-            $scope,
-            symbol!($symbol),
-            Node {
-                definition: $node,
-                scope: Some($node_scope),
-            },
-        )
-        .unwrap()
+        let node = Node {
+            definition: $node,
+            scope: Some($node_scope),
+        };
+        $env.add_definition($scope, symbol!($symbol), node).unwrap()
     }};
 }
 
 #[macro_export]
 macro_rules! import {
     ($env:ident, $scope:ident, [$($path:literal),+ $(,)?]) => {{
-        $env.add_import_direct($scope, vec![ $(symbol!($path)),+ ])
+        $env.add_import($scope, $crate::Import {
+            path: vec![ $(symbol!($path)),+ ],
+            kind: $crate::ImportKind::Named(None),
+        })
     }};
     ($env:ident, $scope:ident, [$($path:literal),+ $(,)?] as $alias:literal) => {{
-        $env.add_import_alias($scope, vec![ $(symbol!($path)),+ ], symbol!($alias))
+        $env.add_import($scope, $crate::Import {
+            path: vec![ $(symbol!($path)),+ ],
+            kind: $crate::ImportKind::Named(Some(symbol!($alias))),
+        })
     }};
     ($env:ident, $scope:ident, [$($path:literal),+ $(,)?] *) => {{
-        $env.add_import_glob($scope, vec![ $(symbol!($path)),+ ])
+        $env.add_import($scope, $crate::Import {
+            path: vec![ $(symbol!($path)),+ ],
+            kind: $crate::ImportKind::Glob,
+        })
+    }};
+}
+
+#[macro_export]
+macro_rules! resolve {
+    ($env:ident, $scope:expr, [$($path:literal),+ $(,)?]) => {{
+        $env.resolve($scope, &[ $(symbol!($path)),+ ])
     }};
 }
 
@@ -301,7 +289,7 @@ mod tests {
 
     macro_rules! assert_path {
         ($env:ident .resolve($scope:expr, [$($path:literal),+ $(,)?]) => [$($definition:ident($index:expr)),* $(,)?]) => {{
-            let nodes = $env.resolve($scope, &[ $(symbol!($path)),+ ]);
+            let nodes = resolve!($env, $scope, [ $( $path ),* ]);
             assert_eq!(nodes, vec![ $(Definition::$definition($index)),* ]);
         }};
     }
