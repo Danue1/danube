@@ -43,7 +43,7 @@ pub enum DefinitionKind {
         ident: Symbol,
         type_parameters: Vec<TypeParameter>,
         predicates: Vec<Predicate>,
-        kind: StructKind,
+        kind: Option<StructKind>,
     },
     Trait {
         visibility: Visibility,
@@ -142,7 +142,7 @@ pub enum StructKind {
 
 pub struct UseTree {
     pub path: Path,
-    pub kind: UseTreeKind,
+    pub kind: Option<UseTreeKind>,
 }
 
 pub enum UseTreeKind {

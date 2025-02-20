@@ -1,23 +1,24 @@
 ast_node! {
     /// ```ebnf
     /// NamedPattern =
-    /// | Path _ "(" _ ")"
-    /// | Path _ "(" _ NamedPatternElement _ ")"
-    /// | Path _ "(" _ ( NamedPatternElement _ "," )+ _ ")"
-    /// | Path _ "(" _ ( NamedPatternElement _ "," )+ _ NamedPatternElement _ ")"
+    /// | Path _ "{" _ "}"
+    /// | Path _ "{" _ NamedPatternElement _ "}"
+    /// | Path _ "{" ( _ NamedPatternElement _ "," )+ _ "}"
+    /// | Path _ "{" ( _ NamedPatternElement _ "," )+ _ NamedPatternElement _ "}"
     /// ```
     struct NamedPattern;
 
     node path -> Path;
-    token left_paren -> LEFT_PAREN;
+    token left_brace -> LEFT_BRACE;
     nodes elements -> NamedPatternElement;
-    token right_paren -> RIGHT_PAREN;
+    token right_brace -> RIGHT_BRACE;
 }
 
 ast_node! {
     /// ```ebnf
     /// NamedPatternElement =
-    /// | Path _ ":" _ Pattern _ ","
+    /// | Path
+    /// | Path _ ":" _ Pattern
     /// ```
     struct NamedPatternElement;
 

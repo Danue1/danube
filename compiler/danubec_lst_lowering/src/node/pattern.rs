@@ -67,8 +67,11 @@ pub fn lower_pattern_kind(pattern_kind: lst::PatternKind) -> Result<ast::Pattern
                 let path = opt!(element.path(), "ICE: Path not found");
                 let path = lower_path(path)?;
 
-                let pattern = opt!(element.pattern(), "ICE: Pattern not found");
-                let pattern = lower_pattern(pattern)?;
+                let pattern = if let Some(pattern) = element.pattern() {
+                    Some(lower_pattern(pattern)?)
+                } else {
+                    None
+                };
 
                 elements.push((path, pattern));
             }

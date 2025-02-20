@@ -1,5 +1,4 @@
-use danubec_middle::{hir, lst};
-use danubec_symbol::Symbol;
+use danubec_middle::{ast, hir};
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -7,49 +6,59 @@ pub struct DefinitionCollection {
     definitions: HashMap<hir::DefId, hir::Definition>,
 }
 
-pub fn resolve(root: lst::Root) -> DefinitionCollection {
+pub fn resolve(root: &ast::Root) -> DefinitionCollection {
     let mut collection = DefinitionCollection {
         definitions: HashMap::new(),
     };
-    let mut definitions = vec![];
-    for definition in root.definitions() {
-        resolve_definition(definition, &mut definitions, &mut collection);
+    let mut scope = vec![];
+    for definition in &root.definitions {
+        resolve_definition(definition, &mut scope, &mut collection);
     }
 
     collection
 }
 
 fn resolve_definition(
-    definition: lst::Definition,
+    definition: &ast::Definition,
     scope: &mut Vec<hir::DefId>,
     collection: &mut DefinitionCollection,
 ) {
     let def_id = hir::DefId::new();
     scope.push(def_id);
 
-    let def = match definition.kind() {
-        Some(lst::DefinitionKind::Module(definition)) => {
-            let mut definitions = vec![];
-            for definition in definition.definitions() {
-                resolve_definition(definition, &mut definitions, collection);
+    let def = match &definition.kind {
+        ast::DefinitionKind::Module {
+            visibility,
+            ident,
+            definitions,
+        } => {
+            let mut scope = vec![];
+            for definition in definitions {
+                resolve_definition(definition, &mut scope, collection);
             }
 
             hir::Definition {
                 kind: hir::DefinitionKind::Module(hir::ModuleDef {
-                    ident: Symbol::new(definition.identifier().unwrap().to_string().as_str()),
-                    definitions,
+                    ident: *ident,
+                    definitions: scope,
                 }),
             }
         }
-        Some(lst::DefinitionKind::Struct(definition)) => hir::Definition {
-            kind: hir::DefinitionKind::Struct(hir::StructDef {
-                ident: Symbol::new(definition.identifier().unwrap().to_string().as_str()),
-                kind: None,
-            }),
-        },
-        Some(lst::DefinitionKind::Use(definition)) => hir::Definition {
+        // ast::DefinitionKind::Struct {
+        //     visibility,
+        //     ident,
+        //     type_parameters,
+        //     predicates,
+        //     kind,
+        // } => hir::Definition {
+        //     kind: hir::DefinitionKind::Struct(hir::StructDef {
+        //         ident: Symbol::new(definition.identifier().unwrap().to_string().as_str()),
+        //         kind: None,
+        //     }),
+        // },
+        ast::DefinitionKind::Use { visibility, tree } => hir::Definition {
             kind: hir::DefinitionKind::Use(hir::UseDef {
-                tree: resolve_use_tree(definition.tree().unwrap()),
+                tree: resolve_use_tree(tree),
             }),
         },
         _ => return,
@@ -58,17 +67,16 @@ fn resolve_definition(
     collection.definitions.insert(def_id, def);
 }
 
-fn resolve_use_tree(tree: lst::UseTree) -> hir::UseTree {
-    let path = resolve_path(tree.path().unwrap());
-    let kind = match tree.kind() {
-        Some(lst::UseTreeKind::Barrel(_)) => Some(hir::UseTreeKind::Barrel),
-        Some(lst::UseTreeKind::Ident(tree)) => Some(hir::UseTreeKind::Ident(hir::UseTreeIdent {
-            alias: Symbol::new(tree.identifier().unwrap().to_string().as_str()),
-        })),
-        Some(lst::UseTreeKind::Nested(tree)) => {
-            Some(hir::UseTreeKind::Nested(hir::UseTreeNested {
-                trees: tree.trees().map(resolve_use_tree).collect(),
-            }))
+fn resolve_use_tree(tree: &ast::UseTree) -> hir::UseTree {
+    let path = resolve_path(&tree.path);
+    let kind = match &tree.kind {
+        Some(ast::UseTreeKind::Barrel) => Some(hir::UseTreeKind::Barrel),
+        Some(ast::UseTreeKind::Alias(alias)) => {
+            Some(hir::UseTreeKind::Ident(hir::UseTreeIdent { alias: *alias }))
+        }
+        Some(ast::UseTreeKind::Nested(trees)) => {
+            let trees = trees.iter().map(resolve_use_tree).collect();
+            Some(hir::UseTreeKind::Nested(hir::UseTreeNested { trees }))
         }
         None => None,
     };
@@ -76,12 +84,13 @@ fn resolve_use_tree(tree: lst::UseTree) -> hir::UseTree {
     hir::UseTree { path, kind }
 }
 
-fn resolve_path(path: lst::Path) -> hir::Path {
+fn resolve_path(path: &ast::Path) -> hir::Path {
     hir::Path {
         segments: path
-            .segments()
+            .segments
+            .iter()
             .map(|segment| hir::PathSegment {
-                ident: Symbol::new(segment.identifier().unwrap().to_string().as_str()),
+                ident: segment.ident,
                 type_arguments: vec![],
             })
             .collect(),
@@ -90,12 +99,13 @@ fn resolve_path(path: lst::Path) -> hir::Path {
 
 #[cfg(test)]
 mod tests {
+    use danubec_lst_lowering::lower_root;
     use danubec_parse::parse;
 
     #[test]
     fn test_resolve() {
         let source = r#"
-            use foo::bar::baz;
+            use bar::Baz;
 
             mod foo {
                 mod bar { }
@@ -106,7 +116,8 @@ mod tests {
             }
         "#;
         let root = parse(source);
-        let collection = super::resolve(root);
+        let root = lower_root(root).unwrap();
+        let collection = super::resolve(&root);
 
         dbg!(&collection);
     }

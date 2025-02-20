@@ -334,7 +334,7 @@ pub fn lower_struct_definition(
         Symbol,
         Vec<ast::TypeParameter>,
         Vec<ast::Predicate>,
-        ast::StructKind,
+        Option<ast::StructKind>,
     ),
     Diagnostic,
 > {
@@ -353,8 +353,11 @@ pub fn lower_struct_definition(
         }
     }
 
-    let kind = opt!(struct_definition.kind(), "ICE: StructKind not found");
-    let kind = lower_struct_kind(kind)?;
+    let kind = if let Some(kind) = struct_definition.kind() {
+        Some(lower_struct_kind(kind)?)
+    } else {
+        None
+    };
 
     Ok((symbol, type_parameters, predicates, kind))
 }
@@ -868,8 +871,11 @@ pub fn lower_use_tree(use_tree: lst::UseTree) -> Result<ast::UseTree, Diagnostic
         ast::Path::empty()
     };
 
-    let kind = opt!(use_tree.kind(), "ICE: UseTreeKind not found");
-    let kind = lower_use_tree_kind(kind)?;
+    let kind = if let Some(kind) = use_tree.kind() {
+        Some(lower_use_tree_kind(kind)?)
+    } else {
+        None
+    };
 
     Ok(ast::UseTree { path, kind })
 }

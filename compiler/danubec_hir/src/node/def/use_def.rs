@@ -3,6 +3,7 @@ use danubec_symbol::Symbol;
 
 #[derive(Debug)]
 pub struct UseDef {
+    // pub visibility: Visibility,
     pub tree: UseTree,
 }
 
