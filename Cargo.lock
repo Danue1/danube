@@ -124,6 +124,7 @@ dependencies = [
 name = "danubec_resolve"
 version = "0.1.0"
 dependencies = [
+ "danubec_lst_lowering",
  "danubec_middle",
  "danubec_parse",
  "danubec_symbol",

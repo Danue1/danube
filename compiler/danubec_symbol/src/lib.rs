@@ -62,3 +62,10 @@ impl Symbols {
         map.get(&hash).cloned()
     }
 }
+
+#[macro_export]
+macro_rules! symbol {
+    ($raw:literal) => {
+        $crate::Symbol::new($raw)
+    };
+}
