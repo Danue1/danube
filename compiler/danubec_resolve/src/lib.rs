@@ -1,6 +1,14 @@
 #![warn(clippy::all)]
 #![allow(unused)]
 
-mod definition;
+#[macro_use]
+extern crate danubec_symbol;
 
-use definition::*;
+#[macro_use]
+pub mod scope;
+
+pub mod definition;
+
+pub use definition::*;
+
+pub use scope::*;
