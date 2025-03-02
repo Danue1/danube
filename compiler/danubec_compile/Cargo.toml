@@ -4,4 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+danubec_diagnostic.path = "../danubec_diagnostic"
+danubec_lst_lowering.path = "../danubec_lst_lowering"
 danubec_parse.path = "../danubec_parse"

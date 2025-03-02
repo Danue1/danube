@@ -25,6 +25,7 @@ name = "danubec"
 version = "0.1.0"
 dependencies = [
  "danubec_compile",
+ "danubec_diagnostic",
 ]
 
 [[package]]
@@ -47,6 +48,8 @@ dependencies = [
 name = "danubec_compile"
 version = "0.1.0"
 dependencies = [
+ "danubec_diagnostic",
+ "danubec_lst_lowering",
  "danubec_parse",
 ]
 
