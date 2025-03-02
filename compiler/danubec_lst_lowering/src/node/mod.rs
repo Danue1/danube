@@ -1,9 +1,9 @@
 pub mod definition;
 pub mod expression;
+pub mod krate;
 pub mod literal;
 pub mod path;
 pub mod pattern;
-pub mod root;
 pub mod statement;
 pub mod symbol;
 pub mod r#type;
@@ -11,11 +11,11 @@ pub mod visibility;
 
 pub use definition::*;
 pub use expression::*;
+pub use krate::*;
 pub use literal::*;
 pub use path::*;
 pub use pattern::*;
-pub use r#type::*;
-pub use root::*;
 pub use statement::*;
 pub use symbol::*;
+pub use r#type::*;
 pub use visibility::*;

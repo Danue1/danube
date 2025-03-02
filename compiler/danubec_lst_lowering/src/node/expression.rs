@@ -4,16 +4,21 @@ use super::{
 use danubec_diagnostic::Diagnostic;
 use danubec_middle::{ast, lst};
 use danubec_syntax::AstNode;
+use std::collections::HashMap;
 
-pub fn lower_expression(expression: lst::Expression) -> Result<ast::Expression, Diagnostic> {
+pub fn lower_expression(
+    expression: lst::Expression,
+    modules: &HashMap<String, lst::Module>,
+) -> Result<ast::Expression, Diagnostic> {
     let kind = opt!(expression.kind(), "ICE: ExpressionKind is missing");
-    let kind = lower_expression_kind(kind)?;
+    let kind = lower_expression_kind(kind, modules)?;
 
     Ok(ast::Expression { kind })
 }
 
 pub fn lower_expression_kind(
     expression_kind: lst::ExpressionKind,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<ast::ExpressionKind, Diagnostic> {
     match expression_kind {
         lst::ExpressionKind::Break(_) => Ok(ast::ExpressionKind::Break),
@@ -24,10 +29,10 @@ pub fn lower_expression_kind(
 
             let expression = opt!(for_expression.iterator(), "ICE: iterator is missing");
             let expression = opt!(expression.expression(), "ICE: expression is missing");
-            let expression = lower_expression(expression)?;
+            let expression = lower_expression(expression, modules)?;
 
             let block = opt!(for_expression.block(), "ICE: block is missing");
-            let block = lower_block_expression(block)?;
+            let block = lower_block_expression(block, modules)?;
 
             Ok(ast::ExpressionKind::For {
                 binding,
@@ -37,21 +42,21 @@ pub fn lower_expression_kind(
         }
         lst::ExpressionKind::If(if_expression) => {
             let condition = opt!(if_expression.condition(), "ICE: condition is missing");
-            let condition = lower_expression(condition)?;
+            let condition = lower_expression(condition, modules)?;
 
             let then_block = opt!(if_expression.then_branch(), "ICE: then branch is missing");
-            let then_block = lower_block_expression(then_block)?;
+            let then_block = lower_block_expression(then_block, modules)?;
 
             let else_block = if let Some(else_branch) = if_expression.else_branch() {
                 if let Some(block) = else_branch.block() {
-                    let block = lower_block_expression(block)?;
+                    let block = lower_block_expression(block, modules)?;
                     let block = ast::Expression {
                         kind: ast::ExpressionKind::Block(block),
                     };
                     Some(Box::new(block))
                 } else {
                     let expression = opt!(else_branch.expression(), "ICE: expression is missing");
-                    Some(Box::new(lower_expression(expression)?))
+                    Some(Box::new(lower_expression(expression, modules)?))
                 }
             } else {
                 None
@@ -64,7 +69,7 @@ pub fn lower_expression_kind(
             })
         }
         lst::ExpressionKind::Let(let_expression) => {
-            let (binding, expression) = lower_let_expression(let_expression)?;
+            let (binding, expression) = lower_let_expression(let_expression, modules)?;
 
             Ok(ast::ExpressionKind::Let {
                 binding,
@@ -73,13 +78,13 @@ pub fn lower_expression_kind(
         }
         lst::ExpressionKind::Loop(loop_expression) => {
             let block = opt!(loop_expression.block(), "ICE: block is missing");
-            let block = lower_block_expression(block)?;
+            let block = lower_block_expression(block, modules)?;
 
             Ok(ast::ExpressionKind::Loop(block))
         }
         lst::ExpressionKind::Match(match_expression) => {
             let condition = opt!(match_expression.expression(), "ICE: expression is missing");
-            let condition = lower_expression(condition)?;
+            let condition = lower_expression(condition, modules)?;
 
             let mut arms = vec![];
             for arm in match_expression.arms() {
@@ -87,7 +92,7 @@ pub fn lower_expression_kind(
                 let binding = lower_pattern(binding)?;
 
                 let expression = opt!(arm.expression(), "ICE: block is missing");
-                let expression = lower_expression(expression)?;
+                let expression = lower_expression(expression, modules)?;
 
                 arms.push((binding, expression));
             }
@@ -99,7 +104,7 @@ pub fn lower_expression_kind(
         }
         lst::ExpressionKind::Return(return_expression) => {
             let expression = if let Some(expression) = return_expression.expression() {
-                Some(Box::new(lower_expression(expression)?))
+                Some(Box::new(lower_expression(expression, modules)?))
             } else {
                 None
             };
@@ -108,10 +113,10 @@ pub fn lower_expression_kind(
         }
         lst::ExpressionKind::While(while_expression) => {
             let condition = opt!(while_expression.expression(), "ICE: expression is missing");
-            let condition = lower_expression(condition)?;
+            let condition = lower_expression(condition, modules)?;
 
             let block = opt!(while_expression.block(), "ICE: block is missing");
-            let block = lower_block_expression(block)?;
+            let block = lower_block_expression(block, modules)?;
 
             Ok(ast::ExpressionKind::While {
                 condition: Box::new(condition),
@@ -123,13 +128,13 @@ pub fn lower_expression_kind(
             let mut elements = vec![];
             for element in array.elements() {
                 let expression = opt!(element.expression(), "ICE: element is missing");
-                elements.push(lower_expression(expression)?);
+                elements.push(lower_expression(expression, modules)?);
             }
 
             Ok(ast::ExpressionKind::Array(elements))
         }
         lst::ExpressionKind::Block(block) => {
-            let block = lower_block_expression(block)?;
+            let block = lower_block_expression(block, modules)?;
 
             Ok(ast::ExpressionKind::Block(block))
         }
@@ -145,35 +150,35 @@ pub fn lower_expression_kind(
             Ok(ast::ExpressionKind::Path(path))
         }
         lst::ExpressionKind::Unary(unary) => {
-            let (operator, operand) = lower_unary_expression(unary)?;
+            let (operator, operand) = lower_unary_expression(unary, modules)?;
 
             Ok(ast::ExpressionKind::Unary { operator, operand })
         }
 
         lst::ExpressionKind::Assignment(assignment) => {
-            let (lhs, operator, rhs) = lower_assignment_expression(assignment)?;
+            let (lhs, operator, rhs) = lower_assignment_expression(assignment, modules)?;
 
             Ok(ast::ExpressionKind::Assignment { lhs, operator, rhs })
         }
         lst::ExpressionKind::Binary(binary) => {
-            let (lhs, operator, rhs) = lower_binary_expression(binary)?;
+            let (lhs, operator, rhs) = lower_binary_expression(binary, modules)?;
 
             Ok(ast::ExpressionKind::Binary { lhs, operator, rhs })
         }
         lst::ExpressionKind::Await(await_expression) => {
             let expression = opt!(await_expression.expression(), "ICE: expression is missing");
-            let expression = lower_expression(expression)?;
+            let expression = lower_expression(expression, modules)?;
 
             Ok(ast::ExpressionKind::Await(Box::new(expression)))
         }
         lst::ExpressionKind::FunctionCall(function_call) => {
             let callee = opt!(function_call.expression(), "ICE: expression is missing");
-            let callee = lower_expression(callee)?;
+            let callee = lower_expression(callee, modules)?;
 
             let mut arguments = vec![];
             for argument in function_call.arguments() {
                 let expression = opt!(argument.expression(), "ICE: expression is missing");
-                arguments.push(lower_expression(expression)?);
+                arguments.push(lower_expression(expression, modules)?);
             }
 
             Ok(ast::ExpressionKind::FunctionCall {
@@ -183,7 +188,7 @@ pub fn lower_expression_kind(
         }
         lst::ExpressionKind::MethodCall(method_call) => {
             let receiver = opt!(method_call.expression(), "ICE: expression is missing");
-            let receiver = lower_expression(receiver)?;
+            let receiver = lower_expression(receiver, modules)?;
 
             let path = opt!(method_call.path_segment(), "ICE: path segment is missing");
             let path = lower_path_segment(path)?;
@@ -191,7 +196,7 @@ pub fn lower_expression_kind(
             let mut arguments = vec![];
             for argument in method_call.arguments() {
                 let expression = opt!(argument.expression(), "ICE: expression is missing");
-                arguments.push(lower_expression(expression)?);
+                arguments.push(lower_expression(expression, modules)?);
             }
 
             Ok(ast::ExpressionKind::MethodCall {
@@ -202,7 +207,7 @@ pub fn lower_expression_kind(
         }
         lst::ExpressionKind::Field(field_expression) => {
             let receiver = opt!(field_expression.expression(), "ICE: expression is missing");
-            let receiver = lower_expression(receiver)?;
+            let receiver = lower_expression(receiver, modules)?;
 
             let field = opt!(field_expression.identifier(), "ICE: identifier is missing");
             let field = lower_identifier(field)?;
@@ -214,10 +219,10 @@ pub fn lower_expression_kind(
         }
         lst::ExpressionKind::Index(index_expression) => {
             let receiver = opt!(index_expression.expression(), "ICE: expression is missing");
-            let receiver = lower_expression(receiver)?;
+            let receiver = lower_expression(receiver, modules)?;
 
             let index = opt!(index_expression.expression(), "ICE: expression is missing");
-            let index = lower_expression(index)?;
+            let index = lower_expression(index, modules)?;
 
             Ok(ast::ExpressionKind::Index {
                 receiver: Box::new(receiver),
@@ -226,14 +231,14 @@ pub fn lower_expression_kind(
         }
         lst::ExpressionKind::Range(range_expression) => {
             let start = if let Some(start) = range_expression.start() {
-                Some(Box::new(lower_expression(start)?))
+                Some(Box::new(lower_expression(start, modules)?))
             } else {
                 None
             };
 
             let end = opt!(range_expression.end(), "ICE: end is missing");
             let end = opt!(end.expression(), "ICE: expression is missing");
-            let end = lower_expression(end)?;
+            let end = lower_expression(end, modules)?;
 
             let range_operator = opt!(
                 range_expression.range_operator(),
@@ -257,7 +262,7 @@ pub fn lower_expression_kind(
                 let identifier = lower_identifier(identifier)?;
 
                 let expression = opt!(field.expression(), "ICE: expression is missing");
-                let expression = lower_expression(expression)?;
+                let expression = lower_expression(expression, modules)?;
 
                 fields.push((identifier, expression));
             }
@@ -266,13 +271,13 @@ pub fn lower_expression_kind(
         }
         lst::ExpressionKind::Try(try_expression) => {
             let expression = opt!(try_expression.expression(), "ICE: expression is missing");
-            let expression = lower_expression(expression)?;
+            let expression = lower_expression(expression, modules)?;
 
             Ok(ast::ExpressionKind::Try(Box::new(expression)))
         }
         lst::ExpressionKind::Yield(yield_expression) => {
             let expression = opt!(yield_expression.expression(), "ICE: expression is missing");
-            let expression = lower_expression(expression)?;
+            let expression = lower_expression(expression, modules)?;
 
             Ok(ast::ExpressionKind::Yield(Box::new(expression)))
         }
@@ -281,6 +286,7 @@ pub fn lower_expression_kind(
 
 pub fn lower_assignment_expression(
     assignment: lst::AssignmentExpression,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<
     (
         Box<ast::Expression>,
@@ -290,19 +296,20 @@ pub fn lower_assignment_expression(
     Diagnostic,
 > {
     let lhs = opt!(assignment.lhs(), "ICE: lhs is missing");
-    let lhs = lower_expression(lhs)?;
+    let lhs = lower_expression(lhs, modules)?;
 
     let operator = opt!(assignment.operator(), "ICE: operator is missing");
     let operator = lower_assignment_operator(operator)?;
 
     let rhs = opt!(assignment.rhs(), "ICE: rhs is missing");
-    let rhs = lower_expression(rhs)?;
+    let rhs = lower_expression(rhs, modules)?;
 
     Ok((Box::new(lhs), operator, Box::new(rhs)))
 }
 
 pub fn lower_binary_expression(
     binary: lst::BinaryExpression,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<
     (
         Box<ast::Expression>,
@@ -312,24 +319,25 @@ pub fn lower_binary_expression(
     Diagnostic,
 > {
     let lhs = opt!(binary.lhs(), "ICE: lhs is missing");
-    let lhs = lower_expression(lhs)?;
+    let lhs = lower_expression(lhs, modules)?;
 
     let operator = opt!(binary.operator(), "ICE: operator is missing");
     let operator = lower_binary_operator(operator)?;
 
     let rhs = opt!(binary.rhs(), "ICE: rhs is missing");
     let rhs = opt!(rhs.expression(), "ICE: expression is missing");
-    let rhs = lower_expression(rhs)?;
+    let rhs = lower_expression(rhs, modules)?;
 
     Ok((Box::new(lhs), operator, Box::new(rhs)))
 }
 
 pub fn lower_block_expression(
     block: lst::BlockExpression,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<Vec<ast::Statement>, Diagnostic> {
     let mut statements = Vec::new();
     for statement in block.statements() {
-        statements.push(lower_statement(statement)?);
+        statements.push(lower_statement(statement, modules)?);
     }
 
     Ok(statements)
@@ -337,12 +345,13 @@ pub fn lower_block_expression(
 
 pub fn lower_let_expression(
     let_expression: lst::LetExpression,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<(ast::Pattern, Option<Box<ast::Expression>>), Diagnostic> {
     let binding = opt!(let_expression.pattern(), "ICE: pattern is missing");
     let binding = lower_pattern(binding)?;
 
     let expression = if let Some(expression) = let_expression.expression() {
-        Some(Box::new(lower_expression(expression)?))
+        Some(Box::new(lower_expression(expression, modules)?))
     } else {
         None
     };
@@ -361,12 +370,13 @@ pub fn lower_literal_expression(
 
 pub fn lower_unary_expression(
     unary: lst::UnaryExpression,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<(ast::UnaryOperator, Box<ast::Expression>), Diagnostic> {
     let operator = opt!(unary.operator(), "ICE: operator is missing");
     let operator = lower_unary_operator(operator)?;
 
     let operand = opt!(unary.expression(), "ICE: operand is missing");
-    let operand = lower_expression(operand)?;
+    let operand = lower_expression(operand, modules)?;
 
     Ok((operator, Box::new(operand)))
 }

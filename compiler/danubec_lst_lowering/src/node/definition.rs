@@ -2,11 +2,15 @@ use super::{lower_expression, lower_identifier, lower_statement, lower_type, low
 use danubec_diagnostic::Diagnostic;
 use danubec_middle::{ast, lst};
 use danubec_symbol::Symbol;
+use std::collections::HashMap;
 
-pub fn lower_definition(definition: lst::Definition) -> Result<ast::Definition, Diagnostic> {
+pub fn lower_definition(
+    definition: lst::Definition,
+    modules: &HashMap<String, lst::Module>,
+) -> Result<ast::Definition, Diagnostic> {
     let visibility = definition.visibility();
     let kind = opt!(definition.kind(), "ICE: DefinitionKind not found");
-    let kind = lower_definition_kind(kind, visibility)?;
+    let kind = lower_definition_kind(kind, visibility, modules)?;
 
     Ok(ast::Definition { kind })
 }
@@ -14,11 +18,12 @@ pub fn lower_definition(definition: lst::Definition) -> Result<ast::Definition, 
 pub fn lower_definition_kind(
     kind: lst::DefinitionKind,
     visibility: Option<lst::Visibility>,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<ast::DefinitionKind, Diagnostic> {
     match kind {
         lst::DefinitionKind::Const(const_definition) => {
             let visibility = lower_visibility(visibility)?;
-            let (ident, ty, expression) = lower_const_definition(const_definition)?;
+            let (ident, ty, expression) = lower_const_definition(const_definition, modules)?;
 
             Ok(ast::DefinitionKind::Const {
                 visibility,
@@ -30,7 +35,7 @@ pub fn lower_definition_kind(
         lst::DefinitionKind::Enum(enum_definition) => {
             let visibility = lower_visibility(visibility)?;
             let (ident, type_parameters, predicates, variants) =
-                lower_enum_definition(enum_definition)?;
+                lower_enum_definition(enum_definition, modules)?;
 
             Ok(ast::DefinitionKind::Enum {
                 visibility,
@@ -43,7 +48,7 @@ pub fn lower_definition_kind(
         lst::DefinitionKind::Function(function_definition) => {
             let visibility = lower_visibility(visibility)?;
             let (ident, type_parameters, parameters, return_type, predicates, body) =
-                lower_function_definition(function_definition)?;
+                lower_function_definition(function_definition, modules)?;
 
             Ok(ast::DefinitionKind::Function(ast::FunctionDef {
                 visibility,
@@ -57,7 +62,7 @@ pub fn lower_definition_kind(
         }
         lst::DefinitionKind::Impl(impl_definition) => {
             let (type_parameters, trait_type, target_type, predicates, definitions) =
-                lower_impl_definition(impl_definition)?;
+                lower_impl_definition(impl_definition, modules)?;
 
             Ok(ast::DefinitionKind::Impl {
                 type_parameters,
@@ -69,7 +74,7 @@ pub fn lower_definition_kind(
         }
         lst::DefinitionKind::Module(module_definition) => {
             let visibility = lower_visibility(visibility)?;
-            let (ident, definitions) = lower_module_definition(module_definition)?;
+            let (ident, definitions) = lower_module_definition(module_definition, modules)?;
 
             Ok(ast::DefinitionKind::Module {
                 visibility,
@@ -79,7 +84,7 @@ pub fn lower_definition_kind(
         }
         lst::DefinitionKind::Static(static_definition) => {
             let visibility = lower_visibility(visibility)?;
-            let (ident, ty, expression) = lower_static_definition(static_definition)?;
+            let (ident, ty, expression) = lower_static_definition(static_definition, modules)?;
 
             Ok(ast::DefinitionKind::Static {
                 visibility,
@@ -104,7 +109,7 @@ pub fn lower_definition_kind(
         lst::DefinitionKind::Trait(trait_definition) => {
             let visibility = lower_visibility(visibility)?;
             let (ident, type_parameters, predicates, definitions) =
-                lower_trait_definition(trait_definition)?;
+                lower_trait_definition(trait_definition, modules)?;
 
             Ok(ast::DefinitionKind::Trait {
                 visibility,
@@ -138,6 +143,7 @@ pub fn lower_definition_kind(
 
 pub fn lower_const_definition(
     const_definition: lst::ConstDefinition,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<(Symbol, ast::Type, ast::Expression), Diagnostic> {
     let identifier = opt!(const_definition.identifier(), "ICE: Identifier not found");
     let symbol = lower_identifier(identifier)?;
@@ -146,13 +152,14 @@ pub fn lower_const_definition(
     let ty = lower_type(ty)?;
 
     let expression = opt!(const_definition.expression(), "ICE: Expression not found");
-    let expression = lower_expression(expression)?;
+    let expression = lower_expression(expression, modules)?;
 
     Ok((symbol, ty, expression))
 }
 
 pub fn lower_enum_definition(
     enum_definition: lst::EnumDefinition,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<
     (
         Symbol,
@@ -179,7 +186,7 @@ pub fn lower_enum_definition(
 
     let mut variants = vec![];
     for variant in enum_definition.variants() {
-        variants.push(lower_enum_variant(variant)?);
+        variants.push(lower_enum_variant(variant, modules)?);
     }
 
     Ok((symbol, type_parameters, predicates, variants))
@@ -187,6 +194,7 @@ pub fn lower_enum_definition(
 
 pub fn lower_function_definition(
     function_definition: lst::FunctionDefinition,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<
     (
         Symbol,
@@ -233,7 +241,7 @@ pub fn lower_function_definition(
     let mut body = vec![];
     if let Some(block_expression) = function_definition.body() {
         for statement in block_expression.statements() {
-            body.push(lower_statement(statement)?);
+            body.push(lower_statement(statement, modules)?);
         }
     }
 
@@ -249,6 +257,7 @@ pub fn lower_function_definition(
 
 pub fn lower_impl_definition(
     impl_definition: lst::ImplDefinition,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<
     (
         Vec<ast::TypeParameter>,
@@ -291,7 +300,7 @@ pub fn lower_impl_definition(
 
     let mut items = vec![];
     for item in impl_definition.items() {
-        items.push(lower_impl_item(item)?);
+        items.push(lower_impl_item(item, modules)?);
     }
 
     Ok((type_parameters, trait_type, target_type, predicates, items))
@@ -299,14 +308,20 @@ pub fn lower_impl_definition(
 
 pub fn lower_module_definition(
     module_definition: lst::ModuleDefinition,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<(Symbol, Vec<ast::Definition>), Diagnostic> {
     let identifier = opt!(module_definition.identifier(), "ICE: Identifier not found");
     let symbol = lower_identifier(identifier)?;
-
     let mut definitions = vec![];
-    for definition in module_definition.definitions() {
-        let definition = lower_definition(definition)?;
-        definitions.push(definition);
+    if module_definition.semicolon().is_some() {
+        let module = opt!(modules.get(&symbol.to_string()), "ICE: Module not found");
+        for definition in module.root().definitions() {
+            definitions.push(lower_definition(definition, module.modules())?);
+        }
+    } else {
+        for definition in module_definition.definitions() {
+            definitions.push(lower_definition(definition, &HashMap::new())?);
+        }
     }
 
     Ok((symbol, definitions))
@@ -314,6 +329,7 @@ pub fn lower_module_definition(
 
 pub fn lower_static_definition(
     static_definition: lst::StaticDefinition,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<(Symbol, ast::Type, ast::Expression), Diagnostic> {
     let identifier = opt!(static_definition.identifier(), "ICE: Identifier not found");
     let symbol = lower_identifier(identifier)?;
@@ -322,7 +338,7 @@ pub fn lower_static_definition(
     let ty = lower_type(ty)?;
 
     let expression = opt!(static_definition.expression(), "ICE: Expression not found");
-    let expression = lower_expression(expression)?;
+    let expression = lower_expression(expression, modules)?;
 
     Ok((symbol, ty, expression))
 }
@@ -381,6 +397,7 @@ pub fn lower_type_definition(
 
 pub fn lower_trait_definition(
     trait_definition: lst::TraitDefinition,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<
     (
         Symbol,
@@ -407,7 +424,7 @@ pub fn lower_trait_definition(
 
     let mut items = vec![];
     for item in trait_definition.items() {
-        items.push(lower_trait_item(item)?);
+        items.push(lower_trait_item(item, modules)?);
     }
 
     Ok((symbol, type_parameters, predicates, items))
@@ -473,7 +490,10 @@ pub fn lower_type_constraint(
     Ok(ast::Predicate { ty, bounds })
 }
 
-pub fn lower_enum_variant(enum_variant: lst::EnumVariant) -> Result<ast::EnumVariant, Diagnostic> {
+pub fn lower_enum_variant(
+    enum_variant: lst::EnumVariant,
+    modules: &HashMap<String, lst::Module>,
+) -> Result<ast::EnumVariant, Diagnostic> {
     let identifier = opt!(enum_variant.identifier(), "ICE: Identifier not found");
     let ident = lower_identifier(identifier)?;
 
@@ -485,7 +505,7 @@ pub fn lower_enum_variant(enum_variant: lst::EnumVariant) -> Result<ast::EnumVar
             ast::EnumVariantKind::Unnamed(lower_enum_variant_unnamed(unnamed)?)
         }
         Some(lst::EnumVariantKind::Sequence(sequence)) => {
-            ast::EnumVariantKind::Sequence(lower_enum_variant_sequence(sequence)?)
+            ast::EnumVariantKind::Sequence(lower_enum_variant_sequence(sequence, modules)?)
         }
         None => ast::EnumVariantKind::Unit,
     };
@@ -524,21 +544,25 @@ pub fn lower_enum_variant_unnamed(
 
 pub fn lower_enum_variant_sequence(
     enum_variant_sequence: lst::EnumVariantSequence,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<ast::Expression, Diagnostic> {
     let expression = opt!(
         enum_variant_sequence.expression(),
         "ICE: Expression not found"
     );
-    let expression = lower_expression(expression)?;
+    let expression = lower_expression(expression, modules)?;
 
     Ok(expression)
 }
 
-pub fn lower_impl_item(associated_item: lst::AssociatedItem) -> Result<ast::ImplItem, Diagnostic> {
+pub fn lower_impl_item(
+    associated_item: lst::AssociatedItem,
+    modules: &HashMap<String, lst::Module>,
+) -> Result<ast::ImplItem, Diagnostic> {
     let visibility = lower_visibility(associated_item.visibility())?;
 
     let kind = opt!(associated_item.kind(), "ICE: AssociatedItemKind not found");
-    let kind = lower_impl_item_kind(kind, visibility)?;
+    let kind = lower_impl_item_kind(kind, visibility, modules)?;
 
     Ok(kind)
 }
@@ -546,10 +570,11 @@ pub fn lower_impl_item(associated_item: lst::AssociatedItem) -> Result<ast::Impl
 pub fn lower_impl_item_kind(
     kind: lst::AssociatedItemKind,
     visibility: ast::Visibility,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<ast::ImplItem, Diagnostic> {
     match kind {
         lst::AssociatedItemKind::Const(const_definition) => {
-            let (ident, ty, expression) = lower_impl_const_item(const_definition)?;
+            let (ident, ty, expression) = lower_impl_const_item(const_definition, modules)?;
 
             Ok(ast::ImplItem::Const {
                 visibility,
@@ -560,7 +585,7 @@ pub fn lower_impl_item_kind(
         }
         lst::AssociatedItemKind::Function(function_definition) => {
             let (ident, type_parameters, parameters, return_type, predicates, body) =
-                lower_impl_function_item(function_definition)?;
+                lower_impl_function_item(function_definition, modules)?;
 
             Ok(ast::ImplItem::Function(ast::FunctionDef {
                 visibility,
@@ -588,6 +613,7 @@ pub fn lower_impl_item_kind(
 
 pub fn lower_impl_const_item(
     const_definition: lst::ConstDefinition,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<(Symbol, ast::Type, ast::Expression), Diagnostic> {
     let identifier = opt!(const_definition.identifier(), "ICE: Identifier not found");
     let symbol = lower_identifier(identifier)?;
@@ -596,7 +622,7 @@ pub fn lower_impl_const_item(
     let ty = lower_type(ty)?;
 
     let expression = opt!(const_definition.expression(), "ICE: Expression not found");
-    let expression = lower_expression(expression)?;
+    let expression = lower_expression(expression, modules)?;
 
     Ok((symbol, ty, expression))
 }
@@ -635,6 +661,7 @@ pub fn lower_impl_type_item(
 
 pub fn lower_impl_function_item(
     function_definition: lst::FunctionDefinition,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<
     (
         Symbol,
@@ -681,7 +708,7 @@ pub fn lower_impl_function_item(
     let mut body = vec![];
     if let Some(block_expression) = function_definition.body() {
         for statement in block_expression.statements() {
-            body.push(lower_statement(statement)?);
+            body.push(lower_statement(statement, modules)?);
         }
     }
 
@@ -697,11 +724,12 @@ pub fn lower_impl_function_item(
 
 pub fn lower_trait_item(
     associated_item: lst::AssociatedItem,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<ast::TraitItem, Diagnostic> {
     let visibility = lower_visibility(associated_item.visibility())?;
 
     let kind = opt!(associated_item.kind(), "ICE: AssociatedItemKind not found");
-    let kind = lower_trait_item_kind(kind, visibility)?;
+    let kind = lower_trait_item_kind(kind, visibility, modules)?;
 
     Ok(kind)
 }
@@ -709,10 +737,11 @@ pub fn lower_trait_item(
 pub fn lower_trait_item_kind(
     kind: lst::AssociatedItemKind,
     visibility: ast::Visibility,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<ast::TraitItem, Diagnostic> {
     match kind {
         lst::AssociatedItemKind::Const(const_definition) => {
-            let (ident, ty, expression) = lower_trait_const_item(const_definition)?;
+            let (ident, ty, expression) = lower_trait_const_item(const_definition, modules)?;
 
             Ok(ast::TraitItem::Const {
                 visibility,
@@ -723,7 +752,7 @@ pub fn lower_trait_item_kind(
         }
         lst::AssociatedItemKind::Function(function_definition) => {
             let (ident, type_parameters, parameters, return_type, predicates, body) =
-                lower_trait_function_item(function_definition)?;
+                lower_trait_function_item(function_definition, modules)?;
 
             Ok(ast::TraitItem::Function(ast::FunctionDef {
                 visibility,
@@ -751,6 +780,7 @@ pub fn lower_trait_item_kind(
 
 pub fn lower_trait_const_item(
     const_definition: lst::ConstDefinition,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<(Symbol, ast::Type, Option<ast::Expression>), Diagnostic> {
     let identifier = opt!(const_definition.identifier(), "ICE: Identifier not found");
     let symbol = lower_identifier(identifier)?;
@@ -759,7 +789,7 @@ pub fn lower_trait_const_item(
     let ty = lower_type(ty)?;
 
     let expression = if let Some(expression) = const_definition.expression() {
-        Some(lower_expression(expression)?)
+        Some(lower_expression(expression, modules)?)
     } else {
         None
     };
@@ -769,6 +799,7 @@ pub fn lower_trait_const_item(
 
 pub fn lower_trait_function_item(
     function_definition: lst::FunctionDefinition,
+    modules: &HashMap<String, lst::Module>,
 ) -> Result<
     (
         Symbol,
@@ -815,7 +846,7 @@ pub fn lower_trait_function_item(
     let mut body = vec![];
     if let Some(block_expression) = function_definition.body() {
         for statement in block_expression.statements() {
-            body.push(lower_statement(statement)?);
+            body.push(lower_statement(statement, modules)?);
         }
     }
 

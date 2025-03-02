@@ -1,13 +1,11 @@
 use super::Root;
 use std::collections::HashMap;
 
-#[derive(Debug)]
 pub struct Krate {
     root: Root,
     submodules: HashMap<String, Module>,
 }
 
-#[derive(Debug)]
 pub struct Module {
     root: Root,
     submodules: HashMap<String, Module>,
@@ -25,8 +23,8 @@ impl Krate {
     }
 
     #[inline]
-    pub fn modules(&self) -> impl Iterator<Item = (&str, &Module)> {
-        self.submodules.iter().map(|(k, v)| (k.as_str(), v))
+    pub fn modules(&self) -> &HashMap<String, Module> {
+        &self.submodules
     }
 }
 
@@ -42,7 +40,7 @@ impl Module {
     }
 
     #[inline]
-    pub fn submodules(&self) -> impl Iterator<Item = (&str, &Module)> {
-        self.submodules.iter().map(|(k, v)| (k.as_str(), v))
+    pub fn modules(&self) -> &HashMap<String, Module> {
+        &self.submodules
     }
 }
