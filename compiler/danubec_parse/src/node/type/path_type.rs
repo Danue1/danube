@@ -4,27 +4,8 @@ use danubec_syntax::SyntaxKind;
 impl crate::Context {
     pub fn path_type(&mut self, lex: &mut Lex) -> bool {
         let checkpoint = self.checkpoint();
-        if self.identifier(lex) {
+        if self.path(lex) {
             self.start_node_at(checkpoint, SyntaxKind::PathType);
-
-            self.trivia(lex);
-
-            while expect!(
-                self,
-                lex,
-                token ->
-                COLON__COLON,
-                SyntaxKind::COLON,
-                SyntaxKind::COLON,
-            ) {
-                self.trivia(lex);
-                if self.identifier(lex) {
-                    self.trivia(lex);
-                } else {
-                    break;
-                }
-            }
-
             self.finish_node();
 
             true

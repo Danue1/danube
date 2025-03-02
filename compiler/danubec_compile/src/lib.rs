@@ -1,9 +1,8 @@
 #![warn(clippy::all)]
 
-pub use danubec_parse::EntryKind;
-
 use danubec_diagnostic::Diagnostic;
 use danubec_lst_lowering::lower_krate;
+use danubec_middle::EntryKind;
 use danubec_parse::parse_crate;
 use std::{collections::HashMap, path::PathBuf};
 

@@ -7,5 +7,6 @@ edition = "2024"
 danubec_data_structure.path = "../danubec_data_structure"
 danubec_lex.path = "../danubec_lex"
 danubec_lst.path = "../danubec_lst"
+danubec_middle.path = "../danubec_middle"
 danubec_syntax.path = "../danubec_syntax"
 insta.workspace = true

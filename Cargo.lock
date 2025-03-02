@@ -26,6 +26,7 @@ version = "0.1.0"
 dependencies = [
  "danubec_compile",
  "danubec_diagnostic",
+ "danubec_middle",
 ]
 
 [[package]]
@@ -50,6 +51,7 @@ version = "0.1.0"
 dependencies = [
  "danubec_diagnostic",
  "danubec_lst_lowering",
+ "danubec_middle",
  "danubec_parse",
 ]
 
@@ -114,6 +116,7 @@ dependencies = [
  "danubec_data_structure",
  "danubec_lex",
  "danubec_lst",
+ "danubec_middle",
  "danubec_syntax",
  "insta",
 ]

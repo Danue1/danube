@@ -1,7 +1,8 @@
 #![warn(clippy::all)]
 
-use danubec_compile::{CompileConfig, EntryKind};
+use danubec_compile::CompileConfig;
 use danubec_diagnostic::Diagnostic;
+use danubec_middle::EntryKind;
 use std::{collections::HashMap, path::PathBuf};
 
 pub fn build(

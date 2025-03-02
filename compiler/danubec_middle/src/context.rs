@@ -3,6 +3,12 @@ use danubec_diagnostic::Diagnostic;
 use danubec_symbol::Symbol;
 use std::{collections::HashMap, path::PathBuf};
 
+#[derive(Clone, Copy)]
+pub enum EntryKind {
+    Lib,
+    Main,
+}
+
 pub struct Context {
     pub working_directory: PathBuf,
 

@@ -15,14 +15,9 @@ use pratt::*;
 
 use danubec_lex::Lex;
 use danubec_lst::{DefinitionKind, Krate, Module, Root};
+use danubec_middle::EntryKind;
 use danubec_syntax::{AstNode, SyntaxNode};
 use std::{collections::HashMap, path::PathBuf};
-
-#[derive(Clone, Copy)]
-pub enum EntryKind {
-    Lib,
-    Main,
-}
 
 pub fn parse_crate(path: PathBuf, kind: EntryKind) -> Krate {
     let path = path.join("src");
