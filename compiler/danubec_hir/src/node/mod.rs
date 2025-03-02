@@ -9,5 +9,5 @@ pub use body::*;
 pub use def::*;
 pub use krate::*;
 pub use path::*;
-pub use r#type::*;
 pub use statement::*;
+pub use r#type::*;

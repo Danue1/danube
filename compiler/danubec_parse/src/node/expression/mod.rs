@@ -24,7 +24,7 @@ mod unary_expression;
 mod while_expression;
 mod yield_expression;
 
-use crate::{tokens::Tokens, Bp};
+use crate::{Bp, tokens::Tokens};
 use danubec_lex::Lex;
 use danubec_syntax::{Checkpoint, SyntaxKind};
 

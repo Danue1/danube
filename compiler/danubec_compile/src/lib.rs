@@ -1,55 +1,23 @@
 #![warn(clippy::all)]
 
-#[macro_use]
-extern crate danubec_diagnostic;
+pub use danubec_parse::EntryKind;
 
-use danubec_data_structure::Directory;
-use danubec_middle::{lst, Context};
+use danubec_parse::parse_crate;
+use std::{collections::HashMap, path::PathBuf};
 
 pub struct CompileConfig {
-    pub working_directory: String,
-    pub crates: Vec<String>,
+    pub working_directory: PathBuf,
+    pub crates: HashMap<String, EntryKind>,
 }
 
 impl CompileConfig {
     pub fn compile(self) {
-        let mut context = Context::new(self.working_directory);
-        let mut directory = Directory::new();
-        for krate in self.crates {
-            load(&mut context, &mut directory, &krate);
+        let mut crates = HashMap::new();
+        for (krate, kind) in self.crates {
+            let entry = self.working_directory.join(&krate);
+            crates.insert(krate.to_owned(), parse_crate(entry, kind));
         }
 
-        dbg!(&directory);
-    }
-}
-
-fn load(context: &mut Context, directory: &mut Directory<lst::Root>, krate: &str) {
-    let pattern = format!("{}/{}/src/**/*.dnb", context.working_directory, krate);
-    match glob::glob(&pattern) {
-        Ok(paths) => {
-            for path in paths.filter_map(Result::ok) {
-                if let Ok(source) = std::fs::read_to_string(&path) {
-                    let Ok(path) = path.strip_prefix(&context.working_directory) else {
-                        error!(
-                            context.diagnostic,
-                            "ICE: failed to strip prefix ({})",
-                            path.display()
-                        );
-                        continue;
-                    };
-                    let lst = danubec_parse::parse(&source);
-                    directory
-                        .insert(&path.to_path_buf(), lst)
-                        .expect("failed to insert");
-                } else {
-                    error!(
-                        context.diagnostic,
-                        "ICE: failed to read file ({})",
-                        path.display()
-                    );
-                }
-            }
-        }
-        Err(_) => error!(context.diagnostic, "ICE: failed to glob ({})", pattern),
+        dbg!(crates);
     }
 }

@@ -4,9 +4,4 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-danubec_data_structure.path = "../danubec_data_structure"
-danubec_diagnostic.path = "../danubec_diagnostic"
-danubec_lst.path = "../danubec_lst"
-danubec_middle.path = "../danubec_middle"
 danubec_parse.path = "../danubec_parse"
-glob.workspace = true

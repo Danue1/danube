@@ -56,22 +56,13 @@ where
 
 #[macro_export]
 macro_rules! new_arena {
-    ($index:ident) => {
-        #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    (
+        $(#[$meta:meta])*
+        struct $index:ident;
+    ) => {
+        $(#[$meta])*
+        #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
         pub struct $index(usize);
-
-        impl $index {
-            pub fn new() -> Self {
-                static mut COUNTER: usize = 0;
-
-                unsafe {
-                    let index = COUNTER;
-                    COUNTER += 1;
-
-                    Self(index)
-                }
-            }
-        }
 
         impl $crate::Index for $index {
             #[inline]

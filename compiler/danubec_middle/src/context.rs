@@ -1,10 +1,10 @@
 use crate::hir;
 use danubec_diagnostic::Diagnostic;
 use danubec_symbol::Symbol;
-use std::collections::HashMap;
+use std::{collections::HashMap, path::PathBuf};
 
 pub struct Context {
-    pub working_directory: String,
+    pub working_directory: PathBuf,
 
     pub ident_to_krate: HashMap<Symbol, hir::KrateId>,
     pub krates: HashMap<hir::KrateId, hir::Krate>,
@@ -15,9 +15,9 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn new(working_directory: String) -> Self {
+    pub fn new(working_directory: PathBuf) -> Self {
         Context {
-            working_directory: working_directory.into(),
+            working_directory,
 
             ident_to_krate: HashMap::new(),
             krates: HashMap::new(),

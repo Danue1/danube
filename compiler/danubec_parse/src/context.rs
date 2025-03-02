@@ -1,5 +1,5 @@
 use danubec_lex::Lex;
-use danubec_syntax::{Checkpoint, GreenNodeBuilder, SyntaxKind, SyntaxNode};
+use danubec_syntax::{Checkpoint, GreenNode, GreenNodeBuilder, SyntaxKind};
 
 pub struct Context {
     builder: GreenNodeBuilder,
@@ -38,8 +38,8 @@ impl Context {
     }
 
     #[inline]
-    pub fn finish(self) -> SyntaxNode {
-        SyntaxNode::new_root(self.builder.finish())
+    pub fn finish(self) -> GreenNode {
+        self.builder.finish()
     }
 
     pub fn error(&mut self, lex: &mut Lex) {

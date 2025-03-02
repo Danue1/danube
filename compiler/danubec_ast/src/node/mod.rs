@@ -12,8 +12,8 @@ pub use expression::*;
 pub use literal::*;
 pub use path::*;
 pub use pattern::*;
-pub use r#type::*;
 pub use statement::*;
+pub use r#type::*;
 pub use visibility::*;
 
 pub struct Root {

@@ -1,6 +1,10 @@
 #[macro_export]
 macro_rules! new_monotonic {
-    ($symbol:ident) => {
+    (
+        $(#[$meta:meta])*
+        struct $symbol:ident;
+    ) => {
+        $(#[$meta])*
         #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
         pub struct $symbol(usize);
 

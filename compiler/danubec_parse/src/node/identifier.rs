@@ -30,7 +30,7 @@ fn identifier() {
         context.identifier(&mut lex);
         let node = context.finish();
 
-        assert_eq!(node.kind(), SyntaxKind::Identifier);
+        assert_eq!(node.kind(), SyntaxKind::Identifier.into());
         assert_eq!(format!("{}", node), source);
     }
 }

@@ -42,7 +42,7 @@ fn path_type() {
         context.path_type(&mut lex);
         let node = context.finish();
 
-        assert_eq!(node.kind(), SyntaxKind::PathType);
+        assert_eq!(node.kind(), SyntaxKind::PathType.into());
         assert_eq!(format!("{}", node), source);
     }
 }

@@ -1,3 +1,7 @@
-pub struct Foo {
-  bar: Bar,
+pub mod foo;
+
+pub mod bar {
+    pub struct Baz {
+        qux: Qux,
+    }
 }

@@ -1,8 +1,9 @@
 #![warn(clippy::all)]
 
-use danubec_compile::CompileConfig;
+use danubec_compile::{CompileConfig, EntryKind};
+use std::{collections::HashMap, path::PathBuf};
 
-pub fn build(working_directory: String, crates: Vec<String>) {
+pub fn build(working_directory: PathBuf, crates: HashMap<String, EntryKind>) {
     let config = CompileConfig {
         working_directory,
         crates,
@@ -16,9 +17,7 @@ fn test_compile() {
         .expect("failed to get current directory")
         .join("../../library")
         .canonicalize()
-        .expect("failed to canonicalize path")
-        .to_string_lossy()
-        .to_string();
-    let crates = vec!["core".to_string()];
+        .expect("failed to canonicalize path");
+    let crates = HashMap::from_iter([("core".to_string(), EntryKind::Lib)]);
     build(working_directory, crates);
 }

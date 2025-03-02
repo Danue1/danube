@@ -45,7 +45,7 @@ fn visibility() {
         context.visibility(&mut lex);
         let node = context.finish();
 
-        assert_eq!(node.kind(), SyntaxKind::Visibility);
+        assert_eq!(node.kind(), SyntaxKind::Visibility.into());
         assert_eq!(format!("{}", node), source);
     }
 }

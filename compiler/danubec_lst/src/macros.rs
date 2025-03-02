@@ -153,23 +153,37 @@ macro_rules! ast_node {
         ast_node!($($rest)*);
     };
     (token $method:ident -> $ty:ident; $($rest:tt)*) => {
-        pub fn $method(&self) -> Option<crate::SyntaxNode> {
+        pub fn $method(&self) -> Option<crate::SyntaxToken> {
             use rowan::ast::AstNode;
 
             self.syntax()
-                .children()
-                .find(|node| matches!(node.kind(), crate::SyntaxKind::$ty))
+                .children_with_tokens()
+                .find_map(|node| {
+                    match node {
+                        rowan::NodeOrToken::Token(token) if token.kind() == crate::SyntaxKind::$ty => {
+                            Some(token)
+                        }
+                        _ => None,
+                    }
+                })
         }
 
         ast_node!($($rest)*);
     };
     (tokens $method:ident -> $ty:ident; $($rest:tt)*) => {
-        pub fn $method(&self) -> impl Iterator<Item = crate::SyntaxNode> + '_ {
+        pub fn $method(&self) -> impl Iterator<Item = crate::SyntaxToken> + '_ {
             use rowan::ast::AstNode;
 
             self.syntax()
-                .children()
-                .filter(|node| matches!(node.kind(), crate::SyntaxKind::$ty))
+                .children_with_tokens()
+                .filter_map(|node| {
+                    match node {
+                        rowan::NodeOrToken::Token(token) if token.kind() == crate::SyntaxKind::$ty => {
+                            Some(token)
+                        }
+                        _ => None,
+                    }
+                })
         }
 
         ast_node!($($rest)*);
