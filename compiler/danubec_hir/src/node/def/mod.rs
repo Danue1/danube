@@ -6,12 +6,11 @@ pub use module_def::*;
 pub use struct_def::*;
 pub use use_def::*;
 
-use crate::{DefId, OwnerId};
+use crate::HirId;
 use danubec_symbol::Symbol;
 
 #[derive(Debug)]
 pub struct Definition {
-    pub owner_id: OwnerId,
     pub kind: DefinitionKind,
 }
 
@@ -19,7 +18,7 @@ pub struct Definition {
 pub enum DefinitionKind {
     Module {
         ident: Symbol,
-        definitions: Vec<DefId>,
+        definitions: Vec<HirId>,
     },
     Use(UseDef),
     Struct(StructDef),

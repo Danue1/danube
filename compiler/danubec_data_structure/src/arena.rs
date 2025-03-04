@@ -9,6 +9,7 @@ pub trait Index: Copy + PartialEq + Eq + std::hash::Hash + 'static {
     }
 }
 
+#[derive(Debug)]
 pub struct Arena<I, T> {
     raw: Vec<T>,
     _marker: std::marker::PhantomData<I>,

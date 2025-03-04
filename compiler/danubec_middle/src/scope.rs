@@ -1,4 +1,4 @@
-use danubec_hir::DefId;
+use danubec_hir::HirId;
 use danubec_symbol::Symbol;
 use std::collections::HashMap;
 
@@ -16,7 +16,7 @@ pub struct Scope {
 #[derive(Debug)]
 pub struct Rib {
     kind: RibKind,
-    map: HashMap<Symbol, DefId>,
+    map: HashMap<Symbol, HirId>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -53,13 +53,13 @@ impl Environment {
         self.scopes.pop();
     }
 
-    pub fn define(&mut self, namespace: NamespaceKind, name: Symbol, def_id: DefId) {
+    pub fn define(&mut self, namespace: NamespaceKind, name: Symbol, def_id: HirId) {
         if let Some(scope) = self.scopes.last_mut() {
             scope.define(namespace, name, def_id);
         }
     }
 
-    pub fn resolve(&self, namespace: NamespaceKind, name: Symbol) -> Option<DefId> {
+    pub fn resolve(&self, namespace: NamespaceKind, name: Symbol) -> Option<HirId> {
         self.scopes
             .iter()
             .rev()
@@ -77,12 +77,12 @@ impl Scope {
     }
 
     #[inline]
-    fn define(&mut self, kind: NamespaceKind, name: Symbol, def_id: DefId) {
+    fn define(&mut self, kind: NamespaceKind, name: Symbol, def_id: HirId) {
         self[kind].define(name, def_id);
     }
 
     #[inline]
-    fn resolve(&self, kind: NamespaceKind, name: Symbol) -> Option<DefId> {
+    fn resolve(&self, kind: NamespaceKind, name: Symbol) -> Option<HirId> {
         self[kind].resolve(&name)
     }
 }
@@ -124,12 +124,12 @@ impl Rib {
     }
 
     #[inline]
-    fn define(&mut self, name: Symbol, def_id: DefId) {
+    fn define(&mut self, name: Symbol, def_id: HirId) {
         self.map.insert(name, def_id);
     }
 
     #[inline]
-    fn resolve(&self, name: &Symbol) -> Option<DefId> {
+    fn resolve(&self, name: &Symbol) -> Option<HirId> {
         self.map.get(name).copied()
     }
 }

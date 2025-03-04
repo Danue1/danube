@@ -14,6 +14,7 @@ struct Symbols {
 pub struct Symbol(Hash64);
 
 impl Symbol {
+    pub const EMPTY: Self = Symbol(Hash64::new_unchecked(3476900567878811119));
     pub const CRATE: Self = Symbol(Hash64::new_unchecked(3160908839602319882));
     pub const SUPER: Self = Symbol(Hash64::new_unchecked(10332305186512876660));
 
@@ -75,6 +76,7 @@ macro_rules! symbol {
 
 #[test]
 fn constant() {
+    assert_eq!(Symbol::new(""), Symbol::EMPTY);
     assert_eq!(Symbol::new("crate"), Symbol::CRATE);
     assert_eq!(Symbol::new("super"), Symbol::SUPER);
 }

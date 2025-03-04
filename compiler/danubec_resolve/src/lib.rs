@@ -1,14 +1,32 @@
 #![warn(clippy::all)]
-#![allow(unused)]
 
-#[macro_use]
-extern crate danubec_symbol;
+mod collect;
+mod resolve;
 
-#[macro_use]
-pub mod scope;
+use collect::*;
+use resolve::*;
 
-pub mod definition;
+use danubec_data_structure::Arena;
+use danubec_middle::{ast, hir};
+use danubec_symbol::Symbol;
+use std::collections::HashMap;
 
-pub use definition::*;
+#[derive(Debug)]
+pub struct Resolved {
+    pub definitions: HashMap<hir::DefId, hir::Definition>,
+    pub bodies: Arena<hir::BodyId, hir::Body>,
+}
 
-pub use scope::*;
+pub fn resolve(name: Symbol, crates: HashMap<Symbol, ast::Krate>) -> Resolved {
+    let mut collector = Collector::new();
+    for (&name, krate) in &crates {
+        collector.collect_krate(name, krate);
+    }
+
+    let mut resolver = Resolver::new(collector);
+    if let Some(krate) = crates.get(&name) {
+        resolver.resolve(name, krate);
+    }
+
+    resolver.finalize()
+}

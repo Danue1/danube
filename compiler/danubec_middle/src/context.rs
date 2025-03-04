@@ -14,7 +14,7 @@ pub struct Context {
 
     pub ident_to_krate: HashMap<Symbol, hir::KrateId>,
     pub krates: HashMap<hir::KrateId, hir::Krate>,
-    pub definitions: HashMap<hir::DefId, hir::Definition>,
+    pub definitions: HashMap<hir::HirId, hir::Definition>,
     pub bodies: HashMap<hir::BodyId, hir::Body>,
 
     pub diagnostic: Diagnostic,

@@ -1,9 +1,9 @@
 use super::Statement;
-use crate::DefId;
+use crate::HirId;
 
 #[derive(Debug)]
 pub struct Body {
-    pub inputs: Vec<DefId>,
-    pub output: Option<DefId>,
+    pub inputs: Vec<HirId>,
+    pub output: Option<HirId>,
     pub statements: Vec<Statement>,
 }

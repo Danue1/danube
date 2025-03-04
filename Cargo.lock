@@ -27,6 +27,7 @@ dependencies = [
  "danubec_compile",
  "danubec_diagnostic",
  "danubec_middle",
+ "danubec_symbol",
 ]
 
 [[package]]
@@ -53,6 +54,8 @@ dependencies = [
  "danubec_lst_lowering",
  "danubec_middle",
  "danubec_parse",
+ "danubec_resolve",
+ "danubec_symbol",
 ]
 
 [[package]]
@@ -119,6 +122,17 @@ dependencies = [
  "danubec_middle",
  "danubec_syntax",
  "insta",
+]
+
+[[package]]
+name = "danubec_resolve"
+version = "0.1.0"
+dependencies = [
+ "danubec_data_structure",
+ "danubec_lst_lowering",
+ "danubec_middle",
+ "danubec_parse",
+ "danubec_symbol",
 ]
 
 [[package]]
