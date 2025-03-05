@@ -21,8 +21,6 @@ pub struct ScopeIndex(usize);
 pub struct Module {
     parent: Option<ModuleIndex>,
     scope: ScopeIndex,
-
-    submodules: HashMap<Symbol, ModuleIndex>,
 }
 
 #[derive(Debug)]
@@ -59,7 +57,7 @@ pub struct NameBinding {
 
 #[derive(Debug, Clone)]
 pub struct Binding {
-    hir_id: hir::HirId,
+    def_id: hir::DefId,
     scope: Option<ScopeIndex>,
 }
 
@@ -141,7 +139,9 @@ impl Collector {
         let scope = ScopeIndex(self.scopes.len());
         self.scopes.push(Scope::new_root(module, scope));
         self.modules.push(Module::new_child(parent, scope));
-        self[parent].submodules.insert(name, module);
+
+        let parent_scope = self[parent].scope;
+        self[parent_scope].submodules.insert(name, module);
 
         scope
     }
@@ -178,8 +178,8 @@ impl Collector {
         symbol: Symbol,
         binding: Option<ScopeIndex>,
     ) {
-        let hir_id = hir::HirId::new();
-        if let Some(_) = self[scope][namespace].insert(symbol, Binding::new((hir_id, binding))) {
+        let def_id = hir::DefId::new();
+        if let Some(_) = self[scope][namespace].insert(symbol, Binding::new((def_id, binding))) {
             panic!("{:?} already defined: {:?}", namespace, symbol);
         }
     }
@@ -189,7 +189,7 @@ impl Collector {
         self.krates.get(&name).copied()
     }
 
-    pub fn find_symbol(
+    pub fn find_binding(
         &self,
         scope: ScopeIndex,
         namespace: Namespace,
@@ -198,26 +198,40 @@ impl Collector {
         let mut scope = Some(scope);
 
         while let Some(index) = scope {
-            if let Some(binding) = self[index][namespace].get(symbol) {
-                return Some(binding.clone());
+            match self[index][namespace].get(symbol) {
+                Some(binding) => return Some(binding.clone()),
+                None => scope = self[index].parent,
             }
-
-            scope = self[index].parent;
         }
 
         None
+    }
+
+    pub fn find_def_id(
+        &self,
+        scope: ScopeIndex,
+        namespace: Namespace,
+        symbol: Symbol,
+    ) -> Option<hir::DefId> {
+        self.find_binding(scope, namespace, symbol)
+            .map(|binding| binding.def_id())
+    }
+
+    pub fn find_scope(
+        &self,
+        scope: ScopeIndex,
+        namespace: Namespace,
+        symbol: Symbol,
+    ) -> Option<ScopeIndex> {
+        self.find_binding(scope, namespace, symbol)
+            .and_then(|binding| binding.scope())
     }
 }
 
 impl Module {
     #[inline]
-    fn new(parent: Option<ModuleIndex>, scope: ScopeIndex) -> Self {
-        Self {
-            parent,
-            scope,
-
-            submodules: HashMap::new(),
-        }
+    const fn new(parent: Option<ModuleIndex>, scope: ScopeIndex) -> Self {
+        Self { parent, scope }
     }
 
     #[inline]
@@ -296,13 +310,13 @@ impl NameBinding {
 
 impl Binding {
     #[inline]
-    const fn new((hir_id, scope): (hir::HirId, Option<ScopeIndex>)) -> Self {
-        Self { hir_id, scope }
+    const fn new((def_id, scope): (hir::DefId, Option<ScopeIndex>)) -> Self {
+        Self { def_id, scope }
     }
 
     #[inline]
-    pub const fn hir_id(&self) -> hir::HirId {
-        self.hir_id
+    pub const fn def_id(&self) -> hir::DefId {
+        self.def_id
     }
 
     #[inline]

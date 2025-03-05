@@ -2,12 +2,20 @@ new_monotonic! {
     struct KrateId;
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct HirId(DefId);
+
 new_monotonic! {
-    struct HirId;
+    struct DefId;
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct DefId(HirId);
+new_arena! {
+    struct BodyId;
+}
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct BodyId(HirId);
+impl DefId {
+    #[inline]
+    pub const fn as_hir_id(self) -> HirId {
+        HirId(self)
+    }
+}

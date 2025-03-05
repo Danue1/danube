@@ -4,4 +4,12 @@ pub mod bar {
     pub struct Baz {
         qux: Qux,
     }
+
+    pub enum A {
+        B,
+        C(u8),
+        D {
+            e: u8,
+        },
+    }
 }

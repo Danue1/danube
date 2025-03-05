@@ -5,12 +5,13 @@ use danubec_symbol::Symbol;
 impl Collector {
     pub fn collect_krate(&mut self, name: Symbol, krate: &ast::Krate) {
         let scope = self.new_krate(name);
+
         for definition in &krate.definitions {
             self.collect_definition(scope, &definition);
         }
     }
 
-    fn collect_definition(&mut self, scope: ScopeIndex, definition: &ast::Definition) {
+    pub fn collect_definition(&mut self, scope: ScopeIndex, definition: &ast::Definition) {
         match &definition.kind {
             ast::DefinitionKind::Use { tree, .. } => {
                 self.collect_use_definition(scope, &tree);
@@ -40,7 +41,7 @@ impl Collector {
                 }
 
                 if let Some(ast::StructKind::Named(fields)) = kind {
-                    for (field, _) in fields {
+                    for (_, field, _) in fields {
                         self.add_symbol(struct_scope, Namespace::Value, *field, None);
                     }
                 }
@@ -64,7 +65,7 @@ impl Collector {
                             self.add_symbol(enum_scope, Namespace::Value, variant.ident, None);
                         }
                         ast::EnumVariantKind::Unnamed(_) => {
-                            let variant_scope = self.new_scope(enum_scope, RibKind::Constructor);
+                            let variant_scope = self.new_scope(enum_scope, RibKind::Variant);
                             self.add_symbol(
                                 enum_scope,
                                 Namespace::Value,
@@ -73,7 +74,7 @@ impl Collector {
                             );
                         }
                         ast::EnumVariantKind::Named(fields) => {
-                            let variant_scope = self.new_scope(enum_scope, RibKind::Constructor);
+                            let variant_scope = self.new_scope(enum_scope, RibKind::Variant);
                             self.add_symbol(
                                 enum_scope,
                                 Namespace::Value,

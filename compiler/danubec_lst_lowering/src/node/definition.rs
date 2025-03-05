@@ -435,13 +435,15 @@ pub fn lower_struct_kind(struct_kind: lst::StructBodyKind) -> Result<ast::Struct
         lst::StructBodyKind::Named(named) => {
             let mut fields = vec![];
             for field in named.fields() {
+                let visibility = lower_visibility(field.visibility())?;
+
                 let identifier = opt!(field.identifier(), "ICE: Identifier not found");
                 let symbol = lower_identifier(identifier)?;
 
                 let ty = opt!(field.ty(), "ICE: Type not found");
                 let ty = lower_type(ty)?;
 
-                fields.push((symbol, ty));
+                fields.push((visibility, symbol, ty));
             }
 
             Ok(ast::StructKind::Named(fields))
@@ -449,10 +451,12 @@ pub fn lower_struct_kind(struct_kind: lst::StructBodyKind) -> Result<ast::Struct
         lst::StructBodyKind::Unnamed(unnamed) => {
             let mut fields = vec![];
             for field in unnamed.fields() {
+                let visibility = lower_visibility(field.visibility())?;
+
                 let ty = opt!(field.ty(), "ICE: Type not found");
                 let ty = lower_type(ty)?;
 
-                fields.push(ty);
+                fields.push((visibility, ty));
             }
 
             Ok(ast::StructKind::Unnamed(fields))
@@ -466,12 +470,12 @@ pub fn lower_type_parameter(
     let identifier = opt!(type_parameter.identifier(), "ICE: Identifier not found");
     let ident = lower_identifier(identifier)?;
 
-    let mut types = vec![];
+    let mut bounds = vec![];
     for ty in type_parameter.types() {
-        types.push(lower_type(ty)?);
+        bounds.push(lower_type(ty)?);
     }
 
-    Ok(ast::TypeParameter { ident, types })
+    Ok(ast::TypeParameter { ident, bounds })
 }
 
 pub fn lower_type_constraint(

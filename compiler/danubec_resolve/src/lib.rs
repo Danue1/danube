@@ -1,5 +1,8 @@
 #![warn(clippy::all)]
 
+#[macro_use]
+extern crate danubec_data_structure;
+
 mod collect;
 mod resolve;
 
@@ -25,7 +28,7 @@ pub fn resolve(name: Symbol, crates: HashMap<Symbol, ast::Krate>) -> Resolved {
 
     let mut resolver = Resolver::new(collector);
     if let Some(krate) = crates.get(&name) {
-        resolver.resolve(name, krate);
+        resolver.resolve_krate(name, krate);
     }
 
     resolver.finalize()

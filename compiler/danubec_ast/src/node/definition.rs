@@ -81,7 +81,7 @@ pub struct Parameter {
 
 pub struct TypeParameter {
     pub ident: Symbol,
-    pub types: Vec<Type>,
+    pub bounds: Vec<Type>,
 }
 
 pub struct Predicate {
@@ -136,8 +136,8 @@ pub enum TraitItem {
 }
 
 pub enum StructKind {
-    Named(Vec<(Symbol, Type)>),
-    Unnamed(Vec<Type>),
+    Named(Vec<(Visibility, Symbol, Type)>),
+    Unnamed(Vec<(Visibility, Type)>),
 }
 
 pub struct UseTree {

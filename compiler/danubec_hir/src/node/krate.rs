@@ -1,8 +1,7 @@
-use crate::{HirId, KrateId};
-use danubec_symbol::Symbol;
+use super::Definition;
+use crate::HirId;
 use std::collections::HashMap;
 
 pub struct Krate {
-    pub modules: Vec<HirId>,
-    pub children: HashMap<Symbol, KrateId>,
+    pub definitions: HashMap<HirId, Definition>,
 }

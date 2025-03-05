@@ -1,9 +1,10 @@
 mod definition;
+mod path;
+mod r#type;
 
 use crate::{Resolved, collect::Collector};
 use danubec_data_structure::Arena;
-use danubec_middle::{ast, hir};
-use danubec_symbol::Symbol;
+use danubec_middle::hir;
 use std::collections::HashMap;
 
 pub struct Resolver {
@@ -22,8 +23,13 @@ impl Resolver {
     }
 
     #[inline]
-    pub fn resolve(&mut self, name: Symbol, krate: &ast::Krate) {
-        self.resolve_krate(name, krate);
+    pub fn add_definition(&mut self, def_id: hir::DefId, definition: hir::Definition) {
+        self.definitions.insert(def_id, definition);
+    }
+
+    #[inline]
+    pub fn add_body(&mut self, body: hir::Body) -> hir::BodyId {
+        self.bodies.alloc(body)
     }
 
     pub fn finalize(self) -> Resolved {

@@ -6,6 +6,7 @@ pub use module_def::*;
 pub use struct_def::*;
 pub use use_def::*;
 
+use super::Type;
 use crate::HirId;
 use danubec_symbol::Symbol;
 
@@ -29,4 +30,16 @@ pub enum DefinitionKind {
     // Static(StaticDef),
     // Trait(TraitDef),
     // Type(TypeDef),
+}
+
+#[derive(Debug)]
+pub struct TypeParameter {
+    pub ty: Type,
+    pub bounds: Vec<Type>,
+}
+
+#[derive(Debug)]
+pub struct Predicate {
+    pub ty: Type,
+    pub bounds: Vec<Type>,
 }
