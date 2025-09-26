@@ -1,24 +1,8 @@
 [workspace]
 resolver = "2"
-members = [
-  "compiler/danubec_ast_lowering",
-  "compiler/danubec_ast",
-  "compiler/danubec_compile",
-  "compiler/danubec_data_structure",
-  "compiler/danubec_diagnostic",
-  "compiler/danubec_hir",
-  "compiler/danubec_lex",
-  "compiler/danubec_lst_lowering",
-  "compiler/danubec_lst",
-  "compiler/danubec_middle",
-  "compiler/danubec_parse",
-  "compiler/danubec_resolve",
-  "compiler/danubec_symbol",
-  "compiler/danubec_syntax",
-  "compiler/danubec",
-]
+members = ["compiler/danubec"]
 
 [workspace.dependencies]
-insta = "1.42.2"
-once_cell = "1.20.3"
+insta = "1.43.2"
+once_cell = "1.21.3"
 rowan = "0.16.1"

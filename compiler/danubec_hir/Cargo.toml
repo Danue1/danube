@@ -1,9 +1,0 @@
-[package]
-name = "danubec_hir"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-danubec_data_structure.path = "../danubec_data_structure"
-danubec_symbol.path = "../danubec_symbol"
-once_cell.workspace = true

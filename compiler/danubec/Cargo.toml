@@ -4,7 +4,3 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-danubec_compile.path = "../danubec_compile"
-danubec_diagnostic.path = "../danubec_diagnostic"
-danubec_middle.path = "../danubec_middle"
-danubec_symbol.path = "../danubec_symbol"
