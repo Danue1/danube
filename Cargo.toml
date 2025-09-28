@@ -1,6 +1,10 @@
 [workspace]
 resolver = "2"
-members = ["compiler/danubec"]
+members = [
+  "compiler/danubec",
+  "compiler/danubec_lex",
+  "compiler/danubec_syntax",
+]
 
 [workspace.dependencies]
 insta = "1.43.2"
