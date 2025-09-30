@@ -9,14 +9,36 @@ pub struct Krate {
 }
 
 pub struct TopLevelAttribute {
-    //
+    pub path: Path,
+    pub arguments: Vec<AttributeArgument>,
 }
 
 pub struct Attribute {
-    //
+    pub path: Path,
+    pub arguments: Vec<AttributeArgument>,
 }
 
-pub enum Definition {
+pub enum AttributeArgument {
+    Expression {
+        value: Expression,
+    },
+    KeyValue {
+        node_id: NodeId,
+        key: Identifier,
+        value: Expression,
+    },
+    Nested {
+        path: Path,
+        arguments: Vec<AttributeArgument>,
+    },
+}
+
+pub struct Definition {
+    pub attributes: Vec<Attribute>,
+    pub kind: DefinitionKind,
+}
+
+pub enum DefinitionKind {
     Function {
         node_id: NodeId,
         visibility: Visibility,
@@ -25,7 +47,7 @@ pub enum Definition {
         parameters: Vec<FunctionParameter>,
         return_type: Option<TypeExpression>,
         type_bounds: HashMap<TypeExpression, TypeBound>,
-        body: Vec<Statement>,
+        body: Expression,
     },
     Struct {
         node_id: NodeId,
@@ -114,6 +136,8 @@ pub struct TypeBound {
 }
 
 pub struct FunctionParameter {
+    pub node_id: NodeId,
+    pub attributes: Vec<Attribute>,
     pub name: Identifier,
     pub r#type: TypeExpression,
 }
@@ -125,13 +149,14 @@ pub enum StructBody {
 
 pub struct EnumVariant {
     pub node_id: NodeId,
+    pub attributes: Vec<Attribute>,
     pub name: Identifier,
     pub body: Option<EnumVariantBody>,
 }
 
 pub enum EnumVariantBody {
-    Named(Vec<(NodeId, Identifier, TypeExpression)>),
-    Unnamed(Vec<TypeExpression>),
+    Named(Vec<(NodeId, Vec<Attribute>, Identifier, TypeExpression)>),
+    Unnamed(Vec<(Vec<Attribute>, TypeExpression)>),
 }
 
 pub struct UseTree {
@@ -158,27 +183,26 @@ pub struct PathSegment {
 
 pub struct AssociatedDefinition {
     pub node_id: NodeId,
+    pub attributes: Vec<Attribute>,
+    pub visibility: Visibility,
     pub kind: AssociatedDefinitionKind,
 }
 
 pub enum AssociatedDefinitionKind {
     Function {
-        visibility: Visibility,
         name: Identifier,
         type_parameters: Vec<TypeParameter>,
         parameters: Vec<FunctionParameter>,
         return_type: Option<TypeExpression>,
         type_bounds: HashMap<TypeExpression, TypeBound>,
-        body: Option<Vec<Statement>>,
+        body: Option<Expression>,
     },
     Constant {
-        visibility: Visibility,
         name: Identifier,
         r#type: TypeExpression,
         value: Option<Expression>,
     },
     Type {
-        visibility: Visibility,
         name: Identifier,
         type_parameters: Vec<TypeParameter>,
         type_bounds: HashMap<TypeExpression, TypeBound>,
@@ -227,6 +251,7 @@ pub enum ExpressionKind {
         elements: Vec<Expression>,
     },
     Block {
+        attributes: Vec<Attribute>,
         statements: Vec<Statement>,
     },
     Literal {

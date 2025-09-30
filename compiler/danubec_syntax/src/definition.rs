@@ -15,6 +15,7 @@ ast_node! {
     token hash where HASH;
     token exclamation where EXCLAMATION;
     token left_bracket where LEFT_BRACKET;
+    nodes arguments -> AttributeArgument;
     token right_bracket where RIGHT_BRACKET;
 }
 
@@ -26,11 +27,61 @@ ast_node! {
 
     token hash where HASH;
     token left_bracket where LEFT_BRACKET;
+    nodes arguments -> AttributeArgument;
     token right_bracket where RIGHT_BRACKET;
 }
 
 ast_node! {
-    enum Definition;
+    /// An argument in an attribute: `value`, `key = value`, `path(arguments)`
+    enum AttributeArgument;
+
+    variant Expression -> ExpressionAttributeArgument;
+    variant KeyValue -> KeyValueAttributeArgument;
+    variant Nested -> NestedAttributeArgument;
+}
+
+ast_node! {
+    /// ```
+    /// expression
+    /// ```
+    struct ExpressionAttributeArgument where EXPRESSION_ATTRIBUTE_ARGUMENT_NODE;
+
+    node value -> Expression;
+}
+
+ast_node! {
+    /// ```
+    /// key = value
+    /// ```
+    struct KeyValueAttributeArgument where KEY_VALUE_ATTRIBUTE_ARGUMENT_NODE;
+
+    node key -> Identifier;
+    token equal where EQUAL;
+    node value -> Expression;
+}
+
+ast_node! {
+    /// ```
+    /// path(arguments)
+    /// ```
+    struct NestedAttributeArgument where NESTED_ATTRIBUTE_ARGUMENT_NODE;
+
+    node path -> Path;
+    token left_paren where LEFT_PAREN;
+    nodes arguments -> AttributeArgument;
+    token right_paren where RIGHT_PAREN;
+}
+
+ast_node! {
+    struct Definition where DEFINITION_NODE;
+
+    nodes attributes -> Attribute;
+    node kind -> DefinitionKind;
+}
+
+ast_node! {
+    /// A top-level definition: function, struct, enum, use, module, trait, constant, static, type alias, impl block.
+    enum DefinitionKind;
 
     variant Function -> FunctionDefinition;
     variant Struct -> StructDefinition;
@@ -264,8 +315,15 @@ ast_node! {
 }
 
 ast_node! {
+    struct AssociatedDefinition where ASSOCIATED_DEFINITION_NODE;
+
+    nodes attributes -> Attribute;
+    node kind -> AssociatedDefinitionKind;
+}
+
+ast_node! {
     /// An associated definition within an impl block.
-    enum AssociatedDefinition;
+    enum AssociatedDefinitionKind;
 
     variant Function -> FunctionDefinition;
     variant Constant -> ConstantDefinition;
@@ -276,6 +334,7 @@ ast_node! {
     /// A parameter in a function definition: `name: Type`
     struct FunctionParameter where FUNCTION_PARAMETER_NODE;
 
+    nodes attributes -> Attribute;
     node pattern -> Pattern;
     token colon where COLON;
     node r#type -> TypeExpression;
@@ -303,6 +362,7 @@ ast_node! {
     /// A named field in a named struct: `a: Type`
     struct StructNamedField where STRUCT_BODY_NAMED_FIELD_NODE;
 
+    nodes attributes -> Attribute;
     node name -> Identifier;
     token colon where COLON;
     node r#type -> TypeExpression;
@@ -322,13 +382,22 @@ ast_node! {
     /// An unnamed field in an unnamed struct: `Type`
     struct StructUnnamedField where STRUCT_BODY_UNNAMED_FIELD_NODE;
 
+    nodes attributes -> Attribute;
     node r#type -> TypeExpression;
     token comma where COMMA;
 }
 
 ast_node! {
     /// A variant in an enum: `Variant { a: Type }` or `Variant(Type)`
-    enum EnumVariant;
+    struct EnumVariant where ENUM_VARIANT_NODE;
+
+    nodes attributes -> Attribute;
+    node kind -> EnumVariantKind;
+}
+
+ast_node! {
+    /// A variant in an enum: `Variant { a: Type }` or `Variant(Type)`
+    enum EnumVariantKind;
 
     variant Named -> EnumVariantNamed;
     variant Unnamed -> EnumVariantUnnamed;
@@ -348,6 +417,7 @@ ast_node! {
     /// A named field in a named enum variant: `a: Type`
     struct EnumVariantNamedField where ENUM_VARIANT_NAMED_FIELD_NODE;
 
+    nodes attributes -> Attribute;
     node name -> Identifier;
     token colon where COLON;
     node r#type -> TypeExpression;
@@ -368,6 +438,7 @@ ast_node! {
     /// An unnamed field in an unnamed enum variant: `Type`
     struct EnumVariantUnnamedField where ENUM_VARIANT_UNNAMED_FIELD_NODE;
 
+    nodes attributes -> Attribute;
     node r#type -> TypeExpression;
     token comma where COMMA;
 }
@@ -807,6 +878,7 @@ ast_node! {
     /// A block expression: `{ statements }`
     struct BlockExpression where BLOCK_EXPRESSION_NODE;
 
+    nodes attributes -> Attribute;
     token left_brace where LEFT_BRACE;
     nodes statements -> Statement;
     token right_brace where RIGHT_BRACE;
@@ -937,15 +1009,6 @@ ast_node! {
     variant Octal -> OctalLiteral;
     variant Decimal -> DecimalLiteral;
     variant Hexadecimal -> HexadecimalLiteral;
-}
-
-ast_node! {
-    /// An array literal: `[1, 2, 3]`
-    struct ArrayLiteral where ARRAY_LITERAL_NODE;
-
-    token left_bracket where LEFT_BRACKET;
-    nodes elements -> Literal;
-    token right_bracket where RIGHT_BRACKET;
 }
 
 ast_node! {
