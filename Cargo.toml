@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
   "compiler/danubec",
+  "compiler/danubec_ast",
   "compiler/danubec_lex",
   "compiler/danubec_syntax",
 ]

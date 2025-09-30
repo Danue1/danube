@@ -1,0 +1,8 @@
+[package]
+name = "danubec_ast"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+danubec_syntax.path = "../danubec_syntax"
+rowan.workspace = true

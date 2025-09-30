@@ -3,6 +3,7 @@ ast_node! {
     struct Krate where KRATE_NODE;
 
     node top_level_attribute -> TopLevelAttribute;
+    nodes definitions -> Definition;
 }
 
 ast_node! {
@@ -49,6 +50,7 @@ ast_node! {
     /// ```
     struct FunctionDefinition where FUNCTION_DEFINITION_NODE;
 
+    node visibility -> Visibility;
     token r#fn where FN;
     node name -> Identifier;
     token left_chevron where LEFT_CHEVRON;
@@ -58,7 +60,7 @@ ast_node! {
     nodes parameters -> FunctionParameter;
     token right_paren where RIGHT_PAREN;
     token arrow where HYPHEN__RIGHT_CHEVRON;
-    node r#type -> Type;
+    node r#type -> TypeExpression;
     token r#where where WHERE;
     nodes constraints -> TypeParameterConstraint;
     node body -> BlockExpression;
@@ -70,6 +72,7 @@ ast_node! {
     /// ```
     struct StructDefinition where STRUCT_DEFINITION_NODE;
 
+    node visibility -> Visibility;
     token r#struct where STRUCT;
     node name -> Identifier;
     token left_chevron where LEFT_CHEVRON;
@@ -86,6 +89,7 @@ ast_node! {
     /// ```
     struct EnumDefinition where ENUM_DEFINITION_NODE;
 
+    node visibility -> Visibility;
     token r#enum where ENUM;
     node name -> Identifier;
     token left_chevron where LEFT_CHEVRON;
@@ -104,6 +108,7 @@ ast_node! {
     /// ```
     struct UseDefinition where USE_DEFINITION_NODE;
 
+    node visibility -> Visibility;
     token r#use where USE;
     node tree -> UseTree;
     token semicolon where SEMICOLON;
@@ -116,6 +121,7 @@ ast_node! {
     /// ```
     struct ModuleDefinition where MODULE_DEFINITION_NODE;
 
+    node visibility -> Visibility;
     token r#mod where MOD;
     node name -> Identifier;
     token left_brace where LEFT_BRACE;
@@ -130,6 +136,7 @@ ast_node! {
     /// ```
     struct TraitDefinition where TRAIT_DEFINITION_NODE;
 
+    node visibility -> Visibility;
     token r#trait where TRAIT;
     node name -> Identifier;
     token left_chevron where LEFT_CHEVRON;
@@ -138,7 +145,7 @@ ast_node! {
     token r#where where WHERE;
     nodes constraints -> TypeParameterConstraint;
     token left_brace where LEFT_BRACE;
-    nodes definitions -> Definition;
+    nodes definitions -> AssociatedDefinition;
     token right_brace where RIGHT_BRACE;
 }
 
@@ -148,10 +155,11 @@ ast_node! {
     /// ```
     struct ConstantDefinition where CONSTANT_DEFINITION_NODE;
 
+    node visibility -> Visibility;
     token r#const where CONST;
     node name -> Identifier;
     token colon where COLON;
-    node r#type -> Type;
+    node r#type -> TypeExpression;
     token equal where EQUAL;
     node expression -> Expression;
     token semicolon where SEMICOLON;
@@ -163,10 +171,11 @@ ast_node! {
     /// ```
     struct StaticDefinition where STATIC_DEFINITION_NODE;
 
+    node visibility -> Visibility;
     token r#static where STATIC;
     node name -> Identifier;
     token colon where COLON;
-    node r#type -> Type;
+    node r#type -> TypeExpression;
     token equal where EQUAL;
     node expression -> Expression;
     token semicolon where SEMICOLON;
@@ -178,6 +187,7 @@ ast_node! {
     /// ```
     struct TypeDefinition where TYPE_DEFINITION_NODE;
 
+    node visibility -> Visibility;
     token r#type where TYPE;
     node name -> Identifier;
     token left_chevron where LEFT_CHEVRON;
@@ -186,7 +196,7 @@ ast_node! {
     token r#where where WHERE;
     nodes constraints -> TypeParameterConstraint;
     token equal where EQUAL;
-    node initializer -> Type;
+    node expression -> TypeExpression;
     token semicolon where SEMICOLON;
 }
 
@@ -200,9 +210,9 @@ ast_node! {
     token left_chevron where LEFT_CHEVRON;
     nodes type_parameters -> TypeParameter;
     token right_chevron where RIGHT_CHEVRON;
-    node trait_type -> Type;
+    node trait_type -> TypeExpression;
     token r#for where FOR;
-    node target_type -> Type;
+    node target_type -> TypeExpression;
     token r#where where WHERE;
     nodes constraints -> TypeParameterConstraint;
     token left_brace where LEFT_BRACE;
@@ -214,6 +224,7 @@ ast_node! {
     /// A tree in a use definition: `a::b::C`, `a::{b, c}`, `a::*`, etc.
     struct UseTree where USE_TREE_NODE;
 
+    node path -> Path;
     token colon__colon where COLON__COLON;
     node kind -> UseTreeKind;
     token comma where COMMA;
@@ -223,18 +234,9 @@ ast_node! {
     /// The kind of a use tree.
     enum UseTreeKind;
 
-    variant Path -> UseTreePath;
     variant Glob -> UseTreeGlob;
+    variant Terminal -> UseTreeTerminal;
     variant Nested -> UseTreeNested;
-}
-
-ast_node! {
-    /// A path in a use tree: `a`, `a::b::C`, etc.
-    struct UseTreePath where USE_TREE_PATH_NODE;
-
-    node path -> Path;
-    token r#as where AS;
-    node rename -> Identifier;
 }
 
 ast_node! {
@@ -242,6 +244,14 @@ ast_node! {
     struct UseTreeGlob where USE_TREE_GLOB_NODE;
 
     token asterisk where ASTERISK;
+}
+
+ast_node! {
+    /// A path in a use tree: `a`, `a as b`, etc.
+    struct UseTreeTerminal where USE_TREE_TERMINAL_NODE;
+
+    token r#as where AS;
+    node identifier -> Identifier;
 }
 
 ast_node! {
@@ -268,7 +278,7 @@ ast_node! {
 
     node pattern -> Pattern;
     token colon where COLON;
-    node r#type -> Type;
+    node r#type -> TypeExpression;
     token comma where COMMA;
 }
 
@@ -295,7 +305,7 @@ ast_node! {
 
     node name -> Identifier;
     token colon where COLON;
-    node r#type -> Type;
+    node r#type -> TypeExpression;
     token comma where COMMA;
 }
 
@@ -312,7 +322,7 @@ ast_node! {
     /// An unnamed field in an unnamed struct: `Type`
     struct StructUnnamedField where STRUCT_BODY_UNNAMED_FIELD_NODE;
 
-    node r#type -> Type;
+    node r#type -> TypeExpression;
     token comma where COMMA;
 }
 
@@ -340,7 +350,7 @@ ast_node! {
 
     node name -> Identifier;
     token colon where COLON;
-    node r#type -> Type;
+    node r#type -> TypeExpression;
     token comma where COMMA;
 }
 
@@ -358,7 +368,7 @@ ast_node! {
     /// An unnamed field in an unnamed enum variant: `Type`
     struct EnumVariantUnnamedField where ENUM_VARIANT_UNNAMED_FIELD_NODE;
 
-    node r#type -> Type;
+    node r#type -> TypeExpression;
     token comma where COMMA;
 }
 
@@ -389,7 +399,7 @@ ast_node! {
     /// The placeholder pattern: `_`
     struct PlaceholderPattern where PLACEHOLDER_PATTERN_NODE;
 
-    token underscore where UNDERSCORE;
+    node identifier -> Identifier;
 }
 
 ast_node! {
@@ -510,7 +520,7 @@ ast_node! {
     token r#mut where MUT;
     node pattern -> Pattern;
     token colon where COLON;
-    node r#type -> Type;
+    node r#type -> TypeExpression;
     token equal where EQUAL;
     node expression -> Expression;
     token semicolon where SEMICOLON;
@@ -543,7 +553,7 @@ ast_node! {
     variant Unary -> UnaryExpression;
     variant Binary -> BinaryExpression;
     variant Assignment -> AssignmentExpression;
-    variant FunctionCall -> CallExpression;
+    variant FunctionCall -> FunctionCallExpression;
     variant MethodCall -> MethodCallExpression;
     variant Field -> FieldExpression;
     variant Index -> IndexExpression;
@@ -697,10 +707,14 @@ ast_node! {
 }
 
 ast_node! {
-    /// A function call expression: `function(arguments)`
-    struct CallExpression where FUNCTION_CALL_EXPRESSION_NODE;
+    /// A function call expression: `function::<type_arguments>(arguments)`
+    struct FunctionCallExpression where FUNCTION_CALL_EXPRESSION_NODE;
 
     node callee -> Expression;
+    token colon__colon where COLON__COLON;
+    token left_chevron where LEFT_CHEVRON;
+    nodes type_arguments -> TypeArgument;
+    token right_chevron where RIGHT_CHEVRON;
     token left_paren where LEFT_PAREN;
     nodes arguments -> Expression;
     token right_paren where RIGHT_PAREN;
@@ -897,7 +911,7 @@ ast_node! {
     /// A type parameter in a generic type or function: `T`
     struct TypeParameter where TYPE_PARAMETER_NODE;
 
-    node r#type -> Type;
+    node r#type -> TypeExpression;
     token colon where COLON;
     nodes constraints -> TypeParameterConstraint;
     token comma where COMMA;
@@ -907,7 +921,7 @@ ast_node! {
     /// A constraint on a type parameter: `T: Trait`
     struct TypeParameterConstraint where TYPE_PARAMETER_CONSTRAINT_NODE;
 
-    node r#type -> Type;
+    node r#type -> TypeExpression;
     token plus where PLUS;
 }
 
@@ -915,7 +929,6 @@ ast_node! {
     /// A literal value: `42`, `"hello"`, `true`, etc.
     enum Literal;
 
-    variant Array -> ArrayLiteral;
     variant Boolean -> BooleanLiteral;
     variant Character -> CharacterLiteral;
     variant Numeric -> NumericLiteral;
@@ -1012,7 +1025,7 @@ ast_node! {
 
 ast_node! {
     /// A type: `i32`, `Option<T>`, `[T]`, `(A, B)`, `!`, etc.
-    enum Type;
+    enum TypeExpression;
 
     variant Never -> NeverType;
     variant Path -> PathType;
@@ -1039,7 +1052,7 @@ ast_node! {
     struct SliceType where SLICE_TYPE_NODE;
 
     token left_bracket where LEFT_BRACKET;
-    node r#type -> Type;
+    node r#type -> TypeExpression;
     token right_bracket where RIGHT_BRACKET;
 }
 
@@ -1056,8 +1069,19 @@ ast_node! {
     /// A type argument in a generic type or function: `T`
     struct TypeArgument where TYPE_ARGUMENT_NODE;
 
-    node r#type -> Type;
+    node r#type -> TypeExpression;
     token comma where COMMA;
+}
+
+ast_node! {
+    struct Visibility where VISIBILITY_NODE;
+
+    token r#pub where PUB;
+    token left_paren where LEFT_PAREN;
+    token krate where CRATE;
+    token self_ where SELF;
+    token super_ where SUPER;
+    token right_paren where RIGHT_PAREN;
 }
 
 ast_node! {
