@@ -5,14 +5,34 @@ pub enum SyntaxKind {
     /// Anything unexpected
     ERROR,
 
-    // Tokens in the lexer
-    /// Anything else
-    RAW,
+    /// The end of the file
+    END_OF_FILE,
 
-    /// `[a-zA-Z]+`
-    ALPHABETIC,
-    /// `[0-9]+`
-    NUMERIC,
+    IDENTIFIER,
+    INTEGER_SEGMENT,
+    FRACTIONAL_PREFIX,
+    FRACTIONAL_SEGMENT,
+    EXPONENTIAL_PREFIX,
+    EXPONENT_SIGN,
+    EXPONENTIAL_SEGMENT,
+    NUMERIC_SEPARATOR,
+    BINARY_START,
+    BINARY_SEGMENT,
+    BINARY_END,
+    OCTAL_START,
+    OCTAL_SEGMENT,
+    OCTAL_END,
+    HEX_START,
+    HEX_SEGMENT,
+    HEX_END,
+    CHARACTER_START,
+    CHARACTER_SEGMENT,
+    CHARACTER_END,
+    STRING_START,
+    STRING_SEGMENT,
+    STRING_END,
+    INTERPOLATION_START,
+    INTERPOLATION_END,
 
     /// ` `
     WHITESPACE,
@@ -260,6 +280,8 @@ pub enum SyntaxKind {
 
     // Root Nodes in the parser
     KRATE_NODE,
+    // A source file in a krate.
+    ROOT_NODE,
 
     /// Comments and other non-semantic tokens
     TRIVIA_NODE,
@@ -268,6 +290,7 @@ pub enum SyntaxKind {
 
     TOP_LEVEL_ATTRIBUTE_NODE,
     ATTRIBUTE_NODE,
+    ATTRIBUTE_ARGUMENT_NODE,
     EXPRESSION_ATTRIBUTE_ARGUMENT_NODE,
     KEY_VALUE_ATTRIBUTE_ARGUMENT_NODE,
     NESTED_ATTRIBUTE_ARGUMENT_NODE,

@@ -1,5 +1,5 @@
 ---
-source: compiler/danubec_lex/src/lib.rs
+source: compiler/danubec_lex/src/tests.rs
 expression: tokens
 ---
 [
@@ -54,10 +54,6 @@ expression: tokens
     (
         HYPHEN,
         "-",
-    ),
-    (
-        UNDERSCORE,
-        "_",
     ),
     (
         PLUS,
@@ -130,13 +126,5 @@ expression: tokens
     (
         RIGHT_CHEVRON,
         ">",
-    ),
-    (
-        DOUBLE_QUOTE,
-        "\"",
-    ),
-    (
-        SINGLE_QUOTE,
-        "'",
     ),
 ]

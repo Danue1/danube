@@ -1,0 +1,266 @@
+---
+source: compiler/danubec_lex/src/tests.rs
+expression: tokens
+---
+[
+    (
+        AS,
+        "as",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        AWAIT,
+        "await",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        BREAK,
+        "break",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        CONST,
+        "const",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        CONTINUE,
+        "continue",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        CRATE,
+        "crate",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        ELSE,
+        "else",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        ENUM,
+        "enum",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        FALSE,
+        "false",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        FN,
+        "fn",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        FOR,
+        "for",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        IF,
+        "if",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        IMPL,
+        "impl",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        IN,
+        "in",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        LET,
+        "let",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        LOOP,
+        "loop",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        MATCH,
+        "match",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        MUT,
+        "mut",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        MOD,
+        "mod",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        PUB,
+        "pub",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        RETURN,
+        "return",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        SELF_UPPERCASE,
+        "Self",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        SELF,
+        "self",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        STATIC,
+        "static",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        STRUCT,
+        "struct",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        SUPER,
+        "super",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        TRAIT,
+        "trait",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        TRUE,
+        "true",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        TYPE,
+        "type",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        USE,
+        "use",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        WHERE,
+        "where",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        WHILE,
+        "while",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        YIELD,
+        "yield",
+    ),
+]

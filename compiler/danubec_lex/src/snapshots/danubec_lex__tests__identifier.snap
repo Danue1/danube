@@ -1,0 +1,90 @@
+---
+source: compiler/danubec_lex/src/tests.rs
+expression: tokens
+---
+[
+    (
+        IDENTIFIER,
+        "_",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        IDENTIFIER,
+        "_foo",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        IDENTIFIER,
+        "_123",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        IDENTIFIER,
+        "_foo123",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        IDENTIFIER,
+        "foo",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        IDENTIFIER,
+        "foo_",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        IDENTIFIER,
+        "foo123",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        IDENTIFIER,
+        "foo123_",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        IDENTIFIER,
+        "foo_foo",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        IDENTIFIER,
+        "foo_123",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        IDENTIFIER,
+        "한글",
+    ),
+]

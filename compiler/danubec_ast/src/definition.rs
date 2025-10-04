@@ -1,11 +1,17 @@
 use danubec_syntax::SyntaxNode;
-use std::collections::HashMap;
+use std::{collections::HashMap, path::PathBuf};
 
 pub type NodeId = usize;
 
 pub struct Krate {
-    pub top_level_attributes: Vec<TopLevelAttribute>,
+    pub attributes: Vec<TopLevelAttribute>,
     pub definitions: Vec<Definition>,
+    pub children: HashMap<Identifier, Root>,
+}
+
+pub struct Root {
+    pub definitions: Vec<Definition>,
+    pub children: HashMap<Identifier, Root>,
 }
 
 pub struct TopLevelAttribute {
@@ -24,7 +30,7 @@ pub enum AttributeArgument {
     },
     KeyValue {
         node_id: NodeId,
-        key: Identifier,
+        key: Path,
         value: Expression,
     },
     Nested {
@@ -46,7 +52,7 @@ pub enum DefinitionKind {
         type_parameters: Vec<TypeParameter>,
         parameters: Vec<FunctionParameter>,
         return_type: Option<TypeExpression>,
-        type_bounds: HashMap<TypeExpression, TypeBound>,
+        type_bounds: Vec<(TypeExpression, TypeBound)>,
         body: Expression,
     },
     Struct {
@@ -54,7 +60,7 @@ pub enum DefinitionKind {
         visibility: Visibility,
         name: Identifier,
         type_parameters: Vec<TypeParameter>,
-        type_bounds: HashMap<TypeExpression, TypeBound>,
+        type_bounds: Vec<(TypeExpression, TypeBound)>,
         body: Option<StructBody>,
     },
     Enum {
@@ -62,7 +68,7 @@ pub enum DefinitionKind {
         visibility: Visibility,
         name: Identifier,
         type_parameters: Vec<TypeParameter>,
-        type_bounds: HashMap<TypeExpression, TypeBound>,
+        type_bounds: Vec<(TypeExpression, TypeBound)>,
         variants: Vec<EnumVariant>,
     },
     Use {
@@ -81,7 +87,7 @@ pub enum DefinitionKind {
         visibility: Visibility,
         name: Identifier,
         type_parameters: Vec<TypeParameter>,
-        type_bounds: HashMap<TypeExpression, TypeBound>,
+        type_bounds: Vec<(TypeExpression, TypeBound)>,
         definitions: Vec<AssociatedDefinition>,
     },
     Constant {
@@ -103,14 +109,14 @@ pub enum DefinitionKind {
         visibility: Visibility,
         name: Identifier,
         type_parameters: Vec<TypeParameter>,
-        type_bounds: HashMap<TypeExpression, TypeBound>,
+        type_bounds: Vec<(TypeExpression, TypeBound)>,
         expression: TypeExpression,
     },
     Implement {
         type_parameters: Vec<TypeParameter>,
         trait_name: Option<Identifier>,
         for_type: TypeExpression,
-        type_bounds: HashMap<TypeExpression, TypeBound>,
+        type_bounds: Vec<(TypeExpression, TypeBound)>,
         definitions: Vec<AssociatedDefinition>,
     },
 }
@@ -122,12 +128,14 @@ pub enum Visibility {
     Private,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Identifier {
     pub name: String,
 }
 
 pub struct TypeParameter {
     pub name: Identifier,
+    pub bounds: Vec<TypeExpression>,
 }
 
 pub struct TypeBound {
@@ -194,7 +202,7 @@ pub enum AssociatedDefinitionKind {
         type_parameters: Vec<TypeParameter>,
         parameters: Vec<FunctionParameter>,
         return_type: Option<TypeExpression>,
-        type_bounds: HashMap<TypeExpression, TypeBound>,
+        type_bounds: Vec<(TypeExpression, TypeBound)>,
         body: Option<Expression>,
     },
     Constant {
@@ -205,7 +213,7 @@ pub enum AssociatedDefinitionKind {
     Type {
         name: Identifier,
         type_parameters: Vec<TypeParameter>,
-        type_bounds: HashMap<TypeExpression, TypeBound>,
+        type_bounds: Vec<(TypeExpression, TypeBound)>,
         expression: Option<TypeExpression>,
     },
 }

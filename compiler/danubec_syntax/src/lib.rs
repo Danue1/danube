@@ -1,8 +1,5 @@
 #![warn(clippy::all)]
 
-#[macro_use]
-mod macros;
-
 pub mod definition;
 pub mod language;
 pub mod syntax_kind;

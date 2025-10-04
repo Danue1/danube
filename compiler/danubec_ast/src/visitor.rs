@@ -17,7 +17,7 @@ pub trait Visitor: Sized {
         walk_type_parameter(self, node);
     }
 
-    fn visit_type_bound(&mut self, node: (crate::TypeExpression, crate::TypeBound)) {
+    fn visit_type_bound(&mut self, node: crate::TypeBound) {
         walk_type_bound(self, node);
     }
 
@@ -120,7 +120,10 @@ pub fn walk_definition<V: Visitor>(visitor: &mut V, node: crate::Definition) {
             visit_each!(visitor.visit_type_parameter(type_parameters));
             visit_each!(visitor.visit_function_parameter(parameters));
             visit_optional!(visitor.visit_type_expression(return_type));
-            visit_each!(visitor.visit_type_bound(type_bounds));
+            for (type_expression, type_bound) in type_bounds {
+                visitor.visit_type_expression(type_expression);
+                visitor.visit_type_bound(type_bound);
+            }
             visitor.visit_expression(body);
         }
         crate::DefinitionKind::Struct {
@@ -133,7 +136,10 @@ pub fn walk_definition<V: Visitor>(visitor: &mut V, node: crate::Definition) {
         } => {
             visitor.visit_identifier(name);
             visit_each!(visitor.visit_type_parameter(type_parameters));
-            visit_each!(visitor.visit_type_bound(type_bounds));
+            for (type_expression, type_bound) in type_bounds {
+                visitor.visit_type_expression(type_expression);
+                visitor.visit_type_bound(type_bound);
+            }
             visit_optional!(visitor.visit_struct_body(body));
         }
         crate::DefinitionKind::Enum {
@@ -146,7 +152,10 @@ pub fn walk_definition<V: Visitor>(visitor: &mut V, node: crate::Definition) {
         } => {
             visitor.visit_identifier(name);
             visit_each!(visitor.visit_type_parameter(type_parameters));
-            visit_each!(visitor.visit_type_bound(type_bounds));
+            for (type_expression, type_bound) in type_bounds {
+                visitor.visit_type_expression(type_expression);
+                visitor.visit_type_bound(type_bound);
+            }
             visit_each!(visitor.visit_enum_variant(variants));
         }
         crate::DefinitionKind::Use {
@@ -175,7 +184,10 @@ pub fn walk_definition<V: Visitor>(visitor: &mut V, node: crate::Definition) {
         } => {
             visitor.visit_identifier(name);
             visit_each!(visitor.visit_type_parameter(type_parameters));
-            visit_each!(visitor.visit_type_bound(type_bounds));
+            for (type_expression, type_bound) in type_bounds {
+                visitor.visit_type_expression(type_expression);
+                visitor.visit_type_bound(type_bound);
+            }
             visit_each!(visitor.visit_associated_definition(definitions));
         }
         crate::DefinitionKind::Constant {
@@ -210,7 +222,10 @@ pub fn walk_definition<V: Visitor>(visitor: &mut V, node: crate::Definition) {
         } => {
             visitor.visit_identifier(name);
             visit_each!(visitor.visit_type_parameter(type_parameters));
-            visit_each!(visitor.visit_type_bound(type_bounds));
+            for (type_expression, type_bound) in type_bounds {
+                visitor.visit_type_expression(type_expression);
+                visitor.visit_type_bound(type_bound);
+            }
             visitor.visit_type_expression(expression);
         }
         crate::DefinitionKind::Implement {
@@ -223,7 +238,10 @@ pub fn walk_definition<V: Visitor>(visitor: &mut V, node: crate::Definition) {
             visit_each!(visitor.visit_type_parameter(type_parameters));
             visit_optional!(visitor.visit_identifier(trait_name));
             visitor.visit_type_expression(for_type);
-            visit_each!(visitor.visit_type_bound(type_bounds));
+            for (type_expression, type_bound) in type_bounds {
+                visitor.visit_type_expression(type_expression);
+                visitor.visit_type_bound(type_bound);
+            }
             visit_each!(visitor.visit_associated_definition(definitions));
         }
     }
@@ -231,15 +249,12 @@ pub fn walk_definition<V: Visitor>(visitor: &mut V, node: crate::Definition) {
 
 pub fn walk_type_parameter<V: Visitor>(visitor: &mut V, node: crate::TypeParameter) {
     visitor.visit_identifier(node.name);
+    visit_each!(visitor.visit_type_expression(node.bounds));
 }
 
-pub fn walk_type_bound<V: Visitor>(
-    visitor: &mut V,
-    node: (crate::TypeExpression, crate::TypeBound),
-) {
-    let (ty, bound) = node;
-    visitor.visit_type_expression(ty);
-    visit_each!(visitor.visit_type_expression(bound.constraints));
+pub fn walk_type_bound<V: Visitor>(visitor: &mut V, node: crate::TypeBound) {
+    visitor.visit_type_expression(node.r#type);
+    visit_each!(visitor.visit_type_expression(node.constraints));
 }
 
 pub fn walk_type_expression<V: Visitor>(visitor: &mut V, node: crate::TypeExpression) {
@@ -334,7 +349,10 @@ pub fn walk_associated_definition<V: Visitor>(visitor: &mut V, node: crate::Asso
             visit_each!(visitor.visit_type_parameter(type_parameters));
             visit_each!(visitor.visit_function_parameter(parameters));
             visit_optional!(visitor.visit_type_expression(return_type));
-            visit_each!(visitor.visit_type_bound(type_bounds));
+            for (type_expression, type_bound) in type_bounds {
+                visitor.visit_type_expression(type_expression);
+                visitor.visit_type_bound(type_bound);
+            }
             visit_optional!(visitor.visit_expression(body));
         }
         crate::AssociatedDefinitionKind::Constant {
@@ -354,7 +372,10 @@ pub fn walk_associated_definition<V: Visitor>(visitor: &mut V, node: crate::Asso
         } => {
             visitor.visit_identifier(name);
             visit_each!(visitor.visit_type_parameter(type_parameters));
-            visit_each!(visitor.visit_type_bound(type_bounds));
+            for (type_expression, type_bound) in type_bounds {
+                visitor.visit_type_expression(type_expression);
+                visitor.visit_type_bound(type_bound);
+            }
             visit_optional!(visitor.visit_type_expression(expression));
         }
     }
@@ -594,7 +615,7 @@ pub fn walk_attribute_argument<V: Visitor>(visitor: &mut V, node: crate::Attribu
             key,
             value,
         } => {
-            visitor.visit_identifier(key);
+            visitor.visit_path(key);
             visitor.visit_expression(value);
         }
         crate::AttributeArgument::Nested { path, arguments } => {

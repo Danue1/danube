@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 danubec_syntax.path = "../danubec_syntax"
 insta.workspace = true
+unicode-ident.workspace = true

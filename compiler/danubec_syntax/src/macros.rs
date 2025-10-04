@@ -52,7 +52,7 @@ macro_rules! ast_node {
         $($rest:tt)*
     ) => {
         $(#[$meta])*
-        #[derive(Debug, Clone)]
+        #[derive(Debug, Clone, PartialEq, Eq, Hash)]
         pub struct $node(crate::SyntaxNode);
 
         impl rowan::ast::AstNode for $node {
@@ -97,7 +97,7 @@ macro_rules! ast_node {
         ast_node!($($rest)*);
     };
     (tokens $node:ident where $kind:ident; $($rest:tt)*) => {
-        pub fn $node(&self) -> Vec<crate::SyntaxToken> {
+        pub fn $node(&self) -> impl Iterator<Item = crate::SyntaxToken> {
             use rowan::{NodeOrToken, ast::AstNode};
 
             self.syntax().children_with_tokens().filter_map(|node| {
@@ -105,7 +105,7 @@ macro_rules! ast_node {
                     NodeOrToken::Token(token) if token.kind() == crate::SyntaxKind::$kind => Some(token),
                     _ => None
                 }
-            }).collect()
+            })
         }
 
         ast_node!($($rest)*);
@@ -120,10 +120,10 @@ macro_rules! ast_node {
         ast_node!($($rest)*);
     };
     (nodes $node:ident -> $ty:ty; $($rest:tt)*) => {
-        pub fn $node(&self) -> Vec<$ty> {
+        pub fn $node(&self) -> impl Iterator<Item = $ty> {
             use rowan::ast::AstNode;
 
-            self.syntax().children().filter_map(<$ty>::cast).collect()
+            self.syntax().children().filter_map(<$ty>::cast)
         }
 
         ast_node!($($rest)*);

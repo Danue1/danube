@@ -1,0 +1,50 @@
+---
+source: compiler/danubec_lex/src/tests.rs
+expression: tokens
+---
+[
+    (
+        STRING_START,
+        "\"",
+    ),
+    (
+        STRING_SEGMENT,
+        "Hello, World!",
+    ),
+    (
+        STRING_END,
+        "\"",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        STRING_START,
+        "\"",
+    ),
+    (
+        STRING_SEGMENT,
+        "a",
+    ),
+    (
+        INTERPOLATION_START,
+        "${",
+    ),
+    (
+        IDENTIFIER,
+        "b",
+    ),
+    (
+        INTERPOLATION_END,
+        "}",
+    ),
+    (
+        STRING_SEGMENT,
+        "c",
+    ),
+    (
+        STRING_END,
+        "\"",
+    ),
+]

@@ -1,202 +1,672 @@
+#![warn(clippy::all)]
+
+#[cfg(test)]
+mod tests;
+
 use danubec_syntax::SyntaxKind;
+use unicode_ident::{is_xid_continue, is_xid_start};
 
-#[derive(Clone)]
-pub struct Lex<'lex> {
-    source: &'lex str,
-    index: usize,
+#[derive(Debug, Clone, Copy)]
+enum Mode {
+    Base {
+        depth: usize,
+    },
+    InString {
+        depth: usize,
+        multiline: bool,
+        allow_interpolation: bool,
+    },
 }
 
-impl<'lex> Lex<'lex> {
-    pub const fn new(source: &'lex str) -> Self {
-        Self { source, index: 0 }
-    }
+pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
+    let mut tokens = vec![];
+    let mut modes = vec![];
+    let mut chars = source.chars();
+    let mut index = 0;
 
-    #[inline]
-    pub const fn is_empty(&self) -> bool {
-        self.source.len() == self.index
-    }
-
-    #[inline]
-    pub fn peek(&self) -> Option<(SyntaxKind, &'lex str)> {
-        self.clone().next()
-    }
-
-    #[inline]
-    pub fn matches<F>(&self, f: F) -> bool
-    where
-        F: FnOnce((SyntaxKind, &'lex str)) -> bool,
-    {
-        self.peek().is_some_and(f)
-    }
-}
-
-impl<'lex> Iterator for Lex<'lex> {
-    type Item = (SyntaxKind, &'lex str);
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let start = self.index;
-        let mut end = start + 1;
-        let mut chars = self.source[start..].chars();
-
-        macro_rules! bump_while {
-            ($pat:pat) => {
-                while let Some($pat) = chars.next() {
-                    end += 1;
-                }
-            };
-        }
-
-        macro_rules! token {
-            ($token:ident) => {{
-                self.index += end - start;
-
-                Some((SyntaxKind::$token, &self.source[start..end]))
-            }};
-        }
-
-        match chars.next()? {
-            ' ' => {
-                bump_while!(' ');
-                token!(WHITESPACE)
-            }
-            '\n' => {
-                bump_while!('\n');
-                token!(NEW_LINE)
-            }
-            '\t' => {
-                bump_while!('\t');
-                token!(TAB)
-            }
-            '\'' => token!(SINGLE_QUOTE),
-            '\\' => token!(BACKSLASH),
-            '_' => token!(UNDERSCORE),
-            '-' => token!(HYPHEN),
-            ',' => token!(COMMA),
-            ';' => token!(SEMICOLON),
-            ':' => token!(COLON),
-            '!' => token!(EXCLAMATION),
-            '?' => token!(QUESTION),
-            '.' => token!(DOT),
-            '"' => token!(DOUBLE_QUOTE),
-            '(' => token!(LEFT_PAREN),
-            ')' => token!(RIGHT_PAREN),
-            '[' => token!(LEFT_BRACKET),
-            ']' => token!(RIGHT_BRACKET),
-            '{' => token!(LEFT_BRACE),
-            '}' => token!(RIGHT_BRACE),
-            '@' => token!(AT),
-            '*' => token!(ASTERISK),
-            '/' => token!(SLASH),
-            '&' => token!(AMPERSAND),
-            '#' => token!(HASH),
-            '%' => token!(PERCENT),
-            '`' => token!(BACKTICK),
-            '^' => token!(CARET),
-            '+' => token!(PLUS),
-            '<' => token!(LEFT_CHEVRON),
-            '=' => token!(EQUAL),
-            '>' => token!(RIGHT_CHEVRON),
-            '|' => token!(PIPE),
-            '~' => token!(TILDE),
-            '$' => token!(DOLLAR),
-            '0'..='9' => {
-                bump_while!('0'..='9');
-                token!(NUMERIC)
-            }
-            'a'..='z' | 'A'..='Z' => {
-                bump_while!('a'..='z' | 'A'..='Z');
-                match &self.source[start..end] {
-                    "as" => token!(AS),
-                    "await" => token!(AWAIT),
-                    "break" => token!(BREAK),
-                    "const" => token!(CONST),
-                    "continue" => token!(CONTINUE),
-                    "crate" => token!(CRATE),
-                    "else" => token!(ELSE),
-                    "enum" => token!(ENUM),
-                    "false" => token!(FALSE),
-                    "fn" => token!(FN),
-                    "for" => token!(FOR),
-                    "if" => token!(IF),
-                    "impl" => token!(IMPL),
-                    "in" => token!(IN),
-                    "let" => token!(LET),
-                    "loop" => token!(LOOP),
-                    "match" => token!(MATCH),
-                    "mut" => token!(MUT),
-                    "mod" => token!(MOD),
-                    "pub" => token!(PUB),
-                    "return" => token!(RETURN),
-                    "Self" => token!(SELF_UPPERCASE),
-                    "self" => token!(SELF),
-                    "static" => token!(STATIC),
-                    "struct" => token!(STRUCT),
-                    "super" => token!(SUPER),
-                    "trait" => token!(TRAIT),
-                    "true" => token!(TRUE),
-                    "type" => token!(TYPE),
-                    "use" => token!(USE),
-                    "where" => token!(WHERE),
-                    "while" => token!(WHILE),
-                    "yield" => token!(YIELD),
-                    _ => token!(ALPHABETIC),
+    macro_rules! source {
+        ($count:expr, $predicate:expr) => {{
+            let mut count = $count;
+            let mut peekable = chars.clone();
+            loop {
+                match peekable.next() {
+                    Some(c) if $predicate(c) => {
+                        count += c.len_utf8();
+                        chars.next();
+                    }
+                    _ => break,
                 }
             }
-            _ => {
-                let count: usize = self.source[start..]
-                    .chars()
-                    .take_while(|c| {
-                        !matches!(c,
-                            'a'..='z' | 'A'..='Z' | '0'..='9'
-                            | ' ' | '\n' | '\t' | '\'' | '\\' | '_' | '-' | ',' | ';' | ':' | '!'
-                            | '?' | '.' | '"' | '(' | ')' | '[' | ']' | '{' | '}' | '@' | '*' | '/'
-                            | '&' | '#' | '%' | '`' | '^' | '+' | '<' | '=' | '>' | '|' | '~' | '$'
-                        )
-                    })
-                    .map(|c| c.len_utf8())
-                    .sum();
-                end = start + count;
-                token!(RAW)
+            slice!(count)
+        }};
+    }
+
+    macro_rules! peek {
+        () => {{ chars.clone().next() }};
+    }
+
+    macro_rules! nth {
+        ($n:expr) => {{
+            let mut peekable = chars.clone();
+            for _ in 0..$n {
+                peekable.next();
+            }
+            peekable.next()
+        }};
+    }
+
+    macro_rules! many {
+        ($kind:ident, $count:expr, $predicate:expr) => {{
+            token!(SyntaxKind::$kind, source!($count, $predicate));
+        }};
+    }
+
+    macro_rules! one {
+        ($kind:ident) => {{
+            token!(SyntaxKind::$kind, slice!(1));
+        }};
+        ($kind:ident, $count:expr) => {{
+            token!(SyntaxKind::$kind, slice!($count));
+        }};
+    }
+
+    macro_rules! token {
+        ($kind:expr, $source:expr) => {{
+            tokens.push(($kind, $source));
+        }};
+    }
+
+    macro_rules! slice {
+        ($count:expr) => {{
+            let start = index;
+            index += $count;
+            let end = index;
+            &source[start..end]
+        }};
+    }
+
+    macro_rules! eat_one {
+        ($kind:ident if $predicate:expr) => {
+            match peek!() {
+                Some(c) if $predicate(c) => {
+                    chars.next();
+
+                    token!(SyntaxKind::$kind, slice!(c.len_utf8()));
+                }
+                _ => {}
+            }
+        };
+    }
+
+    macro_rules! starts_with {
+        ($prefix:expr) => {{ source[index..].starts_with($prefix) }};
+    }
+
+    'lex: loop {
+        let current_mode = modes.last().copied().unwrap_or(Mode::Base { depth: 0 });
+        match current_mode {
+            Mode::Base { depth } => {
+                let Some(c) = chars.next() else {
+                    break 'lex;
+                };
+                match c {
+                    '\'' => {
+                        one!(CHARACTER_START);
+
+                        match (peek!(), nth!(1), nth!(2)) {
+                            // Normal character
+                            (Some(c), _, _) if !matches!(c, '\'' | '\\' | '\n' | '\t') => {
+                                chars.next();
+
+                                one!(CHARACTER_SEGMENT, c.len_utf8());
+                            }
+                            // Escape sequences
+                            (Some('\\'), Some('\\'), _)
+                            | (Some('\\'), Some('\''), _)
+                            | (Some('\\'), Some('"'), _)
+                            | (Some('\\'), Some('n'), _)
+                            | (Some('\\'), Some('t'), _) => {
+                                chars.next(); // skip '\'
+                                chars.next(); // skip escaped char
+
+                                token!(SyntaxKind::CHARACTER_SEGMENT, slice!(2));
+                            }
+                            // Unicode escape sequence
+                            (Some('\\'), Some('u'), Some('{')) => {
+                                chars.next(); // skip '\'
+                                chars.next(); // skip 'u'
+                                chars.next(); // skip '{'
+
+                                let mut peekable = chars.clone();
+                                let mut count = 3;
+                                match peekable.next().filter(|c| c.is_ascii_hexdigit()) {
+                                    Some(_) => {
+                                        count += 1;
+                                        chars.next(); // skip first hex digit
+                                    }
+                                    _ => {
+                                        token!(SyntaxKind::ERROR, slice!(count));
+                                        continue 'lex;
+                                    }
+                                }
+                                for _ in 0..5 {
+                                    match peekable.next().filter(|c| c.is_ascii_hexdigit()) {
+                                        Some(_) => {
+                                            count += 1;
+                                            chars.next(); // skip hex digit
+                                        }
+                                        _ => break,
+                                    }
+                                }
+
+                                let mut peekable = chars.clone();
+                                match peekable.next() {
+                                    Some('}') => {
+                                        count += 1;
+                                        chars.next(); // skip '}'
+                                        token!(SyntaxKind::CHARACTER_SEGMENT, slice!(count));
+                                    }
+                                    _ => {
+                                        token!(SyntaxKind::ERROR, slice!(count));
+                                        continue 'lex;
+                                    }
+                                }
+                            }
+                            // Invalid character
+                            _ => continue 'lex,
+                        }
+
+                        eat_one!(CHARACTER_END if |c| matches!(c, '\''));
+                    }
+                    '"' => {
+                        match (peek!(), nth!(1)) {
+                            // Triple-quoted string start
+                            (Some('"'), Some('"')) => {
+                                chars.next(); // skip second '"'
+                                chars.next(); // skip third '"'
+
+                                one!(STRING_START, "\"\"\"".len());
+                                modes.push(Mode::InString {
+                                    depth,
+                                    multiline: true,
+                                    allow_interpolation: true,
+                                });
+                                continue 'lex;
+                            }
+                            _ => {
+                                one!(STRING_START);
+                                modes.push(Mode::InString {
+                                    depth,
+                                    multiline: false,
+                                    allow_interpolation: true,
+                                });
+                                continue 'lex;
+                            }
+                        }
+                    }
+                    prefix @ '0'..='9' => {
+                        match (prefix, peek!()) {
+                            ('0', Some('b')) => {
+                                chars.next(); // skip 'b' or 'B'
+
+                                one!(BINARY_START, 2);
+
+                                loop {
+                                    let mut peekable = chars.clone();
+                                    match peekable.next() {
+                                        Some(c) if matches!(c, '0' | '1') => {
+                                            chars.next(); // skip first binary digit
+
+                                            let mut count = 1;
+                                            while let Some(_) =
+                                                peekable.next().filter(|c| matches!(c, '0' | '1'))
+                                            {
+                                                count += 1;
+                                                chars.next(); // skip binary digit
+                                            }
+
+                                            one!(BINARY_SEGMENT, count);
+                                        }
+                                        Some('_') => {
+                                            chars.next(); // skip '_'
+
+                                            let mut count = 1;
+                                            while let Some('_') = peekable.next() {
+                                                count += 1;
+                                                chars.next(); // skip '_'
+                                            }
+
+                                            one!(NUMERIC_SEPARATOR, count);
+                                        }
+                                        _ => continue 'lex,
+                                    }
+                                }
+                            }
+                            ('0', Some('o')) => {
+                                chars.next(); // skip 'o'
+
+                                one!(OCTAL_START, 2);
+
+                                loop {
+                                    let mut peekable = chars.clone();
+                                    match peekable.next() {
+                                        Some(c) if matches!(c, '0'..='7') => {
+                                            chars.next(); // skip first octal digit
+
+                                            let mut count = 1;
+                                            while let Some(_) =
+                                                peekable.next().filter(|c| matches!(c, '0'..='7'))
+                                            {
+                                                count += 1;
+                                                chars.next(); // skip octal digit
+                                            }
+
+                                            one!(OCTAL_SEGMENT, count);
+                                        }
+                                        Some('_') => {
+                                            chars.next(); // skip '_'
+
+                                            let mut count = 1;
+                                            while let Some('_') = peekable.next() {
+                                                count += 1;
+                                                chars.next(); // skip '_'
+                                            }
+
+                                            one!(NUMERIC_SEPARATOR, count);
+                                        }
+                                        _ => continue 'lex,
+                                    }
+                                }
+                            }
+                            ('0', Some('x')) => {
+                                chars.next(); // skip 'x'
+
+                                one!(HEX_START, 2);
+
+                                loop {
+                                    let mut peekable = chars.clone();
+                                    let mut count = 1;
+                                    match peekable.next() {
+                                        Some(c) if c.is_ascii_hexdigit() => {
+                                            chars.next(); // skip first hex digit
+
+                                            while let Some(_) =
+                                                peekable.next().filter(|c| c.is_ascii_hexdigit())
+                                            {
+                                                count += 1;
+                                                chars.next(); // skip hex digit
+                                            }
+
+                                            one!(HEX_SEGMENT, count);
+                                        }
+                                        Some('_') => {
+                                            chars.next(); // skip '_'
+
+                                            while let Some('_') = peekable.next() {
+                                                count += 1;
+                                                chars.next(); // skip '_'
+                                            }
+
+                                            one!(NUMERIC_SEPARATOR, count);
+                                        }
+                                        _ => continue 'lex,
+                                    }
+                                }
+                            }
+                            // Decimal or floating-point number
+                            (_, _) => {
+                                // Integer part
+                                let mut peekable = chars.clone();
+                                let mut count = 1;
+                                while let Some(_) = peekable.next().filter(|c| is_numeric(*c)) {
+                                    count += 1;
+                                    chars.next(); // skip digit
+                                }
+
+                                one!(INTEGER_SEGMENT, count);
+
+                                loop {
+                                    let mut peekable = chars.clone();
+                                    let mut count = 1;
+                                    match peekable.next() {
+                                        Some(c) if is_numeric(c) => {
+                                            chars.next();
+
+                                            while let Some(_) =
+                                                peekable.next().filter(|c| is_numeric(*c))
+                                            {
+                                                count += 1;
+                                                chars.next(); // skip digit
+                                            }
+
+                                            one!(INTEGER_SEGMENT, count);
+                                        }
+                                        Some('_') => {
+                                            chars.next();
+
+                                            while let Some('_') = peekable.next() {
+                                                count += 1;
+                                                chars.next(); // skip '_'
+                                            }
+
+                                            one!(NUMERIC_SEPARATOR, count);
+                                        }
+                                        _ => break,
+                                    }
+                                }
+
+                                // Fractional part
+                                if matches!(peek!(), Some('.'))
+                                    && matches!(nth!(1), Some(c) if is_numeric(c) || c == '_')
+                                {
+                                    chars.next(); // skip '.'
+
+                                    one!(FRACTIONAL_PREFIX);
+
+                                    loop {
+                                        let mut peekable = chars.clone();
+                                        let mut count = 1;
+                                        match peekable.next() {
+                                            Some(c) if is_numeric(c) => {
+                                                chars.next();
+
+                                                while let Some(_) =
+                                                    peekable.next().filter(|c| is_numeric(*c))
+                                                {
+                                                    count += 1;
+                                                    chars.next(); // skip digit
+                                                }
+
+                                                one!(FRACTIONAL_SEGMENT, count);
+                                            }
+                                            Some('_') => {
+                                                chars.next();
+
+                                                while let Some('_') = peekable.next() {
+                                                    count += 1;
+                                                    chars.next(); // skip '_'
+                                                }
+
+                                                one!(NUMERIC_SEPARATOR, count);
+                                            }
+                                            _ => break,
+                                        }
+                                    }
+                                }
+
+                                // Exponential part
+                                if matches!(peek!(), Some('e') | Some('E')) {
+                                    chars.next(); // skip 'e' or 'E'
+
+                                    one!(EXPONENTIAL_PREFIX);
+
+                                    if matches!(peek!(), Some('+') | Some('-')) {
+                                        chars.next(); // skip '+' or '-'
+
+                                        one!(EXPONENT_SIGN);
+                                    }
+
+                                    loop {
+                                        let mut peekable = chars.clone();
+                                        let mut count = 1;
+                                        match peekable.next() {
+                                            Some(c) if is_numeric(c) => {
+                                                chars.next();
+
+                                                while let Some(_) =
+                                                    peekable.next().filter(|c| is_numeric(*c))
+                                                {
+                                                    count += 1;
+                                                    chars.next(); // skip digit
+                                                }
+
+                                                one!(EXPONENTIAL_SEGMENT, count);
+                                            }
+                                            Some('_') => {
+                                                chars.next();
+
+                                                while let Some('_') = peekable.next() {
+                                                    count += 1;
+                                                    chars.next(); // skip '_'
+                                                }
+
+                                                one!(NUMERIC_SEPARATOR, count);
+                                            }
+                                            _ => break,
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    c if is_identifier_start(c) => {
+                        let source = source!(c.len_utf8(), is_identifier_continue);
+                        token!(keyword(source), source);
+                    }
+                    c if is_whitespace(c) => many!(WHITESPACE, c.len_utf8(), is_whitespace),
+                    c if is_tab(c) => many!(TAB, c.len_utf8(), is_tab),
+                    '\n' => one!(NEW_LINE),
+                    '\\' => one!(BACKSLASH),
+                    '-' => one!(HYPHEN),
+                    ',' => one!(COMMA),
+                    ';' => one!(SEMICOLON),
+                    ':' => one!(COLON),
+                    '!' => one!(EXCLAMATION),
+                    '?' => one!(QUESTION),
+                    '.' => one!(DOT),
+                    '(' => one!(LEFT_PAREN),
+                    ')' => one!(RIGHT_PAREN),
+                    '[' => one!(LEFT_BRACKET),
+                    ']' => one!(RIGHT_BRACKET),
+                    '{' => one!(LEFT_BRACE),
+                    '}' if depth != 0 => {
+                        one!(INTERPOLATION_END);
+                        modes.pop();
+                    }
+                    '}' => one!(RIGHT_BRACE),
+                    '@' => one!(AT),
+                    '*' => one!(ASTERISK),
+                    '/' => one!(SLASH),
+                    '&' => one!(AMPERSAND),
+                    '#' => one!(HASH),
+                    '%' => one!(PERCENT),
+                    '`' => one!(BACKTICK),
+                    '^' => one!(CARET),
+                    '+' => one!(PLUS),
+                    '<' => one!(LEFT_CHEVRON),
+                    '=' => one!(EQUAL),
+                    '>' => one!(RIGHT_CHEVRON),
+                    '|' => one!(PIPE),
+                    '~' => one!(TILDE),
+                    '$' => one!(DOLLAR),
+                    other => many!(ERROR, other.len_utf8(), unexpected),
+                }
+            }
+            Mode::InString {
+                depth,
+                multiline: false,
+                allow_interpolation,
+            } => {
+                if starts_with!("\"") {
+                    chars.next(); // skip '"'
+
+                    one!(STRING_END);
+                    modes.pop();
+                    continue 'lex;
+                }
+
+                // Error: Newline in string
+                if starts_with!("\n") {
+                    modes.pop();
+                    continue 'lex;
+                }
+
+                if allow_interpolation && starts_with!("${") {
+                    chars.next(); // skip '$'
+                    chars.next(); // skip '{'
+
+                    one!(INTERPOLATION_START, "${".len());
+                    modes.push(Mode::Base { depth: depth + 1 });
+                    continue 'lex;
+                }
+
+                let mut count = 0;
+                loop {
+                    let source = &source[index + count..];
+                    if source.starts_with('"') || source.starts_with('\n') {
+                        break;
+                    }
+                    if allow_interpolation && source.starts_with("${") {
+                        break;
+                    }
+
+                    chars.next();
+                    count += 1;
+                }
+
+                one!(STRING_SEGMENT, count);
+            }
+            Mode::InString {
+                depth,
+                multiline: true,
+                allow_interpolation,
+            } => {
+                if starts_with!("\"\"\"") {
+                    chars.next(); // skip first '"'
+                    chars.next(); // skip second '"'
+                    chars.next(); // skip third '"'
+
+                    one!(STRING_END, "\"\"\"".len());
+                    modes.pop();
+                    continue 'lex;
+                }
+
+                if allow_interpolation && starts_with!("${") {
+                    chars.next(); // skip '$'
+                    chars.next(); // skip '{'
+
+                    one!(INTERPOLATION_START, "${".len());
+                    modes.push(Mode::Base { depth: depth + 1 });
+                    continue 'lex;
+                }
+
+                let mut count = 0;
+                loop {
+                    let source = &source[index + count..];
+                    if source.starts_with("\"\"\"") {
+                        break;
+                    }
+                    if allow_interpolation && source.starts_with("${") {
+                        break;
+                    }
+
+                    chars.next();
+                    count += 1;
+                }
+                one!(STRING_SEGMENT, count);
             }
         }
     }
+
+    tokens
 }
 
-#[test]
-fn keywords() {
-    let source = "as await break const continue crate else enum false fn for if impl in let loop match mut mod pub return Self self static struct super trait true type use where while yield";
-    let lex = Lex::new(source);
-    let tokens: Vec<_> = lex
-        .filter(|(kind, _)| !matches!(kind, SyntaxKind::WHITESPACE))
-        .collect();
-
-    insta::assert_debug_snapshot!(tokens);
+const fn is_whitespace(c: char) -> bool {
+    matches!(c, ' ')
 }
 
-#[test]
-fn punctuations() {
-    let source = "\n\t~`!@#$%^&*-_+=|:;,./?\\{}[]()<>\"'";
-    let lex = Lex::new(source);
-    let tokens: Vec<_> = lex.collect();
-
-    insta::assert_debug_snapshot!(tokens);
+const fn is_tab(c: char) -> bool {
+    matches!(c, '\t')
 }
 
-#[test]
-fn numeric() {
-    let source = "123.456e+789 0b1010 0o123 0xABC";
-    let lex = Lex::new(source);
-    let tokens: Vec<_> = lex.collect();
-
-    insta::assert_debug_snapshot!(tokens);
+fn is_identifier_start(c: char) -> bool {
+    matches!(c, '_') || is_xid_start(c)
 }
 
-#[test]
-fn raw() {
-    let source = "💖✨🚀🦀 한글";
-    dbg!(source.len());
-    let lex = Lex::new(source);
-    let tokens: Vec<_> = lex.collect();
+fn is_identifier_continue(c: char) -> bool {
+    matches!(c, '_') || is_xid_continue(c) || is_numeric(c)
+}
 
-    insta::assert_debug_snapshot!(tokens);
+fn unexpected(c: char) -> bool {
+    is_numeric(c) || is_identifier_start(c) || is_punctuation(c)
+}
+
+const fn is_numeric(c: char) -> bool {
+    matches!(c, '0'..='9')
+}
+
+const fn is_punctuation(c: char) -> bool {
+    matches!(
+        c,
+        ' ' | '\t'
+            | '\n'
+            | '\\'
+            | '-'
+            | ','
+            | ';'
+            | ':'
+            | '!'
+            | '?'
+            | '.'
+            | '('
+            | ')'
+            | '['
+            | ']'
+            | '{'
+            | '}'
+            | '@'
+            | '*'
+            | '/'
+            | '&'
+            | '#'
+            | '%'
+            | '`'
+            | '^'
+            | '+'
+            | '<'
+            | '='
+            | '>'
+            | '|'
+            | '~'
+            | '$'
+    )
+}
+
+fn keyword(identifier: &str) -> SyntaxKind {
+    match identifier {
+        "fn" => SyntaxKind::FN,
+        "let" => SyntaxKind::LET,
+        "true" => SyntaxKind::TRUE,
+        "false" => SyntaxKind::FALSE,
+        "pub" => SyntaxKind::PUB,
+        "crate" => SyntaxKind::CRATE,
+        "super" => SyntaxKind::SUPER,
+        "in" => SyntaxKind::IN,
+        "type" => SyntaxKind::TYPE,
+        "where" => SyntaxKind::WHERE,
+        "struct" => SyntaxKind::STRUCT,
+        "enum" => SyntaxKind::ENUM,
+        "trait" => SyntaxKind::TRAIT,
+        "impl" => SyntaxKind::IMPL,
+        "const" => SyntaxKind::CONST,
+        "static" => SyntaxKind::STATIC,
+        "use" => SyntaxKind::USE,
+        "mod" => SyntaxKind::MOD,
+        "self" => SyntaxKind::SELF,
+        "Self" => SyntaxKind::SELF_UPPERCASE,
+        "as" => SyntaxKind::AS,
+        "for" => SyntaxKind::FOR,
+        "if" => SyntaxKind::IF,
+        "else" => SyntaxKind::ELSE,
+        "match" => SyntaxKind::MATCH,
+        "mut" => SyntaxKind::MUT,
+        "loop" => SyntaxKind::LOOP,
+        "while" => SyntaxKind::WHILE,
+        "return" => SyntaxKind::RETURN,
+        "break" => SyntaxKind::BREAK,
+        "continue" => SyntaxKind::CONTINUE,
+        "await" => SyntaxKind::AWAIT,
+        "yield" => SyntaxKind::YIELD,
+        _ => SyntaxKind::IDENTIFIER,
+    }
 }

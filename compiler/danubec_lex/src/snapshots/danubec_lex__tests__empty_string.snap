@@ -1,0 +1,26 @@
+---
+source: compiler/danubec_lex/src/tests.rs
+expression: tokens
+---
+[
+    (
+        STRING_START,
+        "\"",
+    ),
+    (
+        STRING_END,
+        "\"",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        STRING_START,
+        "\"\"\"",
+    ),
+    (
+        STRING_END,
+        "\"\"\"",
+    ),
+]

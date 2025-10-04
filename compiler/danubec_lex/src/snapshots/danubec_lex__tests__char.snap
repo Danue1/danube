@@ -1,0 +1,82 @@
+---
+source: compiler/danubec_lex/src/tests.rs
+expression: tokens
+---
+[
+    (
+        CHARACTER_START,
+        "'",
+    ),
+    (
+        CHARACTER_SEGMENT,
+        "a",
+    ),
+    (
+        CHARACTER_END,
+        "'",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        CHARACTER_START,
+        "'",
+    ),
+    (
+        CHARACTER_SEGMENT,
+        "\\n",
+    ),
+    (
+        CHARACTER_END,
+        "'",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        CHARACTER_START,
+        "'",
+    ),
+    (
+        CHARACTER_SEGMENT,
+        "\\'",
+    ),
+    (
+        CHARACTER_END,
+        "'",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        CHARACTER_START,
+        "'",
+    ),
+    (
+        CHARACTER_SEGMENT,
+        "한",
+    ),
+    (
+        CHARACTER_END,
+        "'",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        CHARACTER_START,
+        "'",
+    ),
+    (
+        CHARACTER_SEGMENT,
+        "\\u{AC00}",
+    ),
+    (
+        CHARACTER_END,
+        "'",
+    ),
+]
