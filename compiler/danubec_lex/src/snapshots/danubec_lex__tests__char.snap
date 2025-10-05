@@ -24,8 +24,12 @@ expression: tokens
         "'",
     ),
     (
-        CHARACTER_SEGMENT,
-        "\\'",
+        ESCAPE_START,
+        "\\",
+    ),
+    (
+        ESCAPE_SEGMENT,
+        "'",
     ),
     (
         CHARACTER_END,
@@ -40,8 +44,12 @@ expression: tokens
         "'",
     ),
     (
-        CHARACTER_SEGMENT,
-        "\\\\",
+        ESCAPE_START,
+        "\\",
+    ),
+    (
+        ESCAPE_SEGMENT,
+        "\\",
     ),
     (
         CHARACTER_END,
@@ -56,8 +64,12 @@ expression: tokens
         "'",
     ),
     (
-        CHARACTER_SEGMENT,
-        "\\n",
+        ESCAPE_START,
+        "\\",
+    ),
+    (
+        ESCAPE_SEGMENT,
+        "n",
     ),
     (
         CHARACTER_END,
@@ -72,8 +84,12 @@ expression: tokens
         "'",
     ),
     (
-        CHARACTER_SEGMENT,
-        "\\t",
+        ESCAPE_START,
+        "\\",
+    ),
+    (
+        ESCAPE_SEGMENT,
+        "t",
     ),
     (
         CHARACTER_END,

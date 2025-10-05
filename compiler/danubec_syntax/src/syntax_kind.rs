@@ -8,13 +8,14 @@ pub enum SyntaxKind {
     /// The end of the file
     END_OF_FILE,
 
+    RAW_IDENTIFIER_START,
     IDENTIFIER,
     INTEGER_SEGMENT,
-    FRACTIONAL_PREFIX,
-    FRACTIONAL_SEGMENT,
-    EXPONENTIAL_PREFIX,
+    FRACTION_START,
+    FRACTION_SEGMENT,
+    EXPONENT_START,
     EXPONENT_SIGN,
-    EXPONENTIAL_SEGMENT,
+    EXPONENT_SEGMENT,
     NUMERIC_SEPARATOR,
     BINARY_START,
     BINARY_SEGMENT,
@@ -28,6 +29,8 @@ pub enum SyntaxKind {
     CHARACTER_START,
     CHARACTER_SEGMENT,
     CHARACTER_END,
+    ESCAPE_START,
+    ESCAPE_SEGMENT,
     UNICODE_START,
     UNICODE_SEGMENT,
     UNICODE_END,
@@ -36,6 +39,9 @@ pub enum SyntaxKind {
     STRING_END,
     INTERPOLATION_START,
     INTERPOLATION_END,
+    RAW_STRING_START,
+    RAW_STRING_SEGMENT,
+    RAW_STRING_END,
     LINE_COMMENT_START,
     LINE_COMMENT_SEGMENT,
 
@@ -45,12 +51,6 @@ pub enum SyntaxKind {
     NEW_LINE,
     /// `\t`
     TAB,
-    /// '\''
-    SINGLE_QUOTE,
-    /// '\\'
-    BACKSLASH,
-    /// '_'
-    UNDERSCORE,
     /// '-'
     HYPHEN,
     /// ','
@@ -65,8 +65,6 @@ pub enum SyntaxKind {
     QUESTION,
     /// '.'
     DOT,
-    /// '"'
-    DOUBLE_QUOTE,
     /// '('
     LEFT_PAREN,
     /// ')'
@@ -91,8 +89,6 @@ pub enum SyntaxKind {
     HASH,
     /// '%'
     PERCENT,
-    /// '`'
-    BACKTICK,
     /// '^'
     CARET,
     /// '+'
@@ -110,6 +106,8 @@ pub enum SyntaxKind {
     /// '$'
     DOLLAR,
 
+    /// `_`
+    PLACEHOLDER,
     /// `fn`
     FN,
     /// `let`
@@ -311,6 +309,8 @@ pub enum SyntaxKind {
     STATIC_DEFINITION_NODE,
     USE_DEFINITION_NODE,
     MODULE_DEFINITION_NODE,
+    MODULE_DEFINITION_INLINE_NODE,
+    MODULE_DEFINITION_OUTLINE_NODE,
 
     NEVER_TYPE_NODE,
     PATH_TYPE_NODE,
@@ -369,6 +369,13 @@ pub enum SyntaxKind {
     ARRAY_LITERAL_NODE,
     BOOLEAN_LITERAL_NODE,
     CHARACTER_LITERAL_NODE,
+    CHARACTER_LITERAL_ONE_NODE,
+    CHARACTER_LITERAL_ESCAPE_NODE,
+    CHARACTER_LITERAL_UNICODE_NODE,
+    STRING_LITERAL_SEGMENT_NODE,
+    STRING_LITERAL_ESCAPE_NODE,
+    STRING_LITERAL_UNICODE_NODE,
+    STRING_LITERAL_INTERPOLATION_NODE,
     NUMERIC_LITERAL_NODE,
     STRING_LITERAL_NODE,
     BINARY_NUMERIC_LITERAL_NODE,

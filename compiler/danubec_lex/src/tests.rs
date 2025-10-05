@@ -2,7 +2,7 @@ use crate::lex;
 
 #[test]
 fn punctuations() {
-    let source = "\n\t~`!@#$%^&*-+=|:;,./?\\{}[]()<>";
+    let source = "\n\t~!@#$%^&*-+=|:;,./?{}[]()<>";
     let tokens = lex(source);
 
     insta::assert_debug_snapshot!(tokens);
@@ -26,7 +26,7 @@ fn empty_string() {
 
 #[test]
 fn non_multiline_string() {
-    let source = r#""Hello, World!" "a${b}c""#;
+    let source = r#""Hello, World!" "a${b}c" "\'" "\\" "\\" "\n" "\t" "\u{AC00}""#;
     let tokens = lex(source);
 
     insta::assert_debug_snapshot!(tokens);
@@ -35,6 +35,15 @@ fn non_multiline_string() {
 #[test]
 fn multiline_string() {
     let source = r#""""Hello, "World"!""" """a${b}c""""#;
+    let tokens = lex(source);
+
+    insta::assert_debug_snapshot!(tokens);
+}
+
+#[test]
+fn raw_string() {
+    let source =
+        r####"r#"Hello, "World"!""# r##"r#"Hello, "World"!""## r###"r##"Hello, "World"!""###"####;
     let tokens = lex(source);
 
     insta::assert_debug_snapshot!(tokens);
@@ -84,6 +93,14 @@ fn float() {
 #[test]
 fn identifier() {
     let source = "_ _foo _123 _foo123 foo foo_ foo123 foo123_ foo_foo foo_123 한글";
+    let tokens = lex(source);
+
+    insta::assert_debug_snapshot!(tokens);
+}
+
+#[test]
+fn raw_identifier() {
+    let source = "r#abc";
     let tokens = lex(source);
 
     insta::assert_debug_snapshot!(tokens);

@@ -163,10 +163,7 @@ ast_node! {
     token hash where HASH;
     token exclamation where EXCLAMATION;
     token left_bracket where LEFT_BRACKET;
-    node path -> Path;
-    token left_paren where LEFT_PAREN;
-    nodes arguments -> AttributeArgument;
-    token right_paren where RIGHT_PAREN;
+    node attribute -> Attribute;
     token right_bracket where RIGHT_BRACKET;
 }
 
@@ -178,10 +175,7 @@ ast_node! {
 
     token hash where HASH;
     token left_bracket where LEFT_BRACKET;
-    node path -> Path;
-    token left_paren where LEFT_PAREN;
-    nodes arguments -> AttributeArgument;
-    token right_paren where RIGHT_PAREN;
+    node attribute -> AttributeArgument;
     token right_bracket where RIGHT_BRACKET;
 }
 
@@ -235,9 +229,11 @@ ast_node! {
 }
 
 ast_node! {
+    /// A top-level definition: function, struct, enum, use, module, trait, constant, static, type alias, impl block.
     struct Definition where DEFINITION_NODE;
 
     nodes attributes -> Attribute;
+    node visibility -> Visibility;
     node kind -> DefinitionKind;
 }
 
@@ -263,19 +259,23 @@ ast_node! {
     /// ```
     struct FunctionDefinition where FUNCTION_DEFINITION_NODE;
 
-    node visibility -> Visibility;
     token r#fn where FN;
     node name -> Identifier;
+
     token left_chevron where LEFT_CHEVRON;
     nodes type_parameters -> TypeParameter;
     token right_chevron where RIGHT_CHEVRON;
+
     token left_paren where LEFT_PAREN;
     nodes parameters -> FunctionParameter;
     token right_paren where RIGHT_PAREN;
+
     token arrow where HYPHEN__RIGHT_CHEVRON;
     node r#type -> TypeExpression;
+
     token r#where where WHERE;
     nodes constraints -> TypeParameterConstraint;
+
     node body -> BlockExpression;
 }
 
@@ -285,14 +285,16 @@ ast_node! {
     /// ```
     struct StructDefinition where STRUCT_DEFINITION_NODE;
 
-    node visibility -> Visibility;
     token r#struct where STRUCT;
     node name -> Identifier;
+
     token left_chevron where LEFT_CHEVRON;
     nodes type_parameters -> TypeParameter;
     token right_chevron where RIGHT_CHEVRON;
+
     token r#where where WHERE;
     nodes constraints -> TypeParameterConstraint;
+
     node body -> StructBody;
 }
 
@@ -302,14 +304,16 @@ ast_node! {
     /// ```
     struct EnumDefinition where ENUM_DEFINITION_NODE;
 
-    node visibility -> Visibility;
     token r#enum where ENUM;
     node name -> Identifier;
+
     token left_chevron where LEFT_CHEVRON;
     nodes type_parameters -> TypeParameter;
     token right_chevron where RIGHT_CHEVRON;
+
     token r#where where WHERE;
     nodes constraints -> TypeParameterConstraint;
+
     token left_brace where LEFT_BRACE;
     nodes variants -> EnumVariant;
     token right_brace where RIGHT_BRACE;
@@ -321,7 +325,6 @@ ast_node! {
     /// ```
     struct UseDefinition where USE_DEFINITION_NODE;
 
-    node visibility -> Visibility;
     token r#use where USE;
     node tree -> UseTree;
     token semicolon where SEMICOLON;
@@ -334,13 +337,10 @@ ast_node! {
     /// ```
     struct ModuleDefinition where MODULE_DEFINITION_NODE;
 
-    node visibility -> Visibility;
     token r#mod where MOD;
     node name -> Identifier;
-    token left_brace where LEFT_BRACE;
-    nodes definitions -> Definition;
-    token right_brace where RIGHT_BRACE;
-    token semicolon where SEMICOLON;
+
+    node kind -> ModuleDefinitionKind;
 }
 
 ast_node! {
@@ -349,14 +349,16 @@ ast_node! {
     /// ```
     struct TraitDefinition where TRAIT_DEFINITION_NODE;
 
-    node visibility -> Visibility;
     token r#trait where TRAIT;
     node name -> Identifier;
+
     token left_chevron where LEFT_CHEVRON;
     nodes type_parameters -> TypeParameter;
     token right_chevron where RIGHT_CHEVRON;
+
     token r#where where WHERE;
     nodes constraints -> TypeParameterConstraint;
+
     token left_brace where LEFT_BRACE;
     nodes definitions -> AssociatedDefinition;
     token right_brace where RIGHT_BRACE;
@@ -368,11 +370,12 @@ ast_node! {
     /// ```
     struct ConstantDefinition where CONSTANT_DEFINITION_NODE;
 
-    node visibility -> Visibility;
     token r#const where CONST;
     node name -> Identifier;
+
     token colon where COLON;
     node r#type -> TypeExpression;
+
     token equal where EQUAL;
     node expression -> Expression;
     token semicolon where SEMICOLON;
@@ -384,11 +387,12 @@ ast_node! {
     /// ```
     struct StaticDefinition where STATIC_DEFINITION_NODE;
 
-    node visibility -> Visibility;
     token r#static where STATIC;
     node name -> Identifier;
+
     token colon where COLON;
     node r#type -> TypeExpression;
+
     token equal where EQUAL;
     node expression -> Expression;
     token semicolon where SEMICOLON;
@@ -400,14 +404,16 @@ ast_node! {
     /// ```
     struct TypeDefinition where TYPE_DEFINITION_NODE;
 
-    node visibility -> Visibility;
     token r#type where TYPE;
     node name -> Identifier;
+
     token left_chevron where LEFT_CHEVRON;
     nodes type_parameters -> TypeParameter;
     token right_chevron where RIGHT_CHEVRON;
+
     token r#where where WHERE;
     nodes constraints -> TypeParameterConstraint;
+
     token equal where EQUAL;
     node expression -> TypeExpression;
     token semicolon where SEMICOLON;
@@ -420,17 +426,49 @@ ast_node! {
     struct ImplementDefinition where IMPLEMENT_DEFINITION_NODE;
 
     token r#impl where IMPL;
+
     token left_chevron where LEFT_CHEVRON;
     nodes type_parameters -> TypeParameter;
     token right_chevron where RIGHT_CHEVRON;
+
     node trait_type -> TypeExpression;
+
     token r#for where FOR;
     node target_type -> TypeExpression;
+
     token r#where where WHERE;
     nodes constraints -> TypeParameterConstraint;
+
     token left_brace where LEFT_BRACE;
     nodes definitions -> AssociatedDefinition;
     token right_brace where RIGHT_BRACE;
+}
+
+ast_node! {
+    // ```
+    /// mod $name { $definitions }
+    /// mod $name;
+    /// ```
+    enum ModuleDefinitionKind;
+
+    variant Inline -> ModuleDefinitionInline;
+    variant Outline -> ModuleDefinitionOutline;
+}
+
+ast_node! {
+    /// An inline module definition: `mod name { definitions }`
+    struct ModuleDefinitionInline where MODULE_DEFINITION_INLINE_NODE;
+
+    token left_brace where LEFT_BRACE;
+    nodes definitions -> Definition;
+    token right_brace where RIGHT_BRACE;
+}
+
+ast_node! {
+    /// An outline module definition: `mod name;`
+    struct ModuleDefinitionOutline where MODULE_DEFINITION_OUTLINE_NODE;
+
+    token semicolon where SEMICOLON;
 }
 
 ast_node! {
@@ -438,6 +476,7 @@ ast_node! {
     struct UseTree where USE_TREE_NODE;
 
     node path -> Path;
+
     token colon__colon where COLON__COLON;
     node kind -> UseTreeKind;
     token comma where COMMA;
@@ -632,7 +671,7 @@ ast_node! {
     /// The placeholder pattern: `_`
     struct PlaceholderPattern where PLACEHOLDER_PATTERN_NODE;
 
-    node identifier -> Identifier;
+    token placeholder where PLACEHOLDER;
 }
 
 ast_node! {
@@ -1185,39 +1224,106 @@ ast_node! {
     /// A character literal: `'a'`, `'\n'`, etc.
     struct CharacterLiteral where CHARACTER_LITERAL_NODE;
 
-    node raw -> Raw;
+    token character_start where CHARACTER_START;
+    node kind -> CharacterLiteralKind;
+    token character_end where CHARACTER_END;
+}
+
+ast_node! {
+    /// The kind of a character literal.
+    enum CharacterLiteralKind;
+
+    variant One -> CharacterLiteralOne;
+    variant Escape -> CharacterLiteralEscape;
+    variant Unicode -> CharacterLiteralUnicode;
+}
+
+ast_node! {
+    /// A single character in a character literal: `a`
+    struct CharacterLiteralOne where CHARACTER_LITERAL_ONE_NODE;
+
+    token character where CHARACTER_SEGMENT;
+}
+
+ast_node! {
+    /// An escape sequence in a character literal: `\n`, `\t`, `\\`, etc.
+    struct CharacterLiteralEscape where CHARACTER_LITERAL_ESCAPE_NODE;
+
+    token escape where ESCAPE_START;
+    token segment where ESCAPE_SEGMENT;
+}
+
+ast_node! {
+    /// A Unicode escape sequence in a character literal: `\u{1F600}`
+    struct CharacterLiteralUnicode where CHARACTER_LITERAL_UNICODE_NODE;
+
+    token unicode_escape_start where UNICODE_START;
+    tokens segments where UNICODE_SEGMENT;
+    token unicode_escape_end where UNICODE_END;
 }
 
 ast_node! {
     /// A numeric literal: `42`, `3.14`, etc.
     struct NumericLiteral where NUMERIC_LITERAL_NODE;
 
-    node raw -> Raw;
+    tokens integer_segments where INTEGER_SEGMENT;
+    token fraction_start where FRACTION_START;
+    tokens fraction_segments where FRACTION_SEGMENT;
+    token exponent_start where EXPONENT_START;
+    token exponent_sign where EXPONENT_SIGN;
+    tokens exponent_segments where EXPONENT_SEGMENT;
 }
 
 ast_node! {
     /// A string literal: `"hello"`, `"world"`, etc.
     struct StringLiteral where STRING_LITERAL_NODE;
 
-    token left_double_quote where DOUBLE_QUOTE;
-    node raw -> Raw;
+    token string_start where STRING_START;
+    nodes segments -> StringSegment;
+    token string_end where STRING_END;
 }
 
-impl StringLiteral {
-    pub fn right_double_quote(&self) -> Option<crate::SyntaxToken> {
-        use rowan::ast::AstNode;
+ast_node! {
+    /// A segment in a string literal: `hello`, `\n`, etc.
+    enum StringSegment;
 
-        self.syntax()
-            .children_with_tokens()
-            .find_map(|child| match child {
-                rowan::NodeOrToken::Token(token)
-                    if token.kind() == crate::SyntaxKind::DOUBLE_QUOTE =>
-                {
-                    Some(token)
-                }
-                _ => None,
-            })
-    }
+    variant Segment -> StringLiteralSegment;
+    variant Escape -> StringLiteralEscape;
+    variant Unicode -> StringLiteralUnicode;
+    variant Interpolation -> StringLiteralInterpolation;
+}
+
+ast_node! {
+    /// A simple segment in a string literal: `hello`
+    struct StringLiteralSegment where STRING_LITERAL_SEGMENT_NODE;
+
+    token segment where STRING_SEGMENT;
+}
+
+ast_node! {
+    /// An escape sequence in a string literal: `\n`, `\t`, `\\`, etc.
+    struct StringLiteralEscape where STRING_LITERAL_ESCAPE_NODE;
+
+    token escape where ESCAPE_START;
+    token segment where ESCAPE_SEGMENT;
+}
+
+ast_node! {
+    /// A Unicode escape sequence in a string literal: `\u{1F600}`
+    struct StringLiteralUnicode where STRING_LITERAL_UNICODE_NODE;
+
+    token unicode_escape_start where UNICODE_START;
+    tokens segments where UNICODE_SEGMENT;
+    token unicode_escape_end where UNICODE_END;
+}
+
+ast_node! {
+    /// An interpolation in a string literal: `${ expression }`
+    struct StringLiteralInterpolation where STRING_LITERAL_INTERPOLATION_NODE;
+
+    token interpolation_start where INTERPOLATION_START;
+    node expression -> Expression;
+    token interpolation_end where INTERPOLATION_END;
 }
 
 ast_node! {

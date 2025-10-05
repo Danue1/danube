@@ -13,6 +13,7 @@ enum Mode {
     },
     InString {
         depth: usize,
+        raw: usize,
         multiline: bool,
         allow_interpolation: bool,
     },
@@ -124,13 +125,12 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                     '\'' if matches!(peek!(), Some('\\'))
                         && matches!(nth!(1), Some('\\' | '\'' | '"' | 'n' | 't')) =>
                     {
-                        one!(CHARACTER_START, 1);
-
                         chars.next(); // skip '\'
                         chars.next(); // skip escaped char
 
-                        one!(CHARACTER_SEGMENT, 2);
-
+                        one!(CHARACTER_START, 1); // skip '\''
+                        one!(ESCAPE_START, 1); // skip '\'
+                        one!(ESCAPE_SEGMENT, 1); // skip escaped char
                         eat_one!(CHARACTER_END if |c| matches!(c, '\''));
                     }
                     '\'' if matches!(peek!(), Some('\\'))
@@ -181,6 +181,7 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                         one!(STRING_START, "\"\"\"".len());
                         modes.push(Mode::InString {
                             depth,
+                            raw: 0,
                             multiline: true,
                             allow_interpolation: true,
                         });
@@ -190,6 +191,7 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                         one!(STRING_START);
                         modes.push(Mode::InString {
                             depth,
+                            raw: 0,
                             multiline: false,
                             allow_interpolation: true,
                         });
@@ -201,33 +203,18 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                         one!(BINARY_START, 2);
 
                         loop {
-                            let mut peekable = chars.clone();
-                            match peekable.next() {
-                                Some(c) if matches!(c, '0' | '1') => {
-                                    chars.next(); // skip first binary digit
+                            let segment = source!(0, |c| matches!(c, '0' | '1'));
+                            if !segment.is_empty() {
+                                token!(SyntaxKind::BINARY_SEGMENT, segment);
+                            }
 
-                                    let mut count = 1;
-                                    while let Some(_) =
-                                        peekable.next().filter(|c| matches!(c, '0' | '1'))
-                                    {
-                                        count += 1;
-                                        chars.next(); // skip binary digit
-                                    }
+                            let separator = source!(0, |c| c == '_');
+                            if !separator.is_empty() {
+                                token!(SyntaxKind::NUMERIC_SEPARATOR, separator);
+                            }
 
-                                    one!(BINARY_SEGMENT, count);
-                                }
-                                Some('_') => {
-                                    chars.next(); // skip '_'
-
-                                    let mut count = 1;
-                                    while let Some('_') = peekable.next() {
-                                        count += 1;
-                                        chars.next(); // skip '_'
-                                    }
-
-                                    one!(NUMERIC_SEPARATOR, count);
-                                }
-                                _ => continue 'lex,
+                            if segment.is_empty() && separator.is_empty() {
+                                break;
                             }
                         }
                     }
@@ -238,33 +225,18 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                         one!(OCTAL_START, 2);
 
                         loop {
-                            let mut peekable = chars.clone();
-                            match peekable.next() {
-                                Some(c) if matches!(c, '0'..='7') => {
-                                    chars.next(); // skip first octal digit
+                            let segment = source!(0, |c| matches!(c, '0'..='7'));
+                            if !segment.is_empty() {
+                                token!(SyntaxKind::OCTAL_SEGMENT, segment);
+                            }
 
-                                    let mut count = 1;
-                                    while let Some(_) =
-                                        peekable.next().filter(|c| matches!(c, '0'..='7'))
-                                    {
-                                        count += 1;
-                                        chars.next(); // skip octal digit
-                                    }
+                            let separator = source!(0, |c| c == '_');
+                            if !separator.is_empty() {
+                                token!(SyntaxKind::NUMERIC_SEPARATOR, separator);
+                            }
 
-                                    one!(OCTAL_SEGMENT, count);
-                                }
-                                Some('_') => {
-                                    chars.next(); // skip '_'
-
-                                    let mut count = 1;
-                                    while let Some('_') = peekable.next() {
-                                        count += 1;
-                                        chars.next(); // skip '_'
-                                    }
-
-                                    one!(NUMERIC_SEPARATOR, count);
-                                }
-                                _ => continue 'lex,
+                            if segment.is_empty() && separator.is_empty() {
+                                break;
                             }
                         }
                     }
@@ -275,32 +247,18 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                         one!(HEX_START, 2);
 
                         loop {
-                            let mut peekable = chars.clone();
-                            let mut count = 1;
-                            match peekable.next() {
-                                Some(c) if c.is_ascii_hexdigit() => {
-                                    chars.next(); // skip first hex digit
+                            let segment = source!(0, |c: char| c.is_ascii_hexdigit());
+                            if !segment.is_empty() {
+                                token!(SyntaxKind::HEX_SEGMENT, segment);
+                            }
 
-                                    while let Some(_) =
-                                        peekable.next().filter(|c| c.is_ascii_hexdigit())
-                                    {
-                                        count += 1;
-                                        chars.next(); // skip hex digit
-                                    }
+                            let separator = source!(0, |c| c == '_');
+                            if !separator.is_empty() {
+                                token!(SyntaxKind::NUMERIC_SEPARATOR, separator);
+                            }
 
-                                    one!(HEX_SEGMENT, count);
-                                }
-                                Some('_') => {
-                                    chars.next(); // skip '_'
-
-                                    while let Some('_') = peekable.next() {
-                                        count += 1;
-                                        chars.next(); // skip '_'
-                                    }
-
-                                    one!(NUMERIC_SEPARATOR, count);
-                                }
-                                _ => continue 'lex,
+                            if segment.is_empty() && separator.is_empty() {
+                                break;
                             }
                         }
                     }
@@ -317,30 +275,18 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                         one!(INTEGER_SEGMENT, count);
 
                         loop {
-                            let mut peekable = chars.clone();
-                            let mut count = 1;
-                            match peekable.next() {
-                                Some(c) if is_numeric(c) => {
-                                    chars.next();
+                            let segment = source!(0, |c| is_numeric(c));
+                            if !segment.is_empty() {
+                                token!(SyntaxKind::INTEGER_SEGMENT, segment);
+                            }
 
-                                    while let Some(_) = peekable.next().filter(|c| is_numeric(*c)) {
-                                        count += 1;
-                                        chars.next(); // skip digit
-                                    }
+                            let separator = source!(0, |c| c == '_');
+                            if !separator.is_empty() {
+                                token!(SyntaxKind::NUMERIC_SEPARATOR, separator);
+                            }
 
-                                    one!(INTEGER_SEGMENT, count);
-                                }
-                                Some('_') => {
-                                    chars.next();
-
-                                    while let Some('_') = peekable.next() {
-                                        count += 1;
-                                        chars.next(); // skip '_'
-                                    }
-
-                                    one!(NUMERIC_SEPARATOR, count);
-                                }
-                                _ => break,
+                            if segment.is_empty() && separator.is_empty() {
+                                break;
                             }
                         }
 
@@ -350,35 +296,21 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                         {
                             chars.next(); // skip '.'
 
-                            one!(FRACTIONAL_PREFIX);
+                            one!(FRACTION_START);
 
                             loop {
-                                let mut peekable = chars.clone();
-                                let mut count = 1;
-                                match peekable.next() {
-                                    Some(c) if is_numeric(c) => {
-                                        chars.next();
+                                let segment = source!(0, |c| is_numeric(c));
+                                if !segment.is_empty() {
+                                    token!(SyntaxKind::FRACTION_SEGMENT, segment);
+                                }
 
-                                        while let Some(_) =
-                                            peekable.next().filter(|c| is_numeric(*c))
-                                        {
-                                            count += 1;
-                                            chars.next(); // skip digit
-                                        }
+                                let separator = source!(0, |c| c == '_');
+                                if !separator.is_empty() {
+                                    token!(SyntaxKind::NUMERIC_SEPARATOR, separator);
+                                }
 
-                                        one!(FRACTIONAL_SEGMENT, count);
-                                    }
-                                    Some('_') => {
-                                        chars.next();
-
-                                        while let Some('_') = peekable.next() {
-                                            count += 1;
-                                            chars.next(); // skip '_'
-                                        }
-
-                                        one!(NUMERIC_SEPARATOR, count);
-                                    }
-                                    _ => break,
+                                if segment.is_empty() && separator.is_empty() {
+                                    break;
                                 }
                             }
                         }
@@ -387,7 +319,7 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                         if matches!(peek!(), Some('e') | Some('E')) {
                             chars.next(); // skip 'e' or 'E'
 
-                            one!(EXPONENTIAL_PREFIX);
+                            one!(EXPONENT_START);
 
                             if matches!(peek!(), Some('+') | Some('-')) {
                                 chars.next(); // skip '+' or '-'
@@ -396,34 +328,58 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                             }
 
                             loop {
-                                let mut peekable = chars.clone();
-                                let mut count = 1;
-                                match peekable.next() {
-                                    Some(c) if is_numeric(c) => {
-                                        chars.next();
+                                let segment = source!(0, |c| is_numeric(c));
+                                if !segment.is_empty() {
+                                    token!(SyntaxKind::EXPONENT_SEGMENT, segment);
+                                }
 
-                                        while let Some(_) =
-                                            peekable.next().filter(|c| is_numeric(*c))
-                                        {
-                                            count += 1;
-                                            chars.next(); // skip digit
-                                        }
+                                let separator = source!(0, |c| c == '_');
+                                if !separator.is_empty() {
+                                    token!(SyntaxKind::NUMERIC_SEPARATOR, separator);
+                                }
 
-                                        one!(EXPONENTIAL_SEGMENT, count);
-                                    }
-                                    Some('_') => {
-                                        chars.next();
-
-                                        while let Some('_') = peekable.next() {
-                                            count += 1;
-                                            chars.next(); // skip '_'
-                                        }
-
-                                        one!(NUMERIC_SEPARATOR, count);
-                                    }
-                                    _ => break,
+                                if segment.is_empty() && separator.is_empty() {
+                                    break;
                                 }
                             }
+                        }
+                    }
+                    'r' if matches!(peek!(), Some('#')) && matches!(nth!(1), Some('#' | '"')) => {
+                        let mut peekable = chars.clone();
+                        let mut count = 0;
+                        while let Some('#') = peekable.next() {
+                            count += 1;
+                            chars.next(); // skip '#'
+                        }
+
+                        if let Some('"') = peek!() {
+                            chars.next(); // skip '"'
+
+                            let source = &source[index..index + 1 + count + 1];
+                            token!(SyntaxKind::RAW_STRING_START, source);
+
+                            index += 1 + count + 1;
+
+                            modes.push(Mode::InString {
+                                depth,
+                                raw: count,
+                                multiline: false,
+                                allow_interpolation: false,
+                            });
+                        } else {
+                            let source = &source[index..index + 1 + count];
+                            index += 1 + count;
+                            token!(SyntaxKind::RAW_STRING_START, source);
+                        }
+                    }
+                    'r' if matches!(peek!(), Some('#')) => {
+                        chars.next(); // skip '#'
+
+                        one!(RAW_IDENTIFIER_START, 2);
+
+                        let source = source!(0, is_identifier_continue);
+                        if !source.is_empty() {
+                            token!(SyntaxKind::IDENTIFIER, source);
                         }
                     }
                     c if is_identifier_start(c) => {
@@ -433,7 +389,6 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                     c if is_whitespace(c) => many!(WHITESPACE, c.len_utf8(), is_whitespace),
                     c if is_tab(c) => many!(TAB, c.len_utf8(), is_tab),
                     '\n' => one!(NEW_LINE),
-                    '\\' => one!(BACKSLASH),
                     '-' => one!(HYPHEN),
                     ',' => one!(COMMA),
                     ';' => one!(SEMICOLON),
@@ -474,7 +429,6 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                     '&' => one!(AMPERSAND),
                     '#' => one!(HASH),
                     '%' => one!(PERCENT),
-                    '`' => one!(BACKTICK),
                     '^' => one!(CARET),
                     '+' => one!(PLUS),
                     '<' => one!(LEFT_CHEVRON),
@@ -488,85 +442,142 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
             }
             Mode::InString {
                 depth,
-                multiline: false,
+                raw,
+                multiline,
                 allow_interpolation,
             } => {
-                if starts_with!("\"") {
-                    chars.next(); // skip '"'
+                let raw_end = format!("\"{}", "#".repeat(raw));
+                if raw != 0 {
+                    if starts_with!(&raw_end) {
+                        chars.next(); // skip '"'
+                        for _ in 0..raw {
+                            chars.next(); // skip '#'
+                        }
 
-                    one!(STRING_END);
-                    modes.pop();
-                    continue 'lex;
+                        one!(RAW_STRING_END, raw_end.len());
+                        modes.pop();
+                        continue 'lex;
+                    }
                 }
 
-                // Error: Newline in string
-                if starts_with!("\n") {
-                    modes.pop();
-                    continue 'lex;
-                }
+                if raw == 0 {
+                    if multiline {
+                        if starts_with!("\"\"\"") {
+                            chars.next(); // skip first '"'
+                            chars.next(); // skip second '"'
+                            chars.next(); // skip third '"'
 
-                if allow_interpolation && starts_with!("${") {
-                    chars.next(); // skip '$'
-                    chars.next(); // skip '{'
+                            one!(STRING_END, "\"\"\"".len());
+                            modes.pop();
+                            continue 'lex;
+                        }
+                    }
 
-                    one!(INTERPOLATION_START, "${".len());
-                    modes.push(Mode::Base { depth: depth + 1 });
-                    continue 'lex;
+                    if !multiline {
+                        if starts_with!("\"") {
+                            chars.next(); // skip '"'
+
+                            one!(STRING_END);
+                            modes.pop();
+                            continue 'lex;
+                        }
+
+                        // Error: Newline in string
+                        if starts_with!("\n") {
+                            modes.pop();
+                            continue 'lex;
+                        }
+                    }
+
+                    if allow_interpolation && starts_with!("${") {
+                        chars.next(); // skip '$'
+                        chars.next(); // skip '{'
+
+                        one!(INTERPOLATION_START, "${".len());
+                        modes.push(Mode::Base { depth: depth + 1 });
+                        continue 'lex;
+                    }
+
+                    if starts_with!("\\\\")
+                        || starts_with!("\\\'")
+                        || starts_with!("\\\"")
+                        || starts_with!("\\n")
+                        || starts_with!("\\t")
+                    {
+                        chars.next(); // skip '\'
+                        chars.next(); // skip escaped char
+
+                        one!(ESCAPE_START, 1); // skip '\'
+                        one!(ESCAPE_SEGMENT, 1); // skip escaped char
+                        continue 'lex;
+                    }
+
+                    if starts_with!("\\u{") {
+                        chars.next(); // skip '\'
+                        chars.next(); // skip 'u'
+                        chars.next(); // skip '{'
+                        one!(UNICODE_START, 3);
+
+                        let source = source!(0, |c: char| c.is_ascii_hexdigit());
+                        if source.is_empty() {
+                            continue 'lex;
+                        }
+                        token!(SyntaxKind::UNICODE_SEGMENT, source);
+
+                        loop {
+                            let source = source!(0, |c: char| c == '_');
+                            if source.is_empty() {
+                                break;
+                            }
+                            token!(SyntaxKind::NUMERIC_SEPARATOR, source);
+
+                            let source = source!(0, |c: char| c.is_ascii_hexdigit());
+                            if source.is_empty() {
+                                break;
+                            }
+                            token!(SyntaxKind::UNICODE_SEGMENT, source);
+                        }
+
+                        if let Some('}') = peek!() {
+                            chars.next(); // skip '}'
+
+                            one!(UNICODE_END, 1);
+                        }
+                        continue 'lex;
+                    }
                 }
 
                 let mut count = 0;
                 loop {
                     let source = &source[index + count..];
-                    if source.starts_with('"') || source.starts_with('\n') {
+                    if raw != 0 && source.starts_with(&raw_end) {
                         break;
                     }
-                    if allow_interpolation && source.starts_with("${") {
-                        break;
+                    if raw == 0 {
+                        if !multiline && (source.starts_with('"') || source.starts_with('\n')) {
+                            break;
+                        }
+                        if multiline && source.starts_with("\"\"\"") {
+                            break;
+                        }
+                        if allow_interpolation && source.starts_with("${") {
+                            break;
+                        }
+                        if source.starts_with("\\\\")
+                            || source.starts_with("\\\'")
+                            || source.starts_with("\\\"")
+                            || source.starts_with("\\n")
+                            || source.starts_with("\\t")
+                            || source.starts_with("\\u{")
+                        {
+                            break;
+                        }
                     }
 
                     chars.next();
                     count += 1;
                 }
 
-                one!(STRING_SEGMENT, count);
-            }
-            Mode::InString {
-                depth,
-                multiline: true,
-                allow_interpolation,
-            } => {
-                if starts_with!("\"\"\"") {
-                    chars.next(); // skip first '"'
-                    chars.next(); // skip second '"'
-                    chars.next(); // skip third '"'
-
-                    one!(STRING_END, "\"\"\"".len());
-                    modes.pop();
-                    continue 'lex;
-                }
-
-                if allow_interpolation && starts_with!("${") {
-                    chars.next(); // skip '$'
-                    chars.next(); // skip '{'
-
-                    one!(INTERPOLATION_START, "${".len());
-                    modes.push(Mode::Base { depth: depth + 1 });
-                    continue 'lex;
-                }
-
-                let mut count = 0;
-                loop {
-                    let source = &source[index + count..];
-                    if source.starts_with("\"\"\"") {
-                        break;
-                    }
-                    if allow_interpolation && source.starts_with("${") {
-                        break;
-                    }
-
-                    chars.next();
-                    count += 1;
-                }
                 one!(STRING_SEGMENT, count);
             }
         }
@@ -638,6 +649,7 @@ const fn is_punctuation(c: char) -> bool {
 
 fn keyword(identifier: &str) -> SyntaxKind {
     match identifier {
+        "_" => SyntaxKind::PLACEHOLDER,
         "fn" => SyntaxKind::FN,
         "let" => SyntaxKind::LET,
         "true" => SyntaxKind::TRUE,

@@ -16,10 +16,6 @@ expression: tokens
         "~",
     ),
     (
-        BACKTICK,
-        "`",
-    ),
-    (
         EXCLAMATION,
         "!",
     ),
@@ -90,10 +86,6 @@ expression: tokens
     (
         QUESTION,
         "?",
-    ),
-    (
-        BACKSLASH,
-        "\\",
     ),
     (
         LEFT_BRACE,

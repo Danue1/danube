@@ -1,0 +1,14 @@
+---
+source: compiler/danubec_lex/src/tests.rs
+expression: tokens
+---
+[
+    (
+        RAW_IDENTIFIER_START,
+        "r#",
+    ),
+    (
+        IDENTIFIER,
+        "abc",
+    ),
+]
