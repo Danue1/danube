@@ -1,0 +1,34 @@
+---
+source: compiler/danubec_lex/src/tests.rs
+expression: tokens
+---
+[
+    (
+        LINE_COMMENT_START,
+        "//",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        LINE_COMMENT_SEGMENT,
+        "This is a line comment",
+    ),
+    (
+        NEW_LINE,
+        "\n",
+    ),
+    (
+        LINE_COMMENT_START,
+        "//",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        LINE_COMMENT_SEGMENT,
+        "This is another line comment",
+    ),
+]

@@ -26,8 +26,8 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
 
     macro_rules! source {
         ($count:expr, $predicate:expr) => {{
-            let mut count = $count;
             let mut peekable = chars.clone();
+            let mut count = $count;
             loop {
                 match peekable.next() {
                     Some(c) if $predicate(c) => {
@@ -110,331 +110,318 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                     break 'lex;
                 };
                 match c {
-                    '\'' => {
-                        one!(CHARACTER_START);
+                    // Single-quoted character
+                    '\'' if !matches!(peek!(), Some('\'' | '\\' | '\n' | '\t')) => {
+                        one!(CHARACTER_START, 1);
 
-                        match (peek!(), nth!(1), nth!(2)) {
-                            // Normal character
-                            (Some(c), _, _) if !matches!(c, '\'' | '\\' | '\n' | '\t') => {
-                                chars.next();
-
-                                one!(CHARACTER_SEGMENT, c.len_utf8());
-                            }
-                            // Escape sequences
-                            (Some('\\'), Some('\\'), _)
-                            | (Some('\\'), Some('\''), _)
-                            | (Some('\\'), Some('"'), _)
-                            | (Some('\\'), Some('n'), _)
-                            | (Some('\\'), Some('t'), _) => {
-                                chars.next(); // skip '\'
-                                chars.next(); // skip escaped char
-
-                                token!(SyntaxKind::CHARACTER_SEGMENT, slice!(2));
-                            }
-                            // Unicode escape sequence
-                            (Some('\\'), Some('u'), Some('{')) => {
-                                chars.next(); // skip '\'
-                                chars.next(); // skip 'u'
-                                chars.next(); // skip '{'
-
-                                let mut peekable = chars.clone();
-                                let mut count = 3;
-                                match peekable.next().filter(|c| c.is_ascii_hexdigit()) {
-                                    Some(_) => {
-                                        count += 1;
-                                        chars.next(); // skip first hex digit
-                                    }
-                                    _ => {
-                                        token!(SyntaxKind::ERROR, slice!(count));
-                                        continue 'lex;
-                                    }
-                                }
-                                for _ in 0..5 {
-                                    match peekable.next().filter(|c| c.is_ascii_hexdigit()) {
-                                        Some(_) => {
-                                            count += 1;
-                                            chars.next(); // skip hex digit
-                                        }
-                                        _ => break,
-                                    }
-                                }
-
-                                let mut peekable = chars.clone();
-                                match peekable.next() {
-                                    Some('}') => {
-                                        count += 1;
-                                        chars.next(); // skip '}'
-                                        token!(SyntaxKind::CHARACTER_SEGMENT, slice!(count));
-                                    }
-                                    _ => {
-                                        token!(SyntaxKind::ERROR, slice!(count));
-                                        continue 'lex;
-                                    }
-                                }
-                            }
-                            // Invalid character
-                            _ => continue 'lex,
+                        if let Some(c) = chars.next() {
+                            one!(CHARACTER_SEGMENT, c.len_utf8());
                         }
 
                         eat_one!(CHARACTER_END if |c| matches!(c, '\''));
                     }
-                    '"' => {
-                        match (peek!(), nth!(1)) {
-                            // Triple-quoted string start
-                            (Some('"'), Some('"')) => {
-                                chars.next(); // skip second '"'
-                                chars.next(); // skip third '"'
+                    // Escaped character
+                    '\'' if matches!(peek!(), Some('\\'))
+                        && matches!(nth!(1), Some('\\' | '\'' | '"' | 'n' | 't')) =>
+                    {
+                        one!(CHARACTER_START, 1);
 
-                                one!(STRING_START, "\"\"\"".len());
-                                modes.push(Mode::InString {
-                                    depth,
-                                    multiline: true,
-                                    allow_interpolation: true,
-                                });
-                                continue 'lex;
+                        chars.next(); // skip '\'
+                        chars.next(); // skip escaped char
+
+                        one!(CHARACTER_SEGMENT, 2);
+
+                        eat_one!(CHARACTER_END if |c| matches!(c, '\''));
+                    }
+                    '\'' if matches!(peek!(), Some('\\'))
+                        && matches!(nth!(1), Some('u'))
+                        && matches!(nth!(2), Some('{')) =>
+                    {
+                        one!(CHARACTER_START, 1);
+
+                        chars.next(); // skip '\'
+                        chars.next(); // skip 'u'
+                        chars.next(); // skip '{'
+                        one!(UNICODE_START, 3);
+
+                        let source = source!(0, |c: char| c.is_ascii_hexdigit());
+                        if source.is_empty() {
+                            continue 'lex;
+                        }
+                        token!(SyntaxKind::UNICODE_SEGMENT, source);
+
+                        loop {
+                            let source = source!(0, |c: char| c == '_');
+                            if source.is_empty() {
+                                break;
                             }
-                            _ => {
-                                one!(STRING_START);
-                                modes.push(Mode::InString {
-                                    depth,
-                                    multiline: false,
-                                    allow_interpolation: true,
-                                });
-                                continue 'lex;
+                            token!(SyntaxKind::NUMERIC_SEPARATOR, source);
+
+                            let source = source!(0, |c: char| c.is_ascii_hexdigit());
+                            if source.is_empty() {
+                                break;
+                            }
+                            token!(SyntaxKind::UNICODE_SEGMENT, source);
+                        }
+
+                        if let Some('}') = peek!() {
+                            chars.next(); // skip '}'
+
+                            one!(UNICODE_END, 1);
+                            eat_one!(CHARACTER_END if |c| matches!(c, '\''));
+                        }
+                    }
+                    // Error: Empty character
+                    '\'' => one!(CHARACTER_START),
+                    // Triple-quoted string
+                    '"' if matches!(peek!(), Some('"')) && matches!(nth!(1), Some('"')) => {
+                        chars.next(); // skip second '"'
+                        chars.next(); // skip third '"'
+
+                        one!(STRING_START, "\"\"\"".len());
+                        modes.push(Mode::InString {
+                            depth,
+                            multiline: true,
+                            allow_interpolation: true,
+                        });
+                    }
+                    // One-double-quoted string
+                    '"' => {
+                        one!(STRING_START);
+                        modes.push(Mode::InString {
+                            depth,
+                            multiline: false,
+                            allow_interpolation: true,
+                        });
+                    }
+                    // Binary number
+                    '0' if matches!(peek!(), Some('b')) => {
+                        chars.next(); // skip 'b'
+
+                        one!(BINARY_START, 2);
+
+                        loop {
+                            let mut peekable = chars.clone();
+                            match peekable.next() {
+                                Some(c) if matches!(c, '0' | '1') => {
+                                    chars.next(); // skip first binary digit
+
+                                    let mut count = 1;
+                                    while let Some(_) =
+                                        peekable.next().filter(|c| matches!(c, '0' | '1'))
+                                    {
+                                        count += 1;
+                                        chars.next(); // skip binary digit
+                                    }
+
+                                    one!(BINARY_SEGMENT, count);
+                                }
+                                Some('_') => {
+                                    chars.next(); // skip '_'
+
+                                    let mut count = 1;
+                                    while let Some('_') = peekable.next() {
+                                        count += 1;
+                                        chars.next(); // skip '_'
+                                    }
+
+                                    one!(NUMERIC_SEPARATOR, count);
+                                }
+                                _ => continue 'lex,
                             }
                         }
                     }
-                    prefix @ '0'..='9' => {
-                        match (prefix, peek!()) {
-                            ('0', Some('b')) => {
-                                chars.next(); // skip 'b' or 'B'
+                    // Octal number
+                    '0' if matches!(peek!(), Some('o')) => {
+                        chars.next(); // skip 'o'
 
-                                one!(BINARY_START, 2);
+                        one!(OCTAL_START, 2);
 
-                                loop {
-                                    let mut peekable = chars.clone();
-                                    match peekable.next() {
-                                        Some(c) if matches!(c, '0' | '1') => {
-                                            chars.next(); // skip first binary digit
+                        loop {
+                            let mut peekable = chars.clone();
+                            match peekable.next() {
+                                Some(c) if matches!(c, '0'..='7') => {
+                                    chars.next(); // skip first octal digit
 
-                                            let mut count = 1;
-                                            while let Some(_) =
-                                                peekable.next().filter(|c| matches!(c, '0' | '1'))
-                                            {
-                                                count += 1;
-                                                chars.next(); // skip binary digit
-                                            }
-
-                                            one!(BINARY_SEGMENT, count);
-                                        }
-                                        Some('_') => {
-                                            chars.next(); // skip '_'
-
-                                            let mut count = 1;
-                                            while let Some('_') = peekable.next() {
-                                                count += 1;
-                                                chars.next(); // skip '_'
-                                            }
-
-                                            one!(NUMERIC_SEPARATOR, count);
-                                        }
-                                        _ => continue 'lex,
-                                    }
-                                }
-                            }
-                            ('0', Some('o')) => {
-                                chars.next(); // skip 'o'
-
-                                one!(OCTAL_START, 2);
-
-                                loop {
-                                    let mut peekable = chars.clone();
-                                    match peekable.next() {
-                                        Some(c) if matches!(c, '0'..='7') => {
-                                            chars.next(); // skip first octal digit
-
-                                            let mut count = 1;
-                                            while let Some(_) =
-                                                peekable.next().filter(|c| matches!(c, '0'..='7'))
-                                            {
-                                                count += 1;
-                                                chars.next(); // skip octal digit
-                                            }
-
-                                            one!(OCTAL_SEGMENT, count);
-                                        }
-                                        Some('_') => {
-                                            chars.next(); // skip '_'
-
-                                            let mut count = 1;
-                                            while let Some('_') = peekable.next() {
-                                                count += 1;
-                                                chars.next(); // skip '_'
-                                            }
-
-                                            one!(NUMERIC_SEPARATOR, count);
-                                        }
-                                        _ => continue 'lex,
-                                    }
-                                }
-                            }
-                            ('0', Some('x')) => {
-                                chars.next(); // skip 'x'
-
-                                one!(HEX_START, 2);
-
-                                loop {
-                                    let mut peekable = chars.clone();
                                     let mut count = 1;
-                                    match peekable.next() {
-                                        Some(c) if c.is_ascii_hexdigit() => {
-                                            chars.next(); // skip first hex digit
-
-                                            while let Some(_) =
-                                                peekable.next().filter(|c| c.is_ascii_hexdigit())
-                                            {
-                                                count += 1;
-                                                chars.next(); // skip hex digit
-                                            }
-
-                                            one!(HEX_SEGMENT, count);
-                                        }
-                                        Some('_') => {
-                                            chars.next(); // skip '_'
-
-                                            while let Some('_') = peekable.next() {
-                                                count += 1;
-                                                chars.next(); // skip '_'
-                                            }
-
-                                            one!(NUMERIC_SEPARATOR, count);
-                                        }
-                                        _ => continue 'lex,
+                                    while let Some(_) =
+                                        peekable.next().filter(|c| matches!(c, '0'..='7'))
+                                    {
+                                        count += 1;
+                                        chars.next(); // skip octal digit
                                     }
+
+                                    one!(OCTAL_SEGMENT, count);
                                 }
+                                Some('_') => {
+                                    chars.next(); // skip '_'
+
+                                    let mut count = 1;
+                                    while let Some('_') = peekable.next() {
+                                        count += 1;
+                                        chars.next(); // skip '_'
+                                    }
+
+                                    one!(NUMERIC_SEPARATOR, count);
+                                }
+                                _ => continue 'lex,
                             }
-                            // Decimal or floating-point number
-                            (_, _) => {
-                                // Integer part
+                        }
+                    }
+                    // Hexadecimal number
+                    '0' if matches!(peek!(), Some('x')) => {
+                        chars.next(); // skip 'x'
+
+                        one!(HEX_START, 2);
+
+                        loop {
+                            let mut peekable = chars.clone();
+                            let mut count = 1;
+                            match peekable.next() {
+                                Some(c) if c.is_ascii_hexdigit() => {
+                                    chars.next(); // skip first hex digit
+
+                                    while let Some(_) =
+                                        peekable.next().filter(|c| c.is_ascii_hexdigit())
+                                    {
+                                        count += 1;
+                                        chars.next(); // skip hex digit
+                                    }
+
+                                    one!(HEX_SEGMENT, count);
+                                }
+                                Some('_') => {
+                                    chars.next(); // skip '_'
+
+                                    while let Some('_') = peekable.next() {
+                                        count += 1;
+                                        chars.next(); // skip '_'
+                                    }
+
+                                    one!(NUMERIC_SEPARATOR, count);
+                                }
+                                _ => continue 'lex,
+                            }
+                        }
+                    }
+                    // Decimal or floating-point number
+                    '0'..='9' => {
+                        // Integer part
+                        let mut peekable = chars.clone();
+                        let mut count = 1;
+                        while let Some(_) = peekable.next().filter(|c| is_numeric(*c)) {
+                            count += 1;
+                            chars.next(); // skip digit
+                        }
+
+                        one!(INTEGER_SEGMENT, count);
+
+                        loop {
+                            let mut peekable = chars.clone();
+                            let mut count = 1;
+                            match peekable.next() {
+                                Some(c) if is_numeric(c) => {
+                                    chars.next();
+
+                                    while let Some(_) = peekable.next().filter(|c| is_numeric(*c)) {
+                                        count += 1;
+                                        chars.next(); // skip digit
+                                    }
+
+                                    one!(INTEGER_SEGMENT, count);
+                                }
+                                Some('_') => {
+                                    chars.next();
+
+                                    while let Some('_') = peekable.next() {
+                                        count += 1;
+                                        chars.next(); // skip '_'
+                                    }
+
+                                    one!(NUMERIC_SEPARATOR, count);
+                                }
+                                _ => break,
+                            }
+                        }
+
+                        // Fractional part
+                        if matches!(peek!(), Some('.'))
+                            && matches!(nth!(1), Some(c) if is_numeric(c) || c == '_')
+                        {
+                            chars.next(); // skip '.'
+
+                            one!(FRACTIONAL_PREFIX);
+
+                            loop {
                                 let mut peekable = chars.clone();
                                 let mut count = 1;
-                                while let Some(_) = peekable.next().filter(|c| is_numeric(*c)) {
-                                    count += 1;
-                                    chars.next(); // skip digit
+                                match peekable.next() {
+                                    Some(c) if is_numeric(c) => {
+                                        chars.next();
+
+                                        while let Some(_) =
+                                            peekable.next().filter(|c| is_numeric(*c))
+                                        {
+                                            count += 1;
+                                            chars.next(); // skip digit
+                                        }
+
+                                        one!(FRACTIONAL_SEGMENT, count);
+                                    }
+                                    Some('_') => {
+                                        chars.next();
+
+                                        while let Some('_') = peekable.next() {
+                                            count += 1;
+                                            chars.next(); // skip '_'
+                                        }
+
+                                        one!(NUMERIC_SEPARATOR, count);
+                                    }
+                                    _ => break,
                                 }
+                            }
+                        }
 
-                                one!(INTEGER_SEGMENT, count);
+                        // Exponential part
+                        if matches!(peek!(), Some('e') | Some('E')) {
+                            chars.next(); // skip 'e' or 'E'
 
-                                loop {
-                                    let mut peekable = chars.clone();
-                                    let mut count = 1;
-                                    match peekable.next() {
-                                        Some(c) if is_numeric(c) => {
-                                            chars.next();
+                            one!(EXPONENTIAL_PREFIX);
 
-                                            while let Some(_) =
-                                                peekable.next().filter(|c| is_numeric(*c))
-                                            {
-                                                count += 1;
-                                                chars.next(); // skip digit
-                                            }
+                            if matches!(peek!(), Some('+') | Some('-')) {
+                                chars.next(); // skip '+' or '-'
 
-                                            one!(INTEGER_SEGMENT, count);
+                                one!(EXPONENT_SIGN);
+                            }
+
+                            loop {
+                                let mut peekable = chars.clone();
+                                let mut count = 1;
+                                match peekable.next() {
+                                    Some(c) if is_numeric(c) => {
+                                        chars.next();
+
+                                        while let Some(_) =
+                                            peekable.next().filter(|c| is_numeric(*c))
+                                        {
+                                            count += 1;
+                                            chars.next(); // skip digit
                                         }
-                                        Some('_') => {
-                                            chars.next();
 
-                                            while let Some('_') = peekable.next() {
-                                                count += 1;
-                                                chars.next(); // skip '_'
-                                            }
+                                        one!(EXPONENTIAL_SEGMENT, count);
+                                    }
+                                    Some('_') => {
+                                        chars.next();
 
-                                            one!(NUMERIC_SEPARATOR, count);
+                                        while let Some('_') = peekable.next() {
+                                            count += 1;
+                                            chars.next(); // skip '_'
                                         }
-                                        _ => break,
+
+                                        one!(NUMERIC_SEPARATOR, count);
                                     }
-                                }
-
-                                // Fractional part
-                                if matches!(peek!(), Some('.'))
-                                    && matches!(nth!(1), Some(c) if is_numeric(c) || c == '_')
-                                {
-                                    chars.next(); // skip '.'
-
-                                    one!(FRACTIONAL_PREFIX);
-
-                                    loop {
-                                        let mut peekable = chars.clone();
-                                        let mut count = 1;
-                                        match peekable.next() {
-                                            Some(c) if is_numeric(c) => {
-                                                chars.next();
-
-                                                while let Some(_) =
-                                                    peekable.next().filter(|c| is_numeric(*c))
-                                                {
-                                                    count += 1;
-                                                    chars.next(); // skip digit
-                                                }
-
-                                                one!(FRACTIONAL_SEGMENT, count);
-                                            }
-                                            Some('_') => {
-                                                chars.next();
-
-                                                while let Some('_') = peekable.next() {
-                                                    count += 1;
-                                                    chars.next(); // skip '_'
-                                                }
-
-                                                one!(NUMERIC_SEPARATOR, count);
-                                            }
-                                            _ => break,
-                                        }
-                                    }
-                                }
-
-                                // Exponential part
-                                if matches!(peek!(), Some('e') | Some('E')) {
-                                    chars.next(); // skip 'e' or 'E'
-
-                                    one!(EXPONENTIAL_PREFIX);
-
-                                    if matches!(peek!(), Some('+') | Some('-')) {
-                                        chars.next(); // skip '+' or '-'
-
-                                        one!(EXPONENT_SIGN);
-                                    }
-
-                                    loop {
-                                        let mut peekable = chars.clone();
-                                        let mut count = 1;
-                                        match peekable.next() {
-                                            Some(c) if is_numeric(c) => {
-                                                chars.next();
-
-                                                while let Some(_) =
-                                                    peekable.next().filter(|c| is_numeric(*c))
-                                                {
-                                                    count += 1;
-                                                    chars.next(); // skip digit
-                                                }
-
-                                                one!(EXPONENTIAL_SEGMENT, count);
-                                            }
-                                            Some('_') => {
-                                                chars.next();
-
-                                                while let Some('_') = peekable.next() {
-                                                    count += 1;
-                                                    chars.next(); // skip '_'
-                                                }
-
-                                                one!(NUMERIC_SEPARATOR, count);
-                                            }
-                                            _ => break,
-                                        }
-                                    }
+                                    _ => break,
                                 }
                             }
                         }
@@ -459,6 +446,7 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                     '[' => one!(LEFT_BRACKET),
                     ']' => one!(RIGHT_BRACKET),
                     '{' => one!(LEFT_BRACE),
+                    // Interpolation end
                     '}' if depth != 0 => {
                         one!(INTERPOLATION_END);
                         modes.pop();
@@ -466,6 +454,22 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                     '}' => one!(RIGHT_BRACE),
                     '@' => one!(AT),
                     '*' => one!(ASTERISK),
+                    // Line comment
+                    '/' if matches!(peek!(), Some('/')) => {
+                        chars.next(); // skip second '/'
+
+                        one!(LINE_COMMENT_START, 2);
+
+                        let source = source!(0, |c| matches!(c, ' ' | '\t'));
+                        if !source.is_empty() {
+                            token!(SyntaxKind::WHITESPACE, source);
+                        }
+
+                        let source = source!(0, |c| !matches!(c, '\n'));
+                        if !source.is_empty() {
+                            token!(SyntaxKind::LINE_COMMENT_SEGMENT, source);
+                        }
+                    }
                     '/' => one!(SLASH),
                     '&' => one!(AMPERSAND),
                     '#' => one!(HASH),

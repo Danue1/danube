@@ -10,7 +10,7 @@ fn punctuations() {
 
 #[test]
 fn r#char() {
-    let source = "'a' '\\n' '\\'' '한' '\\u{AC00}'";
+    let source = "'a' '\\'' '\\\\' '\\n' '\\t' '한' '\\u{AC00}' '\\u{AC_00}' '\\u{AC00_}'";
     let tokens = lex(source);
 
     insta::assert_debug_snapshot!(tokens);
@@ -92,6 +92,14 @@ fn identifier() {
 #[test]
 fn keywords() {
     let source = "as await break const continue crate else enum false fn for if impl in let loop match mut mod pub return Self self static struct super trait true type use where while yield";
+    let tokens = lex(source);
+
+    insta::assert_debug_snapshot!(tokens);
+}
+
+#[test]
+fn line_comment() {
+    let source = "// This is a line comment\n// This is another line comment";
     let tokens = lex(source);
 
     insta::assert_debug_snapshot!(tokens);

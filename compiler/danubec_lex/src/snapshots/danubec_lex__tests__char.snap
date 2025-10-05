@@ -25,6 +25,38 @@ expression: tokens
     ),
     (
         CHARACTER_SEGMENT,
+        "\\'",
+    ),
+    (
+        CHARACTER_END,
+        "'",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        CHARACTER_START,
+        "'",
+    ),
+    (
+        CHARACTER_SEGMENT,
+        "\\\\",
+    ),
+    (
+        CHARACTER_END,
+        "'",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        CHARACTER_START,
+        "'",
+    ),
+    (
+        CHARACTER_SEGMENT,
         "\\n",
     ),
     (
@@ -41,7 +73,7 @@ expression: tokens
     ),
     (
         CHARACTER_SEGMENT,
-        "\\'",
+        "\\t",
     ),
     (
         CHARACTER_END,
@@ -72,8 +104,76 @@ expression: tokens
         "'",
     ),
     (
-        CHARACTER_SEGMENT,
-        "\\u{AC00}",
+        UNICODE_START,
+        "\\u{",
+    ),
+    (
+        UNICODE_SEGMENT,
+        "AC00",
+    ),
+    (
+        UNICODE_END,
+        "}",
+    ),
+    (
+        CHARACTER_END,
+        "'",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        CHARACTER_START,
+        "'",
+    ),
+    (
+        UNICODE_START,
+        "\\u{",
+    ),
+    (
+        UNICODE_SEGMENT,
+        "AC",
+    ),
+    (
+        NUMERIC_SEPARATOR,
+        "_",
+    ),
+    (
+        UNICODE_SEGMENT,
+        "00",
+    ),
+    (
+        UNICODE_END,
+        "}",
+    ),
+    (
+        CHARACTER_END,
+        "'",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        CHARACTER_START,
+        "'",
+    ),
+    (
+        UNICODE_START,
+        "\\u{",
+    ),
+    (
+        UNICODE_SEGMENT,
+        "AC00",
+    ),
+    (
+        NUMERIC_SEPARATOR,
+        "_",
+    ),
+    (
+        UNICODE_END,
+        "}",
     ),
     (
         CHARACTER_END,
