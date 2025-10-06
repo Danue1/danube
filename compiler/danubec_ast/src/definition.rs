@@ -1,8 +1,6 @@
 use danubec_syntax::SyntaxNode;
 use std::{collections::HashMap, path::PathBuf};
 
-pub type NodeId = usize;
-
 pub struct Krate {
     pub attributes: Vec<TopLevelAttribute>,
     pub definitions: Vec<Definition>,
@@ -15,21 +13,22 @@ pub struct Root {
 }
 
 pub struct TopLevelAttribute {
-    pub path: Path,
-    pub arguments: Vec<AttributeArgument>,
+    pub argument: AttributeArgument,
 }
 
 pub struct Attribute {
-    pub path: Path,
-    pub arguments: Vec<AttributeArgument>,
+    pub argument: AttributeArgument,
 }
 
-pub enum AttributeArgument {
+pub struct AttributeArgument {
+    pub kind: AttributeArgumentKind,
+}
+
+pub enum AttributeArgumentKind {
     Expression {
         value: Expression,
     },
     KeyValue {
-        node_id: NodeId,
         key: Path,
         value: Expression,
     },
@@ -46,7 +45,6 @@ pub struct Definition {
 
 pub enum DefinitionKind {
     Function {
-        node_id: NodeId,
         visibility: Visibility,
         name: Identifier,
         type_parameters: Vec<TypeParameter>,
@@ -56,7 +54,6 @@ pub enum DefinitionKind {
         body: Expression,
     },
     Struct {
-        node_id: NodeId,
         visibility: Visibility,
         name: Identifier,
         type_parameters: Vec<TypeParameter>,
@@ -64,7 +61,6 @@ pub enum DefinitionKind {
         body: Option<StructBody>,
     },
     Enum {
-        node_id: NodeId,
         visibility: Visibility,
         name: Identifier,
         type_parameters: Vec<TypeParameter>,
@@ -72,18 +68,15 @@ pub enum DefinitionKind {
         variants: Vec<EnumVariant>,
     },
     Use {
-        node_id: NodeId,
         visibility: Visibility,
         tree: UseTree,
     },
     Module {
-        node_id: NodeId,
         visibility: Visibility,
         name: Identifier,
         definitions: Vec<Definition>,
     },
     Trait {
-        node_id: NodeId,
         visibility: Visibility,
         name: Identifier,
         type_parameters: Vec<TypeParameter>,
@@ -91,21 +84,18 @@ pub enum DefinitionKind {
         definitions: Vec<AssociatedDefinition>,
     },
     Constant {
-        node_id: NodeId,
         visibility: Visibility,
         name: Identifier,
         r#type: TypeExpression,
         value: Expression,
     },
     Static {
-        node_id: NodeId,
         visibility: Visibility,
         name: Identifier,
         r#type: TypeExpression,
         value: Expression,
     },
     Type {
-        node_id: NodeId,
         visibility: Visibility,
         name: Identifier,
         type_parameters: Vec<TypeParameter>,
@@ -124,7 +114,7 @@ pub enum DefinitionKind {
 pub enum Visibility {
     Public,
     Crate,
-    Restricted(NodeId, Identifier),
+    Restricted(Identifier),
     Private,
 }
 
@@ -144,38 +134,35 @@ pub struct TypeBound {
 }
 
 pub struct FunctionParameter {
-    pub node_id: NodeId,
     pub attributes: Vec<Attribute>,
     pub name: Identifier,
     pub r#type: TypeExpression,
 }
 
 pub enum StructBody {
-    Named(Vec<(NodeId, Visibility, Identifier, TypeExpression)>),
+    Named(Vec<(Visibility, Identifier, TypeExpression)>),
     Unnamed(Vec<(Visibility, TypeExpression)>),
 }
 
 pub struct EnumVariant {
-    pub node_id: NodeId,
     pub attributes: Vec<Attribute>,
     pub name: Identifier,
     pub body: Option<EnumVariantBody>,
 }
 
 pub enum EnumVariantBody {
-    Named(Vec<(NodeId, Vec<Attribute>, Identifier, TypeExpression)>),
+    Named(Vec<(Vec<Attribute>, Identifier, TypeExpression)>),
     Unnamed(Vec<(Vec<Attribute>, TypeExpression)>),
 }
 
 pub struct UseTree {
-    pub node_id: NodeId,
     pub prefix: Path,
     pub kind: UseTreeKind,
 }
 
 pub enum UseTreeKind {
     Glob,
-    Terminal { alias: Option<(NodeId, Identifier)> },
+    Terminal { alias: Option<(Identifier)> },
     Nested { trees: Vec<UseTree> },
 }
 
@@ -184,13 +171,11 @@ pub struct Path {
 }
 
 pub struct PathSegment {
-    pub node_id: NodeId,
     pub name: Identifier,
     pub type_arguments: Vec<TypeExpression>,
 }
 
 pub struct AssociatedDefinition {
-    pub node_id: NodeId,
     pub attributes: Vec<Attribute>,
     pub visibility: Visibility,
     pub kind: AssociatedDefinitionKind,
@@ -219,7 +204,6 @@ pub enum AssociatedDefinitionKind {
 }
 
 pub struct Expression {
-    pub node_id: NodeId,
     pub kind: ExpressionKind,
 }
 
@@ -288,14 +272,12 @@ pub enum ExpressionKind {
         arguments: Vec<Expression>,
     },
     MethodCall {
-        node_id: NodeId,
         receiver: Box<Expression>,
         identifier: Identifier,
         type_arguments: Vec<TypeExpression>,
         arguments: Vec<Expression>,
     },
     Field {
-        node_id: NodeId,
         receiver: Box<Expression>,
         field: Identifier,
     },
@@ -305,7 +287,7 @@ pub enum ExpressionKind {
     },
     Struct {
         path: Path,
-        fields: Vec<(NodeId, Identifier, Expression)>,
+        fields: Vec<(Identifier, Expression)>,
         rest: Option<Box<Expression>>,
     },
     Await {
@@ -362,10 +344,10 @@ pub enum Pattern {
     },
     Named {
         path: Path,
-        fields: Vec<(NodeId, Identifier, Pattern)>,
+        fields: Vec<(Identifier, Pattern)>,
     },
     Unnamed {
-        elements: Vec<(NodeId, Pattern)>,
+        elements: Vec<Pattern>,
     },
 }
 

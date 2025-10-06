@@ -6,16 +6,17 @@ mod tests;
 use danubec_syntax::SyntaxKind;
 use unicode_ident::{is_xid_continue, is_xid_start};
 
-#[derive(Debug, Clone, Copy)]
 enum Mode {
     Base {
         depth: usize,
+        in_interpolation: bool,
     },
     InString {
         depth: usize,
-        raw: usize,
         multiline: bool,
-        allow_interpolation: bool,
+    },
+    InRawString {
+        pattern: String,
     },
 }
 
@@ -103,10 +104,16 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
         ($prefix:expr) => {{ source[index..].starts_with($prefix) }};
     }
 
-    'lex: loop {
-        let current_mode = modes.last().copied().unwrap_or(Mode::Base { depth: 0 });
+    'lex: while peek!().is_some() {
+        let current_mode = modes.last().unwrap_or(&Mode::Base {
+            depth: 0,
+            in_interpolation: false,
+        });
         match current_mode {
-            Mode::Base { depth } => {
+            &Mode::Base {
+                depth,
+                in_interpolation,
+            } => {
                 let Some(c) = chars.next() else {
                     break 'lex;
                 };
@@ -181,9 +188,7 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                         one!(STRING_START, "\"\"\"".len());
                         modes.push(Mode::InString {
                             depth,
-                            raw: 0,
                             multiline: true,
-                            allow_interpolation: true,
                         });
                     }
                     // One-double-quoted string
@@ -191,9 +196,7 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                         one!(STRING_START);
                         modes.push(Mode::InString {
                             depth,
-                            raw: 0,
                             multiline: false,
-                            allow_interpolation: true,
                         });
                     }
                     // Binary number
@@ -344,7 +347,10 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                             }
                         }
                     }
-                    'r' if matches!(peek!(), Some('#')) && matches!(nth!(1), Some('#' | '"')) => {
+                    // Raw string
+                    'r' if matches!(peek!(), Some('"'))
+                        || (matches!(peek!(), Some('#')) && matches!(nth!(1), Some('"' | '#'))) =>
+                    {
                         let mut peekable = chars.clone();
                         let mut count = 0;
                         while let Some('#') = peekable.next() {
@@ -360,11 +366,8 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
 
                             index += 1 + count + 1;
 
-                            modes.push(Mode::InString {
-                                depth,
-                                raw: count,
-                                multiline: false,
-                                allow_interpolation: false,
+                            modes.push(Mode::InRawString {
+                                pattern: format!("\"{}", "#".repeat(count)),
                             });
                         } else {
                             let source = &source[index..index + 1 + count];
@@ -372,9 +375,9 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                             token!(SyntaxKind::RAW_STRING_START, source);
                         }
                     }
+                    // Raw Identifier
                     'r' if matches!(peek!(), Some('#')) => {
                         chars.next(); // skip '#'
-
                         one!(RAW_IDENTIFIER_START, 2);
 
                         let source = source!(0, is_identifier_continue);
@@ -400,13 +403,24 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                     ')' => one!(RIGHT_PAREN),
                     '[' => one!(LEFT_BRACKET),
                     ']' => one!(RIGHT_BRACKET),
-                    '{' => one!(LEFT_BRACE),
+                    // Block start
+                    '{' => {
+                        one!(LEFT_BRACE);
+                        modes.push(Mode::Base {
+                            depth: depth + 1,
+                            in_interpolation: false,
+                        });
+                    }
                     // Interpolation end
-                    '}' if depth != 0 => {
+                    '}' if in_interpolation => {
                         one!(INTERPOLATION_END);
                         modes.pop();
                     }
-                    '}' => one!(RIGHT_BRACE),
+                    // Block end
+                    '}' => {
+                        one!(RIGHT_BRACE);
+                        modes.pop();
+                    }
                     '@' => one!(AT),
                     '*' => one!(ASTERISK),
                     // Line comment
@@ -441,144 +455,167 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                 }
             }
             Mode::InString {
-                depth,
-                raw,
-                multiline,
-                allow_interpolation,
-            } => {
-                let raw_end = format!("\"{}", "#".repeat(raw));
-                if raw != 0 {
-                    if starts_with!(&raw_end) {
-                        chars.next(); // skip '"'
-                        for _ in 0..raw {
-                            chars.next(); // skip '#'
-                        }
+                multiline: true, ..
+            } if starts_with!("\"\"\"") => {
+                chars.next(); // skip first '"'
+                chars.next(); // skip second '"'
+                chars.next(); // skip third '"'
 
-                        one!(RAW_STRING_END, raw_end.len());
-                        modes.pop();
-                        continue 'lex;
-                    }
+                one!(STRING_END, "\"\"\"".len());
+                modes.pop();
+            }
+            Mode::InString {
+                multiline: false, ..
+            } if starts_with!("\"") => {
+                chars.next(); // skip '"'
+
+                one!(STRING_END);
+                modes.pop();
+            }
+            Mode::InString {
+                multiline: false, ..
+            } if starts_with!("\n") => {
+                modes.pop();
+            }
+            Mode::InString { depth, .. } if starts_with!("${") => {
+                chars.next(); // skip '$'
+                chars.next(); // skip '{'
+
+                one!(INTERPOLATION_START, "${".len());
+                modes.push(Mode::Base {
+                    depth: depth + 1,
+                    in_interpolation: true,
+                });
+            }
+            Mode::InString { .. }
+                if starts_with!("\\\\")
+                    || starts_with!("\\\'")
+                    || starts_with!("\\\"")
+                    || starts_with!("\\n")
+                    || starts_with!("\\t") =>
+            {
+                chars.next(); // skip '\'
+                chars.next(); // skip escaped char
+
+                one!(ESCAPE_START, 1); // skip '\'
+                one!(ESCAPE_SEGMENT, 1); // skip escaped char
+            }
+            Mode::InString { .. } if starts_with!("\\u{") => {
+                chars.next(); // skip '\'
+                chars.next(); // skip 'u'
+                chars.next(); // skip '{'
+                one!(UNICODE_START, 3);
+
+                let source = source!(0, |c: char| c.is_ascii_hexdigit());
+                if source.is_empty() {
+                    continue 'lex;
                 }
+                token!(SyntaxKind::UNICODE_SEGMENT, source);
 
-                if raw == 0 {
-                    if multiline {
-                        if starts_with!("\"\"\"") {
-                            chars.next(); // skip first '"'
-                            chars.next(); // skip second '"'
-                            chars.next(); // skip third '"'
-
-                            one!(STRING_END, "\"\"\"".len());
-                            modes.pop();
-                            continue 'lex;
-                        }
-                    }
-
-                    if !multiline {
-                        if starts_with!("\"") {
-                            chars.next(); // skip '"'
-
-                            one!(STRING_END);
-                            modes.pop();
-                            continue 'lex;
-                        }
-
-                        // Error: Newline in string
-                        if starts_with!("\n") {
-                            modes.pop();
-                            continue 'lex;
-                        }
-                    }
-
-                    if allow_interpolation && starts_with!("${") {
-                        chars.next(); // skip '$'
-                        chars.next(); // skip '{'
-
-                        one!(INTERPOLATION_START, "${".len());
-                        modes.push(Mode::Base { depth: depth + 1 });
-                        continue 'lex;
-                    }
-
-                    if starts_with!("\\\\")
-                        || starts_with!("\\\'")
-                        || starts_with!("\\\"")
-                        || starts_with!("\\n")
-                        || starts_with!("\\t")
-                    {
-                        chars.next(); // skip '\'
-                        chars.next(); // skip escaped char
-
-                        one!(ESCAPE_START, 1); // skip '\'
-                        one!(ESCAPE_SEGMENT, 1); // skip escaped char
-                        continue 'lex;
-                    }
-
-                    if starts_with!("\\u{") {
-                        chars.next(); // skip '\'
-                        chars.next(); // skip 'u'
-                        chars.next(); // skip '{'
-                        one!(UNICODE_START, 3);
-
-                        let source = source!(0, |c: char| c.is_ascii_hexdigit());
-                        if source.is_empty() {
-                            continue 'lex;
-                        }
-                        token!(SyntaxKind::UNICODE_SEGMENT, source);
-
-                        loop {
-                            let source = source!(0, |c: char| c == '_');
-                            if source.is_empty() {
-                                break;
-                            }
-                            token!(SyntaxKind::NUMERIC_SEPARATOR, source);
-
-                            let source = source!(0, |c: char| c.is_ascii_hexdigit());
-                            if source.is_empty() {
-                                break;
-                            }
-                            token!(SyntaxKind::UNICODE_SEGMENT, source);
-                        }
-
-                        if let Some('}') = peek!() {
-                            chars.next(); // skip '}'
-
-                            one!(UNICODE_END, 1);
-                        }
-                        continue 'lex;
-                    }
-                }
-
-                let mut count = 0;
                 loop {
-                    let source = &source[index + count..];
-                    if raw != 0 && source.starts_with(&raw_end) {
+                    let source = source!(0, |c: char| c == '_');
+                    if source.is_empty() {
                         break;
                     }
-                    if raw == 0 {
-                        if !multiline && (source.starts_with('"') || source.starts_with('\n')) {
-                            break;
-                        }
-                        if multiline && source.starts_with("\"\"\"") {
-                            break;
-                        }
-                        if allow_interpolation && source.starts_with("${") {
-                            break;
-                        }
-                        if source.starts_with("\\\\")
-                            || source.starts_with("\\\'")
-                            || source.starts_with("\\\"")
-                            || source.starts_with("\\n")
-                            || source.starts_with("\\t")
-                            || source.starts_with("\\u{")
-                        {
-                            break;
-                        }
+                    token!(SyntaxKind::NUMERIC_SEPARATOR, source);
+
+                    let source = source!(0, |c: char| c.is_ascii_hexdigit());
+                    if source.is_empty() {
+                        break;
+                    }
+                    token!(SyntaxKind::UNICODE_SEGMENT, source);
+                }
+
+                if let Some('}') = peek!() {
+                    chars.next(); // skip '}'
+
+                    one!(UNICODE_END, 1);
+                }
+            }
+            Mode::InString {
+                multiline: false, ..
+            } => {
+                let mut count = 0;
+                let mut source = &source[index + count..];
+                loop {
+                    if source.starts_with('"')
+                        || source.starts_with('\n')
+                        || source.starts_with("${")
+                        || source.starts_with("\\\\")
+                        || source.starts_with("\\\'")
+                        || source.starts_with("\\\"")
+                        || source.starts_with("\\n")
+                        || source.starts_with("\\t")
+                        || source.starts_with("\\u{")
+                    {
+                        break;
                     }
 
-                    chars.next();
-                    count += 1;
+                    if let Some(c) = chars.next() {
+                        count += c.len_utf8();
+                        source = &source[c.len_utf8()..];
+                    } else {
+                        break;
+                    }
                 }
 
                 one!(STRING_SEGMENT, count);
+            }
+            Mode::InString {
+                multiline: true, ..
+            } => {
+                let mut count = 0;
+                let mut source = &source[index + count..];
+                loop {
+                    if source.starts_with("\"\"\"")
+                        || source.starts_with("${")
+                        || source.starts_with("\\\\")
+                        || source.starts_with("\\\'")
+                        || source.starts_with("\\\"")
+                        || source.starts_with("\\n")
+                        || source.starts_with("\\t")
+                        || source.starts_with("\\u{")
+                    {
+                        break;
+                    }
+
+                    if let Some(c) = chars.next() {
+                        count += c.len_utf8();
+                        source = &source[c.len_utf8()..];
+                    } else {
+                        break;
+                    }
+                }
+
+                one!(STRING_SEGMENT, count);
+            }
+            Mode::InRawString { pattern } if starts_with!(pattern) => {
+                for _ in 0..pattern.len() {
+                    chars.next();
+                }
+
+                one!(RAW_STRING_END, pattern.len());
+                modes.pop();
+            }
+            Mode::InRawString { pattern } => {
+                let mut count = 0;
+                let mut source = &source[index + count..];
+                loop {
+                    if source.starts_with(pattern) {
+                        break;
+                    }
+
+                    if let Some(c) = chars.next() {
+                        count += c.len_utf8();
+                        source = &source[c.len_utf8()..];
+                    } else {
+                        break;
+                    }
+                }
+
+                if count != 0 {
+                    one!(STRING_SEGMENT, count);
+                }
             }
         }
     }

@@ -107,7 +107,6 @@ pub fn walk_definition<V: Visitor>(visitor: &mut V, node: crate::Definition) {
     visit_each!(visitor.visit_attribute(node.attributes));
     match node.kind {
         crate::DefinitionKind::Function {
-            node_id,
             visibility,
             name,
             type_parameters,
@@ -127,7 +126,6 @@ pub fn walk_definition<V: Visitor>(visitor: &mut V, node: crate::Definition) {
             visitor.visit_expression(body);
         }
         crate::DefinitionKind::Struct {
-            node_id,
             visibility,
             name,
             type_parameters,
@@ -143,7 +141,6 @@ pub fn walk_definition<V: Visitor>(visitor: &mut V, node: crate::Definition) {
             visit_optional!(visitor.visit_struct_body(body));
         }
         crate::DefinitionKind::Enum {
-            node_id,
             visibility,
             name,
             type_parameters,
@@ -158,15 +155,10 @@ pub fn walk_definition<V: Visitor>(visitor: &mut V, node: crate::Definition) {
             }
             visit_each!(visitor.visit_enum_variant(variants));
         }
-        crate::DefinitionKind::Use {
-            node_id,
-            visibility,
-            tree,
-        } => {
+        crate::DefinitionKind::Use { visibility, tree } => {
             visitor.visit_use_tree(tree);
         }
         crate::DefinitionKind::Module {
-            node_id,
             visibility,
             name,
             definitions,
@@ -175,7 +167,6 @@ pub fn walk_definition<V: Visitor>(visitor: &mut V, node: crate::Definition) {
             visit_each!(visitor.visit_definition(definitions));
         }
         crate::DefinitionKind::Trait {
-            node_id,
             visibility,
             name,
             type_parameters,
@@ -191,7 +182,6 @@ pub fn walk_definition<V: Visitor>(visitor: &mut V, node: crate::Definition) {
             visit_each!(visitor.visit_associated_definition(definitions));
         }
         crate::DefinitionKind::Constant {
-            node_id,
             visibility,
             name,
             r#type,
@@ -202,7 +192,6 @@ pub fn walk_definition<V: Visitor>(visitor: &mut V, node: crate::Definition) {
             visitor.visit_expression(value);
         }
         crate::DefinitionKind::Static {
-            node_id,
             visibility,
             name,
             r#type,
@@ -213,7 +202,6 @@ pub fn walk_definition<V: Visitor>(visitor: &mut V, node: crate::Definition) {
             visitor.visit_expression(value);
         }
         crate::DefinitionKind::Type {
-            node_id,
             visibility,
             name,
             type_parameters,
@@ -301,7 +289,7 @@ pub fn walk_statement<V: Visitor>(visitor: &mut V, node: crate::Statement) {
 pub fn walk_struct_body<V: Visitor>(visitor: &mut V, node: crate::StructBody) {
     match node {
         crate::StructBody::Named(fields) => {
-            for (node_id, visibility, name, ty) in fields {
+            for (visibility, name, ty) in fields {
                 visitor.visit_identifier(name);
                 visitor.visit_type_expression(ty);
             }
@@ -324,7 +312,7 @@ pub fn walk_use_tree<V: Visitor>(visitor: &mut V, node: crate::UseTree) {
     match node.kind {
         crate::UseTreeKind::Glob => {}
         crate::UseTreeKind::Terminal { alias } => {
-            if let Some((node_id, alias)) = alias {
+            if let Some(alias) = alias {
                 visitor.visit_identifier(alias);
             }
         }
@@ -480,7 +468,6 @@ pub fn walk_expression<V: Visitor>(visitor: &mut V, node: crate::Expression) {
             visit_each!(visitor.visit_expression(arguments));
         }
         crate::ExpressionKind::MethodCall {
-            node_id,
             receiver,
             identifier,
             type_arguments,
@@ -491,11 +478,7 @@ pub fn walk_expression<V: Visitor>(visitor: &mut V, node: crate::Expression) {
             visit_each!(visitor.visit_type_expression(type_arguments));
             visit_each!(visitor.visit_expression(arguments));
         }
-        crate::ExpressionKind::Field {
-            node_id,
-            receiver,
-            field,
-        } => {
+        crate::ExpressionKind::Field { receiver, field } => {
             visitor.visit_expression(*receiver);
             visitor.visit_identifier(field);
         }
@@ -505,7 +488,7 @@ pub fn walk_expression<V: Visitor>(visitor: &mut V, node: crate::Expression) {
         }
         crate::ExpressionKind::Struct { path, fields, rest } => {
             visitor.visit_path(path);
-            for (node_id, identifier, expression) in fields {
+            for (identifier, expression) in fields {
                 visitor.visit_identifier(identifier);
                 visitor.visit_expression(expression);
             }
@@ -549,7 +532,7 @@ pub fn walk_path_segment<V: Visitor>(visitor: &mut V, node: crate::PathSegment) 
 pub fn walk_enum_variant_body<V: Visitor>(visitor: &mut V, node: crate::EnumVariantBody) {
     match node {
         crate::EnumVariantBody::Named(fields) => {
-            for (node_id, attributes, name, ty) in fields {
+            for (attributes, name, ty) in fields {
                 visitor.visit_identifier(name);
                 visitor.visit_type_expression(ty);
             }
@@ -587,13 +570,13 @@ pub fn walk_pattern<V: Visitor>(visitor: &mut V, node: crate::Pattern) {
         }
         crate::Pattern::Named { path, fields } => {
             visitor.visit_path(path);
-            for (node_id, identifier, pattern) in fields {
+            for (identifier, pattern) in fields {
                 visitor.visit_identifier(identifier);
                 visitor.visit_pattern(pattern);
             }
         }
         crate::Pattern::Unnamed { elements } => {
-            for (node_id, pattern) in elements {
+            for (pattern) in elements {
                 visitor.visit_pattern(pattern);
             }
         }
@@ -601,24 +584,19 @@ pub fn walk_pattern<V: Visitor>(visitor: &mut V, node: crate::Pattern) {
 }
 
 pub fn walk_attribute<V: Visitor>(visitor: &mut V, node: crate::Attribute) {
-    visitor.visit_path(node.path);
-    visit_each!(visitor.visit_attribute_argument(node.arguments));
+    visitor.visit_attribute_argument(node.argument);
 }
 
 pub fn walk_attribute_argument<V: Visitor>(visitor: &mut V, node: crate::AttributeArgument) {
-    match node {
-        crate::AttributeArgument::Expression { value } => {
+    match node.kind {
+        crate::AttributeArgumentKind::Expression { value } => {
             visitor.visit_expression(value);
         }
-        crate::AttributeArgument::KeyValue {
-            node_id,
-            key,
-            value,
-        } => {
+        crate::AttributeArgumentKind::KeyValue { key, value } => {
             visitor.visit_path(key);
             visitor.visit_expression(value);
         }
-        crate::AttributeArgument::Nested { path, arguments } => {
+        crate::AttributeArgumentKind::Nested { path, arguments } => {
             visitor.visit_path(path);
             visit_each!(visitor.visit_attribute_argument(arguments));
         }

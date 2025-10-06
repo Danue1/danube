@@ -163,7 +163,7 @@ ast_node! {
     token hash where HASH;
     token exclamation where EXCLAMATION;
     token left_bracket where LEFT_BRACKET;
-    node attribute -> Attribute;
+    node argument -> AttributeArgument;
     token right_bracket where RIGHT_BRACKET;
 }
 
@@ -175,7 +175,7 @@ ast_node! {
 
     token hash where HASH;
     token left_bracket where LEFT_BRACKET;
-    node attribute -> AttributeArgument;
+    node argument -> AttributeArgument;
     token right_bracket where RIGHT_BRACKET;
 }
 

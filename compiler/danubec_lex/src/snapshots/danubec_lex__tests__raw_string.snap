@@ -5,6 +5,22 @@ expression: tokens
 [
     (
         RAW_STRING_START,
+        "r\"",
+    ),
+    (
+        STRING_SEGMENT,
+        "Hello, World!",
+    ),
+    (
+        RAW_STRING_END,
+        "\"",
+    ),
+    (
+        WHITESPACE,
+        " ",
+    ),
+    (
+        RAW_STRING_START,
         "r#\"",
     ),
     (

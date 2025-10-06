@@ -42,8 +42,15 @@ fn multiline_string() {
 
 #[test]
 fn raw_string() {
-    let source =
-        r####"r#"Hello, "World"!""# r##"r#"Hello, "World"!""## r###"r##"Hello, "World"!""###"####;
+    let source = r####"r"Hello, World!" r#"Hello, "World"!""# r##"r#"Hello, "World"!""## r###"r##"Hello, "World"!""###"####;
+    let tokens = lex(source);
+
+    insta::assert_debug_snapshot!(tokens);
+}
+
+#[test]
+fn similar_block() {
+    let source = "\"a${b{c\"d${e}f\"g}h}i\"";
     let tokens = lex(source);
 
     insta::assert_debug_snapshot!(tokens);
