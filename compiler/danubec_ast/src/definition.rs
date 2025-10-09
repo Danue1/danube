@@ -356,7 +356,14 @@ pub enum Literal {
     Character { value: char },
     Float { value: f64 },
     Integer { value: i64 },
-    String { value: String },
+    String { segments: Vec<StringSegment> },
+}
+
+pub enum StringSegment {
+    Text { value: String },
+    Unicode { value: char },
+    Escape { value: char },
+    Interpolation { expression: Expression },
 }
 
 pub enum UnaryOperator {

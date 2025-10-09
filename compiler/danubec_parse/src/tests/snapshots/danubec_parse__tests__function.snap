@@ -1,0 +1,118 @@
+---
+source: compiler/danubec_parse/src/tests/mod.rs
+expression: events
+---
+KRATE_NODE@0..80
+  NEW_LINE@0..1 "\n"
+  FUNCTION_DEFINITION_NODE@1..11
+    FN@1..3 "fn"
+    WHITESPACE@3..4 " "
+    IDENTIFIER_NODE@4..7
+      IDENTIFIER_SEGMENT@4..7
+        IDENTIFIER@4..7 "foo"
+    LEFT_PAREN@7..8 "("
+    RIGHT_PAREN@8..9 ")"
+    FUNCTION_BODY_UNIT_NODE@9..11
+      SEMICOLON@9..10 ";"
+      NEW_LINE@10..11 "\n"
+  FUNCTION_DEFINITION_NODE@11..23
+    FN@11..13 "fn"
+    WHITESPACE@13..14 " "
+    IDENTIFIER_NODE@14..17
+      IDENTIFIER_SEGMENT@14..17
+        IDENTIFIER@14..17 "bar"
+    LEFT_PAREN@17..18 "("
+    RIGHT_PAREN@18..19 ")"
+    WHITESPACE@19..20 " "
+    FUNCTION_BODY_BLOCK_NODE@20..23
+      BLOCK_EXPRESSION_NODE@20..23
+        LEFT_BRACE@20..21 "{"
+        RIGHT_BRACE@21..22 "}"
+        NEW_LINE@22..23 "\n"
+  FUNCTION_DEFINITION_NODE@23..80
+    FN@23..25 "fn"
+    WHITESPACE@25..26 " "
+    IDENTIFIER_NODE@26..29
+      IDENTIFIER_SEGMENT@26..29
+        IDENTIFIER@26..29 "baz"
+    LEFT_PAREN@29..30 "("
+    FUNCTION_PARAMETER_NODE@30..36
+      PATH_PATTERN_NODE@30..31
+        PATH_NODE@30..31
+          PATH_SEGMENT_IDENTIFIER_NODE@30..31
+            IDENTIFIER_NODE@30..31
+              IDENTIFIER_SEGMENT@30..31
+                IDENTIFIER@30..31 "a"
+      COLON@31..32 ":"
+      WHITESPACE@32..33 " "
+      PATH_TYPE_NODE@33..36
+        PATH_NODE@33..36
+          PATH_SEGMENT_IDENTIFIER_NODE@33..36
+            IDENTIFIER_NODE@33..36
+              IDENTIFIER_SEGMENT@33..36
+                IDENTIFIER@33..36 "i32"
+    COMMA@36..37 ","
+    WHITESPACE@37..38 " "
+    FUNCTION_PARAMETER_NODE@38..47
+      PATH_PATTERN_NODE@38..39
+        PATH_NODE@38..39
+          PATH_SEGMENT_IDENTIFIER_NODE@38..39
+            IDENTIFIER_NODE@38..39
+              IDENTIFIER_SEGMENT@38..39
+                IDENTIFIER@38..39 "b"
+      COLON@39..40 ":"
+      WHITESPACE@40..41 " "
+      PATH_TYPE_NODE@41..47
+        PATH_NODE@41..47
+          PATH_SEGMENT_IDENTIFIER_NODE@41..47
+            IDENTIFIER_NODE@41..47
+              IDENTIFIER_SEGMENT@41..47
+                IDENTIFIER@41..47 "String"
+    RIGHT_PAREN@47..48 ")"
+    WHITESPACE@48..49 " "
+    HYPHEN@49..50 "-"
+    RIGHT_CHEVRON@50..51 ">"
+    WHITESPACE@51..52 " "
+    TUPLE_TYPE_NODE@52..66
+      LEFT_PAREN@52..53 "("
+      PATH_TYPE_NODE@53..56
+        PATH_NODE@53..56
+          PATH_SEGMENT_IDENTIFIER_NODE@53..56
+            IDENTIFIER_NODE@53..56
+              IDENTIFIER_SEGMENT@53..56
+                IDENTIFIER@53..56 "i32"
+      COMMA@56..57 ","
+      WHITESPACE@57..58 " "
+      PATH_TYPE_NODE@58..64
+        PATH_NODE@58..64
+          PATH_SEGMENT_IDENTIFIER_NODE@58..64
+            IDENTIFIER_NODE@58..64
+              IDENTIFIER_SEGMENT@58..64
+                IDENTIFIER@58..64 "String"
+      RIGHT_PAREN@64..65 ")"
+      WHITESPACE@65..66 " "
+    FUNCTION_BODY_BLOCK_NODE@66..80
+      BLOCK_EXPRESSION_NODE@66..80
+        LEFT_BRACE@66..67 "{"
+        NEW_LINE@67..68 "\n"
+        WHITESPACE@68..72 "    "
+        EXPRESSION_STATEMENT_NODE@72..79
+          TUPLE_EXPRESSION_NODE@72..79
+            LEFT_PAREN@72..73 "("
+            PATH_EXPRESSION_NODE@73..74
+              PATH_NODE@73..74
+                PATH_SEGMENT_IDENTIFIER_NODE@73..74
+                  IDENTIFIER_NODE@73..74
+                    IDENTIFIER_SEGMENT@73..74
+                      IDENTIFIER@73..74 "a"
+            COMMA@74..75 ","
+            WHITESPACE@75..76 " "
+            PATH_EXPRESSION_NODE@76..77
+              PATH_NODE@76..77
+                PATH_SEGMENT_IDENTIFIER_NODE@76..77
+                  IDENTIFIER_NODE@76..77
+                    IDENTIFIER_SEGMENT@76..77
+                      IDENTIFIER@76..77 "b"
+            RIGHT_PAREN@77..78 ")"
+            NEW_LINE@78..79 "\n"
+        RIGHT_BRACE@79..80 "}"

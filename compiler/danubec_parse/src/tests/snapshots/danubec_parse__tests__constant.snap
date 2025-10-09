@@ -1,0 +1,52 @@
+---
+source: compiler/danubec_parse/src/tests/mod.rs
+expression: events
+---
+KRATE_NODE@0..55
+  NEW_LINE@0..1 "\n"
+  CONSTANT_DEFINITION_NODE@1..22
+    CONST@1..6 "const"
+    WHITESPACE@6..7 " "
+    IDENTIFIER_NODE@7..10
+      IDENTIFIER_SEGMENT@7..10
+        IDENTIFIER@7..10 "FOO"
+    COLON@10..11 ":"
+    WHITESPACE@11..12 " "
+    PATH_TYPE_NODE@12..16
+      PATH_NODE@12..16
+        PATH_SEGMENT_IDENTIFIER_NODE@12..16
+          IDENTIFIER_NODE@12..16
+            IDENTIFIER_SEGMENT@12..16
+              IDENTIFIER@12..15 "i32"
+              WHITESPACE@15..16 " "
+    EQUAL@16..17 "="
+    WHITESPACE@17..18 " "
+    LITERAL_EXPRESSION_NODE@18..20
+      INTEGER_LITERAL_NODE@18..20
+        INTEGER_SEGMENT@18..20 "42"
+    SEMICOLON@20..21 ";"
+    NEW_LINE@21..22 "\n"
+  CONSTANT_DEFINITION_NODE@22..55
+    CONST@22..27 "const"
+    WHITESPACE@27..28 " "
+    IDENTIFIER_NODE@28..31
+      IDENTIFIER_SEGMENT@28..31
+        IDENTIFIER@28..31 "BAR"
+    COLON@31..32 ":"
+    WHITESPACE@32..33 " "
+    PATH_TYPE_NODE@33..37
+      PATH_NODE@33..37
+        PATH_SEGMENT_IDENTIFIER_NODE@33..37
+          IDENTIFIER_NODE@33..37
+            IDENTIFIER_SEGMENT@33..37
+              IDENTIFIER@33..36 "str"
+              WHITESPACE@36..37 " "
+    EQUAL@37..38 "="
+    WHITESPACE@38..39 " "
+    LITERAL_EXPRESSION_NODE@39..54
+      STRING_LITERAL_NODE@39..54
+        STRING_START@39..40 "\""
+        STRING_LITERAL_SEGMENT_NODE@40..53
+          STRING_SEGMENT@40..53 "Hello, world!"
+        STRING_END@53..54 "\""
+    SEMICOLON@54..55 ";"

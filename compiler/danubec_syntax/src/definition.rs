@@ -88,8 +88,8 @@ macro_rules! ast_node {
             ast_node!($($body)*);
         }
     };
-    (token $node:ident where $kind:ident; $($rest:tt)*) => {
-        pub fn $node(&self) -> Option<crate::SyntaxToken> {
+    (token $token:ident where $kind:ident; $($rest:tt)*) => {
+        pub fn $token(&self) -> Option<crate::SyntaxToken> {
             use rowan::{NodeOrToken, ast::AstNode};
 
             self.syntax().children_with_tokens().find_map(|node| {
@@ -102,8 +102,8 @@ macro_rules! ast_node {
 
         ast_node!($($rest)*);
     };
-    (tokens $node:ident where $kind:ident; $($rest:tt)*) => {
-        pub fn $node(&self) -> impl Iterator<Item = crate::SyntaxToken> {
+    (tokens $token:ident where $kind:ident; $($rest:tt)*) => {
+        pub fn $token(&self) -> impl Iterator<Item = crate::SyntaxToken> {
             use rowan::{NodeOrToken, ast::AstNode};
 
             self.syntax().children_with_tokens().filter_map(|node| {
@@ -264,19 +264,54 @@ ast_node! {
 
     token left_chevron where LEFT_CHEVRON;
     nodes type_parameters -> TypeParameter;
-    token right_chevron where RIGHT_CHEVRON;
+    // token right_chevron_for_type_parameters where RIGHT_CHEVRON;
 
     token left_paren where LEFT_PAREN;
     nodes parameters -> FunctionParameter;
     token right_paren where RIGHT_PAREN;
 
-    token arrow where HYPHEN__RIGHT_CHEVRON;
+    token HYPHEN where HYPHEN;
+    // token right_chevron_for_return_type where RIGHT_CHEVRON;
     node r#type -> TypeExpression;
 
     token r#where where WHERE;
     nodes constraints -> TypeParameterConstraint;
 
-    node body -> BlockExpression;
+    node body -> FunctionBodyKind;
+}
+
+impl FunctionDefinition {
+    pub fn right_chevron_for_type_parameters(&self) -> Option<crate::SyntaxToken> {
+        use rowan::ast::AstNode;
+
+        self.syntax()
+            .children_with_tokens()
+            .take_while(|node| !matches!(node.kind(), crate::SyntaxKind::HYPHEN))
+            .find_map(|node| match node {
+                rowan::NodeOrToken::Token(token)
+                    if token.kind() == crate::SyntaxKind::RIGHT_CHEVRON =>
+                {
+                    Some(token)
+                }
+                _ => None,
+            })
+    }
+
+    pub fn right_chevron_for_return_type(&self) -> Option<crate::SyntaxToken> {
+        use rowan::ast::AstNode;
+
+        self.syntax()
+            .children_with_tokens()
+            .skip_while(|node| !matches!(node.kind(), crate::SyntaxKind::HYPHEN))
+            .find_map(|node| match node {
+                rowan::NodeOrToken::Token(token)
+                    if token.kind() == crate::SyntaxKind::RIGHT_CHEVRON =>
+                {
+                    Some(token)
+                }
+                _ => None,
+            })
+    }
 }
 
 ast_node! {
@@ -407,6 +442,9 @@ ast_node! {
     token r#type where TYPE;
     node name -> Identifier;
 
+    token colon where COLON;
+    // node bound -> TypeExpression;
+
     token left_chevron where LEFT_CHEVRON;
     nodes type_parameters -> TypeParameter;
     token right_chevron where RIGHT_CHEVRON;
@@ -415,8 +453,28 @@ ast_node! {
     nodes constraints -> TypeParameterConstraint;
 
     token equal where EQUAL;
-    node expression -> TypeExpression;
+    // node initializer -> TypeExpression;
     token semicolon where SEMICOLON;
+}
+
+impl TypeDefinition {
+    pub fn bound(&self) -> Option<TypeExpression> {
+        use rowan::ast::AstNode;
+
+        self.syntax()
+            .children()
+            .take_while(|child| matches!(child.kind(), crate::SyntaxKind::EQUAL))
+            .find_map(TypeExpression::cast)
+    }
+
+    pub fn initializer(&self) -> Option<TypeExpression> {
+        use rowan::ast::AstNode;
+
+        self.syntax()
+            .children()
+            .skip_while(|child| !matches!(child.kind(), crate::SyntaxKind::EQUAL))
+            .find_map(TypeExpression::cast)
+    }
 }
 
 ast_node! {
@@ -431,10 +489,10 @@ ast_node! {
     nodes type_parameters -> TypeParameter;
     token right_chevron where RIGHT_CHEVRON;
 
-    node trait_type -> TypeExpression;
+    // node trait_type -> TypeExpression;
 
     token r#for where FOR;
-    node target_type -> TypeExpression;
+    // node target_type -> TypeExpression;
 
     token r#where where WHERE;
     nodes constraints -> TypeParameterConstraint;
@@ -442,6 +500,26 @@ ast_node! {
     token left_brace where LEFT_BRACE;
     nodes definitions -> AssociatedDefinition;
     token right_brace where RIGHT_BRACE;
+}
+
+impl ImplementDefinition {
+    pub fn trait_type(&self) -> Option<TypeExpression> {
+        use rowan::ast::AstNode;
+
+        self.syntax()
+            .children()
+            .take_while(|child| matches!(child.kind(), crate::SyntaxKind::FOR))
+            .find_map(TypeExpression::cast)
+    }
+
+    pub fn target_type(&self) -> Option<TypeExpression> {
+        use rowan::ast::AstNode;
+
+        self.syntax()
+            .children()
+            .skip_while(|child| !matches!(child.kind(), crate::SyntaxKind::FOR))
+            .find_map(TypeExpression::cast)
+    }
 }
 
 ast_node! {
@@ -472,42 +550,46 @@ ast_node! {
 }
 
 ast_node! {
+    /// The body of a function: `{ statements }` or `;`
+    enum FunctionBodyKind;
+
+    variant Block -> FunctionBodyBlock;
+    variant Unit -> FunctionBodyUnit;
+}
+
+ast_node! {
+    /// A block function body: `{ statements }`
+    struct FunctionBodyBlock where FUNCTION_BODY_BLOCK_NODE;
+
+    node body -> BlockExpression;
+}
+
+ast_node! {
+    /// A unit function body: `;`
+    struct FunctionBodyUnit where FUNCTION_BODY_UNIT_NODE;
+
+    token semicolon where SEMICOLON;
+}
+
+ast_node! {
     /// A tree in a use definition: `a::b::C`, `a::{b, c}`, `a::*`, etc.
     struct UseTree where USE_TREE_NODE;
 
-    node path -> Path;
-
-    token colon__colon where COLON__COLON;
+    node root -> PathSegmentRoot;
     node kind -> UseTreeKind;
-    token comma where COMMA;
 }
 
 ast_node! {
-    /// The kind of a use tree.
+    /// A tree in a use definition: `a::b::C`, `a::{b, c}`, `a::*`, etc.
     enum UseTreeKind;
 
-    variant Glob -> UseTreeGlob;
-    variant Terminal -> UseTreeTerminal;
     variant Nested -> UseTreeNested;
+    variant Glob -> UseTreeGlob;
+    variant Element -> UseTreeElement;
 }
 
 ast_node! {
-    /// A glob import in a use tree: `*`
-    struct UseTreeGlob where USE_TREE_GLOB_NODE;
-
-    token asterisk where ASTERISK;
-}
-
-ast_node! {
-    /// A path in a use tree: `a`, `a as b`, etc.
-    struct UseTreeTerminal where USE_TREE_TERMINAL_NODE;
-
-    token r#as where AS;
-    node identifier -> Identifier;
-}
-
-ast_node! {
-    /// A renamed import in a use tree: `{ a as b, c }`
+    /// A renamed import in a use tree: `{ *, a, b as c, ::*, ::a, ::b as c }`, `::{ *, a, b as c, ::*, ::a, ::b as c }`
     struct UseTreeNested where USE_TREE_NESTED_NODE;
 
     token left_brace where LEFT_BRACE;
@@ -516,6 +598,57 @@ ast_node! {
 }
 
 ast_node! {
+    /// A glob import in a use tree: `*`, `::*`;
+    struct UseTreeGlob where USE_TREE_GLOB_NODE;
+
+    token asterisk where ASTERISK;
+}
+
+ast_node! {
+    /// An element import in a use tree: `a`, `::a`
+    struct UseTreeElement where USE_TREE_ELEMENT_NODE;
+
+    node path -> Path;
+    node trailing -> UseTreeTrailing;
+}
+
+ast_node! {
+    enum UseTreeTrailing;
+
+    variant Nested -> UseTreeTrailingNested;
+    variant Glob -> UseTreeTrailingGlob;
+    variant Rename -> UseTreeTrailingRename;
+}
+
+ast_node! {
+    /// A renamed import in a use tree: `{ *, a, b as c, ::*, ::a, ::b as c }`, `::{ *, a, b as c, ::*, ::a, ::b as c }`
+    struct UseTreeTrailingNested where USE_TREE_NESTED_NODE;
+
+    tokens colons where COLON;
+    token left_brace where LEFT_BRACE;
+    nodes trees -> UseTree;
+    token right_brace where RIGHT_BRACE;
+}
+
+ast_node! {
+    /// A glob import in a use tree: `*`, `::*`;
+    struct UseTreeTrailingGlob where USE_TREE_GLOB_NODE;
+
+    tokens colons where COLON;
+    node root -> PathSegmentRoot;
+    token asterisk where ASTERISK;
+}
+
+ast_node! {
+    /// A path in a use tree: `a`, `a as b`, `::a`, `::a as b`.
+    struct UseTreeTrailingRename where USE_TREE_RENAME_NODE;
+
+    token r#as where AS;
+    node identifier -> Identifier;
+}
+
+ast_node! {
+    /// An associated definition within an impl block.
     struct AssociatedDefinition where ASSOCIATED_DEFINITION_NODE;
 
     nodes attributes -> Attribute;
@@ -543,11 +676,19 @@ ast_node! {
 }
 
 ast_node! {
-    /// The body of a struct: `Foo { a: Type, b: Type }` or `Foo(Type, Type)`
+    /// The body of a struct: `Foo;`, `Foo { a: Type, b: Type }` or `Foo(Type, Type)`
     enum StructBody;
 
+    variant Unit -> StructBodyUnit;
     variant Named -> StructNamed;
     variant Unnamed -> StructUnnamed;
+}
+
+ast_node! {
+    /// A unit struct: `Foo;`
+    struct StructBodyUnit where STRUCT_BODY_UNIT_NODE;
+
+    token semicolon where SEMICOLON;
 }
 
 ast_node! {
@@ -567,7 +708,6 @@ ast_node! {
     node name -> Identifier;
     token colon where COLON;
     node r#type -> TypeExpression;
-    token comma where COMMA;
 }
 
 ast_node! {
@@ -594,20 +734,38 @@ ast_node! {
 
     nodes attributes -> Attribute;
     node kind -> EnumVariantKind;
+    token comma where COMMA;
 }
 
 ast_node! {
-    /// A variant in an enum: `Variant { a: Type }` or `Variant(Type)`
+    /// A variant in an enum: `Variant`, `Variant { a: Type }` or `Variant(Type)`
     enum EnumVariantKind;
 
+    variant Unit -> EnumVariantUnit;
+    variant Scalar -> EnumVariantScalar;
     variant Named -> EnumVariantNamed;
     variant Unnamed -> EnumVariantUnnamed;
+}
+
+ast_node! {
+    /// A unit variant in an enum: `Variant`
+    struct EnumVariantUnit where ENUM_VARIANT_UNIT_NODE;
+}
+
+ast_node! {
+    /// A scalar variant in an enum: `Variant = 42`
+    struct EnumVariantScalar where ENUM_VARIANT_SCALAR_NODE;
+
+    node name -> Identifier;
+    token equal where EQUAL;
+    node value -> Expression;
 }
 
 ast_node! {
     /// A named variant in an enum: `Variant { a: Type }`
     struct EnumVariantNamed where ENUM_VARIANT_NAMED_NODE;
 
+    nodes attributes -> Attribute;
     node name -> Identifier;
     token left_brace where LEFT_BRACE;
     nodes fields -> EnumVariantNamedField;
@@ -629,6 +787,7 @@ ast_node! {
     /// An unnamed variant in an enum: `Variant(Type, Type)`
     struct EnumVariantUnnamed where ENUM_VARIANT_UNNAMED_NODE;
 
+    nodes attributes -> Attribute;
     node name -> Identifier;
     token left_paren where LEFT_PAREN;
     nodes fields -> EnumVariantUnnamedField;
@@ -651,10 +810,11 @@ ast_node! {
     variant Never -> NeverPattern;
     variant Placeholder -> PlaceholderPattern;
     variant Path -> PathPattern;
+    variant Mutable -> MutablePattern;
     variant Tuple -> TuplePattern;
     variant Array -> ArrayPattern;
     variant Literal -> LiteralPattern;
-    variant Rest -> RestPattern;
+    variant Range -> RangePattern;
     variant Or -> OrPattern;
     variant Named -> NamedPattern;
     variant Unnamed -> UnnamedPattern;
@@ -679,6 +839,14 @@ ast_node! {
     struct PathPattern where PATH_PATTERN_NODE;
 
     node path -> Path;
+}
+
+ast_node! {
+    /// A mutable pattern: `mut pattern`
+    struct MutablePattern where MUTABLE_PATTERN_NODE;
+
+    token r#mut where MUT;
+    node pattern -> Pattern;
 }
 
 ast_node! {
@@ -707,10 +875,12 @@ ast_node! {
 }
 
 ast_node! {
-    /// A rest pattern: `..`
-    struct RestPattern where REST_PATTERN_NODE;
+    /// A range pattern: `start..end`, `start..=end`, `..end`, `start..`
+    struct RangePattern where RANGE_PATTERN_NODE;
 
-    token dot1 where DOT__DOT;
+    node left -> Pattern;
+    node operator -> RangeOperator;
+    node right -> Pattern;
 }
 
 ast_node! {
@@ -819,6 +989,7 @@ ast_node! {
     variant Match -> MatchExpression;
     variant Let -> LetExpression;
     variant Array -> ArrayExpression;
+    variant Tuple -> TupleExpression;
     variant Block -> BlockExpression;
     variant Literal -> LiteralExpression;
     variant Path -> PathExpression;
@@ -913,7 +1084,8 @@ ast_node! {
     struct MatchArm where MATCH_ARM_NODE;
 
     node pattern -> Pattern;
-    token arrow where EQUAL__RIGHT_CHEVRON;
+    token hyphen where HYPHEN;
+    token right_chevron where RIGHT_CHEVRON;
     node expression -> Expression;
     token comma where COMMA;
 }
@@ -936,6 +1108,15 @@ ast_node! {
     token left_bracket where LEFT_BRACKET;
     nodes elements -> Expression;
     token right_bracket where RIGHT_BRACKET;
+}
+
+ast_node! {
+    /// A tuple expression: `(element, element, ...)`
+    struct TupleExpression where TUPLE_EXPRESSION_NODE;
+
+    token left_paren where LEFT_PAREN;
+    nodes elements -> Expression;
+    token right_paren where RIGHT_PAREN;
 }
 
 ast_node! {
@@ -1204,12 +1385,12 @@ ast_node! {
 
     variant Boolean -> BooleanLiteral;
     variant Character -> CharacterLiteral;
-    variant Numeric -> NumericLiteral;
+    variant Integer -> IntegerLiteral;
+    variant Float -> FloatLiteral;
     variant String -> StringLiteral;
     variant Binary -> BinaryLiteral;
     variant Octal -> OctalLiteral;
-    variant Decimal -> DecimalLiteral;
-    variant Hexadecimal -> HexadecimalLiteral;
+    variant Hex -> HexLiteral;
 }
 
 ast_node! {
@@ -1249,7 +1430,7 @@ ast_node! {
     /// An escape sequence in a character literal: `\n`, `\t`, `\\`, etc.
     struct CharacterLiteralEscape where CHARACTER_LITERAL_ESCAPE_NODE;
 
-    token escape where ESCAPE_START;
+    token start where ESCAPE_START;
     token segment where ESCAPE_SEGMENT;
 }
 
@@ -1257,14 +1438,21 @@ ast_node! {
     /// A Unicode escape sequence in a character literal: `\u{1F600}`
     struct CharacterLiteralUnicode where CHARACTER_LITERAL_UNICODE_NODE;
 
-    token unicode_escape_start where UNICODE_START;
+    token start where UNICODE_START;
     tokens segments where UNICODE_SEGMENT;
-    token unicode_escape_end where UNICODE_END;
+    token end where UNICODE_END;
 }
 
 ast_node! {
-    /// A numeric literal: `42`, `3.14`, etc.
-    struct NumericLiteral where NUMERIC_LITERAL_NODE;
+    /// A integer literal: `42`, `3.14`, etc.
+    struct IntegerLiteral where INTEGER_LITERAL_NODE;
+
+    tokens segments where INTEGER_SEGMENT;
+}
+
+ast_node! {
+    /// A floating-point literal: `3.14`, `2.0`, etc.
+    struct FloatLiteral where FLOAT_LITERAL_NODE;
 
     tokens integer_segments where INTEGER_SEGMENT;
     token fraction_start where FRACTION_START;
@@ -1304,7 +1492,7 @@ ast_node! {
     /// An escape sequence in a string literal: `\n`, `\t`, `\\`, etc.
     struct StringLiteralEscape where STRING_LITERAL_ESCAPE_NODE;
 
-    token escape where ESCAPE_START;
+    token start where ESCAPE_START;
     token segment where ESCAPE_SEGMENT;
 }
 
@@ -1312,46 +1500,42 @@ ast_node! {
     /// A Unicode escape sequence in a string literal: `\u{1F600}`
     struct StringLiteralUnicode where STRING_LITERAL_UNICODE_NODE;
 
-    token unicode_escape_start where UNICODE_START;
+    token start where UNICODE_START;
     tokens segments where UNICODE_SEGMENT;
-    token unicode_escape_end where UNICODE_END;
+    token end where UNICODE_END;
 }
 
 ast_node! {
     /// An interpolation in a string literal: `${ expression }`
     struct StringLiteralInterpolation where STRING_LITERAL_INTERPOLATION_NODE;
 
-    token interpolation_start where INTERPOLATION_START;
+    token start where INTERPOLATION_START;
     node expression -> Expression;
-    token interpolation_end where INTERPOLATION_END;
+    token end where INTERPOLATION_END;
 }
 
 ast_node! {
     /// A binary literal: `0b101010`
     struct BinaryLiteral where BINARY_NUMERIC_LITERAL_NODE;
 
-    node raw -> Raw;
+    token start where BINARY_START;
+    tokens segments where BINARY_SEGMENT;
 }
 
 ast_node! {
     /// An octal literal: `0o52`
     struct OctalLiteral where OCTAL_NUMERIC_LITERAL_NODE;
 
-    node raw -> Raw;
-}
-
-ast_node! {
-    /// A decimal literal: `0d42`
-    struct DecimalLiteral where DECIMAL_NUMERIC_LITERAL_NODE;
-
-    node raw -> Raw;
+    token start where OCTAL_START;
+    tokens segments where OCTAL_SEGMENT;
 }
 
 ast_node! {
     /// A hexadecimal literal: `0x2A`
-    struct HexadecimalLiteral where HEX_NUMERIC_LITERAL_NODE;
+    struct HexLiteral where HEX_NUMERIC_LITERAL_NODE;
 
-    node raw -> Raw;
+    token start where HEX_START;
+    tokens segments where HEX_SEGMENT;
 }
 
 ast_node! {
@@ -1359,6 +1543,7 @@ ast_node! {
     enum TypeExpression;
 
     variant Never -> NeverType;
+    variant Mutable -> MutableType;
     variant Path -> PathType;
     variant Slice -> SliceType;
     variant Tuple -> TupleType;
@@ -1372,10 +1557,22 @@ ast_node! {
 }
 
 ast_node! {
+    /// A mutable type: `mut T`
+    struct MutableType where MUTABLE_TYPE_NODE;
+
+    token r#mut where MUT;
+    node r#type -> TypeExpression;
+}
+
+ast_node! {
     /// A path type: `a::b::C<T>`
     struct PathType where PATH_TYPE_NODE;
 
     node path -> Path;
+
+    token left_chevron where LEFT_CHEVRON;
+    nodes arguments -> TypeArgument;
+    token right_chevron where RIGHT_CHEVRON;
 }
 
 ast_node! {
@@ -1416,46 +1613,61 @@ ast_node! {
 }
 
 ast_node! {
+    /// A path: `::foo`, `a::b::C`, `::std::option::Option`, etc.
     struct Path where PATH_NODE;
 
-    nodes fragments -> PathFragment;
+    nodes segments -> PathSegment;
 }
 
 ast_node! {
-    // A fragment in a path: `a`, `b`, `C::<T>`, etc.
-    struct PathFragment where PATH_FRAGMENT_NODE;
+    /// A segment in a path: `::`, `foo`, `Bar`, etc.
+    enum PathSegment;
 
-    token colon__colon where COLON__COLON;
-    node segment -> PathSegment;
+    variant Root -> PathSegmentRoot;
+    variant Self_ -> PathSegmentSelf;
+    variant Super_ -> PathSegmentSuper;
+    variant Krate -> PathSegmentKrate;
+    variant Identifier -> PathSegmentIdentifier;
 }
 
 ast_node! {
-    /// A segment in a path: `A::<T>`
-    struct PathSegment where PATH_SEGMENT_NODE;
+    /// The root of a path: `::`.
+    struct PathSegmentRoot where PATH_SEGMENT_ROOT_NODE;
 
-    node name -> Identifier;
-    token colon__colon where COLON__COLON;
-    token left_chevron where LEFT_CHEVRON;
-    node type_arguments -> TypeArgument;
-    token right_chevron where RIGHT_CHEVRON;
+    tokens colon where COLON;
+}
+
+ast_node! {
+    /// The `self` segment in a path: `self`.
+    struct PathSegmentSelf where PATH_SEGMENT_SELF_NODE;
+
+    token self_ where SELF;
+}
+
+ast_node! {
+    /// The `super` segment in a path: `super`.
+    struct PathSegmentSuper where PATH_SEGMENT_SUPER_NODE;
+
+    token super_ where SUPER;
+}
+
+ast_node! {
+    /// The `crate` segment in a path: `crate`.
+    struct PathSegmentKrate where PATH_SEGMENT_KRATE_NODE;
+
+    token krate where CRATE;
+}
+
+ast_node! {
+    /// An identifier segment in a path: `foo`, `Bar`, `_baz`, etc.
+    struct PathSegmentIdentifier where PATH_SEGMENT_IDENTIFIER_NODE;
+
+    node identifier -> Identifier;
 }
 
 ast_node! {
     /// An identifier: `foo`, `Bar`, `_baz`, etc.
     struct Identifier where IDENTIFIER_NODE;
 
-    node raw -> Raw;
-}
-
-ast_node! {
-    /// Raw text content of a token.
-    struct Raw where RAW_NODE;
-}
-
-impl Raw {
-    pub fn text(&self) -> String {
-        use rowan::ast::AstNode;
-
-        self.syntax().text().to_string()
-    }
+    tokens segments where IDENTIFIER_SEGMENT;
 }

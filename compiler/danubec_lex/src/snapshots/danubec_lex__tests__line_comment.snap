@@ -5,11 +5,7 @@ expression: tokens
 [
     (
         LINE_COMMENT_START,
-        "//",
-    ),
-    (
-        WHITESPACE,
-        " ",
+        "// ",
     ),
     (
         LINE_COMMENT_SEGMENT,
@@ -21,11 +17,7 @@ expression: tokens
     ),
     (
         LINE_COMMENT_START,
-        "//",
-    ),
-    (
-        WHITESPACE,
-        " ",
+        "// ",
     ),
     (
         LINE_COMMENT_SEGMENT,

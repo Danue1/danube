@@ -423,16 +423,33 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                     }
                     '@' => one!(AT),
                     '*' => one!(ASTERISK),
+                    // Doc Comment
+                    '/' if matches!(peek!(), Some('/')) && matches!(nth!(1), Some('/')) => {
+                        chars.next(); // skip second '/'
+                        chars.next(); // skip third '/'
+
+                        let mut count = 3;
+                        while matches!(peek!(), Some(' ')) {
+                            count += 1;
+                            chars.next(); // skip additional ' '
+                        }
+                        one!(DOC_COMMENT_START, count);
+
+                        let source = source!(0, |c| !matches!(c, '\n'));
+                        if !source.is_empty() {
+                            token!(SyntaxKind::DOC_COMMENT_SEGMENT, source);
+                        }
+                    }
                     // Line comment
                     '/' if matches!(peek!(), Some('/')) => {
                         chars.next(); // skip second '/'
 
-                        one!(LINE_COMMENT_START, 2);
-
-                        let source = source!(0, |c| matches!(c, ' ' | '\t'));
-                        if !source.is_empty() {
-                            token!(SyntaxKind::WHITESPACE, source);
+                        let mut count = 2;
+                        while matches!(peek!(), Some(' ')) {
+                            count += 1;
+                            chars.next(); // skip additional '/'
                         }
+                        one!(LINE_COMMENT_START, count);
 
                         let source = source!(0, |c| !matches!(c, '\n'));
                         if !source.is_empty() {

@@ -1,0 +1,58 @@
+---
+source: compiler/danubec_parse/src/tests/mod.rs
+expression: events
+---
+KRATE_NODE@0..55
+  NEW_LINE@0..1 "\n"
+  STRUCT_DEFINITION_NODE@1..15
+    STRUCT@1..7 "struct"
+    WHITESPACE@7..8 " "
+    IDENTIFIER_NODE@8..11
+      IDENTIFIER_SEGMENT@8..11
+        IDENTIFIER@8..11 "Foo"
+    STRUCT_BODY_UNNAMED_NODE@11..15
+      LEFT_PAREN@11..12 "("
+      RIGHT_PAREN@12..13 ")"
+      SEMICOLON@13..14 ";"
+      NEW_LINE@14..15 "\n"
+  STRUCT_DEFINITION_NODE@15..31
+    STRUCT@15..21 "struct"
+    WHITESPACE@21..22 " "
+    IDENTIFIER_NODE@22..25
+      IDENTIFIER_SEGMENT@22..25
+        IDENTIFIER@22..25 "Bar"
+    STRUCT_BODY_UNNAMED_NODE@25..31
+      LEFT_PAREN@25..26 "("
+      STRUCT_BODY_UNNAMED_FIELD_NODE@26..28
+        TUPLE_TYPE_NODE@26..28
+          LEFT_PAREN@26..27 "("
+          RIGHT_PAREN@27..28 ")"
+      RIGHT_PAREN@28..29 ")"
+      SEMICOLON@29..30 ";"
+      NEW_LINE@30..31 "\n"
+  STRUCT_DEFINITION_NODE@31..55
+    STRUCT@31..37 "struct"
+    WHITESPACE@37..38 " "
+    IDENTIFIER_NODE@38..41
+      IDENTIFIER_SEGMENT@38..41
+        IDENTIFIER@38..41 "Baz"
+    STRUCT_BODY_UNNAMED_NODE@41..55
+      LEFT_PAREN@41..42 "("
+      STRUCT_BODY_UNNAMED_FIELD_NODE@42..45
+        PATH_TYPE_NODE@42..45
+          PATH_NODE@42..45
+            PATH_SEGMENT_IDENTIFIER_NODE@42..45
+              IDENTIFIER_NODE@42..45
+                IDENTIFIER_SEGMENT@42..45
+                  IDENTIFIER@42..45 "i32"
+      COMMA@45..46 ","
+      WHITESPACE@46..47 " "
+      STRUCT_BODY_UNNAMED_FIELD_NODE@47..53
+        PATH_TYPE_NODE@47..53
+          PATH_NODE@47..53
+            PATH_SEGMENT_IDENTIFIER_NODE@47..53
+              IDENTIFIER_NODE@47..53
+                IDENTIFIER_SEGMENT@47..53
+                  IDENTIFIER@47..53 "String"
+      RIGHT_PAREN@53..54 ")"
+      SEMICOLON@54..55 ";"

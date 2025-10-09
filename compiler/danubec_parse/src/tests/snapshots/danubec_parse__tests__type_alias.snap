@@ -1,0 +1,50 @@
+---
+source: compiler/danubec_parse/src/tests/mod.rs
+expression: events
+---
+KRATE_NODE@0..42
+  NEW_LINE@0..1 "\n"
+  TYPE_DEFINITION_NODE@1..17
+    TYPE@1..5 "type"
+    WHITESPACE@5..6 " "
+    IDENTIFIER_NODE@6..10
+      IDENTIFIER_SEGMENT@6..10
+        IDENTIFIER@6..9 "Foo"
+        WHITESPACE@9..10 " "
+    EQUAL@10..11 "="
+    WHITESPACE@11..12 " "
+    PATH_TYPE_NODE@12..15
+      PATH_NODE@12..15
+        PATH_SEGMENT_IDENTIFIER_NODE@12..15
+          IDENTIFIER_NODE@12..15
+            IDENTIFIER_SEGMENT@12..15
+              IDENTIFIER@12..15 "i32"
+    SEMICOLON@15..16 ";"
+    NEW_LINE@16..17 "\n"
+  TYPE_DEFINITION_NODE@17..42
+    TYPE@17..21 "type"
+    WHITESPACE@21..22 " "
+    IDENTIFIER_NODE@22..26
+      IDENTIFIER_SEGMENT@22..26
+        IDENTIFIER@22..25 "Bar"
+        WHITESPACE@25..26 " "
+    EQUAL@26..27 "="
+    WHITESPACE@27..28 " "
+    TUPLE_TYPE_NODE@28..41
+      LEFT_PAREN@28..29 "("
+      PATH_TYPE_NODE@29..32
+        PATH_NODE@29..32
+          PATH_SEGMENT_IDENTIFIER_NODE@29..32
+            IDENTIFIER_NODE@29..32
+              IDENTIFIER_SEGMENT@29..32
+                IDENTIFIER@29..32 "i32"
+      COMMA@32..33 ","
+      WHITESPACE@33..34 " "
+      PATH_TYPE_NODE@34..40
+        PATH_NODE@34..40
+          PATH_SEGMENT_IDENTIFIER_NODE@34..40
+            IDENTIFIER_NODE@34..40
+              IDENTIFIER_SEGMENT@34..40
+                IDENTIFIER@34..40 "String"
+      RIGHT_PAREN@40..41 ")"
+    SEMICOLON@41..42 ";"

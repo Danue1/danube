@@ -55,7 +55,7 @@ pub trait Visitor: Sized {
 
     #[inline]
     fn visit_literal(&mut self, node: crate::Literal) {
-        //
+        walk_literal(self, node);
     }
 
     fn visit_path(&mut self, node: crate::Path) {
@@ -599,6 +599,41 @@ pub fn walk_attribute_argument<V: Visitor>(visitor: &mut V, node: crate::Attribu
         crate::AttributeArgumentKind::Nested { path, arguments } => {
             visitor.visit_path(path);
             visit_each!(visitor.visit_attribute_argument(arguments));
+        }
+    }
+}
+
+pub fn walk_literal<V: Visitor>(visitor: &mut V, node: crate::Literal) {
+    match node {
+        crate::Literal::Boolean { value: _ } => {
+            //
+        }
+        crate::Literal::Character { value: _ } => {
+            //
+        }
+        crate::Literal::Float { value: _ } => {
+            //
+        }
+        crate::Literal::Integer { value: _ } => {
+            //
+        }
+        crate::Literal::String { segments } => {
+            for segment in segments {
+                match segment {
+                    crate::StringSegment::Text { value: _ } => {
+                        //
+                    }
+                    crate::StringSegment::Unicode { value: _ } => {
+                        //
+                    }
+                    crate::StringSegment::Escape { value: _ } => {
+                        //
+                    }
+                    crate::StringSegment::Interpolation { expression } => {
+                        visitor.visit_expression(expression);
+                    }
+                }
+            }
         }
     }
 }

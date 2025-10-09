@@ -1,0 +1,130 @@
+---
+source: compiler/danubec_parse/src/tests/mod.rs
+expression: events
+---
+KRATE_NODE@0..142
+  NEW_LINE@0..1 "\n"
+  MODULE_DEFINITION_NODE@1..10
+    MOD@1..4 "mod"
+    WHITESPACE@4..5 " "
+    IDENTIFIER_NODE@5..8
+      IDENTIFIER_SEGMENT@5..8
+        IDENTIFIER@5..8 "foo"
+    MODULE_DEFINITION_OUTLINE_NODE@8..10
+      SEMICOLON@8..9 ";"
+      NEW_LINE@9..10 "\n"
+  MODULE_DEFINITION_NODE@10..142
+    MOD@10..13 "mod"
+    WHITESPACE@13..14 " "
+    IDENTIFIER_NODE@14..18
+      IDENTIFIER_SEGMENT@14..18
+        IDENTIFIER@14..17 "bar"
+        WHITESPACE@17..18 " "
+    MODULE_DEFINITION_INLINE_NODE@18..142
+      LEFT_BRACE@18..19 "{"
+      NEW_LINE@19..20 "\n"
+      WHITESPACE@20..24 "    "
+      STRUCT_DEFINITION_NODE@24..40
+        STRUCT@24..30 "struct"
+        WHITESPACE@30..31 " "
+        IDENTIFIER_NODE@31..34
+          IDENTIFIER_SEGMENT@31..34
+            IDENTIFIER@31..34 "Foo"
+        STRUCT_BODY_UNIT_NODE@34..40
+          SEMICOLON@34..35 ";"
+          NEW_LINE@35..36 "\n"
+          WHITESPACE@36..40 "    "
+      ENUM_DEFINITION_NODE@40..141
+        ENUM@40..44 "enum"
+        WHITESPACE@44..45 " "
+        IDENTIFIER_NODE@45..49
+          IDENTIFIER_SEGMENT@45..49
+            IDENTIFIER@45..48 "Bar"
+            WHITESPACE@48..49 " "
+        LEFT_BRACE@49..50 "{"
+        NEW_LINE@50..51 "\n"
+        WHITESPACE@51..59 "        "
+        ENUM_VARIANT_UNIT_NODE@59..60
+          IDENTIFIER_NODE@59..60
+            IDENTIFIER_SEGMENT@59..60
+              IDENTIFIER@59..60 "A"
+        COMMA@60..61 ","
+        NEW_LINE@61..62 "\n"
+        WHITESPACE@62..70 "        "
+        ENUM_VARIANT_NAMED_NODE@70..93
+          IDENTIFIER_NODE@70..72
+            IDENTIFIER_SEGMENT@70..72
+              IDENTIFIER@70..71 "B"
+              WHITESPACE@71..72 " "
+          LEFT_BRACE@72..73 "{"
+          WHITESPACE@73..74 " "
+          ENUM_VARIANT_NAMED_FIELD_NODE@74..80
+            IDENTIFIER_NODE@74..75
+              IDENTIFIER_SEGMENT@74..75
+                IDENTIFIER@74..75 "a"
+            COLON@75..76 ":"
+            WHITESPACE@76..77 " "
+            PATH_TYPE_NODE@77..80
+              PATH_NODE@77..80
+                PATH_SEGMENT_IDENTIFIER_NODE@77..80
+                  IDENTIFIER_NODE@77..80
+                    IDENTIFIER_SEGMENT@77..80
+                      IDENTIFIER@77..80 "i32"
+          COMMA@80..81 ","
+          WHITESPACE@81..82 " "
+          ENUM_VARIANT_NAMED_FIELD_NODE@82..92
+            IDENTIFIER_NODE@82..83
+              IDENTIFIER_SEGMENT@82..83
+                IDENTIFIER@82..83 "b"
+            COLON@83..84 ":"
+            WHITESPACE@84..85 " "
+            PATH_TYPE_NODE@85..92
+              PATH_NODE@85..92
+                PATH_SEGMENT_IDENTIFIER_NODE@85..92
+                  IDENTIFIER_NODE@85..92
+                    IDENTIFIER_SEGMENT@85..92
+                      IDENTIFIER@85..91 "String"
+                      WHITESPACE@91..92 " "
+          RIGHT_BRACE@92..93 "}"
+        COMMA@93..94 ","
+        NEW_LINE@94..95 "\n"
+        WHITESPACE@95..103 "        "
+        ENUM_VARIANT_UNNAMED_NODE@103..117
+          IDENTIFIER_NODE@103..104
+            IDENTIFIER_SEGMENT@103..104
+              IDENTIFIER@103..104 "C"
+          LEFT_PAREN@104..105 "("
+          PATH_TYPE_NODE@105..108
+            PATH_NODE@105..108
+              PATH_SEGMENT_IDENTIFIER_NODE@105..108
+                IDENTIFIER_NODE@105..108
+                  IDENTIFIER_SEGMENT@105..108
+                    IDENTIFIER@105..108 "i32"
+          COMMA@108..109 ","
+          WHITESPACE@109..110 " "
+          PATH_TYPE_NODE@110..116
+            PATH_NODE@110..116
+              PATH_SEGMENT_IDENTIFIER_NODE@110..116
+                IDENTIFIER_NODE@110..116
+                  IDENTIFIER_SEGMENT@110..116
+                    IDENTIFIER@110..116 "String"
+          RIGHT_PAREN@116..117 ")"
+        COMMA@117..118 ","
+        NEW_LINE@118..119 "\n"
+        WHITESPACE@119..127 "        "
+        ENUM_VARIANT_SCALAR_NODE@127..133
+          IDENTIFIER_NODE@127..129
+            IDENTIFIER_SEGMENT@127..129
+              IDENTIFIER@127..128 "D"
+              WHITESPACE@128..129 " "
+          EQUAL@129..130 "="
+          WHITESPACE@130..131 " "
+          LITERAL_EXPRESSION_NODE@131..133
+            INTEGER_LITERAL_NODE@131..133
+              INTEGER_SEGMENT@131..133 "42"
+        COMMA@133..134 ","
+        NEW_LINE@134..135 "\n"
+        WHITESPACE@135..139 "    "
+        RIGHT_BRACE@139..140 "}"
+        NEW_LINE@140..141 "\n"
+      RIGHT_BRACE@141..142 "}"
