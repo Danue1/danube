@@ -232,3 +232,60 @@ use ::foo::{*,foo,bar as baz,{},::*,::foo,::bar as baz,::{}};
     assert!(diagnostic.is_empty());
     insta::assert_debug_snapshot!(events);
 }
+
+#[test]
+fn unary_expression() {
+    let source = r#"
+fn foo() {
+    -42;
+    !true;
+    ~0;
+}
+"#;
+    let diagnostic = Diagnostic::new();
+    let (events, diagnostic) = parse(&source, diagnostic);
+
+    assert!(diagnostic.is_empty());
+    insta::assert_debug_snapshot!(events);
+}
+
+#[test]
+fn primary_expression() {
+    let source = r#"
+fn foo() {
+    break;
+    continue;
+    return;
+    for i in 0..10 {}
+    while true {}
+    loop {}
+    if true {}
+    if true {} else {}
+    match 42 {
+        0 => {},
+        1 | 2 => {},
+        foo @ 3 => {},
+        _ => {},
+    }
+    let x;
+    let x: i32;
+    let x = 42;
+    let x: i32 = 42;
+    [0, 1, 2];
+    (42, "hello", true);
+    { 42 };
+    foo();
+    foo.bar;
+    foo.bar();
+    foo.bar.baz;
+    foo.bar().baz();
+    foo[0];
+}"#;
+    let diagnostic = Diagnostic::new();
+    let (events, diagnostic) = parse(&source, diagnostic);
+
+    dbg!(&diagnostic);
+
+    assert!(diagnostic.is_empty());
+    insta::assert_debug_snapshot!(events);
+}

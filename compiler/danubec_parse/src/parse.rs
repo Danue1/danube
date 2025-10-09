@@ -59,7 +59,7 @@ pub(crate) fn parse(source: &str, diagnostic: Diagnostic) -> (SyntaxNode, Diagno
     (node, diagnostic)
 }
 
-fn build(mut tokens: &[(SyntaxKind, &str)], events: Vec<Event>) -> SyntaxNode {
+fn build(mut tokens: &[(SyntaxKind, &str)], mut events: Vec<Event>) -> SyntaxNode {
     let mut builder = GreenNodeBuilder::new();
 
     macro_rules! advance {
@@ -84,10 +84,40 @@ fn build(mut tokens: &[(SyntaxKind, &str)], events: Vec<Event>) -> SyntaxNode {
         };
     }
 
-    for event in events {
-        match event {
-            Event::Start(kind) => {
-                builder.start_node(kind.into());
+    for index in 0..events.len() {
+        match std::mem::replace(&mut events[index], Event::Placeholder) {
+            event @ Event::Start { forward_parent, .. }
+            | event @ Event::Expire { forward_parent } => {
+                let mut forward_parents = match event {
+                    Event::Start { kind, .. } => vec![kind],
+                    _ => vec![],
+                };
+                let mut index = index;
+                let mut forward_parent = forward_parent;
+
+                while let Some(fp) = forward_parent {
+                    index += fp;
+                    match std::mem::replace(&mut events[index], Event::Placeholder) {
+                        Event::Start {
+                            kind,
+                            forward_parent: fp,
+                        } => {
+                            forward_parents.push(kind);
+                            forward_parent = fp;
+                        }
+                        Event::Expire { forward_parent: fp } => {
+                            forward_parent = fp;
+                        }
+                        _ => {
+                            //
+                        }
+                    }
+                }
+
+                for kind in forward_parents.into_iter().rev() {
+                    builder.start_node(kind.into());
+                }
+
                 trivia!();
             }
             Event::Token => {

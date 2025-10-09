@@ -815,6 +815,7 @@ ast_node! {
     variant Array -> ArrayPattern;
     variant Literal -> LiteralPattern;
     variant Range -> RangePattern;
+    variant At -> AtPattern;
     variant Or -> OrPattern;
     variant Named -> NamedPattern;
     variant Unnamed -> UnnamedPattern;
@@ -881,6 +882,35 @@ ast_node! {
     node left -> Pattern;
     node operator -> RangeOperator;
     node right -> Pattern;
+}
+
+ast_node! {
+    /// An at pattern: `name @ pattern`
+    struct AtPattern where AT_PATTERN_NODE;
+
+    // node binding -> Pattern;
+    token at where AT;
+    // node matching -> Pattern;
+}
+
+impl AtPattern {
+    pub fn binding(&self) -> Option<Pattern> {
+        use rowan::ast::AstNode;
+
+        self.syntax()
+            .children()
+            .take_while(|child| !matches!(child.kind(), crate::SyntaxKind::AT))
+            .find_map(Pattern::cast)
+    }
+
+    pub fn matching(&self) -> Option<Pattern> {
+        use rowan::ast::AstNode;
+
+        self.syntax()
+            .children()
+            .skip_while(|child| !matches!(child.kind(), crate::SyntaxKind::AT))
+            .find_map(Pattern::cast)
+    }
 }
 
 ast_node! {
@@ -1164,7 +1194,7 @@ ast_node! {
     struct FunctionCallExpression where FUNCTION_CALL_EXPRESSION_NODE;
 
     node callee -> Expression;
-    token colon__colon where COLON__COLON;
+    tokens colons where COLON;
     token left_chevron where LEFT_CHEVRON;
     nodes type_arguments -> TypeArgument;
     token right_chevron where RIGHT_CHEVRON;
@@ -1230,7 +1260,7 @@ ast_node! {
     struct StructExpression where STRUCT_EXPRESSION_NODE;
 
     node path -> PathExpression;
-    token colon__colon where COLON__COLON;
+    tokens colons where COLON;
     token left_chevron where LEFT_CHEVRON;
     nodes type_arguments -> TypeArgument;
     token right_chevron where RIGHT_CHEVRON;

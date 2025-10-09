@@ -1,6 +1,7 @@
 use crate::{
-    event::{Event, EventStream, Marker},
+    event::{CompleteMarker, Event, EventStream, Marker},
     token_stream::TokenStream,
+    tokens::Tokens,
 };
 use danubec_diagnostic::Diagnostic;
 use danubec_syntax::SyntaxKind::{self, *};
@@ -26,8 +27,18 @@ impl<'source> Parser<'source> {
     }
 
     #[inline]
-    fn complete(&mut self, m: Marker, kind: SyntaxKind) {
-        self.events.complete(m, kind);
+    fn complete(&mut self, m: Marker, kind: SyntaxKind) -> CompleteMarker {
+        self.events.complete(m, kind)
+    }
+
+    #[inline]
+    fn expire(&mut self) -> CompleteMarker {
+        self.events.expire()
+    }
+
+    #[inline]
+    fn precede(&mut self, cm: CompleteMarker) -> Marker {
+        self.events.precede(cm)
     }
 
     fn eat(&mut self, kind: SyntaxKind) -> bool {
@@ -70,10 +81,17 @@ impl<'source> Parser<'source> {
     }
 
     #[inline]
-    fn report(&mut self, ms: Vec<Marker>, report: miette::Report) {
+    fn report(&mut self, ms: Vec<Marker>, report: miette::Report) -> CompleteMarker {
         self.diagnostic.report(report);
+
+        let mut cm = None;
         for m in ms {
-            self.complete(m, ERROR_NODE);
+            cm = Some(self.complete(m, ERROR_NODE));
+        }
+
+        match cm {
+            Some(cm) => cm,
+            None => self.expire(),
         }
     }
 
@@ -110,7 +128,7 @@ macro_rules! expect {
 macro_rules! cut {
     ($p:expr, $($tt:tt)+) => {
         if !at!($p, $($tt)+) {
-            return;
+            return $p.expire();
         }
     };
 }
@@ -144,7 +162,7 @@ pub(crate) fn top_level_attributes(p: &mut Parser) {
     }
 }
 
-pub(crate) fn top_level_attribute(p: &mut Parser) {
+pub(crate) fn top_level_attribute(p: &mut Parser) -> CompleteMarker {
     cut!(p, [HASH, EXCLAMATION]);
 
     let m = p.start();
@@ -155,7 +173,7 @@ pub(crate) fn top_level_attribute(p: &mut Parser) {
     attribute_argument(p);
     expect!(p, RIGHT_BRACKET, [m], ']');
 
-    p.complete(m, TOP_LEVEL_ATTRIBUTE_NODE);
+    p.complete(m, TOP_LEVEL_ATTRIBUTE_NODE)
 }
 
 pub(crate) fn attributes(p: &mut Parser) {
@@ -164,7 +182,7 @@ pub(crate) fn attributes(p: &mut Parser) {
     }
 }
 
-pub(crate) fn attribute(p: &mut Parser) {
+pub(crate) fn attribute(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     expect!(p, HASH, [m], '#');
@@ -172,17 +190,17 @@ pub(crate) fn attribute(p: &mut Parser) {
     attribute_argument(p);
     expect!(p, RIGHT_BRACKET, [m], ']');
 
-    p.complete(m, ATTRIBUTE_NODE);
+    p.complete(m, ATTRIBUTE_NODE)
 }
 
-pub(crate) fn attribute_argument(p: &mut Parser) {
+pub(crate) fn attribute_argument(p: &mut Parser) -> CompleteMarker {
     match p.nth(0) {
         kind if kind.at_literal() => {
             let m = p.start();
 
             expression(p);
 
-            p.complete(m, ATTRIBUTE_ARGUMENT_NODE);
+            p.complete(m, ATTRIBUTE_ARGUMENT_NODE)
         }
         _ if at_path(p) => {
             let m = p.start();
@@ -205,7 +223,7 @@ pub(crate) fn attribute_argument(p: &mut Parser) {
                 expression(p);
             }
 
-            p.complete(m, KEY_VALUE_ATTRIBUTE_ARGUMENT_NODE);
+            p.complete(m, KEY_VALUE_ATTRIBUTE_ARGUMENT_NODE)
         }
         _ => p.report(
             vec![],
@@ -230,24 +248,44 @@ pub(crate) fn definition(p: &mut Parser) {
     attributes(p);
     visibility_modifier(p);
     match p.nth(0) {
-        kind if matches!(kind, FN) => function_definition(p, m),
-        kind if matches!(kind, STRUCT) => struct_definition(p, m),
-        kind if matches!(kind, ENUM) => enum_definition(p, m),
-        kind if matches!(kind, USE) => use_definition(p, m),
-        kind if matches!(kind, MOD) => module_definition(p, m),
-        kind if matches!(kind, TRAIT) => trait_definition(p, m),
-        kind if matches!(kind, CONST) => constant_definition(p, m),
-        kind if matches!(kind, STATIC) => static_definition(p, m),
-        kind if matches!(kind, TYPE) => type_definition(p, m),
-        kind if matches!(kind, IMPL) => implement_definition(p, m),
+        kind if matches!(kind, FN) => {
+            function_definition(p, m);
+        }
+        kind if matches!(kind, STRUCT) => {
+            struct_definition(p, m);
+        }
+        kind if matches!(kind, ENUM) => {
+            enum_definition(p, m);
+        }
+        kind if matches!(kind, USE) => {
+            use_definition(p, m);
+        }
+        kind if matches!(kind, MOD) => {
+            module_definition(p, m);
+        }
+        kind if matches!(kind, TRAIT) => {
+            trait_definition(p, m);
+        }
+        kind if matches!(kind, CONST) => {
+            constant_definition(p, m);
+        }
+        kind if matches!(kind, STATIC) => {
+            static_definition(p, m);
+        }
+        kind if matches!(kind, TYPE) => {
+            type_definition(p, m);
+        }
+        kind if matches!(kind, IMPL) => {
+            implement_definition(p, m);
+        }
         _ => {
             p.report(vec![], miette!("Expected definition"));
             p.recover(m, &DEFINITION_START);
         }
-    }
+    };
 }
 
-pub(crate) fn visibility_modifier(p: &mut Parser) {
+pub(crate) fn visibility_modifier(p: &mut Parser) -> CompleteMarker {
     cut!(p, [PUB]);
 
     let m = p.start();
@@ -266,10 +304,10 @@ pub(crate) fn visibility_modifier(p: &mut Parser) {
 
     expect!(p, RIGHT_PAREN, [m], ')');
 
-    p.complete(m, VISIBILITY_NODE);
+    p.complete(m, VISIBILITY_NODE)
 }
 
-pub(crate) fn function_definition(p: &mut Parser, m: Marker) {
+pub(crate) fn function_definition(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, FN, [m], "function definition");
     identifier(p);
     function_parameters(p);
@@ -281,18 +319,18 @@ pub(crate) fn function_definition(p: &mut Parser, m: Marker) {
 
     function_body(p);
 
-    p.complete(m, FUNCTION_DEFINITION_NODE);
+    p.complete(m, FUNCTION_DEFINITION_NODE)
 }
 
-pub(crate) fn struct_definition(p: &mut Parser, m: Marker) {
+pub(crate) fn struct_definition(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, STRUCT, [m], "struct definition");
     identifier(p);
     struct_definition_body(p);
 
-    p.complete(m, STRUCT_DEFINITION_NODE);
+    p.complete(m, STRUCT_DEFINITION_NODE)
 }
 
-pub(crate) fn enum_definition(p: &mut Parser, m: Marker) {
+pub(crate) fn enum_definition(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, ENUM, [m], "enum definition");
     identifier(p);
     expect!(p, LEFT_BRACE, [m], '{');
@@ -304,18 +342,18 @@ pub(crate) fn enum_definition(p: &mut Parser, m: Marker) {
     }
     expect!(p, RIGHT_BRACE, [m], '}');
 
-    p.complete(m, ENUM_DEFINITION_NODE);
+    p.complete(m, ENUM_DEFINITION_NODE)
 }
 
-pub(crate) fn use_definition(p: &mut Parser, m: Marker) {
+pub(crate) fn use_definition(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, USE, [m], "use definition");
     use_tree(p);
     expect!(p, SEMICOLON, [m], ';');
 
-    p.complete(m, USE_DEFINITION_NODE);
+    p.complete(m, USE_DEFINITION_NODE)
 }
 
-pub(crate) fn module_definition(p: &mut Parser, m: Marker) {
+pub(crate) fn module_definition(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, MOD, [m], "module definition");
     identifier(p);
 
@@ -323,8 +361,7 @@ pub(crate) fn module_definition(p: &mut Parser, m: Marker) {
 
     if p.eat(SEMICOLON) {
         p.complete(m1, MODULE_DEFINITION_OUTLINE_NODE);
-        p.complete(m, MODULE_DEFINITION_NODE);
-        return;
+        return p.complete(m, MODULE_DEFINITION_NODE);
     }
 
     expect!(p, LEFT_BRACE, [m1], '{');
@@ -335,23 +372,21 @@ pub(crate) fn module_definition(p: &mut Parser, m: Marker) {
                 vec![],
                 miette!("Expected definition: function, struct, enum, etc."),
             );
-            p.complete(m, ERROR_NODE);
-            return;
+            return p.complete(m, ERROR_NODE);
         }
         definition(p);
     }
     if !p.eat(RIGHT_BRACE) {
         p.report(vec![], miette!("Expected `}}`"));
         p.complete(m1, ERROR_NODE);
-        p.complete(m, MODULE_DEFINITION_NODE);
-        return;
+        return p.complete(m, MODULE_DEFINITION_NODE);
     }
 
     p.complete(m1, MODULE_DEFINITION_INLINE_NODE);
-    p.complete(m, MODULE_DEFINITION_NODE);
+    p.complete(m, MODULE_DEFINITION_NODE)
 }
 
-pub(crate) fn trait_definition(p: &mut Parser, m: Marker) {
+pub(crate) fn trait_definition(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, TRAIT, [m], "trait definition");
     identifier(p);
     expect!(p, LEFT_BRACE, [m], '{');
@@ -360,10 +395,10 @@ pub(crate) fn trait_definition(p: &mut Parser, m: Marker) {
     }
     expect!(p, RIGHT_BRACE, [m], '}');
 
-    p.complete(m, TRAIT_DEFINITION_NODE);
+    p.complete(m, TRAIT_DEFINITION_NODE)
 }
 
-pub(crate) fn constant_definition(p: &mut Parser, m: Marker) {
+pub(crate) fn constant_definition(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, CONST, [m], "constant definition");
     identifier(p);
     if p.eat(COLON) {
@@ -374,10 +409,10 @@ pub(crate) fn constant_definition(p: &mut Parser, m: Marker) {
     }
     expect!(p, SEMICOLON, [m], ';');
 
-    p.complete(m, CONSTANT_DEFINITION_NODE);
+    p.complete(m, CONSTANT_DEFINITION_NODE)
 }
 
-pub(crate) fn static_definition(p: &mut Parser, m: Marker) {
+pub(crate) fn static_definition(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, STATIC, [m], "static definition");
     identifier(p);
     expect!(p, COLON, [m], ':');
@@ -386,10 +421,10 @@ pub(crate) fn static_definition(p: &mut Parser, m: Marker) {
     expression(p);
     expect!(p, SEMICOLON, [m], ';');
 
-    p.complete(m, STATIC_DEFINITION_NODE);
+    p.complete(m, STATIC_DEFINITION_NODE)
 }
 
-pub(crate) fn type_definition(p: &mut Parser, m: Marker) {
+pub(crate) fn type_definition(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, TYPE, [m], "type definition");
     identifier(p);
     if p.eat(COLON) {
@@ -400,10 +435,10 @@ pub(crate) fn type_definition(p: &mut Parser, m: Marker) {
     }
     expect!(p, SEMICOLON, [m], ';');
 
-    p.complete(m, TYPE_DEFINITION_NODE);
+    p.complete(m, TYPE_DEFINITION_NODE)
 }
 
-pub(crate) fn implement_definition(p: &mut Parser, m: Marker) {
+pub(crate) fn implement_definition(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, IMPL, [m], "implement definition");
     type_expression(p);
     if p.eat(FOR) {
@@ -415,10 +450,10 @@ pub(crate) fn implement_definition(p: &mut Parser, m: Marker) {
     }
     expect!(p, RIGHT_BRACE, [m], '}');
 
-    p.complete(m, IMPLEMENT_DEFINITION_NODE);
+    p.complete(m, IMPLEMENT_DEFINITION_NODE)
 }
 
-pub(crate) fn use_tree(p: &mut Parser) {
+pub(crate) fn use_tree(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     if at_root_path(p) {
@@ -432,10 +467,10 @@ pub(crate) fn use_tree(p: &mut Parser) {
 
     use_tree_kind(p);
 
-    p.complete(m, USE_TREE_NODE);
+    p.complete(m, USE_TREE_NODE)
 }
 
-pub(crate) fn use_tree_kind(p: &mut Parser) {
+pub(crate) fn use_tree_kind(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     if p.at(LEFT_BRACE) {
@@ -446,10 +481,10 @@ pub(crate) fn use_tree_kind(p: &mut Parser) {
         return use_tree_glob(p, m);
     }
 
-    use_tree_element(p, m);
+    return use_tree_element(p, m);
 }
 
-pub(crate) fn use_tree_nested(p: &mut Parser, m: Marker) {
+pub(crate) fn use_tree_nested(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, LEFT_BRACE, [m], '{');
     while !current!(p, [RIGHT_BRACE, END_OF_FILE]) {
         use_tree(p);
@@ -459,16 +494,16 @@ pub(crate) fn use_tree_nested(p: &mut Parser, m: Marker) {
     }
     expect!(p, RIGHT_BRACE, [m], '}');
 
-    p.complete(m, USE_TREE_NESTED_NODE);
+    p.complete(m, USE_TREE_NESTED_NODE)
 }
 
-pub(crate) fn use_tree_glob(p: &mut Parser, m: Marker) {
+pub(crate) fn use_tree_glob(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, ASTERISK, [m], '*');
 
-    p.complete(m, USE_TREE_GLOB_NODE);
+    p.complete(m, USE_TREE_GLOB_NODE)
 }
 
-pub(crate) fn use_tree_element(p: &mut Parser, m: Marker) {
+pub(crate) fn use_tree_element(p: &mut Parser, m: Marker) -> CompleteMarker {
     path(p);
 
     if at_path_separator(p) && p.nth_at(2, LEFT_BRACE) {
@@ -479,10 +514,10 @@ pub(crate) fn use_tree_element(p: &mut Parser, m: Marker) {
         use_tree_rename(p);
     }
 
-    p.complete(m, USE_TREE_ELEMENT_NODE);
+    p.complete(m, USE_TREE_ELEMENT_NODE)
 }
 
-pub(crate) fn use_tree_trailing_nested(p: &mut Parser) {
+pub(crate) fn use_tree_trailing_nested(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     if !at_path_separator(p) {
@@ -491,10 +526,10 @@ pub(crate) fn use_tree_trailing_nested(p: &mut Parser) {
 
     expect!(p, COLON, [m], ':');
     expect!(p, COLON, [m], ':');
-    use_tree_nested(p, m);
+    use_tree_nested(p, m)
 }
 
-pub(crate) fn use_tree_trailing_glob(p: &mut Parser) {
+pub(crate) fn use_tree_trailing_glob(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     if !(at_path_separator(p) && p.nth_at(2, ASTERISK)) {
@@ -505,19 +540,19 @@ pub(crate) fn use_tree_trailing_glob(p: &mut Parser) {
     p.bump(); // eat ':'
     p.bump(); // eat '*'
 
-    p.complete(m, USE_TREE_GLOB_NODE);
+    p.complete(m, USE_TREE_GLOB_NODE)
 }
 
-pub(crate) fn use_tree_rename(p: &mut Parser) {
+pub(crate) fn use_tree_rename(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     expect!(p, AS, [m], "as");
     identifier(p);
 
-    p.complete(m, USE_TREE_RENAME_NODE);
+    p.complete(m, USE_TREE_RENAME_NODE)
 }
 
-pub(crate) fn associated_item(p: &mut Parser) {
+pub(crate) fn associated_item(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     attributes(p);
@@ -529,12 +564,12 @@ pub(crate) fn associated_item(p: &mut Parser) {
         kind if matches!(kind, CONST) => constant_definition(p, m1),
         kind if matches!(kind, TYPE) => type_definition(p, m1),
         _ => return p.report(vec![m1, m], miette!("Expected trait item")),
-    }
+    };
 
-    p.complete(m, ASSOCIATED_DEFINITION_NODE);
+    p.complete(m, ASSOCIATED_DEFINITION_NODE)
 }
 
-pub(crate) fn function_parameters(p: &mut Parser) {
+pub(crate) fn function_parameters(p: &mut Parser) -> CompleteMarker {
     expect!(p, LEFT_PAREN, [], '(');
     while !current!(p, [RIGHT_PAREN, END_OF_FILE]) {
         function_parameter(p);
@@ -543,9 +578,10 @@ pub(crate) fn function_parameters(p: &mut Parser) {
         }
     }
     expect!(p, RIGHT_PAREN, [], ')');
+    p.expire()
 }
 
-pub(crate) fn function_parameter(p: &mut Parser) {
+pub(crate) fn function_parameter(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     attributes(p);
@@ -557,19 +593,21 @@ pub(crate) fn function_parameter(p: &mut Parser) {
     expect!(p, COLON, [m], ':');
     type_expression(p);
 
-    p.complete(m, FUNCTION_PARAMETER_NODE);
+    p.complete(m, FUNCTION_PARAMETER_NODE)
 }
 
 pub(crate) fn function_body(p: &mut Parser) {
     let m = p.start();
 
     if p.eat(SEMICOLON) {
-        return p.complete(m, FUNCTION_BODY_UNIT_NODE);
+        p.complete(m, FUNCTION_BODY_UNIT_NODE);
+        return;
     }
 
     if p.at(LEFT_BRACE) {
         block_expression(p);
-        return p.complete(m, FUNCTION_BODY_BLOCK_NODE);
+        p.complete(m, FUNCTION_BODY_BLOCK_NODE);
+        return;
     }
 
     p.report(vec![m], miette!("Expected function body: `{{` or `;`"));
@@ -596,7 +634,7 @@ pub(crate) fn struct_definition_body(p: &mut Parser) {
     p.report(vec![], miette!("Expected struct body: `{{`, `(`, or `;`"));
 }
 
-pub(crate) fn struct_named_body(p: &mut Parser) {
+pub(crate) fn struct_named_body(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     expect!(p, LEFT_BRACE, [m], '{');
@@ -608,10 +646,10 @@ pub(crate) fn struct_named_body(p: &mut Parser) {
     }
     expect!(p, RIGHT_BRACE, [m], '}');
 
-    p.complete(m, STRUCT_BODY_NAMED_NODE);
+    p.complete(m, STRUCT_BODY_NAMED_NODE)
 }
 
-pub(crate) fn struct_named_field(p: &mut Parser) {
+pub(crate) fn struct_named_field(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     attributes(p);
@@ -620,10 +658,10 @@ pub(crate) fn struct_named_field(p: &mut Parser) {
     expect!(p, COLON, [m], ':');
     type_expression(p);
 
-    p.complete(m, STRUCT_BODY_NAMED_FIELD_NODE);
+    p.complete(m, STRUCT_BODY_NAMED_FIELD_NODE)
 }
 
-pub(crate) fn struct_unnamed_body(p: &mut Parser) {
+pub(crate) fn struct_unnamed_body(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     expect!(p, LEFT_PAREN, [m], '(');
@@ -636,7 +674,7 @@ pub(crate) fn struct_unnamed_body(p: &mut Parser) {
     expect!(p, RIGHT_PAREN, [m], ')');
     expect!(p, SEMICOLON, [m], ';');
 
-    p.complete(m, STRUCT_BODY_UNNAMED_NODE);
+    p.complete(m, STRUCT_BODY_UNNAMED_NODE)
 }
 
 pub(crate) fn struct_unnamed_field(p: &mut Parser) {
@@ -665,14 +703,14 @@ pub(crate) fn enum_variant(p: &mut Parser) {
     }
 }
 
-pub(crate) fn enum_variant_scalar(p: &mut Parser, m: Marker) {
+pub(crate) fn enum_variant_scalar(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, EQUAL, [m], '=');
     expression(p);
 
-    p.complete(m, ENUM_VARIANT_SCALAR_NODE);
+    p.complete(m, ENUM_VARIANT_SCALAR_NODE)
 }
 
-pub(crate) fn enum_variant_named(p: &mut Parser, m: Marker) {
+pub(crate) fn enum_variant_named(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, LEFT_BRACE, [m], '{');
     while !current!(p, [RIGHT_BRACE, END_OF_FILE]) {
         enum_variant_named_field(p);
@@ -682,10 +720,10 @@ pub(crate) fn enum_variant_named(p: &mut Parser, m: Marker) {
     }
     expect!(p, RIGHT_BRACE, [m], '}');
 
-    p.complete(m, ENUM_VARIANT_NAMED_NODE);
+    p.complete(m, ENUM_VARIANT_NAMED_NODE)
 }
 
-pub(crate) fn enum_variant_named_field(p: &mut Parser) {
+pub(crate) fn enum_variant_named_field(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     attributes(p);
@@ -693,10 +731,10 @@ pub(crate) fn enum_variant_named_field(p: &mut Parser) {
     expect!(p, COLON, [m], ':');
     type_expression(p);
 
-    p.complete(m, ENUM_VARIANT_NAMED_FIELD_NODE);
+    p.complete(m, ENUM_VARIANT_NAMED_FIELD_NODE)
 }
 
-pub(crate) fn enum_variant_unnamed(p: &mut Parser, m: Marker) {
+pub(crate) fn enum_variant_unnamed(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, LEFT_PAREN, [m], '(');
     while !current!(p, [RIGHT_PAREN, END_OF_FILE]) {
         type_expression(p);
@@ -706,10 +744,10 @@ pub(crate) fn enum_variant_unnamed(p: &mut Parser, m: Marker) {
     }
     expect!(p, RIGHT_PAREN, [m], ')');
 
-    p.complete(m, ENUM_VARIANT_UNNAMED_NODE);
+    p.complete(m, ENUM_VARIANT_UNNAMED_NODE)
 }
 
-pub(crate) fn type_expression(p: &mut Parser) {
+pub(crate) fn type_expression(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     match p.nth(0) {
@@ -724,7 +762,7 @@ pub(crate) fn type_expression(p: &mut Parser) {
     }
 }
 
-pub(crate) fn path_type_expression(p: &mut Parser, m: Marker) {
+pub(crate) fn path_type_expression(p: &mut Parser, m: Marker) -> CompleteMarker {
     path(p);
 
     if p.at(COLON) && p.nth_at_(1, COLON) && p.nth_at(2, LEFT_CHEVRON) {
@@ -741,18 +779,18 @@ pub(crate) fn path_type_expression(p: &mut Parser, m: Marker) {
         expect!(p, RIGHT_CHEVRON, [m], '>');
     }
 
-    p.complete(m, PATH_TYPE_NODE);
+    p.complete(m, PATH_TYPE_NODE)
 }
 
-pub(crate) fn slice_type_expression(p: &mut Parser, m: Marker) {
+pub(crate) fn slice_type_expression(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, LEFT_BRACKET, [m], '[');
     type_expression(p);
     expect!(p, RIGHT_BRACKET, [m], ']');
 
-    p.complete(m, SLICE_TYPE_NODE);
+    p.complete(m, SLICE_TYPE_NODE)
 }
 
-pub(crate) fn tuple_type_expression(p: &mut Parser, m: Marker) {
+pub(crate) fn tuple_type_expression(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, LEFT_PAREN, [m], '(');
     while !current!(p, [RIGHT_PAREN, END_OF_FILE]) {
         type_expression(p);
@@ -762,17 +800,39 @@ pub(crate) fn tuple_type_expression(p: &mut Parser, m: Marker) {
     }
     expect!(p, RIGHT_PAREN, [m], ')');
 
-    p.complete(m, TUPLE_TYPE_NODE);
+    p.complete(m, TUPLE_TYPE_NODE)
 }
 
-pub(crate) fn mutable_type_expression(p: &mut Parser, m: Marker) {
+pub(crate) fn mutable_type_expression(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, MUT, [m], "mut");
     type_expression(p);
 
-    p.complete(m, MUTABLE_TYPE_NODE);
+    p.complete(m, MUTABLE_TYPE_NODE)
 }
 
-pub(crate) fn pattern(p: &mut Parser) {
+pub(crate) fn pattern(p: &mut Parser) -> CompleteMarker {
+    pattern_bp(p, 0)
+}
+
+pub(crate) fn pattern_bp(p: &mut Parser, bp: usize) -> CompleteMarker {
+    let mut lhs = primary_pattern(p);
+
+    loop {
+        let r_bp = match p.nth(0) {
+            kind if matches!(kind, AT) && 3 >= bp => 2,
+            kind if matches!(kind, PIPE) && 1 >= bp => 0,
+            _ => break,
+        };
+
+        let m = p.precede(lhs);
+
+        lhs = infix_pattern(p, m, r_bp);
+    }
+
+    lhs
+}
+
+pub(crate) fn primary_pattern(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     if p.at(EXCLAMATION) {
@@ -797,34 +857,59 @@ pub(crate) fn pattern(p: &mut Parser) {
         return literal_pattern(p, m);
     }
 
-    p.report(vec![m], miette!("Expected pattern"));
+    p.report(vec![m], miette!("Expected pattern"))
 }
 
-pub(crate) fn never_pattern(p: &mut Parser, m: Marker) {
+pub(crate) fn infix_pattern(p: &mut Parser, m: Marker, bp: usize) -> CompleteMarker {
+    if p.at(AT) {
+        return at_pattern(p, m, bp);
+    }
+    if p.at(PIPE) {
+        return or_pattern(p, m);
+    }
+
+    p.report(vec![m], miette!("Expected infix pattern operator"))
+}
+
+pub(crate) fn at_pattern(p: &mut Parser, m: Marker, bp: usize) -> CompleteMarker {
+    expect!(p, AT, [m], '@');
+    pattern_bp(p, bp);
+
+    p.complete(m, AT_PATTERN_NODE)
+}
+
+pub(crate) fn or_pattern(p: &mut Parser, m: Marker) -> CompleteMarker {
+    expect!(p, PIPE, [m], '|');
+    primary_pattern(p);
+
+    p.complete(m, OR_PATTERN_NODE)
+}
+
+pub(crate) fn never_pattern(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, EXCLAMATION, [m], '!');
 
-    p.complete(m, NEVER_PATTERN_NODE);
+    p.complete(m, NEVER_PATTERN_NODE)
 }
 
-pub(crate) fn placeholder_pattern(p: &mut Parser, m: Marker) {
+pub(crate) fn placeholder_pattern(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, PLACEHOLDER, [m], '_');
 
-    p.complete(m, PLACEHOLDER_PATTERN_NODE);
+    p.complete(m, PLACEHOLDER_PATTERN_NODE)
 }
 
-pub(crate) fn path_pattern(p: &mut Parser, m: Marker) {
+pub(crate) fn path_pattern(p: &mut Parser, m: Marker) -> CompleteMarker {
     path(p);
 
     if p.at(LEFT_BRACE) {
-        named_pattern(p, m);
+        named_pattern(p, m)
     } else if p.at(LEFT_PAREN) {
-        unnamed_pattern(p, m);
+        unnamed_pattern(p, m)
     } else {
-        p.complete(m, PATH_PATTERN_NODE);
+        p.complete(m, PATH_PATTERN_NODE)
     }
 }
 
-pub(crate) fn named_pattern(p: &mut Parser, m: Marker) {
+pub(crate) fn named_pattern(p: &mut Parser, m: Marker) -> CompleteMarker {
     if !at_path(p) {
         return p.report(vec![m], miette!("Expected path"));
     }
@@ -839,10 +924,10 @@ pub(crate) fn named_pattern(p: &mut Parser, m: Marker) {
     }
     expect!(p, RIGHT_BRACE, [m], '}');
 
-    p.complete(m, NAMED_PATTERN_NODE);
+    p.complete(m, NAMED_PATTERN_NODE)
 }
 
-pub(crate) fn named_pattern_field(p: &mut Parser) {
+pub(crate) fn named_pattern_field(p: &mut Parser) -> CompleteMarker {
     if !at_identifier(p) {
         return p.report(vec![], miette!("Expected identifier"));
     }
@@ -853,10 +938,10 @@ pub(crate) fn named_pattern_field(p: &mut Parser) {
     expect!(p, COLON, [m], ':');
     pattern(p);
 
-    p.complete(m, NAMED_PATTERN_FIELD_NODE);
+    p.complete(m, NAMED_PATTERN_FIELD_NODE)
 }
 
-pub(crate) fn unnamed_pattern(p: &mut Parser, m: Marker) {
+pub(crate) fn unnamed_pattern(p: &mut Parser, m: Marker) -> CompleteMarker {
     if !at_path(p) {
         return p.report(vec![m], miette!("Expected path"));
     }
@@ -871,17 +956,17 @@ pub(crate) fn unnamed_pattern(p: &mut Parser, m: Marker) {
     }
     expect!(p, RIGHT_PAREN, [m], ')');
 
-    p.complete(m, UNNAMED_PATTERN_NODE);
+    p.complete(m, UNNAMED_PATTERN_NODE)
 }
 
-pub(crate) fn mutable_pattern(p: &mut Parser, m: Marker) {
+pub(crate) fn mutable_pattern(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, MUT, [m], "mut");
     pattern(p);
 
-    p.complete(m, MUTABLE_PATTERN_NODE);
+    p.complete(m, MUTABLE_PATTERN_NODE)
 }
 
-pub(crate) fn tuple_pattern(p: &mut Parser, m: Marker) {
+pub(crate) fn tuple_pattern(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, LEFT_PAREN, [m], '(');
     while !current!(p, [RIGHT_PAREN, END_OF_FILE]) {
         pattern(p);
@@ -891,10 +976,10 @@ pub(crate) fn tuple_pattern(p: &mut Parser, m: Marker) {
     }
     expect!(p, RIGHT_PAREN, [m], ')');
 
-    p.complete(m, TUPLE_PATTERN_NODE);
+    p.complete(m, TUPLE_PATTERN_NODE)
 }
 
-pub(crate) fn array_pattern(p: &mut Parser, m: Marker) {
+pub(crate) fn array_pattern(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, LEFT_BRACKET, [m], '[');
     while !current!(p, [RIGHT_BRACKET, END_OF_FILE]) {
         pattern(p);
@@ -904,17 +989,17 @@ pub(crate) fn array_pattern(p: &mut Parser, m: Marker) {
     }
     expect!(p, RIGHT_BRACKET, [m], ']');
 
-    p.complete(m, ARRAY_PATTERN_NODE);
+    p.complete(m, ARRAY_PATTERN_NODE)
 }
 
-pub(crate) fn literal_pattern(p: &mut Parser, m: Marker) {
+pub(crate) fn literal_pattern(p: &mut Parser, m: Marker) -> CompleteMarker {
     if !p.nth(0).at_literal() {
         return p.report(vec![m], miette!("Expected literal"));
     }
 
-    expression(p);
+    literal_expression(p);
 
-    p.complete(m, LITERAL_PATTERN_NODE);
+    p.complete(m, LITERAL_PATTERN_NODE)
 }
 
 pub(crate) fn at_path(p: &Parser) -> bool {
@@ -934,7 +1019,7 @@ pub(crate) fn at_path_separator(p: &Parser) -> bool {
     p.at(COLON) && p.nth_at_(1, COLON)
 }
 
-pub(crate) fn path(p: &mut Parser) {
+pub(crate) fn path(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     if !at_path(p) {
@@ -997,18 +1082,17 @@ pub(crate) fn path(p: &mut Parser) {
         }
     }
 
-    p.complete(m, PATH_NODE);
+    p.complete(m, PATH_NODE)
 }
 
-pub(crate) fn identifier(p: &mut Parser) {
+pub(crate) fn identifier(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
     if p.at(IDENTIFIER) {
         let m1 = p.start();
 
         p.bump(); // eat identifier
         p.complete(m1, IDENTIFIER_SEGMENT);
-        p.complete(m, IDENTIFIER_NODE);
-        return;
+        return p.complete(m, IDENTIFIER_NODE);
     }
 
     if p.eat(RAW_IDENTIFIER_START) {
@@ -1016,42 +1100,499 @@ pub(crate) fn identifier(p: &mut Parser) {
 
         expect!(p, IDENTIFIER, [m2, m], "identifier");
         p.complete(m2, IDENTIFIER_SEGMENT);
-        p.complete(m, IDENTIFIER_NODE);
-        return;
+        return p.complete(m, IDENTIFIER_NODE);
     }
 
-    p.report(vec![m], miette!("Expected identifier"));
+    p.report(vec![m], miette!("Expected identifier"))
 }
 
+const LITERAL_FIRST: Tokens = tokens![
+    TRUE,
+    FALSE,
+    CHARACTER_START,
+    STRING_START,
+    RAW_STRING_START,
+    INTEGER_SEGMENT,
+    BINARY_START,
+    OCTAL_START,
+    HEX_START,
+];
+
+const PATH_FIRST: Tokens = tokens![COLON, IDENTIFIER, RAW_IDENTIFIER_START, SELF, SUPER, CRATE];
+
+const UNARY_FIRST: Tokens = tokens![MUT, HYPHEN, EXCLAMATION, TILDE];
+
+const EXPRESSION_FIRST: Tokens = tokens![
+    BREAK,
+    CONTINUE,
+    RETURN,
+    FOR,
+    WHILE,
+    LOOP,
+    IF,
+    MATCH,
+    LET,
+    LEFT_BRACKET,
+    LEFT_PAREN,
+    LEFT_BRACE,
+    HASH,
+];
+
+const PRIMARY_FIRST: Tokens = LITERAL_FIRST.concat(PATH_FIRST).concat(EXPRESSION_FIRST);
+
+const PREFIX_EXPRESSION_FIRST: Tokens = UNARY_FIRST.concat(PRIMARY_FIRST);
+
+#[inline]
 pub(crate) fn expression(p: &mut Parser) {
-    if p.nth(0).at_literal() {
-        return literal_expression(p);
-    }
-    if p.at(HASH) || p.at(LEFT_BRACE) {
-        return block_expression(p);
-    }
-    if p.at(LEFT_PAREN) {
-        return tuple_expression(p);
-    }
-    if at_path(p) {
-        return path_expression(p);
-    }
-
-    p.report(
-        vec![],
-        miette!("Expected expression: literal, path, function call, etc."),
-    );
+    expression_bp(p, 0);
 }
 
-pub(crate) fn literal_expression(p: &mut Parser) {
+pub(crate) fn expression_bp(p: &mut Parser, bp: usize) {
+    let mut lhs = if UNARY_FIRST.contains(p.nth(0)) {
+        unary_expression(p)
+    } else if PRIMARY_FIRST.contains(p.nth(0)) {
+        primary_expression(p)
+    } else {
+        p.report(vec![], miette!("Expected expression"))
+    };
+    ();
+
+    loop {
+        let (r_bp, kind, count) = match bp_infix_expression(p) {
+            Some(((l_bp, r_bp), (kind, count))) if l_bp >= bp => (r_bp, kind, count),
+            _ => break,
+        };
+
+        let m = p.precede(lhs);
+
+        {
+            let m1 = p.start();
+            for _ in 0..count {
+                p.bump(); // eat operator
+            }
+            p.complete(m1, kind);
+        }
+
+        lhs = infix_expression(p, m, r_bp, kind);
+    }
+}
+
+pub(crate) fn unary_expression(p: &mut Parser) -> CompleteMarker {
+    let m = p.start();
+
+    {
+        let m1 = p.start();
+
+        p.bump(); // eat unary operator
+        p.complete(m1, UNARY_OPERATOR_NODE);
+    }
+
+    expression(p);
+
+    p.complete(m, UNARY_EXPRESSION_NODE)
+}
+
+pub(crate) fn bp_infix_expression(p: &mut Parser) -> Option<((usize, usize), (SyntaxKind, usize))> {
+    match (p.nth(0), p.nth(1), p.nth(2), p.nth(3)) {
+        // Assignment operators
+        (PLUS, EQUAL, _, _) => Some(((0, 1), (PLUS__EQUAL, 2))), // +=
+        (PLUS, PIPE, EQUAL, _) => Some(((0, 1), (PLUS__PIPE__EQUAL, 3))), // +|=
+        (PLUS, PERCENT, EQUAL, _) => Some(((0, 1), (PLUS__PERCENT__EQUAL, 3))), // +%=
+        (HYPHEN, EQUAL, _, _) => Some(((0, 1), (HYPHEN__EQUAL, 2))), // -=
+        (HYPHEN, PIPE, EQUAL, _) => Some(((0, 1), (HYPHEN__PIPE__EQUAL, 3))), // -|=
+        (HYPHEN, PERCENT, EQUAL, _) => Some(((0, 1), (HYPHEN__PERCENT__EQUAL, 3))), // -%=
+        (ASTERISK, EQUAL, _, _) => Some(((0, 1), (ASTERISK__EQUAL, 2))), // *=
+        (ASTERISK, PIPE, EQUAL, _) => Some(((0, 1), (ASTERISK__PIPE__EQUAL, 3))), // *|=
+        (ASTERISK, PERCENT, EQUAL, _) => Some(((0, 1), (ASTERISK__PERCENT__EQUAL, 3))), // *%=
+        (ASTERISK, ASTERISK, EQUAL, _) => Some(((0, 1), (ASTERISK__ASTERISK__EQUAL, 3))), // **=
+        (ASTERISK, ASTERISK, PIPE, EQUAL) => Some(((0, 1), (ASTERISK__ASTERISK__PIPE__EQUAL, 4))), // **|=
+        (ASTERISK, ASTERISK, PERCENT, EQUAL) => {
+            Some(((0, 1), (ASTERISK__ASTERISK__PERCENT__EQUAL, 4)))
+        } // **%=
+        (SLASH, EQUAL, _, _) => Some(((0, 1), (SLASH__EQUAL, 2))), // /=
+        (PERCENT, EQUAL, _, _) => Some(((0, 1), (PERCENT__EQUAL, 2))), // %=
+        (CARET, EQUAL, _, _) => Some(((0, 1), (CARET__EQUAL, 2))), // ^=
+        (AMPERSAND, EQUAL, _, _) => Some(((0, 1), (AMPERSAND__EQUAL, 2))), // &=
+        (AMPERSAND, AMPERSAND, EQUAL, _) => Some(((0, 1), (AMPERSAND__AMPERSAND__EQUAL, 3))), // &&=
+        (PIPE, EQUAL, _, _) => Some(((0, 1), (PIPE__EQUAL, 2))),   // |=
+        (PIPE, PIPE, EQUAL, _) => Some(((0, 1), (PIPE__PIPE__EQUAL, 3))), // ||=
+        (LEFT_CHEVRON, LEFT_CHEVRON, EQUAL, _) => {
+            Some(((0, 1), (LEFT_CHEVRON__LEFT_CHEVRON__EQUAL, 3)))
+        } // <<=
+        (LEFT_CHEVRON, LEFT_CHEVRON, PIPE, EQUAL) => {
+            Some(((0, 1), (LEFT_CHEVRON__LEFT_CHEVRON__PIPE__EQUAL, 4)))
+        } // <<|=
+        (RIGHT_CHEVRON, RIGHT_CHEVRON, EQUAL, _) => {
+            Some(((0, 1), (RIGHT_CHEVRON__RIGHT_CHEVRON__EQUAL, 3)))
+        } // >>=
+        (RIGHT_CHEVRON, RIGHT_CHEVRON, RIGHT_CHEVRON, EQUAL) => Some((
+            (0, 1),
+            (RIGHT_CHEVRON__RIGHT_CHEVRON__RIGHT_CHEVRON__EQUAL, 4),
+        )), // >>>=
+
+        // Binary operators
+        (DOT, DOT, EQUAL, _) => Some(((2, 3), (DOT__DOT__EQUAL, 3))), // ..=
+        (DOT, DOT, _, _) => Some(((2, 3), (DOT__DOT, 2))),            // ..
+
+        (PIPE, PIPE, _, _) => Some(((4, 5), (PIPE__PIPE, 2))), // ||
+
+        (AMPERSAND, AMPERSAND, _, _) => Some(((6, 7), (AMPERSAND__AMPERSAND, 2))), // &&
+
+        (EQUAL, EQUAL, _, _) => Some(((8, 9), (EQUAL__EQUAL, 2))), // ==
+        (EXCLAMATION, EQUAL, _, _) => Some(((8, 9), (EXCLAMATION__EQUAL, 2))), // !=
+
+        (LEFT_CHEVRON, EQUAL, _, _) => Some(((10, 11), (LEFT_CHEVRON__EQUAL, 2))), // <=
+        (RIGHT_CHEVRON, EQUAL, _, _) => Some(((10, 11), (RIGHT_CHEVRON__EQUAL, 2))), // >=
+
+        (PIPE, _, _, _) => Some(((12, 13), (PIPE, 1))), // |
+
+        (CARET, _, _, _) => Some(((14, 15), (CARET, 1))), // ^
+
+        (AMPERSAND, _, _, _) => Some(((16, 17), (AMPERSAND, 1))), // &
+
+        (LEFT_CHEVRON, LEFT_CHEVRON, PIPE, _) => {
+            Some(((18, 19), (LEFT_CHEVRON__LEFT_CHEVRON__PIPE, 3)))
+        } // <<|
+        (LEFT_CHEVRON, LEFT_CHEVRON, _, _) => Some(((18, 19), (LEFT_CHEVRON__LEFT_CHEVRON, 2))), // <<
+        (RIGHT_CHEVRON, RIGHT_CHEVRON, RIGHT_CHEVRON, _) => {
+            Some(((18, 19), (RIGHT_CHEVRON__RIGHT_CHEVRON__RIGHT_CHEVRON, 3)))
+        } // >>>
+        (RIGHT_CHEVRON, RIGHT_CHEVRON, _, _) => Some(((18, 19), (RIGHT_CHEVRON__RIGHT_CHEVRON, 2))), // >>
+
+        (PLUS, PIPE, _, _) => Some(((20, 21), (PLUS__PIPE, 2))), // +|
+        (PLUS, PERCENT, _, _) => Some(((20, 21), (PLUS__PERCENT, 2))), // +%
+        (PLUS, _, _, _) => Some(((20, 21), (PLUS, 1))),          // +
+        (HYPHEN, PIPE, _, _) => Some(((20, 21), (HYPHEN__PIPE, 2))), // -|
+        (HYPHEN, PERCENT, _, _) => Some(((20, 21), (HYPHEN__PERCENT, 2))), // -%
+        (HYPHEN, _, _, _) => Some(((20, 21), (HYPHEN, 1))),      // -
+
+        (ASTERISK, PIPE, _, _) => Some(((22, 23), (ASTERISK__PIPE, 2))), // *|
+        (ASTERISK, PERCENT, _, _) => Some(((22, 23), (ASTERISK__PERCENT, 2))), // *%
+        (ASTERISK, ASTERISK, PIPE, _) => Some(((22, 23), (ASTERISK__ASTERISK__PIPE, 3))), // **|
+        (ASTERISK, ASTERISK, PERCENT, _) => Some(((22, 23), (ASTERISK__ASTERISK__PERCENT, 3))), // **%
+        (ASTERISK, ASTERISK, _, _) => Some(((22, 23), (ASTERISK__ASTERISK, 2))), // **
+        (ASTERISK, _, _, _) => Some(((22, 23), (ASTERISK, 1))),                  // *
+        (SLASH, _, _, _) => Some(((22, 23), (SLASH, 1))),                        // /
+        (PERCENT, _, _, _) => Some(((22, 23), (PERCENT, 1))),                    // %
+
+        (QUESTION, _, _, _) => Some(((24, 25), (QUESTION, 1))), // ?
+
+        (LEFT_BRACKET, _, _, _) => Some(((26, 27), (LEFT_BRACKET, 1))), // [
+        (LEFT_PAREN, _, _, _) => Some(((26, 27), (LEFT_PAREN, 1))),     // (
+
+        (DOT, _, _, _) => Some(((28, 29), (DOT, 1))), // .
+
+        // Assignment operators
+        (EQUAL, RIGHT_CHEVRON, _, _) => None,           // =>
+        (EQUAL, _, _, _) => Some(((2, 3), (EQUAL, 1))), // =
+
+        // Binary operators
+        (LEFT_CHEVRON, _, _, _) => Some(((8, 9), (LEFT_CHEVRON, 1))), // <
+        (RIGHT_CHEVRON, _, _, _) => Some(((8, 9), (RIGHT_CHEVRON, 1))), // >
+
+        _ => None,
+    }
+}
+
+pub(crate) fn infix_expression(
+    p: &mut Parser,
+    m: Marker,
+    bp: usize,
+    kind: SyntaxKind,
+) -> CompleteMarker {
+    if kind.at_assign_operator() {
+        return assignment_expression(p, m, bp);
+    }
+    if kind.at_binary_operator() {
+        return binary_expression(p, m, bp);
+    }
+    if kind.at_range_operator() {
+        return range_expression(p, m);
+    }
+    if matches!(kind, LEFT_BRACKET) {
+        return index_expression(p, m);
+    }
+    if matches!(kind, LEFT_PAREN) {
+        return function_call_expression(p, m);
+    }
+    if matches!(kind, QUESTION) {
+        return try_expression(p, m);
+    }
+    if matches!(kind, DOT) {
+        if p.at(AWAIT) {
+            return await_expression(p, m);
+        }
+        if p.at(YIELD) {
+            return yield_expression(p, m);
+        }
+        if p.at(IDENTIFIER) || p.at(RAW_IDENTIFIER_START) {
+            return field_expression(p, m);
+        }
+    }
+
+    p.report(vec![m], miette!("Expected infix expression"))
+}
+
+pub(crate) fn assignment_expression(p: &mut Parser, m: Marker, _bp: usize) -> CompleteMarker {
+    expression_bp(p, 0);
+
+    p.complete(m, ASSIGNMENT_EXPRESSION_NODE)
+}
+
+pub(crate) fn binary_expression(p: &mut Parser, m: Marker, _bp: usize) -> CompleteMarker {
+    expression_bp(p, 0);
+
+    p.complete(m, BINARY_EXPRESSION_NODE)
+}
+
+pub(crate) fn range_expression(p: &mut Parser, m: Marker) -> CompleteMarker {
+    expression(p);
+
+    p.complete(m, RANGE_EXPRESSION_NODE)
+}
+
+pub(crate) fn index_expression(p: &mut Parser, m: Marker) -> CompleteMarker {
+    expression(p);
+    expect!(p, RIGHT_BRACKET, [m], ']');
+
+    p.complete(m, INDEX_EXPRESSION_NODE)
+}
+
+pub(crate) fn function_call_expression(p: &mut Parser, m: Marker) -> CompleteMarker {
+    while !current!(p, [RIGHT_PAREN, END_OF_FILE]) {
+        expression(p);
+        if !p.eat(COMMA) {
+            break;
+        }
+    }
+    expect!(p, RIGHT_PAREN, [m], ')');
+
+    p.complete(m, FUNCTION_CALL_EXPRESSION_NODE)
+}
+
+pub(crate) fn try_expression(p: &mut Parser, m: Marker) -> CompleteMarker {
+    p.complete(m, TRY_EXPRESSION_NODE)
+}
+
+pub(crate) fn await_expression(p: &mut Parser, m: Marker) -> CompleteMarker {
+    expect!(p, AWAIT, [m], "await");
+
+    p.complete(m, AWAIT_EXPRESSION_NODE)
+}
+
+pub(crate) fn yield_expression(p: &mut Parser, m: Marker) -> CompleteMarker {
+    expect!(p, YIELD, [m], "yield");
+
+    p.complete(m, YIELD_EXPRESSION_NODE)
+}
+
+pub(crate) fn field_expression(p: &mut Parser, m: Marker) -> CompleteMarker {
+    identifier(p);
+    if p.at(LEFT_PAREN) {
+        return method_call_expression(p, m);
+    }
+
+    return p.complete(m, FIELD_EXPRESSION_NODE);
+}
+
+pub(crate) fn method_call_expression(p: &mut Parser, m: Marker) -> CompleteMarker {
+    expect!(p, LEFT_PAREN, [m], '(');
+    while !current!(p, [RIGHT_PAREN, END_OF_FILE]) {
+        expression(p);
+        if !p.eat(COMMA) {
+            break;
+        }
+    }
+    expect!(p, RIGHT_PAREN, [m], ')');
+
+    p.complete(m, METHOD_CALL_EXPRESSION_NODE)
+}
+
+pub(crate) fn primary_expression(p: &mut Parser) -> CompleteMarker {
+    match p.nth(0) {
+        kind if matches!(kind, BREAK) => break_expression(p),
+        kind if matches!(kind, CONTINUE) => continue_expression(p),
+        kind if matches!(kind, RETURN) => return_expression(p),
+        kind if matches!(kind, FOR) => for_expression(p),
+        kind if matches!(kind, WHILE) => while_expression(p),
+        kind if matches!(kind, LOOP) => loop_expression(p),
+        kind if matches!(kind, IF) => if_expression(p),
+        kind if matches!(kind, MATCH) => match_expression(p),
+        kind if matches!(kind, LET) => let_expression(p),
+        kind if matches!(kind, LEFT_BRACKET) => array_expression(p),
+        kind if matches!(kind, LEFT_PAREN) => tuple_expression(p),
+        kind if matches!(kind, LEFT_BRACE | HASH) => block_expression(p),
+        kind if matches!(
+            kind,
+            TRUE | FALSE
+                | CHARACTER_START
+                | STRING_START
+                | RAW_STRING_START
+                | INTEGER_SEGMENT
+                | BINARY_START
+                | OCTAL_START
+                | HEX_START
+        ) =>
+        {
+            literal_expression(p)
+        }
+        kind if matches!(
+            kind,
+            COLON | IDENTIFIER | RAW_IDENTIFIER_START | SELF | SUPER | CRATE
+        ) =>
+        {
+            path_expression(p)
+        }
+        _ => p.report(vec![], miette!("Expected expression")),
+    }
+}
+
+pub(crate) fn break_expression(p: &mut Parser) -> CompleteMarker {
+    let m = p.start();
+
+    expect!(p, BREAK, [m], "break");
+    if PREFIX_EXPRESSION_FIRST.contains(p.nth(0)) {
+        expression(p);
+    }
+
+    p.complete(m, BREAK_EXPRESSION_NODE)
+}
+
+pub(crate) fn continue_expression(p: &mut Parser) -> CompleteMarker {
+    let m = p.start();
+
+    expect!(p, CONTINUE, [m], "continue");
+
+    p.complete(m, CONTINUE_EXPRESSION_NODE)
+}
+
+pub(crate) fn return_expression(p: &mut Parser) -> CompleteMarker {
+    let m = p.start();
+
+    expect!(p, RETURN, [m], "return");
+    if PREFIX_EXPRESSION_FIRST.contains(p.nth(0)) {
+        expression(p);
+    }
+
+    p.complete(m, RETURN_EXPRESSION_NODE)
+}
+
+pub(crate) fn for_expression(p: &mut Parser) -> CompleteMarker {
+    let m = p.start();
+
+    expect!(p, FOR, [m], "for");
+    pattern(p);
+    expect!(p, IN, [m], "in");
+    expression(p);
+    block_expression(p);
+
+    p.complete(m, FOR_EXPRESSION_NODE)
+}
+
+pub(crate) fn while_expression(p: &mut Parser) -> CompleteMarker {
+    let m = p.start();
+
+    expect!(p, WHILE, [m], "while");
+    expression(p);
+    block_expression(p);
+
+    p.complete(m, WHILE_EXPRESSION_NODE)
+}
+
+pub(crate) fn loop_expression(p: &mut Parser) -> CompleteMarker {
+    let m = p.start();
+
+    expect!(p, LOOP, [m], "loop");
+    block_expression(p);
+
+    p.complete(m, LOOP_EXPRESSION_NODE)
+}
+
+pub(crate) fn if_expression(p: &mut Parser) -> CompleteMarker {
+    let m = p.start();
+
+    expect!(p, IF, [m], "if");
+    expression(p);
+    block_expression(p);
+
+    if p.eat(ELSE) {
+        if p.at(IF) {
+            if_expression(p);
+        } else {
+            block_expression(p);
+        }
+    }
+
+    p.complete(m, IF_EXPRESSION_NODE)
+}
+
+pub(crate) fn match_expression(p: &mut Parser) -> CompleteMarker {
+    let m = p.start();
+
+    expect!(p, MATCH, [m], "match");
+    expression(p);
+    expect!(p, LEFT_BRACE, [m], '{');
+    while !current!(p, [RIGHT_BRACE, END_OF_FILE]) {
+        match_arm(p);
+        if !p.eat(COMMA) {
+            break;
+        }
+    }
+    expect!(p, RIGHT_BRACE, [m], '}');
+
+    p.complete(m, MATCH_EXPRESSION_NODE)
+}
+
+pub(crate) fn match_arm(p: &mut Parser) -> CompleteMarker {
+    let m = p.start();
+
+    pattern(p);
+    expect!(p, EQUAL, [m], "=>");
+    expect!(p, RIGHT_CHEVRON, [m], '>');
+    expression(p);
+
+    p.complete(m, MATCH_ARM_NODE)
+}
+
+pub(crate) fn let_expression(p: &mut Parser) -> CompleteMarker {
+    let m = p.start();
+
+    expect!(p, LET, [m], "let");
+    pattern(p);
+    if p.eat(COLON) {
+        type_expression(p);
+    }
+    if p.eat(EQUAL) {
+        expression(p);
+    }
+
+    p.complete(m, LET_EXPRESSION_NODE)
+}
+
+pub(crate) fn array_expression(p: &mut Parser) -> CompleteMarker {
+    let m = p.start();
+
+    expect!(p, LEFT_BRACKET, [m], '[');
+    while !current!(p, [RIGHT_BRACKET, END_OF_FILE]) {
+        expression(p);
+        if !p.eat(COMMA) {
+            break;
+        }
+    }
+    expect!(p, RIGHT_BRACKET, [m], ']');
+
+    p.complete(m, ARRAY_EXPRESSION_NODE)
+}
+
+pub(crate) fn literal_expression(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     literal(p);
 
-    p.complete(m, LITERAL_EXPRESSION_NODE);
+    p.complete(m, LITERAL_EXPRESSION_NODE)
 }
 
-pub(crate) fn block_expression(p: &mut Parser) {
+pub(crate) fn block_expression(p: &mut Parser) -> CompleteMarker {
     if !current!(p, [HASH, LEFT_BRACE]) {
         return p.report(vec![], miette!("Expected block expression"));
     }
@@ -1065,10 +1606,10 @@ pub(crate) fn block_expression(p: &mut Parser) {
     }
     expect!(p, RIGHT_BRACE, [m], '}');
 
-    p.complete(m, BLOCK_EXPRESSION_NODE);
+    p.complete(m, BLOCK_EXPRESSION_NODE)
 }
 
-pub(crate) fn tuple_expression(p: &mut Parser) {
+pub(crate) fn tuple_expression(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     expect!(p, LEFT_PAREN, [m], '(');
@@ -1080,18 +1621,18 @@ pub(crate) fn tuple_expression(p: &mut Parser) {
     }
     expect!(p, RIGHT_PAREN, [m], ')');
 
-    p.complete(m, TUPLE_EXPRESSION_NODE);
+    p.complete(m, TUPLE_EXPRESSION_NODE)
 }
 
-pub(crate) fn path_expression(p: &mut Parser) {
+pub(crate) fn path_expression(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     path(p);
 
-    p.complete(m, PATH_EXPRESSION_NODE);
+    p.complete(m, PATH_EXPRESSION_NODE)
 }
 
-pub(crate) fn statement(p: &mut Parser) {
+pub(crate) fn statement(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     if p.eat(SEMICOLON) {
@@ -1100,13 +1641,12 @@ pub(crate) fn statement(p: &mut Parser) {
 
     if p.eat(LET) {
         pattern(p);
-
         if p.eat(COLON) {
             type_expression(p);
         }
-
-        expect!(p, EQUAL, [m], '=');
-        expression(p);
+        if p.eat(EQUAL) {
+            expression(p);
+        }
         expect!(p, SEMICOLON, [m], ';');
 
         return p.complete(m, LET_STATEMENT_NODE);
@@ -1129,10 +1669,10 @@ pub(crate) fn statement(p: &mut Parser) {
     visibility_modifier(p);
     definition(p);
 
-    p.complete(m, DEFINITION_STATEMENT_NODE);
+    p.complete(m, DEFINITION_STATEMENT_NODE)
 }
 
-pub(crate) fn literal(p: &mut Parser) {
+pub(crate) fn literal(p: &mut Parser) -> CompleteMarker {
     match p.nth(0) {
         kind if matches!(kind, TRUE | FALSE) => boolean_literal(p),
         kind if matches!(kind, CHARACTER_START) => character_literal(p),
@@ -1146,7 +1686,7 @@ pub(crate) fn literal(p: &mut Parser) {
     }
 }
 
-pub(crate) fn boolean_literal(p: &mut Parser) {
+pub(crate) fn boolean_literal(p: &mut Parser) -> CompleteMarker {
     if !current!(p, [TRUE, FALSE]) {
         return p.report(vec![], miette!("Expected boolean literal"));
     }
@@ -1154,10 +1694,10 @@ pub(crate) fn boolean_literal(p: &mut Parser) {
     let m = p.start();
     p.bump(); // eat 'true' or 'false'
 
-    p.complete(m, BOOLEAN_LITERAL_NODE);
+    p.complete(m, BOOLEAN_LITERAL_NODE)
 }
 
-pub(crate) fn character_literal(p: &mut Parser) {
+pub(crate) fn character_literal(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     expect!(p, CHARACTER_START, [m], '\'');
@@ -1176,10 +1716,10 @@ pub(crate) fn character_literal(p: &mut Parser) {
 
     expect!(p, CHARACTER_END, [m], '\'');
 
-    p.complete(m, CHARACTER_LITERAL_NODE);
+    p.complete(m, CHARACTER_LITERAL_NODE)
 }
 
-pub(crate) fn string_literal(p: &mut Parser) {
+pub(crate) fn string_literal(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     expect!(p, STRING_START, [m], '"');
@@ -1223,27 +1763,27 @@ pub(crate) fn string_literal(p: &mut Parser) {
             continue;
         }
 
-        m1.expire();
+        m1.terminate();
 
         break;
     }
 
     expect!(p, STRING_END, [m], '"');
 
-    p.complete(m, STRING_LITERAL_NODE);
+    p.complete(m, STRING_LITERAL_NODE)
 }
 
-pub(crate) fn raw_string_literal(p: &mut Parser) {
+pub(crate) fn raw_string_literal(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     expect!(p, RAW_STRING_START, [m], "string start");
     expect!(p, RAW_STRING_SEGMENT, [m], "string segment");
     expect!(p, RAW_STRING_END, [m], "string end");
 
-    p.complete(m, STRING_LITERAL_NODE);
+    p.complete(m, STRING_LITERAL_NODE)
 }
 
-pub(crate) fn numeric_literal(p: &mut Parser) {
+pub(crate) fn numeric_literal(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     expect!(p, INTEGER_SEGMENT, [m], "numeric literal");
@@ -1256,8 +1796,7 @@ pub(crate) fn numeric_literal(p: &mut Parser) {
     }
 
     if !current!(p, [FRACTION_START, EXPONENT_START]) {
-        p.complete(m, INTEGER_LITERAL_NODE);
-        return;
+        return p.complete(m, INTEGER_LITERAL_NODE);
     }
 
     if p.eat(FRACTION_START) {
@@ -1279,10 +1818,10 @@ pub(crate) fn numeric_literal(p: &mut Parser) {
         }
     }
 
-    p.complete(m, FLOAT_LITERAL_NODE);
+    p.complete(m, FLOAT_LITERAL_NODE)
 }
 
-pub(crate) fn binary_literal(p: &mut Parser) {
+pub(crate) fn binary_literal(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     expect!(p, BINARY_START, [m], "0b");
@@ -1293,10 +1832,10 @@ pub(crate) fn binary_literal(p: &mut Parser) {
         }
     }
 
-    p.complete(m, BINARY_NUMERIC_LITERAL_NODE);
+    p.complete(m, BINARY_NUMERIC_LITERAL_NODE)
 }
 
-pub(crate) fn octal_literal(p: &mut Parser) {
+pub(crate) fn octal_literal(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     expect!(p, OCTAL_START, [m], "0o");
@@ -1307,10 +1846,10 @@ pub(crate) fn octal_literal(p: &mut Parser) {
         }
     }
 
-    p.complete(m, OCTAL_NUMERIC_LITERAL_NODE);
+    p.complete(m, OCTAL_NUMERIC_LITERAL_NODE)
 }
 
-pub(crate) fn hex_literal(p: &mut Parser) {
+pub(crate) fn hex_literal(p: &mut Parser) -> CompleteMarker {
     let m = p.start();
 
     expect!(p, HEX_START, [m], "0x");
@@ -1321,5 +1860,5 @@ pub(crate) fn hex_literal(p: &mut Parser) {
         }
     }
 
-    p.complete(m, HEX_NUMERIC_LITERAL_NODE);
+    p.complete(m, HEX_NUMERIC_LITERAL_NODE)
 }

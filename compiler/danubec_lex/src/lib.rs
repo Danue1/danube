@@ -467,7 +467,6 @@ pub fn lex<'lex>(source: &'lex str) -> Vec<(SyntaxKind, &'lex str)> {
                     '>' => one!(RIGHT_CHEVRON),
                     '|' => one!(PIPE),
                     '~' => one!(TILDE),
-                    '$' => one!(DOLLAR),
                     other => many!(ERROR, other.len_utf8(), unexpected),
                 }
             }

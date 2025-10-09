@@ -2,9 +2,6 @@
 #[repr(u16)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum SyntaxKind {
-    /// Anything unexpected
-    ERROR,
-
     /// The end of the file
     END_OF_FILE,
 
@@ -103,8 +100,6 @@ pub enum SyntaxKind {
     PIPE,
     /// '~'
     TILDE,
-    /// '$'
-    DOLLAR,
 
     /// `_`
     PLACEHOLDER,
@@ -175,11 +170,10 @@ pub enum SyntaxKind {
     /// `yield`
     YIELD,
 
+    /// Anything unexpected
+    ERROR,
+
     // Tokens in the parser
-    /// `->`
-    HYPHEN__RIGHT_CHEVRON,
-    /// `::`
-    COLON__COLON,
 
     // Assignment operators
     /// `+=`
@@ -367,6 +361,7 @@ pub enum SyntaxKind {
     ARRAY_PATTERN_NODE,
     LITERAL_PATTERN_NODE,
     RANGE_PATTERN_NODE,
+    AT_PATTERN_NODE,
     OR_PATTERN_NODE,
     NAMED_PATTERN_NODE,
     UNNAMED_PATTERN_NODE,
@@ -454,37 +449,113 @@ pub enum SyntaxKind {
 impl SyntaxKind {
     #[inline]
     pub const fn at_trivia(self) -> bool {
+        use SyntaxKind::*;
+
         matches!(
             self,
-            SyntaxKind::LINE_COMMENT_START
-                | SyntaxKind::LINE_COMMENT_SEGMENT
-                | SyntaxKind::WHITESPACE
-                | SyntaxKind::NEW_LINE
-                | SyntaxKind::TAB
+            LINE_COMMENT_START | LINE_COMMENT_SEGMENT | WHITESPACE | NEW_LINE | TAB
         )
     }
 
     #[inline]
     pub const fn at_literal(self) -> bool {
+        use SyntaxKind::*;
+
         matches!(
             self,
-            SyntaxKind::CHARACTER_START
-                | SyntaxKind::STRING_START
-                | SyntaxKind::RAW_STRING_START
-                | SyntaxKind::INTEGER_SEGMENT
-                | SyntaxKind::BINARY_START
-                | SyntaxKind::OCTAL_START
-                | SyntaxKind::HEX_START
-                | SyntaxKind::TRUE
-                | SyntaxKind::FALSE
+            CHARACTER_START
+                | STRING_START
+                | RAW_STRING_START
+                | INTEGER_SEGMENT
+                | BINARY_START
+                | OCTAL_START
+                | HEX_START
+                | TRUE
+                | FALSE
         )
     }
 
     #[inline]
     pub const fn at_identifier(self) -> bool {
+        use SyntaxKind::*;
+
+        matches!(self, IDENTIFIER | RAW_IDENTIFIER_START)
+    }
+
+    #[inline]
+    pub const fn at_assign_operator(self) -> bool {
+        use SyntaxKind::*;
+
         matches!(
             self,
-            SyntaxKind::IDENTIFIER | SyntaxKind::RAW_IDENTIFIER_START
+            EQUAL
+                | PLUS__EQUAL
+                | PLUS__PIPE__EQUAL
+                | PLUS__PERCENT__EQUAL
+                | HYPHEN__EQUAL
+                | HYPHEN__PIPE__EQUAL
+                | HYPHEN__PERCENT__EQUAL
+                | ASTERISK__EQUAL
+                | ASTERISK__PIPE__EQUAL
+                | ASTERISK__PERCENT__EQUAL
+                | ASTERISK__ASTERISK__EQUAL
+                | ASTERISK__ASTERISK__PIPE__EQUAL
+                | ASTERISK__ASTERISK__PERCENT__EQUAL
+                | SLASH__EQUAL
+                | PERCENT__EQUAL
+                | CARET__EQUAL
+                | AMPERSAND__EQUAL
+                | AMPERSAND__AMPERSAND__EQUAL
+                | PIPE__EQUAL
+                | PIPE__PIPE__EQUAL
+                | LEFT_CHEVRON__LEFT_CHEVRON__EQUAL
+                | LEFT_CHEVRON__LEFT_CHEVRON__PIPE__EQUAL
+                | RIGHT_CHEVRON__RIGHT_CHEVRON__EQUAL
+                | RIGHT_CHEVRON__RIGHT_CHEVRON__RIGHT_CHEVRON__EQUAL
         )
+    }
+
+    #[inline]
+    pub const fn at_binary_operator(self) -> bool {
+        use SyntaxKind::*;
+
+        matches!(
+            self,
+            PIPE__PIPE
+                | AMPERSAND__AMPERSAND
+                | PIPE
+                | CARET
+                | AMPERSAND
+                | LEFT_CHEVRON__LEFT_CHEVRON__PIPE
+                | LEFT_CHEVRON__LEFT_CHEVRON
+                | LEFT_CHEVRON__EQUAL
+                | LEFT_CHEVRON
+                | RIGHT_CHEVRON__RIGHT_CHEVRON__RIGHT_CHEVRON
+                | RIGHT_CHEVRON__RIGHT_CHEVRON
+                | RIGHT_CHEVRON__EQUAL
+                | PLUS__PIPE
+                | PLUS__PERCENT
+                | PLUS
+                | HYPHEN__PERCENT
+                | HYPHEN__PIPE
+                | HYPHEN
+                | ASTERISK__PIPE
+                | ASTERISK__PERCENT
+                | ASTERISK__ASTERISK__PIPE
+                | ASTERISK__ASTERISK__PERCENT
+                | ASTERISK__ASTERISK
+                | ASTERISK
+                | SLASH
+                | PERCENT
+                | EQUAL__EQUAL
+                | EXCLAMATION__EQUAL
+        )
+    }
+
+    #[inline]
+    pub const fn at_range_operator(self) -> bool {
+        use SyntaxKind::*;
+
+        matches!(self, DOT__DOT | DOT__DOT__EQUAL)
     }
 }

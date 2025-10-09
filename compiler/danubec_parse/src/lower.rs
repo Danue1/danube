@@ -1,25 +1,25 @@
 use danubec_diagnostic::Diagnostic;
 use std::collections::HashMap;
 
+macro_rules! list {
+    ($node:ident . $field:ident() . $lower:ident ( $diagnostic:ident )) => {{
+        let mut items = vec![];
+        for item in $node.$field() {
+            match $lower(item, $diagnostic) {
+                Ok(item) => items.push(item),
+                Err(_) => continue,
+            }
+        }
+        items
+    }};
+}
+
 pub fn lower_krate(
     krate: danubec_syntax::Krate,
     diagnostic: &mut Diagnostic,
 ) -> Result<danubec_ast::Krate, ()> {
-    let mut attributes = vec![];
-    for attribute in krate.attributes() {
-        match lower_top_level_attribute(attribute, diagnostic) {
-            Ok(attribute) => attributes.push(attribute),
-            Err(_) => continue,
-        };
-    }
-
-    let mut definitions = vec![];
-    for definition in krate.definitions() {
-        match lower_definition(definition, diagnostic) {
-            Ok(definition) => definitions.push(definition),
-            Err(_) => continue,
-        };
-    }
+    let attributes = list!(krate.attributes().lower_top_level_attribute(diagnostic));
+    let definitions = list!(krate.definitions().lower_definition(diagnostic));
 
     Ok(danubec_ast::Krate {
         attributes,
@@ -32,13 +32,7 @@ pub fn lower_root(
     root: danubec_syntax::Root,
     diagnostic: &mut Diagnostic,
 ) -> Result<danubec_ast::Root, ()> {
-    let mut definitions = vec![];
-    for definition in root.definitions() {
-        match lower_definition(definition, diagnostic) {
-            Ok(definition) => definitions.push(definition),
-            Err(_) => continue,
-        }
-    }
+    let definitions = list!(root.definitions().lower_definition(diagnostic));
 
     Ok(danubec_ast::Root {
         definitions,

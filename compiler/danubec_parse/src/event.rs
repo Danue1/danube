@@ -7,14 +7,24 @@ pub struct EventStream {
 #[derive(Debug)]
 pub enum Event {
     Placeholder,
-    Start(SyntaxKind),
+    Start {
+        kind: SyntaxKind,
+        forward_parent: Option<usize>,
+    },
     Token,
     End,
+    Expire {
+        forward_parent: Option<usize>,
+    },
 }
 
 pub struct Marker {
     index: usize,
     bomb: drop_bomb::DropBomb,
+}
+
+pub struct CompleteMarker {
+    index: usize,
 }
 
 impl EventStream {
@@ -33,10 +43,41 @@ impl EventStream {
         self.events.push(Event::Token);
     }
 
-    pub fn complete(&mut self, m: Marker, kind: SyntaxKind) {
-        self.events[m.index] = Event::Start(kind);
+    pub fn complete(&mut self, m: Marker, kind: SyntaxKind) -> CompleteMarker {
+        self.events[m.index] = Event::Start {
+            kind,
+            forward_parent: None,
+        };
         self.events.push(Event::End);
-        m.complete();
+
+        m.complete()
+    }
+
+    pub fn expire(&mut self) -> CompleteMarker {
+        let m = self.reserve();
+        self.events[m.index] = Event::Expire {
+            forward_parent: None,
+        };
+
+        m.complete()
+    }
+
+    pub fn precede(&mut self, cm: CompleteMarker) -> Marker {
+        let m = self.reserve();
+
+        match &mut self.events[cm.index] {
+            Event::Start { forward_parent, .. } => {
+                *forward_parent = Some(m.index - cm.index);
+            }
+            Event::Expire { forward_parent } => {
+                *forward_parent = Some(m.index - cm.index);
+            }
+            _ => {
+                //
+            }
+        }
+
+        m
     }
 
     #[inline]
@@ -54,12 +95,14 @@ impl Marker {
     }
 
     #[inline]
-    fn complete(mut self) {
+    fn complete(mut self) -> CompleteMarker {
         self.bomb.defuse();
+
+        CompleteMarker { index: self.index }
     }
 
     #[inline]
-    pub fn expire(mut self) {
+    pub fn terminate(mut self) {
         self.bomb.defuse();
     }
 }

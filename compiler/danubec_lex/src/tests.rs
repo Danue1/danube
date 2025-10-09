@@ -2,7 +2,7 @@ use crate::lex;
 
 #[test]
 fn punctuations() {
-    let source = "\n\t~!@#$%^&*-+=|:;,./?{}[]()<>";
+    let source = "\n\t~!@#%^&*-+=|:;,./?{}[]()<>";
     let tokens = lex(source);
 
     insta::assert_debug_snapshot!(tokens);

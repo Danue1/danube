@@ -28,10 +28,6 @@ expression: tokens
         "#",
     ),
     (
-        DOLLAR,
-        "$",
-    ),
-    (
         PERCENT,
         "%",
     ),

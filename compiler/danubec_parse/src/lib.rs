@@ -3,6 +3,9 @@
 #[macro_use]
 extern crate miette;
 
+#[macro_use]
+mod tokens;
+
 #[cfg(test)]
 mod tests;
 
