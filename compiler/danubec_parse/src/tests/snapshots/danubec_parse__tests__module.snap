@@ -11,9 +11,22 @@ Some(
                 visibility: Private,
                 kind: Module {
                     name: Identifier {
-                        name: "foo",
+                        name: Ident {
+                            hash: Hash64(
+                                4506850079084802999,
+                            ),
+                            raw: "foo",
+                        },
+                        span: SyntaxNodePtr {
+                            kind: IDENTIFIER_NODE,
+                            range: 5..8,
+                        },
                     },
                     kind: External,
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 1..10,
                 },
             },
             Definition {
@@ -21,7 +34,16 @@ Some(
                 visibility: Private,
                 kind: Module {
                     name: Identifier {
-                        name: "bar",
+                        name: Ident {
+                            hash: Hash64(
+                                3676438629107045207,
+                            ),
+                            raw: "bar",
+                        },
+                        span: SyntaxNodePtr {
+                            kind: IDENTIFIER_NODE,
+                            range: 14..18,
+                        },
                     },
                     kind: Inline {
                         definitions: [
@@ -30,11 +52,24 @@ Some(
                                 visibility: Private,
                                 kind: Struct {
                                     name: Identifier {
-                                        name: "Foo",
+                                        name: Ident {
+                                            hash: Hash64(
+                                                461893210254723387,
+                                            ),
+                                            raw: "Foo",
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: IDENTIFIER_NODE,
+                                            range: 31..34,
+                                        },
                                     },
                                     type_parameters: [],
                                     type_bounds: [],
                                     body: Unit,
+                                },
+                                span: SyntaxNodePtr {
+                                    kind: DEFINITION_NODE,
+                                    range: 24..40,
                                 },
                             },
                             Definition {
@@ -42,15 +77,32 @@ Some(
                                 visibility: Private,
                                 kind: Enum {
                                     name: Identifier {
-                                        name: "Bar",
+                                        name: Ident {
+                                            hash: Hash64(
+                                                7277881248784541008,
+                                            ),
+                                            raw: "Bar",
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: IDENTIFIER_NODE,
+                                            range: 45..49,
+                                        },
                                     },
                                     type_parameters: [],
                                     type_bounds: [],
                                     variants: [],
                                 },
+                                span: SyntaxNodePtr {
+                                    kind: DEFINITION_NODE,
+                                    range: 40..141,
+                                },
                             },
                         ],
                     },
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 10..142,
                 },
             },
         ],

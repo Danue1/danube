@@ -6,6 +6,8 @@ pub type SyntaxElement = rowan::SyntaxElement<Danube>;
 
 pub type SyntaxNodeChildren = rowan::SyntaxNodeChildren<Danube>;
 
+pub type Span = rowan::ast::SyntaxNodePtr<Danube>;
+
 pub type GreenNodeBuilder = rowan::GreenNodeBuilder<'static>;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

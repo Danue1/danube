@@ -1,4 +1,5 @@
 use danubec_diagnostic::Diagnostic;
+use danubec_syntax::{AstNode, Span};
 use std::collections::HashMap;
 
 macro_rules! lower {
@@ -53,7 +54,10 @@ pub fn lower_top_level_attribute(
 ) -> Result<danubec_ast::TopLevelAttribute, ()> {
     let argument = lower!(attribute.argument().lower_attribute_argument(diagnostic));
 
-    Ok(danubec_ast::TopLevelAttribute { argument })
+    Ok(danubec_ast::TopLevelAttribute {
+        argument,
+        span: Span::new(attribute.syntax()),
+    })
 }
 
 pub fn lower_attribute(
@@ -62,7 +66,10 @@ pub fn lower_attribute(
 ) -> Result<danubec_ast::Attribute, ()> {
     let argument = lower!(attribute.argument().lower_attribute_argument(diagnostic));
 
-    Ok(danubec_ast::Attribute { argument })
+    Ok(danubec_ast::Attribute {
+        argument,
+        span: Span::new(attribute.syntax()),
+    })
 }
 
 pub fn lower_attribute_argument(
@@ -134,6 +141,7 @@ pub fn lower_definition(
         attributes,
         visibility,
         kind,
+        span: Span::new(definition.syntax()),
     })
 }
 
@@ -267,8 +275,6 @@ pub fn lower_definition_kind(
             })
         }
         danubec_syntax::DefinitionKind::Implement(implement) => {
-            use danubec_syntax::AstNode;
-
             let type_parameters =
                 many!(implement.type_parameters().lower_type_parameter(diagnostic));
 
@@ -338,6 +344,7 @@ pub fn lower_associated_definition(
         attributes,
         visibility,
         kind,
+        span: Span::new(definition.syntax()),
     })
 }
 
@@ -422,7 +429,11 @@ pub fn lower_use_tree(
 
     let kind = lower!(tree.kind().lower_use_tree_kind(diagnostic));
 
-    Ok(danubec_ast::UseTree { root, kind })
+    Ok(danubec_ast::UseTree {
+        root,
+        kind,
+        span: Span::new(tree.syntax()),
+    })
 }
 
 pub fn lower_use_tree_kind(
@@ -549,6 +560,7 @@ pub fn lower_enum_variant(
         attributes,
         name,
         kind,
+        span: Span::new(variant.syntax()),
     })
 }
 
@@ -640,6 +652,7 @@ pub fn lower_type_parameter(
     Ok(danubec_ast::TypeParameter {
         r#type,
         constraints,
+        span: Span::new(parameter.syntax()),
     })
 }
 
@@ -654,6 +667,7 @@ pub fn lower_type_bound(
     Ok(danubec_ast::TypeBound {
         r#type,
         constraints,
+        span: Span::new(bound.syntax()),
     })
 }
 
@@ -671,6 +685,7 @@ pub fn lower_function_parameter(
         attributes,
         pattern,
         r#type,
+        span: Span::new(parameter.syntax()),
     })
 }
 
@@ -687,7 +702,7 @@ pub fn lower_expression(
     expr: danubec_syntax::Expression,
     diagnostic: &mut Diagnostic,
 ) -> Result<danubec_ast::Expression, ()> {
-    let kind = match expr {
+    let kind = match &expr {
         danubec_syntax::Expression::Break(_) => danubec_ast::ExpressionKind::Break,
         danubec_syntax::Expression::Continue(_) => danubec_ast::ExpressionKind::Continue,
         danubec_syntax::Expression::Return(expr) => {
@@ -771,7 +786,7 @@ pub fn lower_expression(
             danubec_ast::ExpressionKind::Tuple { elements }
         }
         danubec_syntax::Expression::Block(block) => {
-            let (attributes, statements) = lower_block_expression(block, diagnostic)?;
+            let (attributes, statements) = lower_block_expression(block.clone(), diagnostic)?;
 
             danubec_ast::ExpressionKind::Block {
                 attributes,
@@ -952,7 +967,10 @@ pub fn lower_expression(
         }
     };
 
-    Ok(danubec_ast::Expression { kind })
+    Ok(danubec_ast::Expression {
+        kind,
+        span: Span::new(expr.syntax()),
+    })
 }
 
 pub fn lower_literal_expression(
@@ -1000,18 +1018,18 @@ pub fn lower_statement(
     statement: danubec_syntax::Statement,
     diagnostic: &mut Diagnostic,
 ) -> Result<danubec_ast::Statement, ()> {
-    match statement {
+    let kind = match &statement {
         danubec_syntax::Statement::Definition(definition) => {
             let definition = lower!(definition.definition().lower_definition(diagnostic));
 
-            Ok(danubec_ast::Statement::Definition { definition })
+            danubec_ast::StatementKind::Definition { definition }
         }
         danubec_syntax::Statement::Expression(expr) => {
             let value = lower!(expr.expression().lower_expression(diagnostic));
 
-            Ok(danubec_ast::Statement::Expression { value })
+            danubec_ast::StatementKind::Expression { value }
         }
-        danubec_syntax::Statement::Semicolon(_) => Ok(danubec_ast::Statement::Semicolon),
+        danubec_syntax::Statement::Semicolon(_) => danubec_ast::StatementKind::Semicolon,
         danubec_syntax::Statement::Let(let_) => {
             let pattern = lower!(let_.pattern().lower_pattern(diagnostic));
 
@@ -1019,47 +1037,52 @@ pub fn lower_statement(
 
             let initializer = lower_opt!(let_.initializer().lower_expression(diagnostic));
 
-            Ok(danubec_ast::Statement::Let {
+            danubec_ast::StatementKind::Let {
                 pattern,
                 r#type,
                 initializer,
-            })
+            }
         }
-    }
+    };
+
+    Ok(danubec_ast::Statement {
+        kind,
+        span: Span::new(statement.syntax()),
+    })
 }
 
 pub fn lower_pattern(
     pattern: danubec_syntax::Pattern,
     diagnostic: &mut Diagnostic,
 ) -> Result<danubec_ast::Pattern, ()> {
-    match pattern {
-        danubec_syntax::Pattern::Never(_) => Ok(danubec_ast::Pattern::Never),
-        danubec_syntax::Pattern::Placeholder(_) => Ok(danubec_ast::Pattern::Placeholder),
+    let kind = match &pattern {
+        danubec_syntax::Pattern::Never(_) => danubec_ast::PatternKind::Never,
+        danubec_syntax::Pattern::Placeholder(_) => danubec_ast::PatternKind::Placeholder,
         danubec_syntax::Pattern::Path(path) => {
             let path = lower!(path.path().lower_path(diagnostic));
 
-            Ok(danubec_ast::Pattern::Path { path })
+            danubec_ast::PatternKind::Path { path }
         }
         danubec_syntax::Pattern::Mutable(mutable) => {
             let pattern = lower!(mutable.pattern().lower_pattern(diagnostic));
             let pattern = Box::new(pattern);
 
-            Ok(danubec_ast::Pattern::Mutable { pattern })
+            danubec_ast::PatternKind::Mutable { pattern }
         }
         danubec_syntax::Pattern::Tuple(tuple) => {
             let elements = many!(tuple.elements().lower_pattern(diagnostic));
 
-            Ok(danubec_ast::Pattern::Tuple { elements })
+            danubec_ast::PatternKind::Tuple { elements }
         }
         danubec_syntax::Pattern::Array(array) => {
             let elements = many!(array.elements().lower_pattern(diagnostic));
 
-            Ok(danubec_ast::Pattern::Array { elements })
+            danubec_ast::PatternKind::Array { elements }
         }
         danubec_syntax::Pattern::Literal(literal) => {
             let value = lower!(literal.literal().lower_literal_expression(diagnostic));
 
-            Ok(danubec_ast::Pattern::Literal { value })
+            danubec_ast::PatternKind::Literal { value }
         }
         danubec_syntax::Pattern::Range(range) => {
             let range = match range {
@@ -1101,11 +1124,9 @@ pub fn lower_pattern(
                 }
             };
 
-            Ok(danubec_ast::Pattern::Range { range })
+            danubec_ast::PatternKind::Range { range }
         }
         danubec_syntax::Pattern::At(at) => {
-            use danubec_syntax::AstNode;
-
             let mut patterns = at
                 .syntax()
                 .children()
@@ -1122,25 +1143,30 @@ pub fn lower_pattern(
             let pattern = lower_pattern(pattern, diagnostic)?;
             let pattern = Box::new(pattern);
 
-            Ok(danubec_ast::Pattern::At { name, pattern })
+            danubec_ast::PatternKind::At { name, pattern }
         }
         danubec_syntax::Pattern::Or(or) => {
             let patterns = many!(or.patterns().lower_pattern(diagnostic));
 
-            Ok(danubec_ast::Pattern::Or { patterns })
+            danubec_ast::PatternKind::Or { patterns }
         }
         danubec_syntax::Pattern::Named(named) => {
             let path = lower!(named.path().lower_path_pattern(diagnostic));
             let fields = many!(named.fields().lower_named_pattern_field(diagnostic));
 
-            Ok(danubec_ast::Pattern::Named { path, fields })
+            danubec_ast::PatternKind::Named { path, fields }
         }
         danubec_syntax::Pattern::Unnamed(unnamed) => {
             let elements = many!(unnamed.elements().lower_pattern(diagnostic));
 
-            Ok(danubec_ast::Pattern::Unnamed { elements })
+            danubec_ast::PatternKind::Unnamed { elements }
         }
-    }
+    };
+
+    Ok(danubec_ast::Pattern {
+        kind,
+        span: Span::new(pattern.syntax()),
+    })
 }
 
 pub fn lower_pattern_binding(
@@ -1192,33 +1218,38 @@ pub fn lower_type_expression(
     expr: danubec_syntax::TypeExpression,
     diagnostic: &mut Diagnostic,
 ) -> Result<danubec_ast::TypeExpression, ()> {
-    match expr {
-        danubec_syntax::TypeExpression::Never(_) => Ok(danubec_ast::TypeExpression::Never),
+    let kind = match &expr {
+        danubec_syntax::TypeExpression::Never(_) => danubec_ast::TypeExpressionKind::Never,
         danubec_syntax::TypeExpression::Mutable(mutable) => {
             let inner = lower!(mutable.r#type().lower_type_expression(diagnostic));
 
-            Ok(danubec_ast::TypeExpression::Mutable {
+            danubec_ast::TypeExpressionKind::Mutable {
                 inner: Box::new(inner),
-            })
+            }
         }
         danubec_syntax::TypeExpression::Path(path) => {
             let path = lower!(path.path().lower_path(diagnostic));
 
-            Ok(danubec_ast::TypeExpression::Path { path })
+            danubec_ast::TypeExpressionKind::Path { path }
         }
         danubec_syntax::TypeExpression::Tuple(tuple) => {
             let elements = many!(tuple.arguments().lower_type_argument(diagnostic));
 
-            Ok(danubec_ast::TypeExpression::Tuple { elements })
+            danubec_ast::TypeExpressionKind::Tuple { elements }
         }
         danubec_syntax::TypeExpression::Slice(slice) => {
             let element = lower!(slice.r#type().lower_type_expression(diagnostic));
 
-            Ok(danubec_ast::TypeExpression::Slice {
+            danubec_ast::TypeExpressionKind::Slice {
                 element: Box::new(element),
-            })
+            }
         }
-    }
+    };
+
+    Ok(danubec_ast::TypeExpression {
+        kind,
+        span: Span::new(expr.syntax()),
+    })
 }
 
 pub fn lower_path_expression(
@@ -1236,14 +1267,17 @@ pub fn lower_path(
 ) -> Result<danubec_ast::Path, ()> {
     let segments = many!(path.segments().lower_path_segment(diagnostic));
 
-    Ok(danubec_ast::Path { segments })
+    Ok(danubec_ast::Path {
+        segments,
+        span: Span::new(path.syntax()),
+    })
 }
 
 pub fn lower_path_segment(
     segment: danubec_syntax::PathSegment,
     diagnostic: &mut Diagnostic,
 ) -> Result<danubec_ast::PathSegment, ()> {
-    let kind = match segment {
+    let kind = match &segment {
         danubec_syntax::PathSegment::Root(_) => danubec_ast::PathSegmentKind::Root,
         danubec_syntax::PathSegment::Self_(_) => danubec_ast::PathSegmentKind::Self_,
         danubec_syntax::PathSegment::Super_(_) => danubec_ast::PathSegmentKind::Super_,
@@ -1255,7 +1289,10 @@ pub fn lower_path_segment(
         }
     };
 
-    Ok(danubec_ast::PathSegment { kind })
+    Ok(danubec_ast::PathSegment {
+        kind,
+        span: Span::new(segment.syntax()),
+    })
 }
 
 pub fn lower_identifier(
@@ -1270,7 +1307,10 @@ pub fn lower_identifier(
         }
     };
 
-    Ok(danubec_ast::Identifier { name })
+    Ok(danubec_ast::Identifier {
+        name: symbol!(&name),
+        span: Span::new(identifier.syntax()),
+    })
 }
 
 pub fn lower_unary_operator(
@@ -1390,22 +1430,27 @@ pub fn lower_literal(
     literal: danubec_syntax::Literal,
     diagnostic: &mut Diagnostic,
 ) -> Result<danubec_ast::Literal, ()> {
-    match literal {
-        danubec_syntax::Literal::Boolean(bool_) => lower_boolean_literal(bool_, diagnostic),
-        danubec_syntax::Literal::Character(char_) => lower_character_literal(char_, diagnostic),
-        danubec_syntax::Literal::Integer(integer) => lower_integer_literal(integer, diagnostic),
-        danubec_syntax::Literal::Float(float) => lower_float_literal(float, diagnostic),
-        danubec_syntax::Literal::String(string) => lower_string_literal(string, diagnostic),
-        danubec_syntax::Literal::Binary(binary) => lower_binary_literal(binary, diagnostic),
-        danubec_syntax::Literal::Octal(octal) => lower_octal_literal(octal, diagnostic),
-        danubec_syntax::Literal::Hex(hex) => lower_hex_literal(hex, diagnostic),
-    }
+    let kind = match literal.clone() {
+        danubec_syntax::Literal::Boolean(bool_) => lower_boolean_literal(bool_, diagnostic)?,
+        danubec_syntax::Literal::Character(char_) => lower_character_literal(char_, diagnostic)?,
+        danubec_syntax::Literal::Integer(integer) => lower_integer_literal(integer, diagnostic)?,
+        danubec_syntax::Literal::Float(float) => lower_float_literal(float, diagnostic)?,
+        danubec_syntax::Literal::String(string) => lower_string_literal(string, diagnostic)?,
+        danubec_syntax::Literal::Binary(binary) => lower_binary_literal(binary, diagnostic)?,
+        danubec_syntax::Literal::Octal(octal) => lower_octal_literal(octal, diagnostic)?,
+        danubec_syntax::Literal::Hex(hex) => lower_hex_literal(hex, diagnostic)?,
+    };
+
+    Ok(danubec_ast::Literal {
+        kind,
+        span: Span::new(literal.syntax()),
+    })
 }
 
 pub fn lower_boolean_literal(
     bool_: danubec_syntax::BooleanLiteral,
     diagnostic: &mut Diagnostic,
-) -> Result<danubec_ast::Literal, ()> {
+) -> Result<danubec_ast::LiteralKind, ()> {
     use danubec_syntax::{AstNode, SyntaxKind::*};
 
     let value = match bool_.syntax().first_token().map(|n| n.kind()) {
@@ -1417,24 +1462,22 @@ pub fn lower_boolean_literal(
         }
     };
 
-    Ok(danubec_ast::Literal::Boolean { value })
+    Ok(danubec_ast::LiteralKind::Boolean { value })
 }
 
 pub fn lower_character_literal(
     char_: danubec_syntax::CharacterLiteral,
     diagnostic: &mut Diagnostic,
-) -> Result<danubec_ast::Literal, ()> {
+) -> Result<danubec_ast::LiteralKind, ()> {
     let value = lower!(char_.kind().lower_character_literal_kind(diagnostic));
 
-    Ok(danubec_ast::Literal::Character { value })
+    Ok(danubec_ast::LiteralKind::Character { value })
 }
 
 pub fn lower_character_literal_kind(
     kind: danubec_syntax::CharacterLiteralKind,
     diagnostic: &mut Diagnostic,
 ) -> Result<char, ()> {
-    use danubec_syntax::AstNode;
-
     match kind {
         danubec_syntax::CharacterLiteralKind::One(one) => {
             let text = one.syntax().text().to_string();
@@ -1484,46 +1527,40 @@ pub fn lower_character_literal_kind(
 pub fn lower_integer_literal(
     integer: danubec_syntax::IntegerLiteral,
     diagnostic: &mut Diagnostic,
-) -> Result<danubec_ast::Literal, ()> {
-    use danubec_syntax::AstNode;
-
+) -> Result<danubec_ast::LiteralKind, ()> {
     let value = integer.syntax().to_string();
     let value = value.trim().replace('_', "").parse().map_err(|_| {
         diagnostic.report(miette!("Invalid integer literal"));
     })?;
 
-    Ok(danubec_ast::Literal::Integer { value })
+    Ok(danubec_ast::LiteralKind::Integer { value })
 }
 
 pub fn lower_float_literal(
     float: danubec_syntax::FloatLiteral,
     diagnostic: &mut Diagnostic,
-) -> Result<danubec_ast::Literal, ()> {
-    use danubec_syntax::AstNode;
-
+) -> Result<danubec_ast::LiteralKind, ()> {
     let value = float.syntax().to_string();
     let value = value.trim().replace('_', "").parse().map_err(|_| {
         diagnostic.report(miette!("Invalid float literal"));
     })?;
 
-    Ok(danubec_ast::Literal::Float { value })
+    Ok(danubec_ast::LiteralKind::Float { value })
 }
 
 pub fn lower_string_literal(
     string: danubec_syntax::StringLiteral,
     diagnostic: &mut Diagnostic,
-) -> Result<danubec_ast::Literal, ()> {
+) -> Result<danubec_ast::LiteralKind, ()> {
     let segments = many!(string.segments().lower_string_segment(diagnostic));
 
-    Ok(danubec_ast::Literal::String { segments })
+    Ok(danubec_ast::LiteralKind::String { segments })
 }
 
 pub fn lower_string_segment(
     segment: danubec_syntax::StringSegment,
     diagnostic: &mut Diagnostic,
 ) -> Result<danubec_ast::StringSegment, ()> {
-    use danubec_syntax::AstNode;
-
     match segment {
         danubec_syntax::StringSegment::Text(text) => {
             let value = text.syntax().text().to_string();
@@ -1576,41 +1613,35 @@ pub fn lower_string_segment(
 pub fn lower_binary_literal(
     binary: danubec_syntax::BinaryLiteral,
     diagnostic: &mut Diagnostic,
-) -> Result<danubec_ast::Literal, ()> {
-    use danubec_syntax::AstNode;
-
+) -> Result<danubec_ast::LiteralKind, ()> {
     let value = binary.syntax().to_string();
     let value = i128::from_str_radix(&value.trim().replace('_', ""), 2).map_err(|_| {
         diagnostic.report(miette!("Invalid binary literal"));
     })?;
 
-    Ok(danubec_ast::Literal::Integer { value })
+    Ok(danubec_ast::LiteralKind::Integer { value })
 }
 
 pub fn lower_octal_literal(
     octal: danubec_syntax::OctalLiteral,
     diagnostic: &mut Diagnostic,
-) -> Result<danubec_ast::Literal, ()> {
-    use danubec_syntax::AstNode;
-
+) -> Result<danubec_ast::LiteralKind, ()> {
     let value = octal.syntax().to_string();
     let value = i128::from_str_radix(&value.trim().replace('_', ""), 8).map_err(|_| {
         diagnostic.report(miette!("Invalid octal literal"));
     })?;
 
-    Ok(danubec_ast::Literal::Integer { value })
+    Ok(danubec_ast::LiteralKind::Integer { value })
 }
 
 pub fn lower_hex_literal(
     hex: danubec_syntax::HexLiteral,
     diagnostic: &mut Diagnostic,
-) -> Result<danubec_ast::Literal, ()> {
-    use danubec_syntax::AstNode;
-
+) -> Result<danubec_ast::LiteralKind, ()> {
     let value = hex.syntax().to_string();
     let value = i128::from_str_radix(&value.trim().replace('_', ""), 16).map_err(|_| {
         diagnostic.report(miette!("Invalid hex literal"));
     })?;
 
-    Ok(danubec_ast::Literal::Integer { value })
+    Ok(danubec_ast::LiteralKind::Integer { value })
 }

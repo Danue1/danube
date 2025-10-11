@@ -12,21 +12,48 @@ Some(
                 kind: Implement {
                     type_parameters: [],
                     trait_type: None,
-                    target_type: Path {
-                        path: Path {
-                            segments: [
-                                PathSegment {
-                                    kind: Identifier(
-                                        Identifier {
-                                            name: "Foo",
+                    target_type: TypeExpression {
+                        kind: Path {
+                            path: Path {
+                                segments: [
+                                    PathSegment {
+                                        kind: Identifier(
+                                            Identifier {
+                                                name: Ident {
+                                                    hash: Hash64(
+                                                        461893210254723387,
+                                                    ),
+                                                    raw: "Foo",
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: IDENTIFIER_NODE,
+                                                    range: 6..10,
+                                                },
+                                            },
+                                        ),
+                                        span: SyntaxNodePtr {
+                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                            range: 6..10,
                                         },
-                                    ),
+                                    },
+                                ],
+                                span: SyntaxNodePtr {
+                                    kind: PATH_NODE,
+                                    range: 6..10,
                                 },
-                            ],
+                            },
+                        },
+                        span: SyntaxNodePtr {
+                            kind: PATH_TYPE_NODE,
+                            range: 6..10,
                         },
                     },
                     type_bounds: [],
                     definitions: [],
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 1..14,
                 },
             },
             Definition {
@@ -35,17 +62,40 @@ Some(
                 kind: Implement {
                     type_parameters: [],
                     trait_type: None,
-                    target_type: Path {
-                        path: Path {
-                            segments: [
-                                PathSegment {
-                                    kind: Identifier(
-                                        Identifier {
-                                            name: "Foo",
+                    target_type: TypeExpression {
+                        kind: Path {
+                            path: Path {
+                                segments: [
+                                    PathSegment {
+                                        kind: Identifier(
+                                            Identifier {
+                                                name: Ident {
+                                                    hash: Hash64(
+                                                        461893210254723387,
+                                                    ),
+                                                    raw: "Foo",
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: IDENTIFIER_NODE,
+                                                    range: 19..23,
+                                                },
+                                            },
+                                        ),
+                                        span: SyntaxNodePtr {
+                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                            range: 19..23,
                                         },
-                                    ),
+                                    },
+                                ],
+                                span: SyntaxNodePtr {
+                                    kind: PATH_NODE,
+                                    range: 19..23,
                                 },
-                            ],
+                            },
+                        },
+                        span: SyntaxNodePtr {
+                            kind: PATH_TYPE_NODE,
+                            range: 19..23,
                         },
                     },
                     type_bounds: [],
@@ -55,7 +105,16 @@ Some(
                             visibility: Private,
                             kind: Function {
                                 name: Identifier {
-                                    name: "foo",
+                                    name: Ident {
+                                        hash: Hash64(
+                                            4506850079084802999,
+                                        ),
+                                        raw: "foo",
+                                    },
+                                    span: SyntaxNodePtr {
+                                        kind: IDENTIFIER_NODE,
+                                        range: 32..35,
+                                    },
                                 },
                                 type_parameters: [],
                                 parameters: [],
@@ -65,38 +124,88 @@ Some(
                                     [],
                                 ),
                             },
+                            span: SyntaxNodePtr {
+                                kind: ASSOCIATED_DEFINITION_NODE,
+                                range: 29..45,
+                            },
                         },
                         AssociatedDefinition {
                             attributes: [],
                             visibility: Private,
                             kind: Constant {
                                 name: Identifier {
-                                    name: "BAR",
+                                    name: Ident {
+                                        hash: Hash64(
+                                            150580828709914575,
+                                        ),
+                                        raw: "BAR",
+                                    },
+                                    span: SyntaxNodePtr {
+                                        kind: IDENTIFIER_NODE,
+                                        range: 51..54,
+                                    },
                                 },
                                 type: Some(
-                                    Path {
-                                        path: Path {
-                                            segments: [
-                                                PathSegment {
-                                                    kind: Identifier(
-                                                        Identifier {
-                                                            name: "i32",
+                                    TypeExpression {
+                                        kind: Path {
+                                            path: Path {
+                                                segments: [
+                                                    PathSegment {
+                                                        kind: Identifier(
+                                                            Identifier {
+                                                                name: Ident {
+                                                                    hash: Hash64(
+                                                                        1851586956637574266,
+                                                                    ),
+                                                                    raw: "i32",
+                                                                },
+                                                                span: SyntaxNodePtr {
+                                                                    kind: IDENTIFIER_NODE,
+                                                                    range: 56..60,
+                                                                },
+                                                            },
+                                                        ),
+                                                        span: SyntaxNodePtr {
+                                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                                            range: 56..60,
                                                         },
-                                                    ),
+                                                    },
+                                                ],
+                                                span: SyntaxNodePtr {
+                                                    kind: PATH_NODE,
+                                                    range: 56..60,
                                                 },
-                                            ],
+                                            },
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: PATH_TYPE_NODE,
+                                            range: 56..60,
                                         },
                                     },
                                 ),
                                 initializer: Some(
                                     Expression {
                                         kind: Literal {
-                                            value: Integer {
-                                                value: 42,
+                                            value: Literal {
+                                                kind: Integer {
+                                                    value: 42,
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: INTEGER_LITERAL_NODE,
+                                                    range: 62..64,
+                                                },
                                             },
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: LITERAL_EXPRESSION_NODE,
+                                            range: 62..64,
                                         },
                                     },
                                 ),
+                            },
+                            span: SyntaxNodePtr {
+                                kind: ASSOCIATED_DEFINITION_NODE,
+                                range: 45..70,
                             },
                         },
                         AssociatedDefinition {
@@ -104,14 +213,31 @@ Some(
                             visibility: Private,
                             kind: Type {
                                 name: Identifier {
-                                    name: "Baz",
+                                    name: Ident {
+                                        hash: Hash64(
+                                            11363836552389839519,
+                                        ),
+                                        raw: "Baz",
+                                    },
+                                    span: SyntaxNodePtr {
+                                        kind: IDENTIFIER_NODE,
+                                        range: 75..79,
+                                    },
                                 },
                                 type_parameters: [],
                                 type_bounds: [],
                                 initializer: None,
                             },
+                            span: SyntaxNodePtr {
+                                kind: ASSOCIATED_DEFINITION_NODE,
+                                range: 70..86,
+                            },
                         },
                     ],
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 14..87,
                 },
             },
         ],

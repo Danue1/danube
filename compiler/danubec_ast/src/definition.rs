@@ -1,4 +1,5 @@
-use danubec_syntax::SyntaxNode;
+use danubec_symbol::Symbol;
+use danubec_syntax::{Span, SyntaxNode};
 use std::{collections::HashMap, path::PathBuf};
 
 #[derive(Debug)]
@@ -17,11 +18,13 @@ pub struct Root {
 #[derive(Debug)]
 pub struct TopLevelAttribute {
     pub argument: AttributeArgument,
+    pub span: Span,
 }
 
 #[derive(Debug)]
 pub struct Attribute {
     pub argument: AttributeArgument,
+    pub span: Span,
 }
 
 #[derive(Debug)]
@@ -49,6 +52,7 @@ pub struct Definition {
     pub attributes: Vec<Attribute>,
     pub visibility: Visibility,
     pub kind: DefinitionKind,
+    pub span: Span,
 }
 
 #[derive(Debug)]
@@ -122,25 +126,28 @@ pub enum Visibility {
     Krate,
     Super,
     Self_,
-    Restricted(Identifier),
+    Restricted(Path),
     Private,
 }
 
 #[derive(Debug)]
 pub struct Identifier {
-    pub name: String,
+    pub name: Symbol,
+    pub span: Span,
 }
 
 #[derive(Debug)]
 pub struct TypeParameter {
     pub r#type: TypeExpression,
     pub constraints: Vec<TypeExpression>,
+    pub span: Span,
 }
 
 #[derive(Debug)]
 pub struct TypeBound {
     pub r#type: TypeExpression,
     pub constraints: Vec<TypeExpression>,
+    pub span: Span,
 }
 
 #[derive(Debug)]
@@ -148,6 +155,7 @@ pub struct FunctionParameter {
     pub attributes: Vec<Attribute>,
     pub pattern: Pattern,
     pub r#type: TypeExpression,
+    pub span: Span,
 }
 
 #[derive(Debug)]
@@ -162,6 +170,7 @@ pub struct EnumVariant {
     pub attributes: Vec<Attribute>,
     pub name: Identifier,
     pub kind: EnumVariantKind,
+    pub span: Span,
 }
 
 #[derive(Debug)]
@@ -176,6 +185,7 @@ pub enum EnumVariantKind {
 pub struct UseTree {
     pub root: bool,
     pub kind: UseTreeKind,
+    pub span: Span,
 }
 
 #[derive(Debug)]
@@ -201,11 +211,13 @@ pub enum UseTreeTrailing {
 #[derive(Debug)]
 pub struct Path {
     pub segments: Vec<PathSegment>,
+    pub span: Span,
 }
 
 #[derive(Debug)]
 pub struct PathSegment {
     pub kind: PathSegmentKind,
+    pub span: Span,
 }
 
 #[derive(Debug)]
@@ -222,6 +234,7 @@ pub struct AssociatedDefinition {
     pub attributes: Vec<Attribute>,
     pub visibility: Visibility,
     pub kind: AssociatedDefinitionKind,
+    pub span: Span,
 }
 
 #[derive(Debug)]
@@ -250,6 +263,7 @@ pub enum AssociatedDefinitionKind {
 #[derive(Debug)]
 pub struct Expression {
     pub kind: ExpressionKind,
+    pub span: Span,
 }
 
 #[derive(Debug)]
@@ -375,7 +389,13 @@ pub enum RangeExpression {
 }
 
 #[derive(Debug)]
-pub enum Statement {
+pub struct Statement {
+    pub kind: StatementKind,
+    pub span: Span,
+}
+
+#[derive(Debug)]
+pub enum StatementKind {
     Definition {
         definition: Definition,
     },
@@ -391,7 +411,13 @@ pub enum Statement {
 }
 
 #[derive(Debug)]
-pub enum Pattern {
+pub struct Pattern {
+    pub kind: PatternKind,
+    pub span: Span,
+}
+
+#[derive(Debug)]
+pub enum PatternKind {
     Never,
     Placeholder,
     Path {
@@ -452,7 +478,13 @@ pub enum RangePattern {
 }
 
 #[derive(Debug)]
-pub enum Literal {
+pub struct Literal {
+    pub kind: LiteralKind,
+    pub span: Span,
+}
+
+#[derive(Debug)]
+pub enum LiteralKind {
     Boolean { value: bool },
     Character { value: char },
     Float { value: f64 },
@@ -550,7 +582,13 @@ pub enum RangeOperator {
 }
 
 #[derive(Debug)]
-pub enum TypeExpression {
+pub struct TypeExpression {
+    pub kind: TypeExpressionKind,
+    pub span: Span,
+}
+
+#[derive(Debug)]
+pub enum TypeExpressionKind {
     Never,
     Mutable { inner: Box<TypeExpression> },
     Path { path: Path },

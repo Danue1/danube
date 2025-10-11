@@ -15,7 +15,15 @@ Some(
                         kind: Nested {
                             trees: [],
                         },
+                        span: SyntaxNodePtr {
+                            kind: USE_TREE_NODE,
+                            range: 5..7,
+                        },
                     },
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 1..9,
                 },
             },
             Definition {
@@ -31,26 +39,17 @@ Some(
                                     kind: Nested {
                                         trees: [],
                                     },
+                                    span: SyntaxNodePtr {
+                                        kind: USE_TREE_NODE,
+                                        range: 14..16,
+                                    },
                                 },
                                 UseTree {
                                     root: false,
                                     kind: Glob,
-                                },
-                                UseTree {
-                                    root: false,
-                                    kind: Element {
-                                        path: Path {
-                                            segments: [
-                                                PathSegment {
-                                                    kind: Identifier(
-                                                        Identifier {
-                                                            name: "foo",
-                                                        },
-                                                    ),
-                                                },
-                                            ],
-                                        },
-                                        trailing: Identifier,
+                                    span: SyntaxNodePtr {
+                                        kind: USE_TREE_NODE,
+                                        range: 17..18,
                                     },
                                 },
                                 UseTree {
@@ -61,17 +60,85 @@ Some(
                                                 PathSegment {
                                                     kind: Identifier(
                                                         Identifier {
-                                                            name: "bar",
+                                                            name: Ident {
+                                                                hash: Hash64(
+                                                                    4506850079084802999,
+                                                                ),
+                                                                raw: "foo",
+                                                            },
+                                                            span: SyntaxNodePtr {
+                                                                kind: IDENTIFIER_NODE,
+                                                                range: 19..22,
+                                                            },
                                                         },
                                                     ),
+                                                    span: SyntaxNodePtr {
+                                                        kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                                        range: 19..22,
+                                                    },
                                                 },
                                             ],
+                                            span: SyntaxNodePtr {
+                                                kind: PATH_NODE,
+                                                range: 19..22,
+                                            },
+                                        },
+                                        trailing: Identifier,
+                                    },
+                                    span: SyntaxNodePtr {
+                                        kind: USE_TREE_NODE,
+                                        range: 19..22,
+                                    },
+                                },
+                                UseTree {
+                                    root: false,
+                                    kind: Element {
+                                        path: Path {
+                                            segments: [
+                                                PathSegment {
+                                                    kind: Identifier(
+                                                        Identifier {
+                                                            name: Ident {
+                                                                hash: Hash64(
+                                                                    3676438629107045207,
+                                                                ),
+                                                                raw: "bar",
+                                                            },
+                                                            span: SyntaxNodePtr {
+                                                                kind: IDENTIFIER_NODE,
+                                                                range: 23..27,
+                                                            },
+                                                        },
+                                                    ),
+                                                    span: SyntaxNodePtr {
+                                                        kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                                        range: 23..27,
+                                                    },
+                                                },
+                                            ],
+                                            span: SyntaxNodePtr {
+                                                kind: PATH_NODE,
+                                                range: 23..27,
+                                            },
                                         },
                                         trailing: Rename {
                                             name: Identifier {
-                                                name: "baz",
+                                                name: Ident {
+                                                    hash: Hash64(
+                                                        16260972211344176173,
+                                                    ),
+                                                    raw: "baz",
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: IDENTIFIER_NODE,
+                                                    range: 30..33,
+                                                },
                                             },
                                         },
+                                    },
+                                    span: SyntaxNodePtr {
+                                        kind: USE_TREE_NODE,
+                                        range: 23..33,
                                     },
                                 },
                                 UseTree {
@@ -79,26 +146,17 @@ Some(
                                     kind: Nested {
                                         trees: [],
                                     },
+                                    span: SyntaxNodePtr {
+                                        kind: USE_TREE_NODE,
+                                        range: 34..38,
+                                    },
                                 },
                                 UseTree {
                                     root: true,
                                     kind: Glob,
-                                },
-                                UseTree {
-                                    root: true,
-                                    kind: Element {
-                                        path: Path {
-                                            segments: [
-                                                PathSegment {
-                                                    kind: Identifier(
-                                                        Identifier {
-                                                            name: "foo",
-                                                        },
-                                                    ),
-                                                },
-                                            ],
-                                        },
-                                        trailing: Identifier,
+                                    span: SyntaxNodePtr {
+                                        kind: USE_TREE_NODE,
+                                        range: 39..42,
                                     },
                                 },
                                 UseTree {
@@ -109,22 +167,98 @@ Some(
                                                 PathSegment {
                                                     kind: Identifier(
                                                         Identifier {
-                                                            name: "bar",
+                                                            name: Ident {
+                                                                hash: Hash64(
+                                                                    4506850079084802999,
+                                                                ),
+                                                                raw: "foo",
+                                                            },
+                                                            span: SyntaxNodePtr {
+                                                                kind: IDENTIFIER_NODE,
+                                                                range: 45..48,
+                                                            },
                                                         },
                                                     ),
+                                                    span: SyntaxNodePtr {
+                                                        kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                                        range: 45..48,
+                                                    },
                                                 },
                                             ],
+                                            span: SyntaxNodePtr {
+                                                kind: PATH_NODE,
+                                                range: 45..48,
+                                            },
+                                        },
+                                        trailing: Identifier,
+                                    },
+                                    span: SyntaxNodePtr {
+                                        kind: USE_TREE_NODE,
+                                        range: 43..48,
+                                    },
+                                },
+                                UseTree {
+                                    root: true,
+                                    kind: Element {
+                                        path: Path {
+                                            segments: [
+                                                PathSegment {
+                                                    kind: Identifier(
+                                                        Identifier {
+                                                            name: Ident {
+                                                                hash: Hash64(
+                                                                    3676438629107045207,
+                                                                ),
+                                                                raw: "bar",
+                                                            },
+                                                            span: SyntaxNodePtr {
+                                                                kind: IDENTIFIER_NODE,
+                                                                range: 51..55,
+                                                            },
+                                                        },
+                                                    ),
+                                                    span: SyntaxNodePtr {
+                                                        kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                                        range: 51..55,
+                                                    },
+                                                },
+                                            ],
+                                            span: SyntaxNodePtr {
+                                                kind: PATH_NODE,
+                                                range: 51..55,
+                                            },
                                         },
                                         trailing: Rename {
                                             name: Identifier {
-                                                name: "baz",
+                                                name: Ident {
+                                                    hash: Hash64(
+                                                        16260972211344176173,
+                                                    ),
+                                                    raw: "baz",
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: IDENTIFIER_NODE,
+                                                    range: 58..61,
+                                                },
                                             },
                                         },
+                                    },
+                                    span: SyntaxNodePtr {
+                                        kind: USE_TREE_NODE,
+                                        range: 49..61,
                                     },
                                 },
                             ],
                         },
+                        span: SyntaxNodePtr {
+                            kind: USE_TREE_NODE,
+                            range: 13..63,
+                        },
                     },
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 9..65,
                 },
             },
             Definition {
@@ -134,7 +268,15 @@ Some(
                     tree: UseTree {
                         root: false,
                         kind: Glob,
+                        span: SyntaxNodePtr {
+                            kind: USE_TREE_NODE,
+                            range: 69..70,
+                        },
                     },
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 65..72,
                 },
             },
             Definition {
@@ -149,43 +291,41 @@ Some(
                                     PathSegment {
                                         kind: Identifier(
                                             Identifier {
-                                                name: "foo",
+                                                name: Ident {
+                                                    hash: Hash64(
+                                                        4506850079084802999,
+                                                    ),
+                                                    raw: "foo",
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: IDENTIFIER_NODE,
+                                                    range: 76..79,
+                                                },
                                             },
                                         ),
+                                        span: SyntaxNodePtr {
+                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                            range: 76..79,
+                                        },
                                     },
                                 ],
+                                span: SyntaxNodePtr {
+                                    kind: PATH_NODE,
+                                    range: 76..79,
+                                },
                             },
                             trailing: Identifier,
                         },
-                    },
-                },
-            },
-            Definition {
-                attributes: [],
-                visibility: Private,
-                kind: Use {
-                    tree: UseTree {
-                        root: false,
-                        kind: Element {
-                            path: Path {
-                                segments: [
-                                    PathSegment {
-                                        kind: Identifier(
-                                            Identifier {
-                                                name: "foo",
-                                            },
-                                        ),
-                                    },
-                                ],
-                            },
-                            trailing: Rename {
-                                name: Identifier {
-                                    name: "bar",
-                                },
-                            },
+                        span: SyntaxNodePtr {
+                            kind: USE_TREE_NODE,
+                            range: 76..79,
                         },
                     },
                 },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 72..81,
+                },
             },
             Definition {
                 attributes: [],
@@ -199,17 +339,103 @@ Some(
                                     PathSegment {
                                         kind: Identifier(
                                             Identifier {
-                                                name: "foo",
+                                                name: Ident {
+                                                    hash: Hash64(
+                                                        4506850079084802999,
+                                                    ),
+                                                    raw: "foo",
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: IDENTIFIER_NODE,
+                                                    range: 85..89,
+                                                },
                                             },
                                         ),
+                                        span: SyntaxNodePtr {
+                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                            range: 85..89,
+                                        },
                                     },
                                 ],
+                                span: SyntaxNodePtr {
+                                    kind: PATH_NODE,
+                                    range: 85..89,
+                                },
+                            },
+                            trailing: Rename {
+                                name: Identifier {
+                                    name: Ident {
+                                        hash: Hash64(
+                                            3676438629107045207,
+                                        ),
+                                        raw: "bar",
+                                    },
+                                    span: SyntaxNodePtr {
+                                        kind: IDENTIFIER_NODE,
+                                        range: 92..95,
+                                    },
+                                },
+                            },
+                        },
+                        span: SyntaxNodePtr {
+                            kind: USE_TREE_NODE,
+                            range: 85..95,
+                        },
+                    },
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 81..97,
+                },
+            },
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Use {
+                    tree: UseTree {
+                        root: false,
+                        kind: Element {
+                            path: Path {
+                                segments: [
+                                    PathSegment {
+                                        kind: Identifier(
+                                            Identifier {
+                                                name: Ident {
+                                                    hash: Hash64(
+                                                        4506850079084802999,
+                                                    ),
+                                                    raw: "foo",
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: IDENTIFIER_NODE,
+                                                    range: 101..104,
+                                                },
+                                            },
+                                        ),
+                                        span: SyntaxNodePtr {
+                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                            range: 101..104,
+                                        },
+                                    },
+                                ],
+                                span: SyntaxNodePtr {
+                                    kind: PATH_NODE,
+                                    range: 101..104,
+                                },
                             },
                             trailing: Nested {
                                 trees: [],
                             },
                         },
+                        span: SyntaxNodePtr {
+                            kind: USE_TREE_NODE,
+                            range: 101..108,
+                        },
                     },
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 97..110,
                 },
             },
             Definition {
@@ -224,33 +450,37 @@ Some(
                                     PathSegment {
                                         kind: Identifier(
                                             Identifier {
-                                                name: "foo",
+                                                name: Ident {
+                                                    hash: Hash64(
+                                                        4506850079084802999,
+                                                    ),
+                                                    raw: "foo",
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: IDENTIFIER_NODE,
+                                                    range: 114..117,
+                                                },
                                             },
                                         ),
+                                        span: SyntaxNodePtr {
+                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                            range: 114..117,
+                                        },
                                     },
                                 ],
+                                span: SyntaxNodePtr {
+                                    kind: PATH_NODE,
+                                    range: 114..117,
+                                },
                             },
                             trailing: Nested {
                                 trees: [
                                     UseTree {
                                         root: false,
                                         kind: Glob,
-                                    },
-                                    UseTree {
-                                        root: false,
-                                        kind: Element {
-                                            path: Path {
-                                                segments: [
-                                                    PathSegment {
-                                                        kind: Identifier(
-                                                            Identifier {
-                                                                name: "foo",
-                                                            },
-                                                        ),
-                                                    },
-                                                ],
-                                            },
-                                            trailing: Identifier,
+                                        span: SyntaxNodePtr {
+                                            kind: USE_TREE_NODE,
+                                            range: 120..121,
                                         },
                                     },
                                     UseTree {
@@ -261,44 +491,103 @@ Some(
                                                     PathSegment {
                                                         kind: Identifier(
                                                             Identifier {
-                                                                name: "bar",
+                                                                name: Ident {
+                                                                    hash: Hash64(
+                                                                        4506850079084802999,
+                                                                    ),
+                                                                    raw: "foo",
+                                                                },
+                                                                span: SyntaxNodePtr {
+                                                                    kind: IDENTIFIER_NODE,
+                                                                    range: 122..125,
+                                                                },
                                                             },
                                                         ),
+                                                        span: SyntaxNodePtr {
+                                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                                            range: 122..125,
+                                                        },
                                                     },
                                                 ],
+                                                span: SyntaxNodePtr {
+                                                    kind: PATH_NODE,
+                                                    range: 122..125,
+                                                },
+                                            },
+                                            trailing: Identifier,
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: USE_TREE_NODE,
+                                            range: 122..125,
+                                        },
+                                    },
+                                    UseTree {
+                                        root: false,
+                                        kind: Element {
+                                            path: Path {
+                                                segments: [
+                                                    PathSegment {
+                                                        kind: Identifier(
+                                                            Identifier {
+                                                                name: Ident {
+                                                                    hash: Hash64(
+                                                                        3676438629107045207,
+                                                                    ),
+                                                                    raw: "bar",
+                                                                },
+                                                                span: SyntaxNodePtr {
+                                                                    kind: IDENTIFIER_NODE,
+                                                                    range: 126..130,
+                                                                },
+                                                            },
+                                                        ),
+                                                        span: SyntaxNodePtr {
+                                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                                            range: 126..130,
+                                                        },
+                                                    },
+                                                ],
+                                                span: SyntaxNodePtr {
+                                                    kind: PATH_NODE,
+                                                    range: 126..130,
+                                                },
                                             },
                                             trailing: Rename {
                                                 name: Identifier {
-                                                    name: "baz",
+                                                    name: Ident {
+                                                        hash: Hash64(
+                                                            16260972211344176173,
+                                                        ),
+                                                        raw: "baz",
+                                                    },
+                                                    span: SyntaxNodePtr {
+                                                        kind: IDENTIFIER_NODE,
+                                                        range: 133..136,
+                                                    },
                                                 },
                                             },
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: USE_TREE_NODE,
+                                            range: 126..136,
                                         },
                                     },
                                     UseTree {
                                         root: false,
                                         kind: Nested {
                                             trees: [],
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: USE_TREE_NODE,
+                                            range: 137..139,
                                         },
                                     },
                                     UseTree {
                                         root: true,
                                         kind: Glob,
-                                    },
-                                    UseTree {
-                                        root: true,
-                                        kind: Element {
-                                            path: Path {
-                                                segments: [
-                                                    PathSegment {
-                                                        kind: Identifier(
-                                                            Identifier {
-                                                                name: "foo",
-                                                            },
-                                                        ),
-                                                    },
-                                                ],
-                                            },
-                                            trailing: Identifier,
+                                        span: SyntaxNodePtr {
+                                            kind: USE_TREE_NODE,
+                                            range: 140..143,
                                         },
                                     },
                                     UseTree {
@@ -309,17 +598,85 @@ Some(
                                                     PathSegment {
                                                         kind: Identifier(
                                                             Identifier {
-                                                                name: "bar",
+                                                                name: Ident {
+                                                                    hash: Hash64(
+                                                                        4506850079084802999,
+                                                                    ),
+                                                                    raw: "foo",
+                                                                },
+                                                                span: SyntaxNodePtr {
+                                                                    kind: IDENTIFIER_NODE,
+                                                                    range: 146..149,
+                                                                },
                                                             },
                                                         ),
+                                                        span: SyntaxNodePtr {
+                                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                                            range: 146..149,
+                                                        },
                                                     },
                                                 ],
+                                                span: SyntaxNodePtr {
+                                                    kind: PATH_NODE,
+                                                    range: 146..149,
+                                                },
+                                            },
+                                            trailing: Identifier,
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: USE_TREE_NODE,
+                                            range: 144..149,
+                                        },
+                                    },
+                                    UseTree {
+                                        root: true,
+                                        kind: Element {
+                                            path: Path {
+                                                segments: [
+                                                    PathSegment {
+                                                        kind: Identifier(
+                                                            Identifier {
+                                                                name: Ident {
+                                                                    hash: Hash64(
+                                                                        3676438629107045207,
+                                                                    ),
+                                                                    raw: "bar",
+                                                                },
+                                                                span: SyntaxNodePtr {
+                                                                    kind: IDENTIFIER_NODE,
+                                                                    range: 152..156,
+                                                                },
+                                                            },
+                                                        ),
+                                                        span: SyntaxNodePtr {
+                                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                                            range: 152..156,
+                                                        },
+                                                    },
+                                                ],
+                                                span: SyntaxNodePtr {
+                                                    kind: PATH_NODE,
+                                                    range: 152..156,
+                                                },
                                             },
                                             trailing: Rename {
                                                 name: Identifier {
-                                                    name: "baz",
+                                                    name: Ident {
+                                                        hash: Hash64(
+                                                            16260972211344176173,
+                                                        ),
+                                                        raw: "baz",
+                                                    },
+                                                    span: SyntaxNodePtr {
+                                                        kind: IDENTIFIER_NODE,
+                                                        range: 159..162,
+                                                    },
                                                 },
                                             },
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: USE_TREE_NODE,
+                                            range: 150..162,
                                         },
                                     },
                                     UseTree {
@@ -327,11 +684,23 @@ Some(
                                         kind: Nested {
                                             trees: [],
                                         },
+                                        span: SyntaxNodePtr {
+                                            kind: USE_TREE_NODE,
+                                            range: 163..167,
+                                        },
                                     },
                                 ],
                             },
                         },
+                        span: SyntaxNodePtr {
+                            kind: USE_TREE_NODE,
+                            range: 114..168,
+                        },
                     },
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 110..171,
                 },
             },
             Definition {
@@ -343,7 +712,15 @@ Some(
                         kind: Nested {
                             trees: [],
                         },
+                        span: SyntaxNodePtr {
+                            kind: USE_TREE_NODE,
+                            range: 175..179,
+                        },
                     },
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 171..181,
                 },
             },
             Definition {
@@ -359,26 +736,17 @@ Some(
                                     kind: Nested {
                                         trees: [],
                                     },
+                                    span: SyntaxNodePtr {
+                                        kind: USE_TREE_NODE,
+                                        range: 188..190,
+                                    },
                                 },
                                 UseTree {
                                     root: false,
                                     kind: Glob,
-                                },
-                                UseTree {
-                                    root: false,
-                                    kind: Element {
-                                        path: Path {
-                                            segments: [
-                                                PathSegment {
-                                                    kind: Identifier(
-                                                        Identifier {
-                                                            name: "foo",
-                                                        },
-                                                    ),
-                                                },
-                                            ],
-                                        },
-                                        trailing: Identifier,
+                                    span: SyntaxNodePtr {
+                                        kind: USE_TREE_NODE,
+                                        range: 191..192,
                                     },
                                 },
                                 UseTree {
@@ -389,17 +757,85 @@ Some(
                                                 PathSegment {
                                                     kind: Identifier(
                                                         Identifier {
-                                                            name: "bar",
+                                                            name: Ident {
+                                                                hash: Hash64(
+                                                                    4506850079084802999,
+                                                                ),
+                                                                raw: "foo",
+                                                            },
+                                                            span: SyntaxNodePtr {
+                                                                kind: IDENTIFIER_NODE,
+                                                                range: 193..196,
+                                                            },
                                                         },
                                                     ),
+                                                    span: SyntaxNodePtr {
+                                                        kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                                        range: 193..196,
+                                                    },
                                                 },
                                             ],
+                                            span: SyntaxNodePtr {
+                                                kind: PATH_NODE,
+                                                range: 193..196,
+                                            },
+                                        },
+                                        trailing: Identifier,
+                                    },
+                                    span: SyntaxNodePtr {
+                                        kind: USE_TREE_NODE,
+                                        range: 193..196,
+                                    },
+                                },
+                                UseTree {
+                                    root: false,
+                                    kind: Element {
+                                        path: Path {
+                                            segments: [
+                                                PathSegment {
+                                                    kind: Identifier(
+                                                        Identifier {
+                                                            name: Ident {
+                                                                hash: Hash64(
+                                                                    3676438629107045207,
+                                                                ),
+                                                                raw: "bar",
+                                                            },
+                                                            span: SyntaxNodePtr {
+                                                                kind: IDENTIFIER_NODE,
+                                                                range: 197..201,
+                                                            },
+                                                        },
+                                                    ),
+                                                    span: SyntaxNodePtr {
+                                                        kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                                        range: 197..201,
+                                                    },
+                                                },
+                                            ],
+                                            span: SyntaxNodePtr {
+                                                kind: PATH_NODE,
+                                                range: 197..201,
+                                            },
                                         },
                                         trailing: Rename {
                                             name: Identifier {
-                                                name: "baz",
+                                                name: Ident {
+                                                    hash: Hash64(
+                                                        16260972211344176173,
+                                                    ),
+                                                    raw: "baz",
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: IDENTIFIER_NODE,
+                                                    range: 204..207,
+                                                },
                                             },
                                         },
+                                    },
+                                    span: SyntaxNodePtr {
+                                        kind: USE_TREE_NODE,
+                                        range: 197..207,
                                     },
                                 },
                                 UseTree {
@@ -407,26 +843,17 @@ Some(
                                     kind: Nested {
                                         trees: [],
                                     },
+                                    span: SyntaxNodePtr {
+                                        kind: USE_TREE_NODE,
+                                        range: 208..212,
+                                    },
                                 },
                                 UseTree {
                                     root: true,
                                     kind: Glob,
-                                },
-                                UseTree {
-                                    root: true,
-                                    kind: Element {
-                                        path: Path {
-                                            segments: [
-                                                PathSegment {
-                                                    kind: Identifier(
-                                                        Identifier {
-                                                            name: "foo",
-                                                        },
-                                                    ),
-                                                },
-                                            ],
-                                        },
-                                        trailing: Identifier,
+                                    span: SyntaxNodePtr {
+                                        kind: USE_TREE_NODE,
+                                        range: 213..216,
                                     },
                                 },
                                 UseTree {
@@ -437,22 +864,98 @@ Some(
                                                 PathSegment {
                                                     kind: Identifier(
                                                         Identifier {
-                                                            name: "bar",
+                                                            name: Ident {
+                                                                hash: Hash64(
+                                                                    4506850079084802999,
+                                                                ),
+                                                                raw: "foo",
+                                                            },
+                                                            span: SyntaxNodePtr {
+                                                                kind: IDENTIFIER_NODE,
+                                                                range: 219..222,
+                                                            },
                                                         },
                                                     ),
+                                                    span: SyntaxNodePtr {
+                                                        kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                                        range: 219..222,
+                                                    },
                                                 },
                                             ],
+                                            span: SyntaxNodePtr {
+                                                kind: PATH_NODE,
+                                                range: 219..222,
+                                            },
+                                        },
+                                        trailing: Identifier,
+                                    },
+                                    span: SyntaxNodePtr {
+                                        kind: USE_TREE_NODE,
+                                        range: 217..222,
+                                    },
+                                },
+                                UseTree {
+                                    root: true,
+                                    kind: Element {
+                                        path: Path {
+                                            segments: [
+                                                PathSegment {
+                                                    kind: Identifier(
+                                                        Identifier {
+                                                            name: Ident {
+                                                                hash: Hash64(
+                                                                    3676438629107045207,
+                                                                ),
+                                                                raw: "bar",
+                                                            },
+                                                            span: SyntaxNodePtr {
+                                                                kind: IDENTIFIER_NODE,
+                                                                range: 225..229,
+                                                            },
+                                                        },
+                                                    ),
+                                                    span: SyntaxNodePtr {
+                                                        kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                                        range: 225..229,
+                                                    },
+                                                },
+                                            ],
+                                            span: SyntaxNodePtr {
+                                                kind: PATH_NODE,
+                                                range: 225..229,
+                                            },
                                         },
                                         trailing: Rename {
                                             name: Identifier {
-                                                name: "baz",
+                                                name: Ident {
+                                                    hash: Hash64(
+                                                        16260972211344176173,
+                                                    ),
+                                                    raw: "baz",
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: IDENTIFIER_NODE,
+                                                    range: 232..235,
+                                                },
                                             },
                                         },
+                                    },
+                                    span: SyntaxNodePtr {
+                                        kind: USE_TREE_NODE,
+                                        range: 223..235,
                                     },
                                 },
                             ],
                         },
+                        span: SyntaxNodePtr {
+                            kind: USE_TREE_NODE,
+                            range: 185..237,
+                        },
                     },
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 181..239,
                 },
             },
             Definition {
@@ -462,7 +965,15 @@ Some(
                     tree: UseTree {
                         root: true,
                         kind: Glob,
+                        span: SyntaxNodePtr {
+                            kind: USE_TREE_NODE,
+                            range: 243..246,
+                        },
                     },
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 239..248,
                 },
             },
             Definition {
@@ -477,43 +988,41 @@ Some(
                                     PathSegment {
                                         kind: Identifier(
                                             Identifier {
-                                                name: "foo",
+                                                name: Ident {
+                                                    hash: Hash64(
+                                                        4506850079084802999,
+                                                    ),
+                                                    raw: "foo",
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: IDENTIFIER_NODE,
+                                                    range: 254..257,
+                                                },
                                             },
                                         ),
+                                        span: SyntaxNodePtr {
+                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                            range: 254..257,
+                                        },
                                     },
                                 ],
+                                span: SyntaxNodePtr {
+                                    kind: PATH_NODE,
+                                    range: 254..257,
+                                },
                             },
                             trailing: Identifier,
                         },
-                    },
-                },
-            },
-            Definition {
-                attributes: [],
-                visibility: Private,
-                kind: Use {
-                    tree: UseTree {
-                        root: true,
-                        kind: Element {
-                            path: Path {
-                                segments: [
-                                    PathSegment {
-                                        kind: Identifier(
-                                            Identifier {
-                                                name: "foo",
-                                            },
-                                        ),
-                                    },
-                                ],
-                            },
-                            trailing: Rename {
-                                name: Identifier {
-                                    name: "bar",
-                                },
-                            },
+                        span: SyntaxNodePtr {
+                            kind: USE_TREE_NODE,
+                            range: 252..257,
                         },
                     },
                 },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 248..259,
+                },
             },
             Definition {
                 attributes: [],
@@ -527,17 +1036,103 @@ Some(
                                     PathSegment {
                                         kind: Identifier(
                                             Identifier {
-                                                name: "foo",
+                                                name: Ident {
+                                                    hash: Hash64(
+                                                        4506850079084802999,
+                                                    ),
+                                                    raw: "foo",
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: IDENTIFIER_NODE,
+                                                    range: 265..269,
+                                                },
                                             },
                                         ),
+                                        span: SyntaxNodePtr {
+                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                            range: 265..269,
+                                        },
                                     },
                                 ],
+                                span: SyntaxNodePtr {
+                                    kind: PATH_NODE,
+                                    range: 265..269,
+                                },
+                            },
+                            trailing: Rename {
+                                name: Identifier {
+                                    name: Ident {
+                                        hash: Hash64(
+                                            3676438629107045207,
+                                        ),
+                                        raw: "bar",
+                                    },
+                                    span: SyntaxNodePtr {
+                                        kind: IDENTIFIER_NODE,
+                                        range: 272..275,
+                                    },
+                                },
+                            },
+                        },
+                        span: SyntaxNodePtr {
+                            kind: USE_TREE_NODE,
+                            range: 263..275,
+                        },
+                    },
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 259..277,
+                },
+            },
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Use {
+                    tree: UseTree {
+                        root: true,
+                        kind: Element {
+                            path: Path {
+                                segments: [
+                                    PathSegment {
+                                        kind: Identifier(
+                                            Identifier {
+                                                name: Ident {
+                                                    hash: Hash64(
+                                                        4506850079084802999,
+                                                    ),
+                                                    raw: "foo",
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: IDENTIFIER_NODE,
+                                                    range: 283..286,
+                                                },
+                                            },
+                                        ),
+                                        span: SyntaxNodePtr {
+                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                            range: 283..286,
+                                        },
+                                    },
+                                ],
+                                span: SyntaxNodePtr {
+                                    kind: PATH_NODE,
+                                    range: 283..286,
+                                },
                             },
                             trailing: Nested {
                                 trees: [],
                             },
                         },
+                        span: SyntaxNodePtr {
+                            kind: USE_TREE_NODE,
+                            range: 281..290,
+                        },
                     },
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 277..292,
                 },
             },
             Definition {
@@ -552,33 +1147,37 @@ Some(
                                     PathSegment {
                                         kind: Identifier(
                                             Identifier {
-                                                name: "foo",
+                                                name: Ident {
+                                                    hash: Hash64(
+                                                        4506850079084802999,
+                                                    ),
+                                                    raw: "foo",
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: IDENTIFIER_NODE,
+                                                    range: 298..301,
+                                                },
                                             },
                                         ),
+                                        span: SyntaxNodePtr {
+                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                            range: 298..301,
+                                        },
                                     },
                                 ],
+                                span: SyntaxNodePtr {
+                                    kind: PATH_NODE,
+                                    range: 298..301,
+                                },
                             },
                             trailing: Nested {
                                 trees: [
                                     UseTree {
                                         root: false,
                                         kind: Glob,
-                                    },
-                                    UseTree {
-                                        root: false,
-                                        kind: Element {
-                                            path: Path {
-                                                segments: [
-                                                    PathSegment {
-                                                        kind: Identifier(
-                                                            Identifier {
-                                                                name: "foo",
-                                                            },
-                                                        ),
-                                                    },
-                                                ],
-                                            },
-                                            trailing: Identifier,
+                                        span: SyntaxNodePtr {
+                                            kind: USE_TREE_NODE,
+                                            range: 304..305,
                                         },
                                     },
                                     UseTree {
@@ -589,44 +1188,103 @@ Some(
                                                     PathSegment {
                                                         kind: Identifier(
                                                             Identifier {
-                                                                name: "bar",
+                                                                name: Ident {
+                                                                    hash: Hash64(
+                                                                        4506850079084802999,
+                                                                    ),
+                                                                    raw: "foo",
+                                                                },
+                                                                span: SyntaxNodePtr {
+                                                                    kind: IDENTIFIER_NODE,
+                                                                    range: 306..309,
+                                                                },
                                                             },
                                                         ),
+                                                        span: SyntaxNodePtr {
+                                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                                            range: 306..309,
+                                                        },
                                                     },
                                                 ],
+                                                span: SyntaxNodePtr {
+                                                    kind: PATH_NODE,
+                                                    range: 306..309,
+                                                },
+                                            },
+                                            trailing: Identifier,
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: USE_TREE_NODE,
+                                            range: 306..309,
+                                        },
+                                    },
+                                    UseTree {
+                                        root: false,
+                                        kind: Element {
+                                            path: Path {
+                                                segments: [
+                                                    PathSegment {
+                                                        kind: Identifier(
+                                                            Identifier {
+                                                                name: Ident {
+                                                                    hash: Hash64(
+                                                                        3676438629107045207,
+                                                                    ),
+                                                                    raw: "bar",
+                                                                },
+                                                                span: SyntaxNodePtr {
+                                                                    kind: IDENTIFIER_NODE,
+                                                                    range: 310..314,
+                                                                },
+                                                            },
+                                                        ),
+                                                        span: SyntaxNodePtr {
+                                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                                            range: 310..314,
+                                                        },
+                                                    },
+                                                ],
+                                                span: SyntaxNodePtr {
+                                                    kind: PATH_NODE,
+                                                    range: 310..314,
+                                                },
                                             },
                                             trailing: Rename {
                                                 name: Identifier {
-                                                    name: "baz",
+                                                    name: Ident {
+                                                        hash: Hash64(
+                                                            16260972211344176173,
+                                                        ),
+                                                        raw: "baz",
+                                                    },
+                                                    span: SyntaxNodePtr {
+                                                        kind: IDENTIFIER_NODE,
+                                                        range: 317..320,
+                                                    },
                                                 },
                                             },
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: USE_TREE_NODE,
+                                            range: 310..320,
                                         },
                                     },
                                     UseTree {
                                         root: false,
                                         kind: Nested {
                                             trees: [],
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: USE_TREE_NODE,
+                                            range: 321..323,
                                         },
                                     },
                                     UseTree {
                                         root: true,
                                         kind: Glob,
-                                    },
-                                    UseTree {
-                                        root: true,
-                                        kind: Element {
-                                            path: Path {
-                                                segments: [
-                                                    PathSegment {
-                                                        kind: Identifier(
-                                                            Identifier {
-                                                                name: "foo",
-                                                            },
-                                                        ),
-                                                    },
-                                                ],
-                                            },
-                                            trailing: Identifier,
+                                        span: SyntaxNodePtr {
+                                            kind: USE_TREE_NODE,
+                                            range: 324..327,
                                         },
                                     },
                                     UseTree {
@@ -637,17 +1295,85 @@ Some(
                                                     PathSegment {
                                                         kind: Identifier(
                                                             Identifier {
-                                                                name: "bar",
+                                                                name: Ident {
+                                                                    hash: Hash64(
+                                                                        4506850079084802999,
+                                                                    ),
+                                                                    raw: "foo",
+                                                                },
+                                                                span: SyntaxNodePtr {
+                                                                    kind: IDENTIFIER_NODE,
+                                                                    range: 330..333,
+                                                                },
                                                             },
                                                         ),
+                                                        span: SyntaxNodePtr {
+                                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                                            range: 330..333,
+                                                        },
                                                     },
                                                 ],
+                                                span: SyntaxNodePtr {
+                                                    kind: PATH_NODE,
+                                                    range: 330..333,
+                                                },
+                                            },
+                                            trailing: Identifier,
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: USE_TREE_NODE,
+                                            range: 328..333,
+                                        },
+                                    },
+                                    UseTree {
+                                        root: true,
+                                        kind: Element {
+                                            path: Path {
+                                                segments: [
+                                                    PathSegment {
+                                                        kind: Identifier(
+                                                            Identifier {
+                                                                name: Ident {
+                                                                    hash: Hash64(
+                                                                        3676438629107045207,
+                                                                    ),
+                                                                    raw: "bar",
+                                                                },
+                                                                span: SyntaxNodePtr {
+                                                                    kind: IDENTIFIER_NODE,
+                                                                    range: 336..340,
+                                                                },
+                                                            },
+                                                        ),
+                                                        span: SyntaxNodePtr {
+                                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                                            range: 336..340,
+                                                        },
+                                                    },
+                                                ],
+                                                span: SyntaxNodePtr {
+                                                    kind: PATH_NODE,
+                                                    range: 336..340,
+                                                },
                                             },
                                             trailing: Rename {
                                                 name: Identifier {
-                                                    name: "baz",
+                                                    name: Ident {
+                                                        hash: Hash64(
+                                                            16260972211344176173,
+                                                        ),
+                                                        raw: "baz",
+                                                    },
+                                                    span: SyntaxNodePtr {
+                                                        kind: IDENTIFIER_NODE,
+                                                        range: 343..346,
+                                                    },
                                                 },
                                             },
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: USE_TREE_NODE,
+                                            range: 334..346,
                                         },
                                     },
                                     UseTree {
@@ -655,11 +1381,23 @@ Some(
                                         kind: Nested {
                                             trees: [],
                                         },
+                                        span: SyntaxNodePtr {
+                                            kind: USE_TREE_NODE,
+                                            range: 347..351,
+                                        },
                                     },
                                 ],
                             },
                         },
+                        span: SyntaxNodePtr {
+                            kind: USE_TREE_NODE,
+                            range: 296..352,
+                        },
                     },
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 292..354,
                 },
             },
         ],

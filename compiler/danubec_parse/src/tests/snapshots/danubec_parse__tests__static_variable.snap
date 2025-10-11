@@ -11,28 +11,74 @@ Some(
                 visibility: Private,
                 kind: Static {
                     name: Identifier {
-                        name: "FOO",
+                        name: Ident {
+                            hash: Hash64(
+                                5939771681137335939,
+                            ),
+                            raw: "FOO",
+                        },
+                        span: SyntaxNodePtr {
+                            kind: IDENTIFIER_NODE,
+                            range: 8..11,
+                        },
                     },
-                    type: Path {
-                        path: Path {
-                            segments: [
-                                PathSegment {
-                                    kind: Identifier(
-                                        Identifier {
-                                            name: "i32",
+                    type: TypeExpression {
+                        kind: Path {
+                            path: Path {
+                                segments: [
+                                    PathSegment {
+                                        kind: Identifier(
+                                            Identifier {
+                                                name: Ident {
+                                                    hash: Hash64(
+                                                        1851586956637574266,
+                                                    ),
+                                                    raw: "i32",
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: IDENTIFIER_NODE,
+                                                    range: 13..17,
+                                                },
+                                            },
+                                        ),
+                                        span: SyntaxNodePtr {
+                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                            range: 13..17,
                                         },
-                                    ),
+                                    },
+                                ],
+                                span: SyntaxNodePtr {
+                                    kind: PATH_NODE,
+                                    range: 13..17,
                                 },
-                            ],
+                            },
+                        },
+                        span: SyntaxNodePtr {
+                            kind: PATH_TYPE_NODE,
+                            range: 13..17,
                         },
                     },
                     initializer: Expression {
                         kind: Literal {
-                            value: Integer {
-                                value: 42,
+                            value: Literal {
+                                kind: Integer {
+                                    value: 42,
+                                },
+                                span: SyntaxNodePtr {
+                                    kind: INTEGER_LITERAL_NODE,
+                                    range: 19..21,
+                                },
                             },
                         },
+                        span: SyntaxNodePtr {
+                            kind: LITERAL_EXPRESSION_NODE,
+                            range: 19..21,
+                        },
                     },
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 1..23,
                 },
             },
             Definition {
@@ -40,32 +86,78 @@ Some(
                 visibility: Private,
                 kind: Static {
                     name: Identifier {
-                        name: "BAR",
+                        name: Ident {
+                            hash: Hash64(
+                                150580828709914575,
+                            ),
+                            raw: "BAR",
+                        },
+                        span: SyntaxNodePtr {
+                            kind: IDENTIFIER_NODE,
+                            range: 30..33,
+                        },
                     },
-                    type: Path {
-                        path: Path {
-                            segments: [
-                                PathSegment {
-                                    kind: Identifier(
-                                        Identifier {
-                                            name: "str",
+                    type: TypeExpression {
+                        kind: Path {
+                            path: Path {
+                                segments: [
+                                    PathSegment {
+                                        kind: Identifier(
+                                            Identifier {
+                                                name: Ident {
+                                                    hash: Hash64(
+                                                        4124878610510368140,
+                                                    ),
+                                                    raw: "str",
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: IDENTIFIER_NODE,
+                                                    range: 35..39,
+                                                },
+                                            },
+                                        ),
+                                        span: SyntaxNodePtr {
+                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
+                                            range: 35..39,
                                         },
-                                    ),
+                                    },
+                                ],
+                                span: SyntaxNodePtr {
+                                    kind: PATH_NODE,
+                                    range: 35..39,
                                 },
-                            ],
+                            },
+                        },
+                        span: SyntaxNodePtr {
+                            kind: PATH_TYPE_NODE,
+                            range: 35..39,
                         },
                     },
                     initializer: Expression {
                         kind: Literal {
-                            value: String {
-                                segments: [
-                                    Text {
-                                        value: "Hello, world!",
-                                    },
-                                ],
+                            value: Literal {
+                                kind: String {
+                                    segments: [
+                                        Text {
+                                            value: "Hello, world!",
+                                        },
+                                    ],
+                                },
+                                span: SyntaxNodePtr {
+                                    kind: STRING_LITERAL_NODE,
+                                    range: 41..56,
+                                },
                             },
                         },
+                        span: SyntaxNodePtr {
+                            kind: LITERAL_EXPRESSION_NODE,
+                            range: 41..56,
+                        },
                     },
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 23..57,
                 },
             },
         ],

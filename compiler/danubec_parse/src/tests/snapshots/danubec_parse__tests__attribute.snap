@@ -11,11 +11,24 @@ Some(
                 visibility: Private,
                 kind: Struct {
                     name: Identifier {
-                        name: "Foo",
+                        name: Ident {
+                            hash: Hash64(
+                                461893210254723387,
+                            ),
+                            raw: "Foo",
+                        },
+                        span: SyntaxNodePtr {
+                            kind: IDENTIFIER_NODE,
+                            range: 22..25,
+                        },
                     },
                     type_parameters: [],
                     type_bounds: [],
                     body: Unit,
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 1..26,
                 },
             },
         ],

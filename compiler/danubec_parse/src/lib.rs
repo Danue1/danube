@@ -4,6 +4,9 @@
 extern crate miette;
 
 #[macro_use]
+extern crate danubec_symbol;
+
+#[macro_use]
 mod tokens;
 
 #[cfg(test)]

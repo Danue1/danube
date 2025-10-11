@@ -1,0 +1,100 @@
+use std::{
+    collections::HashMap,
+    sync::{Mutex, OnceLock},
+};
+
+static SYMBOLS: OnceLock<Symbols> = OnceLock::new();
+
+struct Symbols {
+    map: Mutex<HashMap<Hash64, String>>,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Symbol(Hash64);
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+struct Hash64(u64);
+
+impl Symbol {
+    pub const EMPTY: Self = Symbol(Hash64::new_unchecked(3476900567878811119));
+    pub const CRATE: Self = Symbol(Hash64::new_unchecked(3160908839602319882));
+    pub const SUPER: Self = Symbol(Hash64::new_unchecked(10332305186512876660));
+
+    pub fn new(raw: &str) -> Self {
+        let hash = Hash64::new(raw);
+        let map = SYMBOLS.get_or_init(Symbols::new);
+        map.insert(hash, raw.to_owned());
+
+        Symbol(hash)
+    }
+}
+
+impl std::fmt::Display for Symbol {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let map = SYMBOLS.get_or_init(Symbols::new);
+        let raw = map.get(self.0).expect("failed to get ident");
+
+        write!(f, "{}", raw)
+    }
+}
+
+impl std::fmt::Debug for Symbol {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let map = SYMBOLS.get_or_init(Symbols::new);
+        let raw = map.get(self.0).expect("failed to get ident");
+
+        f.debug_struct("Ident")
+            .field("hash", &self.0)
+            .field("raw", &raw)
+            .finish()
+    }
+}
+
+impl Symbols {
+    pub fn new() -> Self {
+        Symbols {
+            map: Mutex::new(HashMap::new()),
+        }
+    }
+
+    pub fn insert(&self, hash: Hash64, raw: String) {
+        let mut map = self.map.lock().expect("failed to lock ident map");
+        map.insert(hash, raw);
+    }
+
+    pub fn get(&self, hash: Hash64) -> Option<String> {
+        let map = self.map.lock().expect("failed to lock ident map");
+
+        map.get(&hash).cloned()
+    }
+}
+
+impl Hash64 {
+    pub fn new(raw: &str) -> Self {
+        use std::hash::{DefaultHasher, Hash, Hasher};
+
+        let mut hasher = DefaultHasher::new();
+        raw.hash(&mut hasher);
+
+        Hash64(hasher.finish())
+    }
+
+    #[inline]
+    pub const fn new_unchecked(value: u64) -> Self {
+        Hash64(value)
+    }
+}
+
+#[macro_export]
+macro_rules! symbol {
+    ($raw:expr) => {
+        $crate::Symbol::new($raw)
+    };
+}
+
+#[test]
+fn constant() {
+    assert_eq!(symbol!(""), Symbol::EMPTY);
+    assert_eq!(symbol!("crate"), Symbol::CRATE);
+    assert_eq!(symbol!("super"), Symbol::SUPER);
+}

@@ -11,7 +11,16 @@ Some(
                 visibility: Private,
                 kind: Function {
                     name: Identifier {
-                        name: "foo",
+                        name: Ident {
+                            hash: Hash64(
+                                4506850079084802999,
+                            ),
+                            raw: "foo",
+                        },
+                        span: SyntaxNodePtr {
+                            kind: IDENTIFIER_NODE,
+                            range: 4..7,
+                        },
                     },
                     type_parameters: [],
                     parameters: [],
@@ -19,50 +28,114 @@ Some(
                     type_bounds: [],
                     body: Some(
                         [
-                            Expression {
-                                value: Expression {
-                                    kind: Unary {
-                                        operator: Negate,
-                                        operand: Expression {
-                                            kind: Literal {
-                                                value: Integer {
-                                                    value: 42,
+                            Statement {
+                                kind: Expression {
+                                    value: Expression {
+                                        kind: Unary {
+                                            operator: Negate,
+                                            operand: Expression {
+                                                kind: Literal {
+                                                    value: Literal {
+                                                        kind: Integer {
+                                                            value: 42,
+                                                        },
+                                                        span: SyntaxNodePtr {
+                                                            kind: INTEGER_LITERAL_NODE,
+                                                            range: 17..19,
+                                                        },
+                                                    },
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: LITERAL_EXPRESSION_NODE,
+                                                    range: 17..19,
                                                 },
                                             },
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: UNARY_EXPRESSION_NODE,
+                                            range: 16..19,
                                         },
                                     },
                                 },
+                                span: SyntaxNodePtr {
+                                    kind: EXPRESSION_STATEMENT_NODE,
+                                    range: 16..25,
+                                },
                             },
-                            Expression {
-                                value: Expression {
-                                    kind: Unary {
-                                        operator: Not,
-                                        operand: Expression {
-                                            kind: Literal {
-                                                value: Boolean {
-                                                    value: true,
+                            Statement {
+                                kind: Expression {
+                                    value: Expression {
+                                        kind: Unary {
+                                            operator: Not,
+                                            operand: Expression {
+                                                kind: Literal {
+                                                    value: Literal {
+                                                        kind: Boolean {
+                                                            value: true,
+                                                        },
+                                                        span: SyntaxNodePtr {
+                                                            kind: BOOLEAN_LITERAL_NODE,
+                                                            range: 26..30,
+                                                        },
+                                                    },
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: LITERAL_EXPRESSION_NODE,
+                                                    range: 26..30,
                                                 },
                                             },
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: UNARY_EXPRESSION_NODE,
+                                            range: 25..30,
                                         },
                                     },
                                 },
+                                span: SyntaxNodePtr {
+                                    kind: EXPRESSION_STATEMENT_NODE,
+                                    range: 25..36,
+                                },
                             },
-                            Expression {
-                                value: Expression {
-                                    kind: Unary {
-                                        operator: BitwiseNot,
-                                        operand: Expression {
-                                            kind: Literal {
-                                                value: Integer {
-                                                    value: 0,
+                            Statement {
+                                kind: Expression {
+                                    value: Expression {
+                                        kind: Unary {
+                                            operator: BitwiseNot,
+                                            operand: Expression {
+                                                kind: Literal {
+                                                    value: Literal {
+                                                        kind: Integer {
+                                                            value: 0,
+                                                        },
+                                                        span: SyntaxNodePtr {
+                                                            kind: INTEGER_LITERAL_NODE,
+                                                            range: 37..38,
+                                                        },
+                                                    },
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: LITERAL_EXPRESSION_NODE,
+                                                    range: 37..38,
                                                 },
                                             },
                                         },
+                                        span: SyntaxNodePtr {
+                                            kind: UNARY_EXPRESSION_NODE,
+                                            range: 36..38,
+                                        },
                                     },
+                                },
+                                span: SyntaxNodePtr {
+                                    kind: EXPRESSION_STATEMENT_NODE,
+                                    range: 36..40,
                                 },
                             },
                         ],
                     ),
+                },
+                span: SyntaxNodePtr {
+                    kind: DEFINITION_NODE,
+                    range: 1..42,
                 },
             },
         ],

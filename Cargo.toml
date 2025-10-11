@@ -5,6 +5,7 @@ members = [
   "compiler/danubec_diagnostic",
   "compiler/danubec_lex",
   "compiler/danubec_parse",
+  "compiler/danubec_symbol",
   "compiler/danubec_syntax",
   "compiler/danubec",
 ]

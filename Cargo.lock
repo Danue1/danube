@@ -85,6 +85,7 @@ version = "0.1.0"
 name = "danubec_ast"
 version = "0.1.0"
 dependencies = [
+ "danubec_symbol",
  "danubec_syntax",
  "rowan",
 ]
@@ -113,11 +114,16 @@ dependencies = [
  "danubec_ast",
  "danubec_diagnostic",
  "danubec_lex",
+ "danubec_symbol",
  "danubec_syntax",
  "drop_bomb",
  "insta",
  "miette",
 ]
+
+[[package]]
+name = "danubec_symbol"
+version = "0.1.0"
 
 [[package]]
 name = "danubec_syntax"
