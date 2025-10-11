@@ -23,16 +23,12 @@ pub fn parse_krate(parent: PathBuf) -> Result<Krate, Diagnostic> {
         Ok(source) => source,
         Err(()) => return Err(diagnostic),
     };
-    let (node, mut diagnostic) = parse(&source, diagnostic);
-    let krate = match danubec_syntax::Krate::cast(node) {
-        Some(node) => lower_krate(node, &mut diagnostic).map_err(|_| diagnostic)?,
-        None => {
-            diagnostic.report(miette!("ICE: Expected krate node"));
-            return Err(diagnostic);
-        }
-    };
+    let (node, mut diagnostic) = parse(&source, diagnostic, krate);
+    let node = danubec_syntax::Krate::cast(node)
+        .and_then(|node| lower_krate(node, &mut diagnostic).ok())
+        .ok_or_else(|| diagnostic)?;
 
-    Ok(krate)
+    Ok(node)
 }
 
 fn read(path: &PathBuf, diagnostic: &mut Diagnostic) -> Result<String, ()> {
@@ -46,12 +42,15 @@ fn read(path: &PathBuf, diagnostic: &mut Diagnostic) -> Result<String, ()> {
     }
 }
 
-pub(crate) fn parse(source: &str, diagnostic: Diagnostic) -> (SyntaxNode, Diagnostic) {
+pub(crate) fn parse<P>(source: &str, diagnostic: Diagnostic, parse: P) -> (SyntaxNode, Diagnostic)
+where
+    P: FnOnce(&mut Parser),
+{
     let tokens = lex(source);
     let (events, diagnostic) = {
         let tokens: Vec<_> = tokens.iter().map(|&(kind, _)| kind).collect();
         let mut parser = Parser::new(&tokens, diagnostic);
-        krate(&mut parser);
+        parse(&mut parser);
         parser.finish()
     };
     let node = build(&tokens, events);

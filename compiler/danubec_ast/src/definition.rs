@@ -1,36 +1,42 @@
 use danubec_syntax::SyntaxNode;
 use std::{collections::HashMap, path::PathBuf};
 
+#[derive(Debug)]
 pub struct Krate {
     pub attributes: Vec<TopLevelAttribute>,
     pub definitions: Vec<Definition>,
     pub children: HashMap<Identifier, Root>,
 }
 
+#[derive(Debug)]
 pub struct Root {
     pub definitions: Vec<Definition>,
     pub children: HashMap<Identifier, Root>,
 }
 
+#[derive(Debug)]
 pub struct TopLevelAttribute {
     pub argument: AttributeArgument,
 }
 
+#[derive(Debug)]
 pub struct Attribute {
     pub argument: AttributeArgument,
 }
 
+#[derive(Debug)]
 pub struct AttributeArgument {
     pub kind: AttributeArgumentKind,
 }
 
+#[derive(Debug)]
 pub enum AttributeArgumentKind {
     Expression {
         value: Expression,
     },
     KeyValue {
         key: Path,
-        value: Expression,
+        value: Option<Expression>,
     },
     Nested {
         path: Path,
@@ -38,175 +44,215 @@ pub enum AttributeArgumentKind {
     },
 }
 
+#[derive(Debug)]
 pub struct Definition {
     pub attributes: Vec<Attribute>,
+    pub visibility: Visibility,
     pub kind: DefinitionKind,
 }
 
+#[derive(Debug)]
 pub enum DefinitionKind {
     Function {
-        visibility: Visibility,
         name: Identifier,
         type_parameters: Vec<TypeParameter>,
         parameters: Vec<FunctionParameter>,
         return_type: Option<TypeExpression>,
-        type_bounds: Vec<(TypeExpression, TypeBound)>,
-        body: Expression,
+        type_bounds: Vec<TypeBound>,
+        body: Option<Vec<Statement>>,
     },
     Struct {
-        visibility: Visibility,
         name: Identifier,
         type_parameters: Vec<TypeParameter>,
-        type_bounds: Vec<(TypeExpression, TypeBound)>,
-        body: Option<StructBody>,
+        type_bounds: Vec<TypeBound>,
+        body: StructBody,
     },
     Enum {
-        visibility: Visibility,
         name: Identifier,
         type_parameters: Vec<TypeParameter>,
-        type_bounds: Vec<(TypeExpression, TypeBound)>,
+        type_bounds: Vec<TypeBound>,
         variants: Vec<EnumVariant>,
     },
     Use {
-        visibility: Visibility,
         tree: UseTree,
     },
     Module {
-        visibility: Visibility,
         name: Identifier,
-        definitions: Vec<Definition>,
+        kind: ModuleDefinitionKind,
     },
     Trait {
-        visibility: Visibility,
         name: Identifier,
         type_parameters: Vec<TypeParameter>,
-        type_bounds: Vec<(TypeExpression, TypeBound)>,
+        type_bounds: Vec<TypeBound>,
         definitions: Vec<AssociatedDefinition>,
     },
     Constant {
-        visibility: Visibility,
         name: Identifier,
         r#type: TypeExpression,
-        value: Expression,
+        initializer: Expression,
     },
     Static {
-        visibility: Visibility,
         name: Identifier,
         r#type: TypeExpression,
-        value: Expression,
+        initializer: Expression,
     },
     Type {
-        visibility: Visibility,
         name: Identifier,
         type_parameters: Vec<TypeParameter>,
-        type_bounds: Vec<(TypeExpression, TypeBound)>,
-        expression: TypeExpression,
+        type_bounds: Vec<TypeBound>,
+        initializer: Option<TypeExpression>,
     },
     Implement {
         type_parameters: Vec<TypeParameter>,
-        trait_name: Option<Identifier>,
-        for_type: TypeExpression,
-        type_bounds: Vec<(TypeExpression, TypeBound)>,
+        trait_type: Option<TypeExpression>,
+        target_type: TypeExpression,
+        type_bounds: Vec<TypeBound>,
         definitions: Vec<AssociatedDefinition>,
     },
 }
 
+#[derive(Debug)]
+pub enum ModuleDefinitionKind {
+    External,
+    Inline { definitions: Vec<Definition> },
+}
+
+#[derive(Debug)]
 pub enum Visibility {
-    Public,
-    Crate,
+    Krate,
+    Super,
+    Self_,
     Restricted(Identifier),
     Private,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Debug)]
 pub struct Identifier {
     pub name: String,
 }
 
+#[derive(Debug)]
 pub struct TypeParameter {
-    pub name: Identifier,
-    pub bounds: Vec<TypeExpression>,
+    pub r#type: TypeExpression,
+    pub constraints: Vec<TypeExpression>,
 }
 
+#[derive(Debug)]
 pub struct TypeBound {
     pub r#type: TypeExpression,
     pub constraints: Vec<TypeExpression>,
 }
 
+#[derive(Debug)]
 pub struct FunctionParameter {
     pub attributes: Vec<Attribute>,
-    pub name: Identifier,
+    pub pattern: Pattern,
     pub r#type: TypeExpression,
 }
 
+#[derive(Debug)]
 pub enum StructBody {
+    Unit,
     Named(Vec<(Visibility, Identifier, TypeExpression)>),
     Unnamed(Vec<(Visibility, TypeExpression)>),
 }
 
+#[derive(Debug)]
 pub struct EnumVariant {
     pub attributes: Vec<Attribute>,
     pub name: Identifier,
-    pub body: Option<EnumVariantBody>,
+    pub kind: EnumVariantKind,
 }
 
-pub enum EnumVariantBody {
+#[derive(Debug)]
+pub enum EnumVariantKind {
+    Unit,
+    Scalar(Expression),
     Named(Vec<(Vec<Attribute>, Identifier, TypeExpression)>),
     Unnamed(Vec<(Vec<Attribute>, TypeExpression)>),
 }
 
+#[derive(Debug)]
 pub struct UseTree {
-    pub prefix: Path,
+    pub root: bool,
     pub kind: UseTreeKind,
 }
 
+#[derive(Debug)]
 pub enum UseTreeKind {
+    Nested {
+        trees: Vec<UseTree>,
+    },
     Glob,
-    Terminal { alias: Option<(Identifier)> },
-    Nested { trees: Vec<UseTree> },
+    Element {
+        path: Path,
+        trailing: UseTreeTrailing,
+    },
 }
 
+#[derive(Debug)]
+pub enum UseTreeTrailing {
+    Identifier,
+    Nested { trees: Vec<UseTree> },
+    Glob,
+    Rename { name: Identifier },
+}
+
+#[derive(Debug)]
 pub struct Path {
     pub segments: Vec<PathSegment>,
 }
 
+#[derive(Debug)]
 pub struct PathSegment {
-    pub name: Identifier,
-    pub type_arguments: Vec<TypeExpression>,
+    pub kind: PathSegmentKind,
 }
 
+#[derive(Debug)]
+pub enum PathSegmentKind {
+    Root,
+    Self_,
+    Super_,
+    Krate,
+    Identifier(Identifier),
+}
+
+#[derive(Debug)]
 pub struct AssociatedDefinition {
     pub attributes: Vec<Attribute>,
     pub visibility: Visibility,
     pub kind: AssociatedDefinitionKind,
 }
 
+#[derive(Debug)]
 pub enum AssociatedDefinitionKind {
     Function {
         name: Identifier,
         type_parameters: Vec<TypeParameter>,
         parameters: Vec<FunctionParameter>,
         return_type: Option<TypeExpression>,
-        type_bounds: Vec<(TypeExpression, TypeBound)>,
-        body: Option<Expression>,
+        type_bounds: Vec<TypeBound>,
+        body: Option<Vec<Statement>>,
     },
     Constant {
         name: Identifier,
-        r#type: TypeExpression,
-        value: Option<Expression>,
+        r#type: Option<TypeExpression>,
+        initializer: Option<Expression>,
     },
     Type {
         name: Identifier,
         type_parameters: Vec<TypeParameter>,
-        type_bounds: Vec<(TypeExpression, TypeBound)>,
-        expression: Option<TypeExpression>,
+        type_bounds: Vec<TypeBound>,
+        initializer: Option<TypeExpression>,
     },
 }
 
+#[derive(Debug)]
 pub struct Expression {
     pub kind: ExpressionKind,
 }
 
+#[derive(Debug)]
 pub enum ExpressionKind {
     Break,
     Continue,
@@ -236,10 +282,13 @@ pub enum ExpressionKind {
     },
     Let {
         pattern: Pattern,
-        type_annotation: Option<TypeExpression>,
+        r#type: Option<TypeExpression>,
         initializer: Option<Box<Expression>>,
     },
     Array {
+        elements: Vec<Expression>,
+    },
+    Tuple {
         elements: Vec<Expression>,
     },
     Block {
@@ -262,9 +311,9 @@ pub enum ExpressionKind {
         right: Box<Expression>,
     },
     Assignment {
-        target: Box<Expression>,
+        left: Box<Expression>,
         operator: AssignmentOperator,
-        value: Box<Expression>,
+        right: Box<Expression>,
     },
     FunctionCall {
         callee: Box<Expression>,
@@ -273,7 +322,7 @@ pub enum ExpressionKind {
     },
     MethodCall {
         receiver: Box<Expression>,
-        identifier: Identifier,
+        method: Identifier,
         type_arguments: Vec<TypeExpression>,
         arguments: Vec<Expression>,
     },
@@ -288,24 +337,44 @@ pub enum ExpressionKind {
     Struct {
         path: Path,
         fields: Vec<(Identifier, Expression)>,
-        rest: Option<Box<Expression>>,
     },
     Await {
         expression: Box<Expression>,
     },
     Range {
-        start: Option<Box<Expression>>,
-        operator: RangeOperator,
-        end: Option<Box<Expression>>,
+        range: RangeExpression,
     },
     Try {
         expression: Box<Expression>,
     },
     Yield {
-        expression: Box<Expression>,
+        expression: Option<Box<Expression>>,
     },
 }
 
+#[derive(Debug)]
+pub enum RangeExpression {
+    /// `..`
+    Full,
+    /// `..end`
+    To { end: Box<Expression> },
+    /// `..=end`
+    ToInclusive { end: Box<Expression> },
+    /// `start..`
+    From { start: Box<Expression> },
+    /// `start..end`
+    FromTo {
+        start: Box<Expression>,
+        end: Box<Expression>,
+    },
+    /// `start..=end`
+    FromToInclusive {
+        start: Box<Expression>,
+        end: Box<Expression>,
+    },
+}
+
+#[derive(Debug)]
 pub enum Statement {
     Definition {
         definition: Definition,
@@ -313,19 +382,23 @@ pub enum Statement {
     Let {
         pattern: Pattern,
         r#type: Option<TypeExpression>,
-        expression: Option<Expression>,
+        initializer: Option<Expression>,
     },
     Expression {
-        expression: Expression,
+        value: Expression,
     },
     Semicolon,
 }
 
+#[derive(Debug)]
 pub enum Pattern {
     Never,
     Placeholder,
     Path {
         path: Path,
+    },
+    Mutable {
+        pattern: Box<Pattern>,
     },
     Tuple {
         elements: Vec<Pattern>,
@@ -336,7 +409,14 @@ pub enum Pattern {
     Literal {
         value: Literal,
     },
+    Range {
+        range: RangePattern,
+    },
     Rest {
+        pattern: Box<Pattern>,
+    },
+    At {
+        name: Identifier,
         pattern: Box<Pattern>,
     },
     Or {
@@ -351,14 +431,36 @@ pub enum Pattern {
     },
 }
 
+#[derive(Debug)]
+pub enum RangePattern {
+    /// `start..end`
+    FromTo {
+        start: Box<Pattern>,
+        end: Box<Pattern>,
+    },
+    /// `start..=end`
+    FromToInclusive {
+        start: Box<Pattern>,
+        end: Box<Pattern>,
+    },
+    /// `start..`
+    From { start: Box<Pattern> },
+    /// `..end`
+    To { end: Box<Pattern> },
+    /// `..=end`
+    ToInclusive { end: Box<Pattern> },
+}
+
+#[derive(Debug)]
 pub enum Literal {
     Boolean { value: bool },
     Character { value: char },
     Float { value: f64 },
-    Integer { value: i64 },
+    Integer { value: i128 },
     String { segments: Vec<StringSegment> },
 }
 
+#[derive(Debug)]
 pub enum StringSegment {
     Text { value: String },
     Unicode { value: char },
@@ -366,14 +468,21 @@ pub enum StringSegment {
     Interpolation { expression: Expression },
 }
 
+#[derive(Debug)]
 pub enum UnaryOperator {
+    /// mut
+    Mutable,
+    /// +
     Positive,
+    /// -
     Negate,
-    WrappingNegate,
+    /// !
     Not,
+    /// ~
     BitwiseNot,
 }
 
+#[derive(Debug)]
 pub enum BinaryOperator {
     Add,
     SaturatingAdd,
@@ -406,6 +515,7 @@ pub enum BinaryOperator {
     GreaterOrEqual,
 }
 
+#[derive(Debug)]
 pub enum AssignmentOperator {
     Assign,
     Add,
@@ -433,13 +543,16 @@ pub enum AssignmentOperator {
     LogicalOr,
 }
 
+#[derive(Debug)]
 pub enum RangeOperator {
     Exclusive,
     Inclusive,
 }
 
+#[derive(Debug)]
 pub enum TypeExpression {
     Never,
+    Mutable { inner: Box<TypeExpression> },
     Path { path: Path },
     Slice { element: Box<TypeExpression> },
     Tuple { elements: Vec<TypeExpression> },

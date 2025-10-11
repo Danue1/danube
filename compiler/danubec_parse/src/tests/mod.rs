@@ -1,5 +1,15 @@
-use crate::parse;
+use crate::{grammar::krate, lower::lower_krate};
 use danubec_diagnostic::Diagnostic;
+use danubec_syntax::AstNode;
+
+fn parse(source: &str) -> (Option<danubec_ast::Krate>, Diagnostic) {
+    let diagnostic = Diagnostic::new();
+    let (node, mut diagnostic) = crate::parse(source, diagnostic, krate);
+    let node =
+        danubec_syntax::Krate::cast(node).and_then(|node| lower_krate(node, &mut diagnostic).ok());
+
+    (node, diagnostic)
+}
 
 #[test]
 fn top_level_attribute() {
@@ -8,12 +18,12 @@ fn top_level_attribute() {
 #![a(key)]
 #![a(key1, key2)]
 #![a(key = "value")]
-#![a::b(key = "value")]"#;
-    let diagnostic = Diagnostic::new();
-    let (events, diagnostic) = parse(&source, diagnostic);
+#![a::b(key = "value")]
+"#;
+    let (node, diagnostic) = parse(&source);
 
     assert!(diagnostic.is_empty());
-    insta::assert_debug_snapshot!(events);
+    insta::assert_debug_snapshot!(node);
 }
 
 #[test]
@@ -21,22 +31,20 @@ fn attribute() {
     let source = r#"
 #[a("value")]
 struct Foo;"#;
-    let diagnostic = Diagnostic::new();
-    let (events, diagnostic) = parse(&source, diagnostic);
+    let (node, diagnostic) = parse(&source);
 
     assert!(diagnostic.is_empty());
-    insta::assert_debug_snapshot!(events);
+    insta::assert_debug_snapshot!(node);
 }
 
 #[test]
 fn zero_sized_struct() {
     let source = r#"
 struct Foo;"#;
-    let diagnostic = Diagnostic::new();
-    let (events, diagnostic) = parse(&source, diagnostic);
+    let (node, diagnostic) = parse(&source);
 
     assert!(diagnostic.is_empty());
-    insta::assert_debug_snapshot!(events);
+    insta::assert_debug_snapshot!(node);
 }
 
 #[test]
@@ -47,11 +55,10 @@ struct Bar {
     a: i32,
     b: String,
 }"#;
-    let diagnostic = Diagnostic::new();
-    let (events, diagnostic) = parse(&source, diagnostic);
+    let (node, diagnostic) = parse(&source);
 
     assert!(diagnostic.is_empty());
-    insta::assert_debug_snapshot!(events);
+    insta::assert_debug_snapshot!(node);
 }
 
 #[test]
@@ -60,11 +67,10 @@ fn unnamed_struct() {
 struct Foo();
 struct Bar(());
 struct Baz(i32, String);"#;
-    let diagnostic = Diagnostic::new();
-    let (events, diagnostic) = parse(&source, diagnostic);
+    let (node, diagnostic) = parse(&source);
 
     assert!(diagnostic.is_empty());
-    insta::assert_debug_snapshot!(events);
+    insta::assert_debug_snapshot!(node);
 }
 
 #[test]
@@ -77,11 +83,10 @@ enum Bar {
     C(i32, String),
     D = 42,
 }"#;
-    let diagnostic = Diagnostic::new();
-    let (events, diagnostic) = parse(&source, diagnostic);
+    let (node, diagnostic) = parse(&source);
 
     assert!(diagnostic.is_empty());
-    insta::assert_debug_snapshot!(events);
+    insta::assert_debug_snapshot!(node);
 }
 
 #[test]
@@ -97,23 +102,22 @@ mod bar {
         D = 42,
     }
 }"#;
-    let diagnostic = Diagnostic::new();
-    let (events, diagnostic) = parse(&source, diagnostic);
+    let (node, diagnostic) = parse(&source);
 
     assert!(diagnostic.is_empty());
-    insta::assert_debug_snapshot!(events);
+    insta::assert_debug_snapshot!(node);
 }
 
 #[test]
 fn constant() {
     let source = r#"
 const FOO: i32 = 42;
-const BAR: str = "Hello, world!";"#;
-    let diagnostic = Diagnostic::new();
-    let (events, diagnostic) = parse(&source, diagnostic);
+const BAR: str = "Hello, world!";
+"#;
+    let (node, diagnostic) = parse(&source);
 
     assert!(diagnostic.is_empty());
-    insta::assert_debug_snapshot!(events);
+    insta::assert_debug_snapshot!(node);
 }
 
 #[test]
@@ -121,11 +125,10 @@ fn static_variable() {
     let source = r#"
 static FOO: i32 = 42;
 static BAR: str = "Hello, world!";"#;
-    let diagnostic = Diagnostic::new();
-    let (events, diagnostic) = parse(&source, diagnostic);
+    let (node, diagnostic) = parse(&source);
 
     assert!(diagnostic.is_empty());
-    insta::assert_debug_snapshot!(events);
+    insta::assert_debug_snapshot!(node);
 }
 
 #[test]
@@ -133,11 +136,10 @@ fn type_alias() {
     let source = r#"
 type Foo = i32;
 type Bar = (i32, String);"#;
-    let diagnostic = Diagnostic::new();
-    let (events, diagnostic) = parse(&source, diagnostic);
+    let (node, diagnostic) = parse(&source);
 
     assert!(diagnostic.is_empty());
-    insta::assert_debug_snapshot!(events);
+    insta::assert_debug_snapshot!(node);
 }
 
 #[test]
@@ -148,13 +150,10 @@ fn bar() {}
 fn baz(a: i32, b: String) -> (i32, String) {
     (a, b)
 }"#;
-    let diagnostic = Diagnostic::new();
-    let (events, diagnostic) = parse(&source, diagnostic);
-
-    dbg!(&diagnostic);
+    let (node, diagnostic) = parse(&source);
 
     assert!(diagnostic.is_empty());
-    insta::assert_debug_snapshot!(events);
+    insta::assert_debug_snapshot!(node);
 }
 
 #[test]
@@ -166,11 +165,10 @@ trait Bar {
     const BAR: i32;
     type Baz;
 }"#;
-    let diagnostic = Diagnostic::new();
-    let (events, diagnostic) = parse(&source, diagnostic);
+    let (node, diagnostic) = parse(&source);
 
     assert!(diagnostic.is_empty());
-    insta::assert_debug_snapshot!(events);
+    insta::assert_debug_snapshot!(node);
 }
 
 #[test]
@@ -182,11 +180,10 @@ impl Foo {
     const BAR: i32 = 42;
     type Baz = i32;
 }"#;
-    let diagnostic = Diagnostic::new();
-    let (events, diagnostic) = parse(&source, diagnostic);
+    let (node, diagnostic) = parse(&source);
 
     assert!(diagnostic.is_empty());
-    insta::assert_debug_snapshot!(events);
+    insta::assert_debug_snapshot!(node);
 }
 
 #[test]
@@ -198,11 +195,10 @@ impl Foo for Bar {
     const BAR: i32 = 42;
     type Baz = i32;
 }"#;
-    let diagnostic = Diagnostic::new();
-    let (events, diagnostic) = parse(&source, diagnostic);
+    let (node, diagnostic) = parse(&source);
 
     assert!(diagnostic.is_empty());
-    insta::assert_debug_snapshot!(events);
+    insta::assert_debug_snapshot!(node);
 }
 
 #[test]
@@ -224,13 +220,10 @@ use ::foo as bar;
 use ::foo::{};
 use ::foo::{*,foo,bar as baz,{},::*,::foo,::bar as baz,::{}};
 "#;
-    let diagnostic = Diagnostic::new();
-    let (events, diagnostic) = parse(&source, diagnostic);
-
-    dbg!(&diagnostic);
+    let (node, diagnostic) = parse(&source);
 
     assert!(diagnostic.is_empty());
-    insta::assert_debug_snapshot!(events);
+    insta::assert_debug_snapshot!(node);
 }
 
 #[test]
@@ -242,11 +235,10 @@ fn foo() {
     ~0;
 }
 "#;
-    let diagnostic = Diagnostic::new();
-    let (events, diagnostic) = parse(&source, diagnostic);
+    let (node, diagnostic) = parse(&source);
 
     assert!(diagnostic.is_empty());
-    insta::assert_debug_snapshot!(events);
+    insta::assert_debug_snapshot!(node);
 }
 
 #[test]
@@ -256,7 +248,7 @@ fn foo() {
     break;
     continue;
     return;
-    for i in 0..10 {}
+    for i in expr {}
     while true {}
     loop {}
     if true {}
@@ -280,12 +272,10 @@ fn foo() {
     foo.bar.baz;
     foo.bar().baz();
     foo[0];
+    foo += 1;
 }"#;
-    let diagnostic = Diagnostic::new();
-    let (events, diagnostic) = parse(&source, diagnostic);
-
-    dbg!(&diagnostic);
+    let (node, diagnostic) = parse(&source);
 
     assert!(diagnostic.is_empty());
-    insta::assert_debug_snapshot!(events);
+    insta::assert_debug_snapshot!(node);
 }

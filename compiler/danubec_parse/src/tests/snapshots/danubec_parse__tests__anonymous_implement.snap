@@ -1,92 +1,120 @@
 ---
 source: compiler/danubec_parse/src/tests/mod.rs
-expression: events
+expression: node
 ---
-KRATE_NODE@0..87
-  NEW_LINE@0..1 "\n"
-  IMPLEMENT_DEFINITION_NODE@1..14
-    IMPL@1..5 "impl"
-    WHITESPACE@5..6 " "
-    PATH_TYPE_NODE@6..10
-      PATH_NODE@6..10
-        PATH_SEGMENT_IDENTIFIER_NODE@6..10
-          IDENTIFIER_NODE@6..10
-            IDENTIFIER_SEGMENT@6..10
-              IDENTIFIER@6..9 "Foo"
-              WHITESPACE@9..10 " "
-    LEFT_BRACE@10..11 "{"
-    WHITESPACE@11..12 " "
-    RIGHT_BRACE@12..13 "}"
-    NEW_LINE@13..14 "\n"
-  IMPLEMENT_DEFINITION_NODE@14..87
-    IMPL@14..18 "impl"
-    WHITESPACE@18..19 " "
-    PATH_TYPE_NODE@19..23
-      PATH_NODE@19..23
-        PATH_SEGMENT_IDENTIFIER_NODE@19..23
-          IDENTIFIER_NODE@19..23
-            IDENTIFIER_SEGMENT@19..23
-              IDENTIFIER@19..22 "Foo"
-              WHITESPACE@22..23 " "
-    LEFT_BRACE@23..24 "{"
-    NEW_LINE@24..25 "\n"
-    WHITESPACE@25..29 "    "
-    ASSOCIATED_DEFINITION_NODE@29..45
-      FUNCTION_DEFINITION_NODE@29..45
-        FN@29..31 "fn"
-        WHITESPACE@31..32 " "
-        IDENTIFIER_NODE@32..35
-          IDENTIFIER_SEGMENT@32..35
-            IDENTIFIER@32..35 "foo"
-        LEFT_PAREN@35..36 "("
-        RIGHT_PAREN@36..37 ")"
-        WHITESPACE@37..38 " "
-        FUNCTION_BODY_BLOCK_NODE@38..45
-          BLOCK_EXPRESSION_NODE@38..45
-            LEFT_BRACE@38..39 "{"
-            RIGHT_BRACE@39..40 "}"
-            NEW_LINE@40..41 "\n"
-            WHITESPACE@41..45 "    "
-    ASSOCIATED_DEFINITION_NODE@45..70
-      CONSTANT_DEFINITION_NODE@45..70
-        CONST@45..50 "const"
-        WHITESPACE@50..51 " "
-        IDENTIFIER_NODE@51..54
-          IDENTIFIER_SEGMENT@51..54
-            IDENTIFIER@51..54 "BAR"
-        COLON@54..55 ":"
-        WHITESPACE@55..56 " "
-        PATH_TYPE_NODE@56..60
-          PATH_NODE@56..60
-            PATH_SEGMENT_IDENTIFIER_NODE@56..60
-              IDENTIFIER_NODE@56..60
-                IDENTIFIER_SEGMENT@56..60
-                  IDENTIFIER@56..59 "i32"
-                  WHITESPACE@59..60 " "
-        EQUAL@60..61 "="
-        WHITESPACE@61..62 " "
-        LITERAL_EXPRESSION_NODE@62..64
-          INTEGER_LITERAL_NODE@62..64
-            INTEGER_SEGMENT@62..64 "42"
-        SEMICOLON@64..65 ";"
-        NEW_LINE@65..66 "\n"
-        WHITESPACE@66..70 "    "
-    ASSOCIATED_DEFINITION_NODE@70..86
-      TYPE_DEFINITION_NODE@70..86
-        TYPE@70..74 "type"
-        WHITESPACE@74..75 " "
-        IDENTIFIER_NODE@75..79
-          IDENTIFIER_SEGMENT@75..79
-            IDENTIFIER@75..78 "Baz"
-            WHITESPACE@78..79 " "
-        EQUAL@79..80 "="
-        WHITESPACE@80..81 " "
-        PATH_TYPE_NODE@81..84
-          PATH_NODE@81..84
-            PATH_SEGMENT_IDENTIFIER_NODE@81..84
-              IDENTIFIER_NODE@81..84
-                IDENTIFIER_SEGMENT@81..84
-                  IDENTIFIER@81..84 "i32"
-        SEMICOLON@84..85 ";"
-        NEW_LINE@85..86 "\n"
-    RIGHT_BRACE@86..87 "}"
+Some(
+    Krate {
+        attributes: [],
+        definitions: [
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Implement {
+                    type_parameters: [],
+                    trait_type: None,
+                    target_type: Path {
+                        path: Path {
+                            segments: [
+                                PathSegment {
+                                    kind: Identifier(
+                                        Identifier {
+                                            name: "Foo",
+                                        },
+                                    ),
+                                },
+                            ],
+                        },
+                    },
+                    type_bounds: [],
+                    definitions: [],
+                },
+            },
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Implement {
+                    type_parameters: [],
+                    trait_type: None,
+                    target_type: Path {
+                        path: Path {
+                            segments: [
+                                PathSegment {
+                                    kind: Identifier(
+                                        Identifier {
+                                            name: "Foo",
+                                        },
+                                    ),
+                                },
+                            ],
+                        },
+                    },
+                    type_bounds: [],
+                    definitions: [
+                        AssociatedDefinition {
+                            attributes: [],
+                            visibility: Private,
+                            kind: Function {
+                                name: Identifier {
+                                    name: "foo",
+                                },
+                                type_parameters: [],
+                                parameters: [],
+                                return_type: None,
+                                type_bounds: [],
+                                body: Some(
+                                    [],
+                                ),
+                            },
+                        },
+                        AssociatedDefinition {
+                            attributes: [],
+                            visibility: Private,
+                            kind: Constant {
+                                name: Identifier {
+                                    name: "BAR",
+                                },
+                                type: Some(
+                                    Path {
+                                        path: Path {
+                                            segments: [
+                                                PathSegment {
+                                                    kind: Identifier(
+                                                        Identifier {
+                                                            name: "i32",
+                                                        },
+                                                    ),
+                                                },
+                                            ],
+                                        },
+                                    },
+                                ),
+                                initializer: Some(
+                                    Expression {
+                                        kind: Literal {
+                                            value: Integer {
+                                                value: 42,
+                                            },
+                                        },
+                                    },
+                                ),
+                            },
+                        },
+                        AssociatedDefinition {
+                            attributes: [],
+                            visibility: Private,
+                            kind: Type {
+                                name: Identifier {
+                                    name: "Baz",
+                                },
+                                type_parameters: [],
+                                type_bounds: [],
+                                initializer: None,
+                            },
+                        },
+                    ],
+                },
+            },
+        ],
+        children: {},
+    },
+)

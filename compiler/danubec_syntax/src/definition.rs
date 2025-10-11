@@ -181,15 +181,7 @@ ast_node! {
 
 ast_node! {
     /// An argument in an attribute: `value`, `key = value`, `path(arguments)`
-    struct AttributeArgument where ATTRIBUTE_ARGUMENT_NODE;
-
-    node kind -> AttributeArgumentKind;
-    token comma where COMMA;
-}
-
-ast_node! {
-    /// An argument in an attribute: `value`, `key = value`, `path(arguments)`
-    enum AttributeArgumentKind;
+    enum AttributeArgument;
 
     variant Expression -> ExpressionAttributeArgument;
     variant KeyValue -> KeyValueAttributeArgument;
@@ -255,7 +247,7 @@ ast_node! {
 
 ast_node! {
     /// ```
-    /// fn $name<$type_parameters>($params) -> $return_type where $constraints { $body }
+    /// fn $name<$type_parameters>($params) -> $return_type where $type_bounds { $body }
     /// ```
     struct FunctionDefinition where FUNCTION_DEFINITION_NODE;
 
@@ -272,10 +264,10 @@ ast_node! {
 
     token HYPHEN where HYPHEN;
     // token right_chevron_for_return_type where RIGHT_CHEVRON;
-    node r#type -> TypeExpression;
+    node return_type -> TypeExpression;
 
     token r#where where WHERE;
-    nodes constraints -> TypeParameterConstraint;
+    nodes type_bounds -> TypeBound;
 
     node body -> FunctionBodyKind;
 }
@@ -316,7 +308,7 @@ impl FunctionDefinition {
 
 ast_node! {
     /// ```
-    /// struct $name<$type_parameters> where $constraints { $body }
+    /// struct $name<$type_parameters> where $type_bounds { $body }
     /// ```
     struct StructDefinition where STRUCT_DEFINITION_NODE;
 
@@ -328,14 +320,14 @@ ast_node! {
     token right_chevron where RIGHT_CHEVRON;
 
     token r#where where WHERE;
-    nodes constraints -> TypeParameterConstraint;
+    nodes type_bounds -> TypeBound;
 
     node body -> StructBody;
 }
 
 ast_node! {
     /// ```
-    /// enum $name<$type_parameters> where $constraints { $variants }
+    /// enum $name<$type_parameters> where $type_bounds { $variants }
     /// ```
     struct EnumDefinition where ENUM_DEFINITION_NODE;
 
@@ -347,7 +339,7 @@ ast_node! {
     token right_chevron where RIGHT_CHEVRON;
 
     token r#where where WHERE;
-    nodes constraints -> TypeParameterConstraint;
+    nodes type_bounds -> TypeBound;
 
     token left_brace where LEFT_BRACE;
     nodes variants -> EnumVariant;
@@ -380,7 +372,7 @@ ast_node! {
 
 ast_node! {
     /// ```
-    /// trait $name<$type_parameters> where $constraints { $definitions }
+    /// trait $name<$type_parameters> where $type_bounds { $definitions }
     /// ```
     struct TraitDefinition where TRAIT_DEFINITION_NODE;
 
@@ -392,7 +384,7 @@ ast_node! {
     token right_chevron where RIGHT_CHEVRON;
 
     token r#where where WHERE;
-    nodes constraints -> TypeParameterConstraint;
+    nodes type_bounds -> TypeBound;
 
     token left_brace where LEFT_BRACE;
     nodes definitions -> AssociatedDefinition;
@@ -412,7 +404,7 @@ ast_node! {
     node r#type -> TypeExpression;
 
     token equal where EQUAL;
-    node expression -> Expression;
+    node initializer -> Expression;
     token semicolon where SEMICOLON;
 }
 
@@ -429,13 +421,13 @@ ast_node! {
     node r#type -> TypeExpression;
 
     token equal where EQUAL;
-    node expression -> Expression;
+    node initializer -> Expression;
     token semicolon where SEMICOLON;
 }
 
 ast_node! {
     /// ```
-    /// type $name<$type_parameters> where $constraints = $initializer;
+    /// type $name<$type_parameters> where $type_bounds = $initializer;
     /// ```
     struct TypeDefinition where TYPE_DEFINITION_NODE;
 
@@ -450,7 +442,7 @@ ast_node! {
     token right_chevron where RIGHT_CHEVRON;
 
     token r#where where WHERE;
-    nodes constraints -> TypeParameterConstraint;
+    nodes type_bounds -> TypeBound;
 
     token equal where EQUAL;
     // node initializer -> TypeExpression;
@@ -479,7 +471,7 @@ impl TypeDefinition {
 
 ast_node! {
     /// ```
-    /// impl<$type_parameters> $trait_type for $target_type where $constraints { $definitions }
+    /// impl<$type_parameters> $trait_type for $target_type where $type_bounds { $definitions }
     /// ```
     struct ImplementDefinition where IMPLEMENT_DEFINITION_NODE;
 
@@ -495,7 +487,7 @@ ast_node! {
     // node target_type -> TypeExpression;
 
     token r#where where WHERE;
-    nodes constraints -> TypeParameterConstraint;
+    nodes type_bounds -> TypeBound;
 
     token left_brace where LEFT_BRACE;
     nodes definitions -> AssociatedDefinition;
@@ -530,7 +522,7 @@ ast_node! {
     enum ModuleDefinitionKind;
 
     variant Inline -> ModuleDefinitionInline;
-    variant Outline -> ModuleDefinitionOutline;
+    variant External -> ModuleDefinitionExternal;
 }
 
 ast_node! {
@@ -544,7 +536,7 @@ ast_node! {
 
 ast_node! {
     /// An outline module definition: `mod name;`
-    struct ModuleDefinitionOutline where MODULE_DEFINITION_OUTLINE_NODE;
+    struct ModuleDefinitionExternal where MODULE_DEFINITION_EXTERNAL_NODE;
 
     token semicolon where SEMICOLON;
 }
@@ -652,6 +644,7 @@ ast_node! {
     struct AssociatedDefinition where ASSOCIATED_DEFINITION_NODE;
 
     nodes attributes -> Attribute;
+    node visibility -> Visibility;
     node kind -> AssociatedDefinitionKind;
 }
 
@@ -705,6 +698,7 @@ ast_node! {
     struct StructNamedField where STRUCT_BODY_NAMED_FIELD_NODE;
 
     nodes attributes -> Attribute;
+    node visibility -> Visibility;
     node name -> Identifier;
     token colon where COLON;
     node r#type -> TypeExpression;
@@ -724,6 +718,7 @@ ast_node! {
     struct StructUnnamedField where STRUCT_BODY_UNNAMED_FIELD_NODE;
 
     nodes attributes -> Attribute;
+    node visibility -> Visibility;
     node r#type -> TypeExpression;
     token comma where COMMA;
 }
@@ -733,6 +728,7 @@ ast_node! {
     struct EnumVariant where ENUM_VARIANT_NODE;
 
     nodes attributes -> Attribute;
+    node name -> Identifier;
     node kind -> EnumVariantKind;
     token comma where COMMA;
 }
@@ -756,7 +752,6 @@ ast_node! {
     /// A scalar variant in an enum: `Variant = 42`
     struct EnumVariantScalar where ENUM_VARIANT_SCALAR_NODE;
 
-    node name -> Identifier;
     token equal where EQUAL;
     node value -> Expression;
 }
@@ -765,8 +760,6 @@ ast_node! {
     /// A named variant in an enum: `Variant { a: Type }`
     struct EnumVariantNamed where ENUM_VARIANT_NAMED_NODE;
 
-    nodes attributes -> Attribute;
-    node name -> Identifier;
     token left_brace where LEFT_BRACE;
     nodes fields -> EnumVariantNamedField;
     token right_brace where RIGHT_BRACE;
@@ -872,29 +865,78 @@ ast_node! {
     /// A literal pattern: `42`, `"hello"`, `true`
     struct LiteralPattern where LITERAL_PATTERN_NODE;
 
-    node literal -> Literal;
+    node literal -> LiteralExpression;
 }
 
 ast_node! {
     /// A range pattern: `start..end`, `start..=end`, `..end`, `start..`
-    struct RangePattern where RANGE_PATTERN_NODE;
+    enum RangePattern;
 
-    node left -> Pattern;
-    node operator -> RangeOperator;
-    node right -> Pattern;
+    // `start..end`
+    variant FromTo -> RangeFromToPattern;
+    // `start..=end`
+    variant FromToInclusive -> RangeFromToInclusivePattern;
+    // `start..`
+    variant From -> RangeFromPattern;
+    // `..end`
+    variant To -> RangeToPattern;
+    // `..=end`
+    variant ToInclusive -> RangeToInclusivePattern;
+}
+
+ast_node! {
+    /// A range pattern: `start..end`
+    struct RangeFromToPattern where RANGE_FROM_TO_PATTERN_NODE;
+
+    node start -> Pattern;
+    token operator where DOT__DOT;
+    node end -> Pattern;
+}
+
+ast_node! {
+    /// A range pattern: `start..=end`
+    struct RangeFromToInclusivePattern where RANGE_FROM_TO_INCLUSIVE_PATTERN_NODE;
+
+    node start -> Pattern;
+    token operator where DOT__DOT__EQUAL;
+    node end -> Pattern;
+}
+
+ast_node! {
+    /// A range pattern: `start..`
+    struct RangeFromPattern where RANGE_FROM_PATTERN_NODE;
+
+    node start -> Pattern;
+    token operator where DOT__DOT;
+}
+
+ast_node! {
+    /// A range pattern: `..end`
+    struct RangeToPattern where RANGE_TO_PATTERN_NODE;
+
+    token operator where DOT__DOT;
+    node end -> Pattern;
+}
+
+ast_node! {
+    /// A range pattern: `..=end`
+    struct RangeToInclusivePattern where RANGE_TO_INCLUSIVE_PATTERN_NODE;
+
+    token operator where DOT__DOT__EQUAL;
+    node end -> Pattern;
 }
 
 ast_node! {
     /// An at pattern: `name @ pattern`
     struct AtPattern where AT_PATTERN_NODE;
 
-    // node binding -> Pattern;
+    // node name -> Pattern;
     token at where AT;
-    // node matching -> Pattern;
+    // node pattern -> Pattern;
 }
 
 impl AtPattern {
-    pub fn binding(&self) -> Option<Pattern> {
+    pub fn name(&self) -> Option<Pattern> {
         use rowan::ast::AstNode;
 
         self.syntax()
@@ -903,7 +945,7 @@ impl AtPattern {
             .find_map(Pattern::cast)
     }
 
-    pub fn matching(&self) -> Option<Pattern> {
+    pub fn pattern(&self) -> Option<Pattern> {
         use rowan::ast::AstNode;
 
         self.syntax()
@@ -917,16 +959,8 @@ ast_node! {
     /// An or pattern: `a | b | C`
     struct OrPattern where OR_PATTERN_NODE;
 
-    node left -> Pattern;
-    token pipe where PIPE;
-}
-
-impl OrPattern {
-    pub fn right(&self) -> Option<Pattern> {
-        use rowan::ast::AstNode;
-
-        self.syntax().children().filter_map(Pattern::cast).nth(1)
-    }
+    nodes patterns -> Pattern;
+    tokens pipe where PIPE;
 }
 
 ast_node! {
@@ -994,7 +1028,7 @@ ast_node! {
     token colon where COLON;
     node r#type -> TypeExpression;
     token equal where EQUAL;
-    node expression -> Expression;
+    node initializer -> Expression;
     token semicolon where SEMICOLON;
 }
 
@@ -1127,8 +1161,10 @@ ast_node! {
     token r#let where LET;
     token r#mut where MUT;
     node pattern -> Pattern;
+    token colon where COLON;
+    node r#type -> TypeExpression;
     token equal where EQUAL;
-    node expression -> Expression;
+    node initializer -> Expression;
 }
 
 ast_node! {
@@ -1248,11 +1284,69 @@ ast_node! {
 
 ast_node! {
     /// A range expression: `start..end`, `start..=end`, `..end`, `start..`
-    struct RangeExpression where RANGE_EXPRESSION_NODE;
+    enum RangeExpression;
 
-    node left -> Expression;
-    node operator -> RangeOperator;
-    node right -> Expression;
+    // `start..end`
+    variant FromTo -> RangeFromToExpression;
+    // `start..`
+    variant From -> RangeFromExpression;
+    // `..end`
+    variant To -> RangeToExpression;
+    // `..`
+    variant Full -> RangeFullExpression;
+    // `start..=end`
+    variant FromToInclusive -> RangeFromToInclusiveExpression;
+    // `..=end`
+    variant ToInclusive -> RangeToInclusiveExpression;
+}
+
+ast_node! {
+    /// A range expression: `start..end`
+    struct RangeFromToExpression where RANGE_FROM_TO_EXPRESSION_NODE;
+
+    node start -> Expression;
+    token operator where DOT__DOT;
+    node end -> Expression;
+}
+
+ast_node! {
+    /// A range expression: `start..`
+    struct RangeFromExpression where RANGE_FROM_EXPRESSION_NODE;
+
+    node start -> Expression;
+    token operator where DOT__DOT;
+}
+
+ast_node! {
+    /// A range expression: `..end`
+    struct RangeToExpression where RANGE_TO_EXPRESSION_NODE;
+
+    token operator where DOT__DOT;
+    node end -> Expression;
+}
+
+ast_node! {
+    /// A range expression: `..`
+    struct RangeFullExpression where RANGE_FULL_EXPRESSION_NODE;
+
+    token operator where DOT__DOT;
+}
+
+ast_node! {
+    /// A range expression: `start..=end`
+    struct RangeFromToInclusiveExpression where RANGE_FROM_TO_INCLUSIVE_EXPRESSION_NODE;
+
+    node start -> Expression;
+    token operator where DOT__DOT__EQUAL;
+    node end -> Expression;
+}
+
+ast_node! {
+    /// A range expression: `..=end`
+    struct RangeToInclusiveExpression where RANGE_TO_INCLUSIVE_EXPRESSION_NODE;
+
+    token operator where DOT__DOT__EQUAL;
+    node end -> Expression;
 }
 
 ast_node! {
@@ -1302,7 +1396,7 @@ ast_node! {
 
     node name -> Identifier;
     token colon where COLON;
-    node expression -> Expression;
+    node value -> Expression;
     token comma where COMMA;
 }
 
@@ -1392,8 +1486,18 @@ ast_node! {
 }
 
 ast_node! {
-    /// A type parameter in a generic type or function: `T`
+    /// A type parameter in a generic type or function: `T`, `T: Trait`, etc.
     struct TypeParameter where TYPE_PARAMETER_NODE;
+
+    node r#type -> TypeExpression;
+    token colon where COLON;
+    nodes constraints -> TypeParameterConstraint;
+    token comma where COMMA;
+}
+
+ast_node! {
+    /// A type bound in a where clause: `T: Trait`
+    struct TypeBound where TYPE_BOUND_NODE;
 
     node r#type -> TypeExpression;
     token colon where COLON;
@@ -1505,7 +1609,7 @@ ast_node! {
     /// A segment in a string literal: `hello`, `\n`, etc.
     enum StringSegment;
 
-    variant Segment -> StringLiteralSegment;
+    variant Text -> StringLiteralText;
     variant Escape -> StringLiteralEscape;
     variant Unicode -> StringLiteralUnicode;
     variant Interpolation -> StringLiteralInterpolation;
@@ -1513,7 +1617,7 @@ ast_node! {
 
 ast_node! {
     /// A simple segment in a string literal: `hello`
-    struct StringLiteralSegment where STRING_LITERAL_SEGMENT_NODE;
+    struct StringLiteralText where STRING_LITERAL_TEXT_NODE;
 
     token segment where STRING_SEGMENT;
 }
@@ -1699,5 +1803,13 @@ ast_node! {
     /// An identifier: `foo`, `Bar`, `_baz`, etc.
     struct Identifier where IDENTIFIER_NODE;
 
-    tokens segments where IDENTIFIER_SEGMENT;
+    token raw_start where RAW_IDENTIFIER_START;
+    node segment -> IdentifierSegment;
+}
+
+ast_node! {
+    /// A segment in an identifier: `foo`, `Bar`, `_baz`, etc.
+    struct IdentifierSegment where IDENTIFIER_SEGMENT;
+
+    token identifier where IDENTIFIER;
 }

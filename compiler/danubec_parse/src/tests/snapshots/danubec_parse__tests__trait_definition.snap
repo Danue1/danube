@@ -1,68 +1,88 @@
 ---
 source: compiler/danubec_parse/src/tests/mod.rs
-expression: events
+expression: node
 ---
-KRATE_NODE@0..76
-  NEW_LINE@0..1 "\n"
-  TRAIT_DEFINITION_NODE@1..15
-    TRAIT@1..6 "trait"
-    WHITESPACE@6..7 " "
-    IDENTIFIER_NODE@7..11
-      IDENTIFIER_SEGMENT@7..11
-        IDENTIFIER@7..10 "Foo"
-        WHITESPACE@10..11 " "
-    LEFT_BRACE@11..12 "{"
-    WHITESPACE@12..13 " "
-    RIGHT_BRACE@13..14 "}"
-    NEW_LINE@14..15 "\n"
-  TRAIT_DEFINITION_NODE@15..76
-    TRAIT@15..20 "trait"
-    WHITESPACE@20..21 " "
-    IDENTIFIER_NODE@21..25
-      IDENTIFIER_SEGMENT@21..25
-        IDENTIFIER@21..24 "Bar"
-        WHITESPACE@24..25 " "
-    LEFT_BRACE@25..26 "{"
-    NEW_LINE@26..27 "\n"
-    WHITESPACE@27..31 "    "
-    ASSOCIATED_DEFINITION_NODE@31..45
-      FUNCTION_DEFINITION_NODE@31..45
-        FN@31..33 "fn"
-        WHITESPACE@33..34 " "
-        IDENTIFIER_NODE@34..37
-          IDENTIFIER_SEGMENT@34..37
-            IDENTIFIER@34..37 "foo"
-        LEFT_PAREN@37..38 "("
-        RIGHT_PAREN@38..39 ")"
-        FUNCTION_BODY_UNIT_NODE@39..45
-          SEMICOLON@39..40 ";"
-          NEW_LINE@40..41 "\n"
-          WHITESPACE@41..45 "    "
-    ASSOCIATED_DEFINITION_NODE@45..65
-      CONSTANT_DEFINITION_NODE@45..65
-        CONST@45..50 "const"
-        WHITESPACE@50..51 " "
-        IDENTIFIER_NODE@51..54
-          IDENTIFIER_SEGMENT@51..54
-            IDENTIFIER@51..54 "BAR"
-        COLON@54..55 ":"
-        WHITESPACE@55..56 " "
-        PATH_TYPE_NODE@56..59
-          PATH_NODE@56..59
-            PATH_SEGMENT_IDENTIFIER_NODE@56..59
-              IDENTIFIER_NODE@56..59
-                IDENTIFIER_SEGMENT@56..59
-                  IDENTIFIER@56..59 "i32"
-        SEMICOLON@59..60 ";"
-        NEW_LINE@60..61 "\n"
-        WHITESPACE@61..65 "    "
-    ASSOCIATED_DEFINITION_NODE@65..75
-      TYPE_DEFINITION_NODE@65..75
-        TYPE@65..69 "type"
-        WHITESPACE@69..70 " "
-        IDENTIFIER_NODE@70..73
-          IDENTIFIER_SEGMENT@70..73
-            IDENTIFIER@70..73 "Baz"
-        SEMICOLON@73..74 ";"
-        NEW_LINE@74..75 "\n"
-    RIGHT_BRACE@75..76 "}"
+Some(
+    Krate {
+        attributes: [],
+        definitions: [
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Trait {
+                    name: Identifier {
+                        name: "Foo",
+                    },
+                    type_parameters: [],
+                    type_bounds: [],
+                    definitions: [],
+                },
+            },
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Trait {
+                    name: Identifier {
+                        name: "Bar",
+                    },
+                    type_parameters: [],
+                    type_bounds: [],
+                    definitions: [
+                        AssociatedDefinition {
+                            attributes: [],
+                            visibility: Private,
+                            kind: Function {
+                                name: Identifier {
+                                    name: "foo",
+                                },
+                                type_parameters: [],
+                                parameters: [],
+                                return_type: None,
+                                type_bounds: [],
+                                body: None,
+                            },
+                        },
+                        AssociatedDefinition {
+                            attributes: [],
+                            visibility: Private,
+                            kind: Constant {
+                                name: Identifier {
+                                    name: "BAR",
+                                },
+                                type: Some(
+                                    Path {
+                                        path: Path {
+                                            segments: [
+                                                PathSegment {
+                                                    kind: Identifier(
+                                                        Identifier {
+                                                            name: "i32",
+                                                        },
+                                                    ),
+                                                },
+                                            ],
+                                        },
+                                    },
+                                ),
+                                initializer: None,
+                            },
+                        },
+                        AssociatedDefinition {
+                            attributes: [],
+                            visibility: Private,
+                            kind: Type {
+                                name: Identifier {
+                                    name: "Baz",
+                                },
+                                type_parameters: [],
+                                type_bounds: [],
+                                initializer: None,
+                            },
+                        },
+                    ],
+                },
+            },
+        ],
+        children: {},
+    },
+)

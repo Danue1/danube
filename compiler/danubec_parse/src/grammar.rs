@@ -244,45 +244,50 @@ const DEFINITION_START: [SyntaxKind; 12] = [
 
 pub(crate) fn definition(p: &mut Parser) {
     let m = p.start();
+    let m1 = p.start();
 
     attributes(p);
     visibility_modifier(p);
+
     match p.nth(0) {
         kind if matches!(kind, FN) => {
-            function_definition(p, m);
+            function_definition(p, m1);
         }
         kind if matches!(kind, STRUCT) => {
-            struct_definition(p, m);
+            struct_definition(p, m1);
         }
         kind if matches!(kind, ENUM) => {
-            enum_definition(p, m);
+            enum_definition(p, m1);
         }
         kind if matches!(kind, USE) => {
-            use_definition(p, m);
+            use_definition(p, m1);
         }
         kind if matches!(kind, MOD) => {
-            module_definition(p, m);
+            module_definition(p, m1);
         }
         kind if matches!(kind, TRAIT) => {
-            trait_definition(p, m);
+            trait_definition(p, m1);
         }
         kind if matches!(kind, CONST) => {
-            constant_definition(p, m);
+            constant_definition(p, m1);
         }
         kind if matches!(kind, STATIC) => {
-            static_definition(p, m);
+            static_definition(p, m1);
         }
         kind if matches!(kind, TYPE) => {
-            type_definition(p, m);
+            type_definition(p, m1);
         }
         kind if matches!(kind, IMPL) => {
-            implement_definition(p, m);
+            implement_definition(p, m1);
         }
         _ => {
             p.report(vec![], miette!("Expected definition"));
-            p.recover(m, &DEFINITION_START);
+            p.recover(m1, &DEFINITION_START);
+            return;
         }
     };
+
+    p.complete(m, DEFINITION_NODE);
 }
 
 pub(crate) fn visibility_modifier(p: &mut Parser) -> CompleteMarker {
@@ -360,7 +365,7 @@ pub(crate) fn module_definition(p: &mut Parser, m: Marker) -> CompleteMarker {
     let m1 = p.start();
 
     if p.eat(SEMICOLON) {
-        p.complete(m1, MODULE_DEFINITION_OUTLINE_NODE);
+        p.complete(m1, MODULE_DEFINITION_EXTERNAL_NODE);
         return p.complete(m, MODULE_DEFINITION_NODE);
     }
 
@@ -882,6 +887,10 @@ pub(crate) fn or_pattern(p: &mut Parser, m: Marker) -> CompleteMarker {
     expect!(p, PIPE, [m], '|');
     primary_pattern(p);
 
+    while p.eat(PIPE) {
+        primary_pattern(p);
+    }
+
     p.complete(m, OR_PATTERN_NODE)
 }
 
@@ -1035,54 +1044,42 @@ pub(crate) fn path(p: &mut Parser) -> CompleteMarker {
         p.complete(m1, PATH_SEGMENT_ROOT_NODE);
     }
 
-    let m2 = p.start();
-    match p.nth(0) {
-        kind if kind.at_identifier() => {
-            identifier(p);
-            p.complete(m2, PATH_SEGMENT_IDENTIFIER_NODE);
-        }
-        kind if matches!(kind, SELF) => {
-            p.bump(); // eat 'self'
-            p.complete(m2, PATH_SEGMENT_SELF_NODE);
-        }
-        kind if matches!(kind, SUPER) => {
-            p.bump(); // eat 'super'
-            p.complete(m2, PATH_SEGMENT_SUPER_NODE);
-        }
-        kind if matches!(kind, CRATE) => {
-            p.bump(); // eat 'crate'
-            p.complete(m2, PATH_SEGMENT_KRATE_NODE);
-        }
-        _ => return p.report(vec![m2, m], miette!("Expected identifier")),
-    }
+    path_segment(p);
 
     while at_path_separator(p) && !matches!(p.nth(2), ASTERISK | LEFT_CHEVRON | LEFT_BRACE) {
         p.bump(); // eat ':'
         p.bump(); // eat ':'
 
-        let m3 = p.start();
-        match p.nth(0) {
-            kind if kind.at_identifier() => {
-                identifier(p);
-                p.complete(m3, PATH_SEGMENT_IDENTIFIER_NODE);
-            }
-            kind if matches!(kind, SELF) => {
-                p.bump(); // eat 'self'
-                p.complete(m3, PATH_SEGMENT_SELF_NODE);
-            }
-            kind if matches!(kind, SUPER) => {
-                p.bump(); // eat 'super'
-                p.complete(m3, PATH_SEGMENT_SUPER_NODE);
-            }
-            kind if matches!(kind, CRATE) => {
-                p.bump(); // eat 'crate'
-                p.complete(m3, PATH_SEGMENT_KRATE_NODE);
-            }
-            _ => return p.report(vec![m3, m], miette!("Expected identifier")),
-        }
+        path_segment(p);
     }
 
     p.complete(m, PATH_NODE)
+}
+
+pub(crate) fn path_segment(p: &mut Parser) {
+    let m = p.start();
+
+    match p.nth(0) {
+        kind if kind.at_identifier() => {
+            identifier(p);
+            p.complete(m, PATH_SEGMENT_IDENTIFIER_NODE);
+        }
+        kind if matches!(kind, SELF) => {
+            p.bump(); // eat 'self'
+            p.complete(m, PATH_SEGMENT_SELF_NODE);
+        }
+        kind if matches!(kind, SUPER) => {
+            p.bump(); // eat 'super'
+            p.complete(m, PATH_SEGMENT_SUPER_NODE);
+        }
+        kind if matches!(kind, CRATE) => {
+            p.bump(); // eat 'crate'
+            p.complete(m, PATH_SEGMENT_KRATE_NODE);
+        }
+        _ => {
+            p.report(vec![m], miette!("Expected identifier"));
+        }
+    }
 }
 
 pub(crate) fn identifier(p: &mut Parser) -> CompleteMarker {
@@ -1120,7 +1117,7 @@ const LITERAL_FIRST: Tokens = tokens![
 
 const PATH_FIRST: Tokens = tokens![COLON, IDENTIFIER, RAW_IDENTIFIER_START, SELF, SUPER, CRATE];
 
-const UNARY_FIRST: Tokens = tokens![MUT, HYPHEN, EXCLAMATION, TILDE];
+const UNARY_FIRST: Tokens = tokens![MUT, PLUS, HYPHEN, EXCLAMATION, TILDE];
 
 const EXPRESSION_FIRST: Tokens = tokens![
     BREAK,
@@ -1170,7 +1167,18 @@ pub(crate) fn expression_bp(p: &mut Parser, bp: usize) {
             for _ in 0..count {
                 p.bump(); // eat operator
             }
-            p.complete(m1, kind);
+            let cm = p.complete(m1, kind);
+            let parent = if kind.at_assign_operator() {
+                Some(ASSIGNMENT_OPERATOR_NODE)
+            } else if kind.at_binary_operator() {
+                Some(BINARY_OPERATOR_NODE)
+            } else {
+                None
+            };
+            if let Some(parent) = parent {
+                let m = p.precede(cm);
+                p.complete(m, parent);
+            }
         }
 
         lhs = infix_expression(p, m, r_bp, kind);
@@ -1306,9 +1314,6 @@ pub(crate) fn infix_expression(
     if kind.at_binary_operator() {
         return binary_expression(p, m, bp);
     }
-    if kind.at_range_operator() {
-        return range_expression(p, m);
-    }
     if matches!(kind, LEFT_BRACKET) {
         return index_expression(p, m);
     }
@@ -1343,12 +1348,6 @@ pub(crate) fn binary_expression(p: &mut Parser, m: Marker, _bp: usize) -> Comple
     expression_bp(p, 0);
 
     p.complete(m, BINARY_EXPRESSION_NODE)
-}
-
-pub(crate) fn range_expression(p: &mut Parser, m: Marker) -> CompleteMarker {
-    expression(p);
-
-    p.complete(m, RANGE_EXPRESSION_NODE)
 }
 
 pub(crate) fn index_expression(p: &mut Parser, m: Marker) -> CompleteMarker {
@@ -1728,7 +1727,7 @@ pub(crate) fn string_literal(p: &mut Parser) -> CompleteMarker {
         let m1 = p.start();
 
         if p.eat(STRING_SEGMENT) {
-            p.complete(m1, STRING_LITERAL_SEGMENT_NODE);
+            p.complete(m1, STRING_LITERAL_TEXT_NODE);
 
             continue;
         }

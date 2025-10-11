@@ -1,14 +1,24 @@
 ---
 source: compiler/danubec_parse/src/tests/mod.rs
-expression: events
+expression: node
 ---
-KRATE_NODE@0..12
-  NEW_LINE@0..1 "\n"
-  STRUCT_DEFINITION_NODE@1..12
-    STRUCT@1..7 "struct"
-    WHITESPACE@7..8 " "
-    IDENTIFIER_NODE@8..11
-      IDENTIFIER_SEGMENT@8..11
-        IDENTIFIER@8..11 "Foo"
-    STRUCT_BODY_UNIT_NODE@11..12
-      SEMICOLON@11..12 ";"
+Some(
+    Krate {
+        attributes: [],
+        definitions: [
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Struct {
+                    name: Identifier {
+                        name: "Foo",
+                    },
+                    type_parameters: [],
+                    type_bounds: [],
+                    body: Unit,
+                },
+            },
+        ],
+        children: {},
+    },
+)

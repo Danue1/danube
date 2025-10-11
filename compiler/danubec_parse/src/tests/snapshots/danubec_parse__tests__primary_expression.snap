@@ -1,456 +1,718 @@
 ---
 source: compiler/danubec_parse/src/tests/mod.rs
-expression: events
+expression: node
 ---
-KRATE_NODE@0..444
-  NEW_LINE@0..1 "\n"
-  FUNCTION_DEFINITION_NODE@1..444
-    FN@1..3 "fn"
-    WHITESPACE@3..4 " "
-    IDENTIFIER_NODE@4..7
-      IDENTIFIER_SEGMENT@4..7
-        IDENTIFIER@4..7 "foo"
-    LEFT_PAREN@7..8 "("
-    RIGHT_PAREN@8..9 ")"
-    WHITESPACE@9..10 " "
-    FUNCTION_BODY_BLOCK_NODE@10..444
-      BLOCK_EXPRESSION_NODE@10..444
-        LEFT_BRACE@10..11 "{"
-        NEW_LINE@11..12 "\n"
-        WHITESPACE@12..16 "    "
-        EXPRESSION_STATEMENT_NODE@16..27
-          BREAK_EXPRESSION_NODE@16..21
-            BREAK@16..21 "break"
-          SEMICOLON@21..22 ";"
-          NEW_LINE@22..23 "\n"
-          WHITESPACE@23..27 "    "
-        EXPRESSION_STATEMENT_NODE@27..41
-          CONTINUE_EXPRESSION_NODE@27..35
-            CONTINUE@27..35 "continue"
-          SEMICOLON@35..36 ";"
-          NEW_LINE@36..37 "\n"
-          WHITESPACE@37..41 "    "
-        EXPRESSION_STATEMENT_NODE@41..53
-          RETURN_EXPRESSION_NODE@41..47
-            RETURN@41..47 "return"
-          SEMICOLON@47..48 ";"
-          NEW_LINE@48..49 "\n"
-          WHITESPACE@49..53 "    "
-        EXPRESSION_STATEMENT_NODE@53..75
-          FOR_EXPRESSION_NODE@53..75
-            FOR@53..56 "for"
-            WHITESPACE@56..57 " "
-            PATH_PATTERN_NODE@57..59
-              PATH_NODE@57..59
-                PATH_SEGMENT_IDENTIFIER_NODE@57..59
-                  IDENTIFIER_NODE@57..59
-                    IDENTIFIER_SEGMENT@57..59
-                      IDENTIFIER@57..58 "i"
-                      WHITESPACE@58..59 " "
-            IN@59..61 "in"
-            WHITESPACE@61..62 " "
-            RANGE_EXPRESSION_NODE@62..68
-              LITERAL_EXPRESSION_NODE@62..63
-                INTEGER_LITERAL_NODE@62..63
-                  INTEGER_SEGMENT@62..63 "0"
-              DOT__DOT@63..65
-                DOT@63..64 "."
-                DOT@64..65 "."
-              LITERAL_EXPRESSION_NODE@65..68
-                INTEGER_LITERAL_NODE@65..68
-                  INTEGER_SEGMENT@65..67 "10"
-                  WHITESPACE@67..68 " "
-            BLOCK_EXPRESSION_NODE@68..75
-              LEFT_BRACE@68..69 "{"
-              RIGHT_BRACE@69..70 "}"
-              NEW_LINE@70..71 "\n"
-              WHITESPACE@71..75 "    "
-        EXPRESSION_STATEMENT_NODE@75..93
-          WHILE_EXPRESSION_NODE@75..93
-            WHILE@75..80 "while"
-            WHITESPACE@80..81 " "
-            LITERAL_EXPRESSION_NODE@81..86
-              BOOLEAN_LITERAL_NODE@81..86
-                TRUE@81..85 "true"
-                WHITESPACE@85..86 " "
-            BLOCK_EXPRESSION_NODE@86..93
-              LEFT_BRACE@86..87 "{"
-              RIGHT_BRACE@87..88 "}"
-              NEW_LINE@88..89 "\n"
-              WHITESPACE@89..93 "    "
-        EXPRESSION_STATEMENT_NODE@93..105
-          LOOP_EXPRESSION_NODE@93..105
-            LOOP@93..97 "loop"
-            WHITESPACE@97..98 " "
-            BLOCK_EXPRESSION_NODE@98..105
-              LEFT_BRACE@98..99 "{"
-              RIGHT_BRACE@99..100 "}"
-              NEW_LINE@100..101 "\n"
-              WHITESPACE@101..105 "    "
-        EXPRESSION_STATEMENT_NODE@105..120
-          IF_EXPRESSION_NODE@105..120
-            IF@105..107 "if"
-            WHITESPACE@107..108 " "
-            LITERAL_EXPRESSION_NODE@108..113
-              BOOLEAN_LITERAL_NODE@108..113
-                TRUE@108..112 "true"
-                WHITESPACE@112..113 " "
-            BLOCK_EXPRESSION_NODE@113..120
-              LEFT_BRACE@113..114 "{"
-              RIGHT_BRACE@114..115 "}"
-              NEW_LINE@115..116 "\n"
-              WHITESPACE@116..120 "    "
-        EXPRESSION_STATEMENT_NODE@120..143
-          IF_EXPRESSION_NODE@120..143
-            IF@120..122 "if"
-            WHITESPACE@122..123 " "
-            LITERAL_EXPRESSION_NODE@123..128
-              BOOLEAN_LITERAL_NODE@123..128
-                TRUE@123..127 "true"
-                WHITESPACE@127..128 " "
-            BLOCK_EXPRESSION_NODE@128..131
-              LEFT_BRACE@128..129 "{"
-              RIGHT_BRACE@129..130 "}"
-              WHITESPACE@130..131 " "
-            ELSE@131..135 "else"
-            WHITESPACE@135..136 " "
-            BLOCK_EXPRESSION_NODE@136..143
-              LEFT_BRACE@136..137 "{"
-              RIGHT_BRACE@137..138 "}"
-              NEW_LINE@138..139 "\n"
-              WHITESPACE@139..143 "    "
-        EXPRESSION_STATEMENT_NODE@143..242
-          MATCH_EXPRESSION_NODE@143..242
-            MATCH@143..148 "match"
-            WHITESPACE@148..149 " "
-            LITERAL_EXPRESSION_NODE@149..152
-              INTEGER_LITERAL_NODE@149..152
-                INTEGER_SEGMENT@149..151 "42"
-                WHITESPACE@151..152 " "
-            LEFT_BRACE@152..153 "{"
-            NEW_LINE@153..154 "\n"
-            WHITESPACE@154..162 "        "
-            MATCH_ARM_NODE@162..169
-              LITERAL_PATTERN_NODE@162..164
-                LITERAL_EXPRESSION_NODE@162..164
-                  INTEGER_LITERAL_NODE@162..164
-                    INTEGER_SEGMENT@162..163 "0"
-                    WHITESPACE@163..164 " "
-              EQUAL@164..165 "="
-              RIGHT_CHEVRON@165..166 ">"
-              WHITESPACE@166..167 " "
-              BLOCK_EXPRESSION_NODE@167..169
-                LEFT_BRACE@167..168 "{"
-                RIGHT_BRACE@168..169 "}"
-            COMMA@169..170 ","
-            NEW_LINE@170..171 "\n"
-            WHITESPACE@171..179 "        "
-            MATCH_ARM_NODE@179..190
-              OR_PATTERN_NODE@179..185
-                LITERAL_PATTERN_NODE@179..181
-                  LITERAL_EXPRESSION_NODE@179..181
-                    INTEGER_LITERAL_NODE@179..181
-                      INTEGER_SEGMENT@179..180 "1"
-                      WHITESPACE@180..181 " "
-                PIPE@181..182 "|"
-                WHITESPACE@182..183 " "
-                LITERAL_PATTERN_NODE@183..185
-                  LITERAL_EXPRESSION_NODE@183..185
-                    INTEGER_LITERAL_NODE@183..185
-                      INTEGER_SEGMENT@183..184 "2"
-                      WHITESPACE@184..185 " "
-              EQUAL@185..186 "="
-              RIGHT_CHEVRON@186..187 ">"
-              WHITESPACE@187..188 " "
-              BLOCK_EXPRESSION_NODE@188..190
-                LEFT_BRACE@188..189 "{"
-                RIGHT_BRACE@189..190 "}"
-            COMMA@190..191 ","
-            NEW_LINE@191..192 "\n"
-            WHITESPACE@192..200 "        "
-            MATCH_ARM_NODE@200..213
-              AT_PATTERN_NODE@200..208
-                PATH_PATTERN_NODE@200..204
-                  PATH_NODE@200..204
-                    PATH_SEGMENT_IDENTIFIER_NODE@200..204
-                      IDENTIFIER_NODE@200..204
-                        IDENTIFIER_SEGMENT@200..204
-                          IDENTIFIER@200..203 "foo"
-                          WHITESPACE@203..204 " "
-                AT@204..205 "@"
-                WHITESPACE@205..206 " "
-                LITERAL_PATTERN_NODE@206..208
-                  LITERAL_EXPRESSION_NODE@206..208
-                    INTEGER_LITERAL_NODE@206..208
-                      INTEGER_SEGMENT@206..207 "3"
-                      WHITESPACE@207..208 " "
-              EQUAL@208..209 "="
-              RIGHT_CHEVRON@209..210 ">"
-              WHITESPACE@210..211 " "
-              BLOCK_EXPRESSION_NODE@211..213
-                LEFT_BRACE@211..212 "{"
-                RIGHT_BRACE@212..213 "}"
-            COMMA@213..214 ","
-            NEW_LINE@214..215 "\n"
-            WHITESPACE@215..223 "        "
-            MATCH_ARM_NODE@223..230
-              PLACEHOLDER_PATTERN_NODE@223..225
-                PLACEHOLDER@223..224 "_"
-                WHITESPACE@224..225 " "
-              EQUAL@225..226 "="
-              RIGHT_CHEVRON@226..227 ">"
-              WHITESPACE@227..228 " "
-              BLOCK_EXPRESSION_NODE@228..230
-                LEFT_BRACE@228..229 "{"
-                RIGHT_BRACE@229..230 "}"
-            COMMA@230..231 ","
-            NEW_LINE@231..232 "\n"
-            WHITESPACE@232..236 "    "
-            RIGHT_BRACE@236..237 "}"
-            NEW_LINE@237..238 "\n"
-            WHITESPACE@238..242 "    "
-        LET_STATEMENT_NODE@242..253
-          LET@242..245 "let"
-          WHITESPACE@245..246 " "
-          PATH_PATTERN_NODE@246..247
-            PATH_NODE@246..247
-              PATH_SEGMENT_IDENTIFIER_NODE@246..247
-                IDENTIFIER_NODE@246..247
-                  IDENTIFIER_SEGMENT@246..247
-                    IDENTIFIER@246..247 "x"
-          SEMICOLON@247..248 ";"
-          NEW_LINE@248..249 "\n"
-          WHITESPACE@249..253 "    "
-        LET_STATEMENT_NODE@253..269
-          LET@253..256 "let"
-          WHITESPACE@256..257 " "
-          PATH_PATTERN_NODE@257..258
-            PATH_NODE@257..258
-              PATH_SEGMENT_IDENTIFIER_NODE@257..258
-                IDENTIFIER_NODE@257..258
-                  IDENTIFIER_SEGMENT@257..258
-                    IDENTIFIER@257..258 "x"
-          COLON@258..259 ":"
-          WHITESPACE@259..260 " "
-          PATH_TYPE_NODE@260..263
-            PATH_NODE@260..263
-              PATH_SEGMENT_IDENTIFIER_NODE@260..263
-                IDENTIFIER_NODE@260..263
-                  IDENTIFIER_SEGMENT@260..263
-                    IDENTIFIER@260..263 "i32"
-          SEMICOLON@263..264 ";"
-          NEW_LINE@264..265 "\n"
-          WHITESPACE@265..269 "    "
-        LET_STATEMENT_NODE@269..285
-          LET@269..272 "let"
-          WHITESPACE@272..273 " "
-          PATH_PATTERN_NODE@273..275
-            PATH_NODE@273..275
-              PATH_SEGMENT_IDENTIFIER_NODE@273..275
-                IDENTIFIER_NODE@273..275
-                  IDENTIFIER_SEGMENT@273..275
-                    IDENTIFIER@273..274 "x"
-                    WHITESPACE@274..275 " "
-          EQUAL@275..276 "="
-          WHITESPACE@276..277 " "
-          LITERAL_EXPRESSION_NODE@277..279
-            INTEGER_LITERAL_NODE@277..279
-              INTEGER_SEGMENT@277..279 "42"
-          SEMICOLON@279..280 ";"
-          NEW_LINE@280..281 "\n"
-          WHITESPACE@281..285 "    "
-        LET_STATEMENT_NODE@285..306
-          LET@285..288 "let"
-          WHITESPACE@288..289 " "
-          PATH_PATTERN_NODE@289..290
-            PATH_NODE@289..290
-              PATH_SEGMENT_IDENTIFIER_NODE@289..290
-                IDENTIFIER_NODE@289..290
-                  IDENTIFIER_SEGMENT@289..290
-                    IDENTIFIER@289..290 "x"
-          COLON@290..291 ":"
-          WHITESPACE@291..292 " "
-          PATH_TYPE_NODE@292..296
-            PATH_NODE@292..296
-              PATH_SEGMENT_IDENTIFIER_NODE@292..296
-                IDENTIFIER_NODE@292..296
-                  IDENTIFIER_SEGMENT@292..296
-                    IDENTIFIER@292..295 "i32"
-                    WHITESPACE@295..296 " "
-          EQUAL@296..297 "="
-          WHITESPACE@297..298 " "
-          LITERAL_EXPRESSION_NODE@298..300
-            INTEGER_LITERAL_NODE@298..300
-              INTEGER_SEGMENT@298..300 "42"
-          SEMICOLON@300..301 ";"
-          NEW_LINE@301..302 "\n"
-          WHITESPACE@302..306 "    "
-        EXPRESSION_STATEMENT_NODE@306..321
-          ARRAY_EXPRESSION_NODE@306..315
-            LEFT_BRACKET@306..307 "["
-            LITERAL_EXPRESSION_NODE@307..308
-              INTEGER_LITERAL_NODE@307..308
-                INTEGER_SEGMENT@307..308 "0"
-            COMMA@308..309 ","
-            WHITESPACE@309..310 " "
-            LITERAL_EXPRESSION_NODE@310..311
-              INTEGER_LITERAL_NODE@310..311
-                INTEGER_SEGMENT@310..311 "1"
-            COMMA@311..312 ","
-            WHITESPACE@312..313 " "
-            LITERAL_EXPRESSION_NODE@313..314
-              INTEGER_LITERAL_NODE@313..314
-                INTEGER_SEGMENT@313..314 "2"
-            RIGHT_BRACKET@314..315 "]"
-          SEMICOLON@315..316 ";"
-          NEW_LINE@316..317 "\n"
-          WHITESPACE@317..321 "    "
-        EXPRESSION_STATEMENT_NODE@321..346
-          TUPLE_EXPRESSION_NODE@321..340
-            LEFT_PAREN@321..322 "("
-            LITERAL_EXPRESSION_NODE@322..324
-              INTEGER_LITERAL_NODE@322..324
-                INTEGER_SEGMENT@322..324 "42"
-            COMMA@324..325 ","
-            WHITESPACE@325..326 " "
-            LITERAL_EXPRESSION_NODE@326..333
-              STRING_LITERAL_NODE@326..333
-                STRING_START@326..327 "\""
-                STRING_LITERAL_SEGMENT_NODE@327..332
-                  STRING_SEGMENT@327..332 "hello"
-                STRING_END@332..333 "\""
-            COMMA@333..334 ","
-            WHITESPACE@334..335 " "
-            LITERAL_EXPRESSION_NODE@335..339
-              BOOLEAN_LITERAL_NODE@335..339
-                TRUE@335..339 "true"
-            RIGHT_PAREN@339..340 ")"
-          SEMICOLON@340..341 ";"
-          NEW_LINE@341..342 "\n"
-          WHITESPACE@342..346 "    "
-        EXPRESSION_STATEMENT_NODE@346..358
-          BLOCK_EXPRESSION_NODE@346..352
-            LEFT_BRACE@346..347 "{"
-            WHITESPACE@347..348 " "
-            EXPRESSION_STATEMENT_NODE@348..351
-              LITERAL_EXPRESSION_NODE@348..351
-                INTEGER_LITERAL_NODE@348..351
-                  INTEGER_SEGMENT@348..350 "42"
-                  WHITESPACE@350..351 " "
-            RIGHT_BRACE@351..352 "}"
-          SEMICOLON@352..353 ";"
-          NEW_LINE@353..354 "\n"
-          WHITESPACE@354..358 "    "
-        EXPRESSION_STATEMENT_NODE@358..369
-          FUNCTION_CALL_EXPRESSION_NODE@358..363
-            PATH_EXPRESSION_NODE@358..361
-              PATH_NODE@358..361
-                PATH_SEGMENT_IDENTIFIER_NODE@358..361
-                  IDENTIFIER_NODE@358..361
-                    IDENTIFIER_SEGMENT@358..361
-                      IDENTIFIER@358..361 "foo"
-            LEFT_PAREN@361..362
-              LEFT_PAREN@361..362 "("
-            RIGHT_PAREN@362..363 ")"
-          SEMICOLON@363..364 ";"
-          NEW_LINE@364..365 "\n"
-          WHITESPACE@365..369 "    "
-        EXPRESSION_STATEMENT_NODE@369..382
-          FIELD_EXPRESSION_NODE@369..376
-            PATH_EXPRESSION_NODE@369..372
-              PATH_NODE@369..372
-                PATH_SEGMENT_IDENTIFIER_NODE@369..372
-                  IDENTIFIER_NODE@369..372
-                    IDENTIFIER_SEGMENT@369..372
-                      IDENTIFIER@369..372 "foo"
-            DOT@372..373
-              DOT@372..373 "."
-            IDENTIFIER_NODE@373..376
-              IDENTIFIER_SEGMENT@373..376
-                IDENTIFIER@373..376 "bar"
-          SEMICOLON@376..377 ";"
-          NEW_LINE@377..378 "\n"
-          WHITESPACE@378..382 "    "
-        EXPRESSION_STATEMENT_NODE@382..397
-          METHOD_CALL_EXPRESSION_NODE@382..391
-            PATH_EXPRESSION_NODE@382..385
-              PATH_NODE@382..385
-                PATH_SEGMENT_IDENTIFIER_NODE@382..385
-                  IDENTIFIER_NODE@382..385
-                    IDENTIFIER_SEGMENT@382..385
-                      IDENTIFIER@382..385 "foo"
-            DOT@385..386
-              DOT@385..386 "."
-            IDENTIFIER_NODE@386..389
-              IDENTIFIER_SEGMENT@386..389
-                IDENTIFIER@386..389 "bar"
-            LEFT_PAREN@389..390 "("
-            RIGHT_PAREN@390..391 ")"
-          SEMICOLON@391..392 ";"
-          NEW_LINE@392..393 "\n"
-          WHITESPACE@393..397 "    "
-        EXPRESSION_STATEMENT_NODE@397..414
-          FIELD_EXPRESSION_NODE@397..408
-            FIELD_EXPRESSION_NODE@397..404
-              PATH_EXPRESSION_NODE@397..400
-                PATH_NODE@397..400
-                  PATH_SEGMENT_IDENTIFIER_NODE@397..400
-                    IDENTIFIER_NODE@397..400
-                      IDENTIFIER_SEGMENT@397..400
-                        IDENTIFIER@397..400 "foo"
-              DOT@400..401
-                DOT@400..401 "."
-              IDENTIFIER_NODE@401..404
-                IDENTIFIER_SEGMENT@401..404
-                  IDENTIFIER@401..404 "bar"
-            DOT@404..405
-              DOT@404..405 "."
-            IDENTIFIER_NODE@405..408
-              IDENTIFIER_SEGMENT@405..408
-                IDENTIFIER@405..408 "baz"
-          SEMICOLON@408..409 ";"
-          NEW_LINE@409..410 "\n"
-          WHITESPACE@410..414 "    "
-        EXPRESSION_STATEMENT_NODE@414..435
-          METHOD_CALL_EXPRESSION_NODE@414..429
-            METHOD_CALL_EXPRESSION_NODE@414..423
-              PATH_EXPRESSION_NODE@414..417
-                PATH_NODE@414..417
-                  PATH_SEGMENT_IDENTIFIER_NODE@414..417
-                    IDENTIFIER_NODE@414..417
-                      IDENTIFIER_SEGMENT@414..417
-                        IDENTIFIER@414..417 "foo"
-              DOT@417..418
-                DOT@417..418 "."
-              IDENTIFIER_NODE@418..421
-                IDENTIFIER_SEGMENT@418..421
-                  IDENTIFIER@418..421 "bar"
-              LEFT_PAREN@421..422 "("
-              RIGHT_PAREN@422..423 ")"
-            DOT@423..424
-              DOT@423..424 "."
-            IDENTIFIER_NODE@424..427
-              IDENTIFIER_SEGMENT@424..427
-                IDENTIFIER@424..427 "baz"
-            LEFT_PAREN@427..428 "("
-            RIGHT_PAREN@428..429 ")"
-          SEMICOLON@429..430 ";"
-          NEW_LINE@430..431 "\n"
-          WHITESPACE@431..435 "    "
-        EXPRESSION_STATEMENT_NODE@435..443
-          INDEX_EXPRESSION_NODE@435..441
-            PATH_EXPRESSION_NODE@435..438
-              PATH_NODE@435..438
-                PATH_SEGMENT_IDENTIFIER_NODE@435..438
-                  IDENTIFIER_NODE@435..438
-                    IDENTIFIER_SEGMENT@435..438
-                      IDENTIFIER@435..438 "foo"
-            LEFT_BRACKET@438..439
-              LEFT_BRACKET@438..439 "["
-            LITERAL_EXPRESSION_NODE@439..440
-              INTEGER_LITERAL_NODE@439..440
-                INTEGER_SEGMENT@439..440 "0"
-            RIGHT_BRACKET@440..441 "]"
-          SEMICOLON@441..442 ";"
-          NEW_LINE@442..443 "\n"
-        RIGHT_BRACE@443..444 "}"
+Some(
+    Krate {
+        attributes: [],
+        definitions: [
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Function {
+                    name: Identifier {
+                        name: "foo",
+                    },
+                    type_parameters: [],
+                    parameters: [],
+                    return_type: None,
+                    type_bounds: [],
+                    body: Some(
+                        [
+                            Expression {
+                                value: Expression {
+                                    kind: Break,
+                                },
+                            },
+                            Expression {
+                                value: Expression {
+                                    kind: Continue,
+                                },
+                            },
+                            Expression {
+                                value: Expression {
+                                    kind: Return {
+                                        value: None,
+                                    },
+                                },
+                            },
+                            Expression {
+                                value: Expression {
+                                    kind: For {
+                                        pattern: Path {
+                                            path: Path {
+                                                segments: [
+                                                    PathSegment {
+                                                        kind: Identifier(
+                                                            Identifier {
+                                                                name: "i",
+                                                            },
+                                                        ),
+                                                    },
+                                                ],
+                                            },
+                                        },
+                                        iterable: Expression {
+                                            kind: Path {
+                                                path: Path {
+                                                    segments: [
+                                                        PathSegment {
+                                                            kind: Identifier(
+                                                                Identifier {
+                                                                    name: "expr",
+                                                                },
+                                                            ),
+                                                        },
+                                                    ],
+                                                },
+                                            },
+                                        },
+                                        body: [],
+                                    },
+                                },
+                            },
+                            Expression {
+                                value: Expression {
+                                    kind: While {
+                                        condition: Expression {
+                                            kind: Literal {
+                                                value: Boolean {
+                                                    value: true,
+                                                },
+                                            },
+                                        },
+                                        body: [],
+                                    },
+                                },
+                            },
+                            Expression {
+                                value: Expression {
+                                    kind: Loop {
+                                        body: [],
+                                    },
+                                },
+                            },
+                            Expression {
+                                value: Expression {
+                                    kind: If {
+                                        condition: Expression {
+                                            kind: Literal {
+                                                value: Boolean {
+                                                    value: true,
+                                                },
+                                            },
+                                        },
+                                        then_branch: [],
+                                        else_branch: Some(
+                                            Expression {
+                                                kind: Literal {
+                                                    value: Boolean {
+                                                        value: true,
+                                                    },
+                                                },
+                                            },
+                                        ),
+                                    },
+                                },
+                            },
+                            Expression {
+                                value: Expression {
+                                    kind: If {
+                                        condition: Expression {
+                                            kind: Literal {
+                                                value: Boolean {
+                                                    value: true,
+                                                },
+                                            },
+                                        },
+                                        then_branch: [],
+                                        else_branch: Some(
+                                            Expression {
+                                                kind: Literal {
+                                                    value: Boolean {
+                                                        value: true,
+                                                    },
+                                                },
+                                            },
+                                        ),
+                                    },
+                                },
+                            },
+                            Expression {
+                                value: Expression {
+                                    kind: Match {
+                                        expression: Expression {
+                                            kind: Literal {
+                                                value: Integer {
+                                                    value: 42,
+                                                },
+                                            },
+                                        },
+                                        arms: [
+                                            (
+                                                Literal {
+                                                    value: Integer {
+                                                        value: 0,
+                                                    },
+                                                },
+                                                Expression {
+                                                    kind: Block {
+                                                        attributes: [],
+                                                        statements: [],
+                                                    },
+                                                },
+                                            ),
+                                            (
+                                                Or {
+                                                    patterns: [
+                                                        Literal {
+                                                            value: Integer {
+                                                                value: 1,
+                                                            },
+                                                        },
+                                                        Literal {
+                                                            value: Integer {
+                                                                value: 2,
+                                                            },
+                                                        },
+                                                    ],
+                                                },
+                                                Expression {
+                                                    kind: Block {
+                                                        attributes: [],
+                                                        statements: [],
+                                                    },
+                                                },
+                                            ),
+                                            (
+                                                At {
+                                                    name: Identifier {
+                                                        name: "foo",
+                                                    },
+                                                    pattern: Literal {
+                                                        value: Integer {
+                                                            value: 3,
+                                                        },
+                                                    },
+                                                },
+                                                Expression {
+                                                    kind: Block {
+                                                        attributes: [],
+                                                        statements: [],
+                                                    },
+                                                },
+                                            ),
+                                            (
+                                                Placeholder,
+                                                Expression {
+                                                    kind: Block {
+                                                        attributes: [],
+                                                        statements: [],
+                                                    },
+                                                },
+                                            ),
+                                        ],
+                                    },
+                                },
+                            },
+                            Let {
+                                pattern: Path {
+                                    path: Path {
+                                        segments: [
+                                            PathSegment {
+                                                kind: Identifier(
+                                                    Identifier {
+                                                        name: "x",
+                                                    },
+                                                ),
+                                            },
+                                        ],
+                                    },
+                                },
+                                type: None,
+                                initializer: None,
+                            },
+                            Let {
+                                pattern: Path {
+                                    path: Path {
+                                        segments: [
+                                            PathSegment {
+                                                kind: Identifier(
+                                                    Identifier {
+                                                        name: "x",
+                                                    },
+                                                ),
+                                            },
+                                        ],
+                                    },
+                                },
+                                type: Some(
+                                    Path {
+                                        path: Path {
+                                            segments: [
+                                                PathSegment {
+                                                    kind: Identifier(
+                                                        Identifier {
+                                                            name: "i32",
+                                                        },
+                                                    ),
+                                                },
+                                            ],
+                                        },
+                                    },
+                                ),
+                                initializer: None,
+                            },
+                            Let {
+                                pattern: Path {
+                                    path: Path {
+                                        segments: [
+                                            PathSegment {
+                                                kind: Identifier(
+                                                    Identifier {
+                                                        name: "x",
+                                                    },
+                                                ),
+                                            },
+                                        ],
+                                    },
+                                },
+                                type: None,
+                                initializer: Some(
+                                    Expression {
+                                        kind: Literal {
+                                            value: Integer {
+                                                value: 42,
+                                            },
+                                        },
+                                    },
+                                ),
+                            },
+                            Let {
+                                pattern: Path {
+                                    path: Path {
+                                        segments: [
+                                            PathSegment {
+                                                kind: Identifier(
+                                                    Identifier {
+                                                        name: "x",
+                                                    },
+                                                ),
+                                            },
+                                        ],
+                                    },
+                                },
+                                type: Some(
+                                    Path {
+                                        path: Path {
+                                            segments: [
+                                                PathSegment {
+                                                    kind: Identifier(
+                                                        Identifier {
+                                                            name: "i32",
+                                                        },
+                                                    ),
+                                                },
+                                            ],
+                                        },
+                                    },
+                                ),
+                                initializer: Some(
+                                    Expression {
+                                        kind: Literal {
+                                            value: Integer {
+                                                value: 42,
+                                            },
+                                        },
+                                    },
+                                ),
+                            },
+                            Expression {
+                                value: Expression {
+                                    kind: Array {
+                                        elements: [
+                                            Expression {
+                                                kind: Literal {
+                                                    value: Integer {
+                                                        value: 0,
+                                                    },
+                                                },
+                                            },
+                                            Expression {
+                                                kind: Literal {
+                                                    value: Integer {
+                                                        value: 1,
+                                                    },
+                                                },
+                                            },
+                                            Expression {
+                                                kind: Literal {
+                                                    value: Integer {
+                                                        value: 2,
+                                                    },
+                                                },
+                                            },
+                                        ],
+                                    },
+                                },
+                            },
+                            Expression {
+                                value: Expression {
+                                    kind: Tuple {
+                                        elements: [
+                                            Expression {
+                                                kind: Literal {
+                                                    value: Integer {
+                                                        value: 42,
+                                                    },
+                                                },
+                                            },
+                                            Expression {
+                                                kind: Literal {
+                                                    value: String {
+                                                        segments: [
+                                                            Text {
+                                                                value: "hello",
+                                                            },
+                                                        ],
+                                                    },
+                                                },
+                                            },
+                                            Expression {
+                                                kind: Literal {
+                                                    value: Boolean {
+                                                        value: true,
+                                                    },
+                                                },
+                                            },
+                                        ],
+                                    },
+                                },
+                            },
+                            Expression {
+                                value: Expression {
+                                    kind: Block {
+                                        attributes: [],
+                                        statements: [
+                                            Expression {
+                                                value: Expression {
+                                                    kind: Literal {
+                                                        value: Integer {
+                                                            value: 42,
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        ],
+                                    },
+                                },
+                            },
+                            Expression {
+                                value: Expression {
+                                    kind: FunctionCall {
+                                        callee: Expression {
+                                            kind: Path {
+                                                path: Path {
+                                                    segments: [
+                                                        PathSegment {
+                                                            kind: Identifier(
+                                                                Identifier {
+                                                                    name: "foo",
+                                                                },
+                                                            ),
+                                                        },
+                                                    ],
+                                                },
+                                            },
+                                        },
+                                        type_arguments: [],
+                                        arguments: [
+                                            Expression {
+                                                kind: Path {
+                                                    path: Path {
+                                                        segments: [
+                                                            PathSegment {
+                                                                kind: Identifier(
+                                                                    Identifier {
+                                                                        name: "foo",
+                                                                    },
+                                                                ),
+                                                            },
+                                                        ],
+                                                    },
+                                                },
+                                            },
+                                        ],
+                                    },
+                                },
+                            },
+                            Expression {
+                                value: Expression {
+                                    kind: Field {
+                                        receiver: Expression {
+                                            kind: Path {
+                                                path: Path {
+                                                    segments: [
+                                                        PathSegment {
+                                                            kind: Identifier(
+                                                                Identifier {
+                                                                    name: "foo",
+                                                                },
+                                                            ),
+                                                        },
+                                                    ],
+                                                },
+                                            },
+                                        },
+                                        field: Identifier {
+                                            name: "bar",
+                                        },
+                                    },
+                                },
+                            },
+                            Expression {
+                                value: Expression {
+                                    kind: MethodCall {
+                                        receiver: Expression {
+                                            kind: Path {
+                                                path: Path {
+                                                    segments: [
+                                                        PathSegment {
+                                                            kind: Identifier(
+                                                                Identifier {
+                                                                    name: "foo",
+                                                                },
+                                                            ),
+                                                        },
+                                                    ],
+                                                },
+                                            },
+                                        },
+                                        method: Identifier {
+                                            name: "bar",
+                                        },
+                                        type_arguments: [],
+                                        arguments: [
+                                            Expression {
+                                                kind: Path {
+                                                    path: Path {
+                                                        segments: [
+                                                            PathSegment {
+                                                                kind: Identifier(
+                                                                    Identifier {
+                                                                        name: "foo",
+                                                                    },
+                                                                ),
+                                                            },
+                                                        ],
+                                                    },
+                                                },
+                                            },
+                                        ],
+                                    },
+                                },
+                            },
+                            Expression {
+                                value: Expression {
+                                    kind: Field {
+                                        receiver: Expression {
+                                            kind: Field {
+                                                receiver: Expression {
+                                                    kind: Path {
+                                                        path: Path {
+                                                            segments: [
+                                                                PathSegment {
+                                                                    kind: Identifier(
+                                                                        Identifier {
+                                                                            name: "foo",
+                                                                        },
+                                                                    ),
+                                                                },
+                                                            ],
+                                                        },
+                                                    },
+                                                },
+                                                field: Identifier {
+                                                    name: "bar",
+                                                },
+                                            },
+                                        },
+                                        field: Identifier {
+                                            name: "baz",
+                                        },
+                                    },
+                                },
+                            },
+                            Expression {
+                                value: Expression {
+                                    kind: MethodCall {
+                                        receiver: Expression {
+                                            kind: MethodCall {
+                                                receiver: Expression {
+                                                    kind: Path {
+                                                        path: Path {
+                                                            segments: [
+                                                                PathSegment {
+                                                                    kind: Identifier(
+                                                                        Identifier {
+                                                                            name: "foo",
+                                                                        },
+                                                                    ),
+                                                                },
+                                                            ],
+                                                        },
+                                                    },
+                                                },
+                                                method: Identifier {
+                                                    name: "bar",
+                                                },
+                                                type_arguments: [],
+                                                arguments: [
+                                                    Expression {
+                                                        kind: Path {
+                                                            path: Path {
+                                                                segments: [
+                                                                    PathSegment {
+                                                                        kind: Identifier(
+                                                                            Identifier {
+                                                                                name: "foo",
+                                                                            },
+                                                                        ),
+                                                                    },
+                                                                ],
+                                                            },
+                                                        },
+                                                    },
+                                                ],
+                                            },
+                                        },
+                                        method: Identifier {
+                                            name: "baz",
+                                        },
+                                        type_arguments: [],
+                                        arguments: [
+                                            Expression {
+                                                kind: MethodCall {
+                                                    receiver: Expression {
+                                                        kind: Path {
+                                                            path: Path {
+                                                                segments: [
+                                                                    PathSegment {
+                                                                        kind: Identifier(
+                                                                            Identifier {
+                                                                                name: "foo",
+                                                                            },
+                                                                        ),
+                                                                    },
+                                                                ],
+                                                            },
+                                                        },
+                                                    },
+                                                    method: Identifier {
+                                                        name: "bar",
+                                                    },
+                                                    type_arguments: [],
+                                                    arguments: [
+                                                        Expression {
+                                                            kind: Path {
+                                                                path: Path {
+                                                                    segments: [
+                                                                        PathSegment {
+                                                                            kind: Identifier(
+                                                                                Identifier {
+                                                                                    name: "foo",
+                                                                                },
+                                                                            ),
+                                                                        },
+                                                                    ],
+                                                                },
+                                                            },
+                                                        },
+                                                    ],
+                                                },
+                                            },
+                                        ],
+                                    },
+                                },
+                            },
+                            Expression {
+                                value: Expression {
+                                    kind: Index {
+                                        collection: Expression {
+                                            kind: Path {
+                                                path: Path {
+                                                    segments: [
+                                                        PathSegment {
+                                                            kind: Identifier(
+                                                                Identifier {
+                                                                    name: "foo",
+                                                                },
+                                                            ),
+                                                        },
+                                                    ],
+                                                },
+                                            },
+                                        },
+                                        index: Expression {
+                                            kind: Path {
+                                                path: Path {
+                                                    segments: [
+                                                        PathSegment {
+                                                            kind: Identifier(
+                                                                Identifier {
+                                                                    name: "foo",
+                                                                },
+                                                            ),
+                                                        },
+                                                    ],
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                            Expression {
+                                value: Expression {
+                                    kind: Assignment {
+                                        left: Expression {
+                                            kind: Path {
+                                                path: Path {
+                                                    segments: [
+                                                        PathSegment {
+                                                            kind: Identifier(
+                                                                Identifier {
+                                                                    name: "foo",
+                                                                },
+                                                            ),
+                                                        },
+                                                    ],
+                                                },
+                                            },
+                                        },
+                                        operator: Add,
+                                        right: Expression {
+                                            kind: Path {
+                                                path: Path {
+                                                    segments: [
+                                                        PathSegment {
+                                                            kind: Identifier(
+                                                                Identifier {
+                                                                    name: "foo",
+                                                                },
+                                                            ),
+                                                        },
+                                                    ],
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        ],
+                    ),
+                },
+            },
+        ],
+        children: {},
+    },
+)

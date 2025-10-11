@@ -1,512 +1,668 @@
 ---
 source: compiler/danubec_parse/src/tests/mod.rs
-expression: events
+expression: node
 ---
-KRATE_NODE@0..354
-  NEW_LINE@0..1 "\n"
-  USE_DEFINITION_NODE@1..9
-    USE@1..4 "use"
-    WHITESPACE@4..5 " "
-    USE_TREE_NODE@5..7
-      USE_TREE_NESTED_NODE@5..7
-        LEFT_BRACE@5..6 "{"
-        RIGHT_BRACE@6..7 "}"
-    SEMICOLON@7..8 ";"
-    NEW_LINE@8..9 "\n"
-  USE_DEFINITION_NODE@9..65
-    USE@9..12 "use"
-    WHITESPACE@12..13 " "
-    USE_TREE_NODE@13..63
-      USE_TREE_NESTED_NODE@13..63
-        LEFT_BRACE@13..14 "{"
-        USE_TREE_NODE@14..16
-          USE_TREE_NESTED_NODE@14..16
-            LEFT_BRACE@14..15 "{"
-            RIGHT_BRACE@15..16 "}"
-        COMMA@16..17 ","
-        USE_TREE_NODE@17..18
-          USE_TREE_GLOB_NODE@17..18
-            ASTERISK@17..18 "*"
-        COMMA@18..19 ","
-        USE_TREE_NODE@19..22
-          USE_TREE_ELEMENT_NODE@19..22
-            PATH_NODE@19..22
-              PATH_SEGMENT_IDENTIFIER_NODE@19..22
-                IDENTIFIER_NODE@19..22
-                  IDENTIFIER_SEGMENT@19..22
-                    IDENTIFIER@19..22 "foo"
-        COMMA@22..23 ","
-        USE_TREE_NODE@23..33
-          USE_TREE_ELEMENT_NODE@23..33
-            PATH_NODE@23..27
-              PATH_SEGMENT_IDENTIFIER_NODE@23..27
-                IDENTIFIER_NODE@23..27
-                  IDENTIFIER_SEGMENT@23..27
-                    IDENTIFIER@23..26 "bar"
-                    WHITESPACE@26..27 " "
-            USE_TREE_RENAME_NODE@27..33
-              AS@27..29 "as"
-              WHITESPACE@29..30 " "
-              IDENTIFIER_NODE@30..33
-                IDENTIFIER_SEGMENT@30..33
-                  IDENTIFIER@30..33 "baz"
-        COMMA@33..34 ","
-        USE_TREE_NODE@34..38
-          PATH_SEGMENT_ROOT_NODE@34..36
-            COLON@34..35 ":"
-            COLON@35..36 ":"
-          USE_TREE_NESTED_NODE@36..38
-            LEFT_BRACE@36..37 "{"
-            RIGHT_BRACE@37..38 "}"
-        COMMA@38..39 ","
-        USE_TREE_NODE@39..42
-          PATH_SEGMENT_ROOT_NODE@39..41
-            COLON@39..40 ":"
-            COLON@40..41 ":"
-          USE_TREE_GLOB_NODE@41..42
-            ASTERISK@41..42 "*"
-        COMMA@42..43 ","
-        USE_TREE_NODE@43..48
-          PATH_SEGMENT_ROOT_NODE@43..45
-            COLON@43..44 ":"
-            COLON@44..45 ":"
-          USE_TREE_ELEMENT_NODE@45..48
-            PATH_NODE@45..48
-              PATH_SEGMENT_IDENTIFIER_NODE@45..48
-                IDENTIFIER_NODE@45..48
-                  IDENTIFIER_SEGMENT@45..48
-                    IDENTIFIER@45..48 "foo"
-        COMMA@48..49 ","
-        USE_TREE_NODE@49..61
-          PATH_SEGMENT_ROOT_NODE@49..51
-            COLON@49..50 ":"
-            COLON@50..51 ":"
-          USE_TREE_ELEMENT_NODE@51..61
-            PATH_NODE@51..55
-              PATH_SEGMENT_IDENTIFIER_NODE@51..55
-                IDENTIFIER_NODE@51..55
-                  IDENTIFIER_SEGMENT@51..55
-                    IDENTIFIER@51..54 "bar"
-                    WHITESPACE@54..55 " "
-            USE_TREE_RENAME_NODE@55..61
-              AS@55..57 "as"
-              WHITESPACE@57..58 " "
-              IDENTIFIER_NODE@58..61
-                IDENTIFIER_SEGMENT@58..61
-                  IDENTIFIER@58..61 "baz"
-        COMMA@61..62 ","
-        RIGHT_BRACE@62..63 "}"
-    SEMICOLON@63..64 ";"
-    NEW_LINE@64..65 "\n"
-  USE_DEFINITION_NODE@65..72
-    USE@65..68 "use"
-    WHITESPACE@68..69 " "
-    USE_TREE_NODE@69..70
-      USE_TREE_GLOB_NODE@69..70
-        ASTERISK@69..70 "*"
-    SEMICOLON@70..71 ";"
-    NEW_LINE@71..72 "\n"
-  USE_DEFINITION_NODE@72..81
-    USE@72..75 "use"
-    WHITESPACE@75..76 " "
-    USE_TREE_NODE@76..79
-      USE_TREE_ELEMENT_NODE@76..79
-        PATH_NODE@76..79
-          PATH_SEGMENT_IDENTIFIER_NODE@76..79
-            IDENTIFIER_NODE@76..79
-              IDENTIFIER_SEGMENT@76..79
-                IDENTIFIER@76..79 "foo"
-    SEMICOLON@79..80 ";"
-    NEW_LINE@80..81 "\n"
-  USE_DEFINITION_NODE@81..97
-    USE@81..84 "use"
-    WHITESPACE@84..85 " "
-    USE_TREE_NODE@85..95
-      USE_TREE_ELEMENT_NODE@85..95
-        PATH_NODE@85..89
-          PATH_SEGMENT_IDENTIFIER_NODE@85..89
-            IDENTIFIER_NODE@85..89
-              IDENTIFIER_SEGMENT@85..89
-                IDENTIFIER@85..88 "foo"
-                WHITESPACE@88..89 " "
-        USE_TREE_RENAME_NODE@89..95
-          AS@89..91 "as"
-          WHITESPACE@91..92 " "
-          IDENTIFIER_NODE@92..95
-            IDENTIFIER_SEGMENT@92..95
-              IDENTIFIER@92..95 "bar"
-    SEMICOLON@95..96 ";"
-    NEW_LINE@96..97 "\n"
-  USE_DEFINITION_NODE@97..110
-    USE@97..100 "use"
-    WHITESPACE@100..101 " "
-    USE_TREE_NODE@101..108
-      USE_TREE_ELEMENT_NODE@101..108
-        PATH_NODE@101..104
-          PATH_SEGMENT_IDENTIFIER_NODE@101..104
-            IDENTIFIER_NODE@101..104
-              IDENTIFIER_SEGMENT@101..104
-                IDENTIFIER@101..104 "foo"
-        USE_TREE_NESTED_NODE@104..108
-          COLON@104..105 ":"
-          COLON@105..106 ":"
-          LEFT_BRACE@106..107 "{"
-          RIGHT_BRACE@107..108 "}"
-    SEMICOLON@108..109 ";"
-    NEW_LINE@109..110 "\n"
-  USE_DEFINITION_NODE@110..171
-    USE@110..113 "use"
-    WHITESPACE@113..114 " "
-    USE_TREE_NODE@114..168
-      USE_TREE_ELEMENT_NODE@114..168
-        PATH_NODE@114..117
-          PATH_SEGMENT_IDENTIFIER_NODE@114..117
-            IDENTIFIER_NODE@114..117
-              IDENTIFIER_SEGMENT@114..117
-                IDENTIFIER@114..117 "foo"
-        USE_TREE_NESTED_NODE@117..168
-          COLON@117..118 ":"
-          COLON@118..119 ":"
-          LEFT_BRACE@119..120 "{"
-          USE_TREE_NODE@120..121
-            USE_TREE_GLOB_NODE@120..121
-              ASTERISK@120..121 "*"
-          COMMA@121..122 ","
-          USE_TREE_NODE@122..125
-            USE_TREE_ELEMENT_NODE@122..125
-              PATH_NODE@122..125
-                PATH_SEGMENT_IDENTIFIER_NODE@122..125
-                  IDENTIFIER_NODE@122..125
-                    IDENTIFIER_SEGMENT@122..125
-                      IDENTIFIER@122..125 "foo"
-          COMMA@125..126 ","
-          USE_TREE_NODE@126..136
-            USE_TREE_ELEMENT_NODE@126..136
-              PATH_NODE@126..130
-                PATH_SEGMENT_IDENTIFIER_NODE@126..130
-                  IDENTIFIER_NODE@126..130
-                    IDENTIFIER_SEGMENT@126..130
-                      IDENTIFIER@126..129 "bar"
-                      WHITESPACE@129..130 " "
-              USE_TREE_RENAME_NODE@130..136
-                AS@130..132 "as"
-                WHITESPACE@132..133 " "
-                IDENTIFIER_NODE@133..136
-                  IDENTIFIER_SEGMENT@133..136
-                    IDENTIFIER@133..136 "baz"
-          COMMA@136..137 ","
-          USE_TREE_NODE@137..139
-            USE_TREE_NESTED_NODE@137..139
-              LEFT_BRACE@137..138 "{"
-              RIGHT_BRACE@138..139 "}"
-          COMMA@139..140 ","
-          USE_TREE_NODE@140..143
-            PATH_SEGMENT_ROOT_NODE@140..142
-              COLON@140..141 ":"
-              COLON@141..142 ":"
-            USE_TREE_GLOB_NODE@142..143
-              ASTERISK@142..143 "*"
-          COMMA@143..144 ","
-          USE_TREE_NODE@144..149
-            PATH_SEGMENT_ROOT_NODE@144..146
-              COLON@144..145 ":"
-              COLON@145..146 ":"
-            USE_TREE_ELEMENT_NODE@146..149
-              PATH_NODE@146..149
-                PATH_SEGMENT_IDENTIFIER_NODE@146..149
-                  IDENTIFIER_NODE@146..149
-                    IDENTIFIER_SEGMENT@146..149
-                      IDENTIFIER@146..149 "foo"
-          COMMA@149..150 ","
-          USE_TREE_NODE@150..162
-            PATH_SEGMENT_ROOT_NODE@150..152
-              COLON@150..151 ":"
-              COLON@151..152 ":"
-            USE_TREE_ELEMENT_NODE@152..162
-              PATH_NODE@152..156
-                PATH_SEGMENT_IDENTIFIER_NODE@152..156
-                  IDENTIFIER_NODE@152..156
-                    IDENTIFIER_SEGMENT@152..156
-                      IDENTIFIER@152..155 "bar"
-                      WHITESPACE@155..156 " "
-              USE_TREE_RENAME_NODE@156..162
-                AS@156..158 "as"
-                WHITESPACE@158..159 " "
-                IDENTIFIER_NODE@159..162
-                  IDENTIFIER_SEGMENT@159..162
-                    IDENTIFIER@159..162 "baz"
-          COMMA@162..163 ","
-          USE_TREE_NODE@163..167
-            PATH_SEGMENT_ROOT_NODE@163..165
-              COLON@163..164 ":"
-              COLON@164..165 ":"
-            USE_TREE_NESTED_NODE@165..167
-              LEFT_BRACE@165..166 "{"
-              RIGHT_BRACE@166..167 "}"
-          RIGHT_BRACE@167..168 "}"
-    SEMICOLON@168..169 ";"
-    NEW_LINE@169..170 "\n"
-    NEW_LINE@170..171 "\n"
-  USE_DEFINITION_NODE@171..181
-    USE@171..174 "use"
-    WHITESPACE@174..175 " "
-    USE_TREE_NODE@175..179
-      PATH_SEGMENT_ROOT_NODE@175..177
-        COLON@175..176 ":"
-        COLON@176..177 ":"
-      USE_TREE_NESTED_NODE@177..179
-        LEFT_BRACE@177..178 "{"
-        RIGHT_BRACE@178..179 "}"
-    SEMICOLON@179..180 ";"
-    NEW_LINE@180..181 "\n"
-  USE_DEFINITION_NODE@181..239
-    USE@181..184 "use"
-    WHITESPACE@184..185 " "
-    USE_TREE_NODE@185..237
-      PATH_SEGMENT_ROOT_NODE@185..187
-        COLON@185..186 ":"
-        COLON@186..187 ":"
-      USE_TREE_NESTED_NODE@187..237
-        LEFT_BRACE@187..188 "{"
-        USE_TREE_NODE@188..190
-          USE_TREE_NESTED_NODE@188..190
-            LEFT_BRACE@188..189 "{"
-            RIGHT_BRACE@189..190 "}"
-        COMMA@190..191 ","
-        USE_TREE_NODE@191..192
-          USE_TREE_GLOB_NODE@191..192
-            ASTERISK@191..192 "*"
-        COMMA@192..193 ","
-        USE_TREE_NODE@193..196
-          USE_TREE_ELEMENT_NODE@193..196
-            PATH_NODE@193..196
-              PATH_SEGMENT_IDENTIFIER_NODE@193..196
-                IDENTIFIER_NODE@193..196
-                  IDENTIFIER_SEGMENT@193..196
-                    IDENTIFIER@193..196 "foo"
-        COMMA@196..197 ","
-        USE_TREE_NODE@197..207
-          USE_TREE_ELEMENT_NODE@197..207
-            PATH_NODE@197..201
-              PATH_SEGMENT_IDENTIFIER_NODE@197..201
-                IDENTIFIER_NODE@197..201
-                  IDENTIFIER_SEGMENT@197..201
-                    IDENTIFIER@197..200 "bar"
-                    WHITESPACE@200..201 " "
-            USE_TREE_RENAME_NODE@201..207
-              AS@201..203 "as"
-              WHITESPACE@203..204 " "
-              IDENTIFIER_NODE@204..207
-                IDENTIFIER_SEGMENT@204..207
-                  IDENTIFIER@204..207 "baz"
-        COMMA@207..208 ","
-        USE_TREE_NODE@208..212
-          PATH_SEGMENT_ROOT_NODE@208..210
-            COLON@208..209 ":"
-            COLON@209..210 ":"
-          USE_TREE_NESTED_NODE@210..212
-            LEFT_BRACE@210..211 "{"
-            RIGHT_BRACE@211..212 "}"
-        COMMA@212..213 ","
-        USE_TREE_NODE@213..216
-          PATH_SEGMENT_ROOT_NODE@213..215
-            COLON@213..214 ":"
-            COLON@214..215 ":"
-          USE_TREE_GLOB_NODE@215..216
-            ASTERISK@215..216 "*"
-        COMMA@216..217 ","
-        USE_TREE_NODE@217..222
-          PATH_SEGMENT_ROOT_NODE@217..219
-            COLON@217..218 ":"
-            COLON@218..219 ":"
-          USE_TREE_ELEMENT_NODE@219..222
-            PATH_NODE@219..222
-              PATH_SEGMENT_IDENTIFIER_NODE@219..222
-                IDENTIFIER_NODE@219..222
-                  IDENTIFIER_SEGMENT@219..222
-                    IDENTIFIER@219..222 "foo"
-        COMMA@222..223 ","
-        USE_TREE_NODE@223..235
-          PATH_SEGMENT_ROOT_NODE@223..225
-            COLON@223..224 ":"
-            COLON@224..225 ":"
-          USE_TREE_ELEMENT_NODE@225..235
-            PATH_NODE@225..229
-              PATH_SEGMENT_IDENTIFIER_NODE@225..229
-                IDENTIFIER_NODE@225..229
-                  IDENTIFIER_SEGMENT@225..229
-                    IDENTIFIER@225..228 "bar"
-                    WHITESPACE@228..229 " "
-            USE_TREE_RENAME_NODE@229..235
-              AS@229..231 "as"
-              WHITESPACE@231..232 " "
-              IDENTIFIER_NODE@232..235
-                IDENTIFIER_SEGMENT@232..235
-                  IDENTIFIER@232..235 "baz"
-        COMMA@235..236 ","
-        RIGHT_BRACE@236..237 "}"
-    SEMICOLON@237..238 ";"
-    NEW_LINE@238..239 "\n"
-  USE_DEFINITION_NODE@239..248
-    USE@239..242 "use"
-    WHITESPACE@242..243 " "
-    USE_TREE_NODE@243..246
-      PATH_SEGMENT_ROOT_NODE@243..245
-        COLON@243..244 ":"
-        COLON@244..245 ":"
-      USE_TREE_GLOB_NODE@245..246
-        ASTERISK@245..246 "*"
-    SEMICOLON@246..247 ";"
-    NEW_LINE@247..248 "\n"
-  USE_DEFINITION_NODE@248..259
-    USE@248..251 "use"
-    WHITESPACE@251..252 " "
-    USE_TREE_NODE@252..257
-      PATH_SEGMENT_ROOT_NODE@252..254
-        COLON@252..253 ":"
-        COLON@253..254 ":"
-      USE_TREE_ELEMENT_NODE@254..257
-        PATH_NODE@254..257
-          PATH_SEGMENT_IDENTIFIER_NODE@254..257
-            IDENTIFIER_NODE@254..257
-              IDENTIFIER_SEGMENT@254..257
-                IDENTIFIER@254..257 "foo"
-    SEMICOLON@257..258 ";"
-    NEW_LINE@258..259 "\n"
-  USE_DEFINITION_NODE@259..277
-    USE@259..262 "use"
-    WHITESPACE@262..263 " "
-    USE_TREE_NODE@263..275
-      PATH_SEGMENT_ROOT_NODE@263..265
-        COLON@263..264 ":"
-        COLON@264..265 ":"
-      USE_TREE_ELEMENT_NODE@265..275
-        PATH_NODE@265..269
-          PATH_SEGMENT_IDENTIFIER_NODE@265..269
-            IDENTIFIER_NODE@265..269
-              IDENTIFIER_SEGMENT@265..269
-                IDENTIFIER@265..268 "foo"
-                WHITESPACE@268..269 " "
-        USE_TREE_RENAME_NODE@269..275
-          AS@269..271 "as"
-          WHITESPACE@271..272 " "
-          IDENTIFIER_NODE@272..275
-            IDENTIFIER_SEGMENT@272..275
-              IDENTIFIER@272..275 "bar"
-    SEMICOLON@275..276 ";"
-    NEW_LINE@276..277 "\n"
-  USE_DEFINITION_NODE@277..292
-    USE@277..280 "use"
-    WHITESPACE@280..281 " "
-    USE_TREE_NODE@281..290
-      PATH_SEGMENT_ROOT_NODE@281..283
-        COLON@281..282 ":"
-        COLON@282..283 ":"
-      USE_TREE_ELEMENT_NODE@283..290
-        PATH_NODE@283..286
-          PATH_SEGMENT_IDENTIFIER_NODE@283..286
-            IDENTIFIER_NODE@283..286
-              IDENTIFIER_SEGMENT@283..286
-                IDENTIFIER@283..286 "foo"
-        USE_TREE_NESTED_NODE@286..290
-          COLON@286..287 ":"
-          COLON@287..288 ":"
-          LEFT_BRACE@288..289 "{"
-          RIGHT_BRACE@289..290 "}"
-    SEMICOLON@290..291 ";"
-    NEW_LINE@291..292 "\n"
-  USE_DEFINITION_NODE@292..354
-    USE@292..295 "use"
-    WHITESPACE@295..296 " "
-    USE_TREE_NODE@296..352
-      PATH_SEGMENT_ROOT_NODE@296..298
-        COLON@296..297 ":"
-        COLON@297..298 ":"
-      USE_TREE_ELEMENT_NODE@298..352
-        PATH_NODE@298..301
-          PATH_SEGMENT_IDENTIFIER_NODE@298..301
-            IDENTIFIER_NODE@298..301
-              IDENTIFIER_SEGMENT@298..301
-                IDENTIFIER@298..301 "foo"
-        USE_TREE_NESTED_NODE@301..352
-          COLON@301..302 ":"
-          COLON@302..303 ":"
-          LEFT_BRACE@303..304 "{"
-          USE_TREE_NODE@304..305
-            USE_TREE_GLOB_NODE@304..305
-              ASTERISK@304..305 "*"
-          COMMA@305..306 ","
-          USE_TREE_NODE@306..309
-            USE_TREE_ELEMENT_NODE@306..309
-              PATH_NODE@306..309
-                PATH_SEGMENT_IDENTIFIER_NODE@306..309
-                  IDENTIFIER_NODE@306..309
-                    IDENTIFIER_SEGMENT@306..309
-                      IDENTIFIER@306..309 "foo"
-          COMMA@309..310 ","
-          USE_TREE_NODE@310..320
-            USE_TREE_ELEMENT_NODE@310..320
-              PATH_NODE@310..314
-                PATH_SEGMENT_IDENTIFIER_NODE@310..314
-                  IDENTIFIER_NODE@310..314
-                    IDENTIFIER_SEGMENT@310..314
-                      IDENTIFIER@310..313 "bar"
-                      WHITESPACE@313..314 " "
-              USE_TREE_RENAME_NODE@314..320
-                AS@314..316 "as"
-                WHITESPACE@316..317 " "
-                IDENTIFIER_NODE@317..320
-                  IDENTIFIER_SEGMENT@317..320
-                    IDENTIFIER@317..320 "baz"
-          COMMA@320..321 ","
-          USE_TREE_NODE@321..323
-            USE_TREE_NESTED_NODE@321..323
-              LEFT_BRACE@321..322 "{"
-              RIGHT_BRACE@322..323 "}"
-          COMMA@323..324 ","
-          USE_TREE_NODE@324..327
-            PATH_SEGMENT_ROOT_NODE@324..326
-              COLON@324..325 ":"
-              COLON@325..326 ":"
-            USE_TREE_GLOB_NODE@326..327
-              ASTERISK@326..327 "*"
-          COMMA@327..328 ","
-          USE_TREE_NODE@328..333
-            PATH_SEGMENT_ROOT_NODE@328..330
-              COLON@328..329 ":"
-              COLON@329..330 ":"
-            USE_TREE_ELEMENT_NODE@330..333
-              PATH_NODE@330..333
-                PATH_SEGMENT_IDENTIFIER_NODE@330..333
-                  IDENTIFIER_NODE@330..333
-                    IDENTIFIER_SEGMENT@330..333
-                      IDENTIFIER@330..333 "foo"
-          COMMA@333..334 ","
-          USE_TREE_NODE@334..346
-            PATH_SEGMENT_ROOT_NODE@334..336
-              COLON@334..335 ":"
-              COLON@335..336 ":"
-            USE_TREE_ELEMENT_NODE@336..346
-              PATH_NODE@336..340
-                PATH_SEGMENT_IDENTIFIER_NODE@336..340
-                  IDENTIFIER_NODE@336..340
-                    IDENTIFIER_SEGMENT@336..340
-                      IDENTIFIER@336..339 "bar"
-                      WHITESPACE@339..340 " "
-              USE_TREE_RENAME_NODE@340..346
-                AS@340..342 "as"
-                WHITESPACE@342..343 " "
-                IDENTIFIER_NODE@343..346
-                  IDENTIFIER_SEGMENT@343..346
-                    IDENTIFIER@343..346 "baz"
-          COMMA@346..347 ","
-          USE_TREE_NODE@347..351
-            PATH_SEGMENT_ROOT_NODE@347..349
-              COLON@347..348 ":"
-              COLON@348..349 ":"
-            USE_TREE_NESTED_NODE@349..351
-              LEFT_BRACE@349..350 "{"
-              RIGHT_BRACE@350..351 "}"
-          RIGHT_BRACE@351..352 "}"
-    SEMICOLON@352..353 ";"
-    NEW_LINE@353..354 "\n"
+Some(
+    Krate {
+        attributes: [],
+        definitions: [
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Use {
+                    tree: UseTree {
+                        root: false,
+                        kind: Nested {
+                            trees: [],
+                        },
+                    },
+                },
+            },
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Use {
+                    tree: UseTree {
+                        root: false,
+                        kind: Nested {
+                            trees: [
+                                UseTree {
+                                    root: false,
+                                    kind: Nested {
+                                        trees: [],
+                                    },
+                                },
+                                UseTree {
+                                    root: false,
+                                    kind: Glob,
+                                },
+                                UseTree {
+                                    root: false,
+                                    kind: Element {
+                                        path: Path {
+                                            segments: [
+                                                PathSegment {
+                                                    kind: Identifier(
+                                                        Identifier {
+                                                            name: "foo",
+                                                        },
+                                                    ),
+                                                },
+                                            ],
+                                        },
+                                        trailing: Identifier,
+                                    },
+                                },
+                                UseTree {
+                                    root: false,
+                                    kind: Element {
+                                        path: Path {
+                                            segments: [
+                                                PathSegment {
+                                                    kind: Identifier(
+                                                        Identifier {
+                                                            name: "bar",
+                                                        },
+                                                    ),
+                                                },
+                                            ],
+                                        },
+                                        trailing: Rename {
+                                            name: Identifier {
+                                                name: "baz",
+                                            },
+                                        },
+                                    },
+                                },
+                                UseTree {
+                                    root: true,
+                                    kind: Nested {
+                                        trees: [],
+                                    },
+                                },
+                                UseTree {
+                                    root: true,
+                                    kind: Glob,
+                                },
+                                UseTree {
+                                    root: true,
+                                    kind: Element {
+                                        path: Path {
+                                            segments: [
+                                                PathSegment {
+                                                    kind: Identifier(
+                                                        Identifier {
+                                                            name: "foo",
+                                                        },
+                                                    ),
+                                                },
+                                            ],
+                                        },
+                                        trailing: Identifier,
+                                    },
+                                },
+                                UseTree {
+                                    root: true,
+                                    kind: Element {
+                                        path: Path {
+                                            segments: [
+                                                PathSegment {
+                                                    kind: Identifier(
+                                                        Identifier {
+                                                            name: "bar",
+                                                        },
+                                                    ),
+                                                },
+                                            ],
+                                        },
+                                        trailing: Rename {
+                                            name: Identifier {
+                                                name: "baz",
+                                            },
+                                        },
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                },
+            },
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Use {
+                    tree: UseTree {
+                        root: false,
+                        kind: Glob,
+                    },
+                },
+            },
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Use {
+                    tree: UseTree {
+                        root: false,
+                        kind: Element {
+                            path: Path {
+                                segments: [
+                                    PathSegment {
+                                        kind: Identifier(
+                                            Identifier {
+                                                name: "foo",
+                                            },
+                                        ),
+                                    },
+                                ],
+                            },
+                            trailing: Identifier,
+                        },
+                    },
+                },
+            },
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Use {
+                    tree: UseTree {
+                        root: false,
+                        kind: Element {
+                            path: Path {
+                                segments: [
+                                    PathSegment {
+                                        kind: Identifier(
+                                            Identifier {
+                                                name: "foo",
+                                            },
+                                        ),
+                                    },
+                                ],
+                            },
+                            trailing: Rename {
+                                name: Identifier {
+                                    name: "bar",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Use {
+                    tree: UseTree {
+                        root: false,
+                        kind: Element {
+                            path: Path {
+                                segments: [
+                                    PathSegment {
+                                        kind: Identifier(
+                                            Identifier {
+                                                name: "foo",
+                                            },
+                                        ),
+                                    },
+                                ],
+                            },
+                            trailing: Nested {
+                                trees: [],
+                            },
+                        },
+                    },
+                },
+            },
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Use {
+                    tree: UseTree {
+                        root: false,
+                        kind: Element {
+                            path: Path {
+                                segments: [
+                                    PathSegment {
+                                        kind: Identifier(
+                                            Identifier {
+                                                name: "foo",
+                                            },
+                                        ),
+                                    },
+                                ],
+                            },
+                            trailing: Nested {
+                                trees: [
+                                    UseTree {
+                                        root: false,
+                                        kind: Glob,
+                                    },
+                                    UseTree {
+                                        root: false,
+                                        kind: Element {
+                                            path: Path {
+                                                segments: [
+                                                    PathSegment {
+                                                        kind: Identifier(
+                                                            Identifier {
+                                                                name: "foo",
+                                                            },
+                                                        ),
+                                                    },
+                                                ],
+                                            },
+                                            trailing: Identifier,
+                                        },
+                                    },
+                                    UseTree {
+                                        root: false,
+                                        kind: Element {
+                                            path: Path {
+                                                segments: [
+                                                    PathSegment {
+                                                        kind: Identifier(
+                                                            Identifier {
+                                                                name: "bar",
+                                                            },
+                                                        ),
+                                                    },
+                                                ],
+                                            },
+                                            trailing: Rename {
+                                                name: Identifier {
+                                                    name: "baz",
+                                                },
+                                            },
+                                        },
+                                    },
+                                    UseTree {
+                                        root: false,
+                                        kind: Nested {
+                                            trees: [],
+                                        },
+                                    },
+                                    UseTree {
+                                        root: true,
+                                        kind: Glob,
+                                    },
+                                    UseTree {
+                                        root: true,
+                                        kind: Element {
+                                            path: Path {
+                                                segments: [
+                                                    PathSegment {
+                                                        kind: Identifier(
+                                                            Identifier {
+                                                                name: "foo",
+                                                            },
+                                                        ),
+                                                    },
+                                                ],
+                                            },
+                                            trailing: Identifier,
+                                        },
+                                    },
+                                    UseTree {
+                                        root: true,
+                                        kind: Element {
+                                            path: Path {
+                                                segments: [
+                                                    PathSegment {
+                                                        kind: Identifier(
+                                                            Identifier {
+                                                                name: "bar",
+                                                            },
+                                                        ),
+                                                    },
+                                                ],
+                                            },
+                                            trailing: Rename {
+                                                name: Identifier {
+                                                    name: "baz",
+                                                },
+                                            },
+                                        },
+                                    },
+                                    UseTree {
+                                        root: true,
+                                        kind: Nested {
+                                            trees: [],
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Use {
+                    tree: UseTree {
+                        root: true,
+                        kind: Nested {
+                            trees: [],
+                        },
+                    },
+                },
+            },
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Use {
+                    tree: UseTree {
+                        root: true,
+                        kind: Nested {
+                            trees: [
+                                UseTree {
+                                    root: false,
+                                    kind: Nested {
+                                        trees: [],
+                                    },
+                                },
+                                UseTree {
+                                    root: false,
+                                    kind: Glob,
+                                },
+                                UseTree {
+                                    root: false,
+                                    kind: Element {
+                                        path: Path {
+                                            segments: [
+                                                PathSegment {
+                                                    kind: Identifier(
+                                                        Identifier {
+                                                            name: "foo",
+                                                        },
+                                                    ),
+                                                },
+                                            ],
+                                        },
+                                        trailing: Identifier,
+                                    },
+                                },
+                                UseTree {
+                                    root: false,
+                                    kind: Element {
+                                        path: Path {
+                                            segments: [
+                                                PathSegment {
+                                                    kind: Identifier(
+                                                        Identifier {
+                                                            name: "bar",
+                                                        },
+                                                    ),
+                                                },
+                                            ],
+                                        },
+                                        trailing: Rename {
+                                            name: Identifier {
+                                                name: "baz",
+                                            },
+                                        },
+                                    },
+                                },
+                                UseTree {
+                                    root: true,
+                                    kind: Nested {
+                                        trees: [],
+                                    },
+                                },
+                                UseTree {
+                                    root: true,
+                                    kind: Glob,
+                                },
+                                UseTree {
+                                    root: true,
+                                    kind: Element {
+                                        path: Path {
+                                            segments: [
+                                                PathSegment {
+                                                    kind: Identifier(
+                                                        Identifier {
+                                                            name: "foo",
+                                                        },
+                                                    ),
+                                                },
+                                            ],
+                                        },
+                                        trailing: Identifier,
+                                    },
+                                },
+                                UseTree {
+                                    root: true,
+                                    kind: Element {
+                                        path: Path {
+                                            segments: [
+                                                PathSegment {
+                                                    kind: Identifier(
+                                                        Identifier {
+                                                            name: "bar",
+                                                        },
+                                                    ),
+                                                },
+                                            ],
+                                        },
+                                        trailing: Rename {
+                                            name: Identifier {
+                                                name: "baz",
+                                            },
+                                        },
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                },
+            },
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Use {
+                    tree: UseTree {
+                        root: true,
+                        kind: Glob,
+                    },
+                },
+            },
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Use {
+                    tree: UseTree {
+                        root: true,
+                        kind: Element {
+                            path: Path {
+                                segments: [
+                                    PathSegment {
+                                        kind: Identifier(
+                                            Identifier {
+                                                name: "foo",
+                                            },
+                                        ),
+                                    },
+                                ],
+                            },
+                            trailing: Identifier,
+                        },
+                    },
+                },
+            },
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Use {
+                    tree: UseTree {
+                        root: true,
+                        kind: Element {
+                            path: Path {
+                                segments: [
+                                    PathSegment {
+                                        kind: Identifier(
+                                            Identifier {
+                                                name: "foo",
+                                            },
+                                        ),
+                                    },
+                                ],
+                            },
+                            trailing: Rename {
+                                name: Identifier {
+                                    name: "bar",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Use {
+                    tree: UseTree {
+                        root: true,
+                        kind: Element {
+                            path: Path {
+                                segments: [
+                                    PathSegment {
+                                        kind: Identifier(
+                                            Identifier {
+                                                name: "foo",
+                                            },
+                                        ),
+                                    },
+                                ],
+                            },
+                            trailing: Nested {
+                                trees: [],
+                            },
+                        },
+                    },
+                },
+            },
+            Definition {
+                attributes: [],
+                visibility: Private,
+                kind: Use {
+                    tree: UseTree {
+                        root: true,
+                        kind: Element {
+                            path: Path {
+                                segments: [
+                                    PathSegment {
+                                        kind: Identifier(
+                                            Identifier {
+                                                name: "foo",
+                                            },
+                                        ),
+                                    },
+                                ],
+                            },
+                            trailing: Nested {
+                                trees: [
+                                    UseTree {
+                                        root: false,
+                                        kind: Glob,
+                                    },
+                                    UseTree {
+                                        root: false,
+                                        kind: Element {
+                                            path: Path {
+                                                segments: [
+                                                    PathSegment {
+                                                        kind: Identifier(
+                                                            Identifier {
+                                                                name: "foo",
+                                                            },
+                                                        ),
+                                                    },
+                                                ],
+                                            },
+                                            trailing: Identifier,
+                                        },
+                                    },
+                                    UseTree {
+                                        root: false,
+                                        kind: Element {
+                                            path: Path {
+                                                segments: [
+                                                    PathSegment {
+                                                        kind: Identifier(
+                                                            Identifier {
+                                                                name: "bar",
+                                                            },
+                                                        ),
+                                                    },
+                                                ],
+                                            },
+                                            trailing: Rename {
+                                                name: Identifier {
+                                                    name: "baz",
+                                                },
+                                            },
+                                        },
+                                    },
+                                    UseTree {
+                                        root: false,
+                                        kind: Nested {
+                                            trees: [],
+                                        },
+                                    },
+                                    UseTree {
+                                        root: true,
+                                        kind: Glob,
+                                    },
+                                    UseTree {
+                                        root: true,
+                                        kind: Element {
+                                            path: Path {
+                                                segments: [
+                                                    PathSegment {
+                                                        kind: Identifier(
+                                                            Identifier {
+                                                                name: "foo",
+                                                            },
+                                                        ),
+                                                    },
+                                                ],
+                                            },
+                                            trailing: Identifier,
+                                        },
+                                    },
+                                    UseTree {
+                                        root: true,
+                                        kind: Element {
+                                            path: Path {
+                                                segments: [
+                                                    PathSegment {
+                                                        kind: Identifier(
+                                                            Identifier {
+                                                                name: "bar",
+                                                            },
+                                                        ),
+                                                    },
+                                                ],
+                                            },
+                                            trailing: Rename {
+                                                name: Identifier {
+                                                    name: "baz",
+                                                },
+                                            },
+                                        },
+                                    },
+                                    UseTree {
+                                        root: true,
+                                        kind: Nested {
+                                            trees: [],
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+        ],
+        children: {},
+    },
+)

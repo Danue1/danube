@@ -10,6 +10,7 @@ members = [
 ]
 
 [workspace.dependencies]
+anyhow = "1.0.100"
 drop_bomb = "0.1.5"
 insta = "1.43.2"
 miette = { version = "7.6.0", features = ["fancy"] }
