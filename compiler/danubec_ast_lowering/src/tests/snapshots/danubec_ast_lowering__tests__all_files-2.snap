@@ -1,0 +1,246 @@
+---
+source: compiler/danubec_ast_lowering/src/tests/mod.rs
+expression: table
+---
+Table {
+    modules: SlotMap {
+        slots: [
+            Slot {
+                version: 0,
+                next_free: 0,
+            },
+            Slot {
+                version: 1,
+                value: Module {
+                    parent: None,
+                    scope: ScopeId(
+                        1v1,
+                    ),
+                    children: {
+                        Symbol(
+                            1,
+                        ): ModuleId(
+                            2v1,
+                        ),
+                        Symbol(
+                            0,
+                        ): ModuleId(
+                            4v1,
+                        ),
+                        Symbol(
+                            2,
+                        ): ModuleId(
+                            3v1,
+                        ),
+                    },
+                    imports: [],
+                    file: FileId(
+                        1v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Module {
+                    parent: Some(
+                        ModuleId(
+                            1v1,
+                        ),
+                    ),
+                    scope: ScopeId(
+                        2v1,
+                    ),
+                    children: {},
+                    imports: [],
+                    file: FileId(
+                        2v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Module {
+                    parent: Some(
+                        ModuleId(
+                            1v1,
+                        ),
+                    ),
+                    scope: ScopeId(
+                        3v1,
+                    ),
+                    children: {},
+                    imports: [],
+                    file: FileId(
+                        3v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Module {
+                    parent: Some(
+                        ModuleId(
+                            1v1,
+                        ),
+                    ),
+                    scope: ScopeId(
+                        4v1,
+                    ),
+                    children: {},
+                    imports: [],
+                    file: FileId(
+                        4v1,
+                    ),
+                },
+            },
+        ],
+        free_head: 5,
+        num_elems: 4,
+        _k: PhantomData<fn(danubec_ast_lowering::table::ModuleId) -> danubec_ast_lowering::table::ModuleId>,
+    },
+    scopes: SlotMap {
+        slots: [
+            Slot {
+                version: 0,
+                next_free: 0,
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    parent: None,
+                    kind: Module,
+                    values: {},
+                    types: {
+                        Symbol(
+                            1,
+                        ): DefinitionId(
+                            1v1,
+                        ),
+                        Symbol(
+                            2,
+                        ): DefinitionId(
+                            2v1,
+                        ),
+                        Symbol(
+                            0,
+                        ): DefinitionId(
+                            3v1,
+                        ),
+                    },
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    parent: Some(
+                        ScopeId(
+                            1v1,
+                        ),
+                    ),
+                    kind: Module,
+                    values: {},
+                    types: {},
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    parent: Some(
+                        ScopeId(
+                            1v1,
+                        ),
+                    ),
+                    kind: Module,
+                    values: {},
+                    types: {},
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    parent: Some(
+                        ScopeId(
+                            1v1,
+                        ),
+                    ),
+                    kind: Module,
+                    values: {},
+                    types: {},
+                },
+            },
+        ],
+        free_head: 5,
+        num_elems: 4,
+        _k: PhantomData<fn(danubec_ast_lowering::table::ScopeId) -> danubec_ast_lowering::table::ScopeId>,
+    },
+    imports: SlotMap {
+        slots: [
+            Slot {
+                version: 0,
+                next_free: 0,
+            },
+        ],
+        free_head: 1,
+        num_elems: 0,
+        _k: PhantomData<fn(danubec_ast_lowering::table::ImportId) -> danubec_ast_lowering::table::ImportId>,
+    },
+    definitions: SlotMap {
+        slots: [
+            Slot {
+                version: 0,
+                next_free: 0,
+            },
+            Slot {
+                version: 1,
+                value: Definition {
+                    parent_scope: ScopeId(
+                        1v1,
+                    ),
+                    name: Symbol(
+                        1,
+                    ),
+                    namespace: Type,
+                    kind: Module,
+                    file: FileId(
+                        1v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Definition {
+                    parent_scope: ScopeId(
+                        1v1,
+                    ),
+                    name: Symbol(
+                        2,
+                    ),
+                    namespace: Type,
+                    kind: Module,
+                    file: FileId(
+                        1v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Definition {
+                    parent_scope: ScopeId(
+                        1v1,
+                    ),
+                    name: Symbol(
+                        0,
+                    ),
+                    namespace: Type,
+                    kind: Module,
+                    file: FileId(
+                        1v1,
+                    ),
+                },
+            },
+        ],
+        free_head: 4,
+        num_elems: 3,
+        _k: PhantomData<fn(danubec_ast_lowering::table::DefinitionId) -> danubec_ast_lowering::table::DefinitionId>,
+    },
+}

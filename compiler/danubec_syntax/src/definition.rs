@@ -169,17 +169,10 @@ macro_rules! ast_node {
 }
 
 ast_node! {
-    /// The root of a krate.
-    struct Krate where KRATE_NODE;
-
-    nodes attributes -> TopLevelAttribute;
-    nodes definitions -> Definition;
-}
-
-ast_node! {
     /// A source file in a krate.
     struct Root where ROOT_NODE;
 
+    nodes attributes -> TopLevelAttribute;
     nodes definitions -> Definition;
 }
 

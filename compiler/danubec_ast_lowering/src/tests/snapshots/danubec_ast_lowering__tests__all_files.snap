@@ -1,0 +1,81 @@
+---
+source: compiler/danubec_ast_lowering/src/tests/mod.rs
+expression: fs
+---
+FileSystem {
+    inner: InnerFileSystem {
+        paths: SlotMap {
+            slots: [
+                Slot {
+                    version: 0,
+                    next_free: 0,
+                },
+                Slot {
+                    version: 1,
+                    value: "src/tests/fixtures/lib.dnb",
+                },
+                Slot {
+                    version: 1,
+                    value: "src/tests/fixtures/bar.dnb",
+                },
+                Slot {
+                    version: 1,
+                    value: "src/tests/fixtures/baz.dnb",
+                },
+                Slot {
+                    version: 1,
+                    value: "src/tests/fixtures/foo.dnb",
+                },
+            ],
+            free_head: 5,
+            num_elems: 4,
+            _k: PhantomData<fn(danubec_ast_lowering::file_system::FileId) -> danubec_ast_lowering::file_system::FileId>,
+        },
+        canonicals: SecondaryMap {
+            slots: [
+                Vacant,
+                Occupied {
+                    value: "/Users/danuel/Documents/internal/danube-lang/danube/compiler/danubec_ast_lowering/src/tests/fixtures/lib.dnb",
+                    version: 1,
+                },
+                Occupied {
+                    value: "/Users/danuel/Documents/internal/danube-lang/danube/compiler/danubec_ast_lowering/src/tests/fixtures/bar.dnb",
+                    version: 1,
+                },
+                Occupied {
+                    value: "/Users/danuel/Documents/internal/danube-lang/danube/compiler/danubec_ast_lowering/src/tests/fixtures/baz.dnb",
+                    version: 1,
+                },
+                Occupied {
+                    value: "/Users/danuel/Documents/internal/danube-lang/danube/compiler/danubec_ast_lowering/src/tests/fixtures/foo.dnb",
+                    version: 1,
+                },
+            ],
+            num_elems: 4,
+            _k: PhantomData<fn(danubec_ast_lowering::file_system::FileId) -> danubec_ast_lowering::file_system::FileId>,
+        },
+        files: SecondaryMap {
+            slots: [
+                Vacant,
+                Occupied {
+                    value: "mod foo;\nmod bar;\nmod baz;\n",
+                    version: 1,
+                },
+                Occupied {
+                    value: "",
+                    version: 1,
+                },
+                Occupied {
+                    value: "",
+                    version: 1,
+                },
+                Occupied {
+                    value: "",
+                    version: 1,
+                },
+            ],
+            num_elems: 4,
+            _k: PhantomData<fn(danubec_ast_lowering::file_system::FileId) -> danubec_ast_lowering::file_system::FileId>,
+        },
+    },
+}

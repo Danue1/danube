@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
+  "compiler/danubec_ast_lowering",
   "compiler/danubec_ast",
   "compiler/danubec_diagnostic",
   "compiler/danubec_lex",
@@ -13,8 +14,10 @@ members = [
 [workspace.dependencies]
 anyhow = "1.0.100"
 drop_bomb = "0.1.5"
+indexmap = "2.11.4"
 insta = "1.43.2"
 miette = { version = "7.6.0", features = ["fancy"] }
 once_cell = "1.21.3"
 rowan = "0.16.1"
+slotmap = "1.0.7"
 unicode-ident = "1.0.19"

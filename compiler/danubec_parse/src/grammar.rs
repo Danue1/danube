@@ -147,13 +147,13 @@ macro_rules! current {
     };
 }
 
-pub(crate) fn krate(p: &mut Context) {
+pub(crate) fn root(p: &mut Context) {
     let m = p.start();
 
     top_level_attributes(p);
     definitions(p);
 
-    p.complete(m, KRATE_NODE);
+    p.complete(m, ROOT_NODE);
 }
 
 pub(crate) fn top_level_attributes(p: &mut Context) {

@@ -1,0 +1,11 @@
+---
+source: compiler/danubec_ast_lowering/src/tests/mod.rs
+expression: symbols
+---
+SymbolInterner {
+    inner: {
+        "foo",
+        "bar",
+        "baz",
+    },
+}

@@ -278,8 +278,6 @@ pub enum SyntaxKind {
     /// Any node that represents an error in the syntax tree
     ERROR_NODE,
 
-    // Root Nodes in the parser
-    KRATE_NODE,
     // A source file in a krate.
     ROOT_NODE,
 

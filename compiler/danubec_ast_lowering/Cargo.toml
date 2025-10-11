@@ -1,12 +1,13 @@
 [package]
-name = "danubec_parse"
+name = "danubec_ast_lowering"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
 danubec_diagnostic.path = "../danubec_diagnostic"
-danubec_lex.path = "../danubec_lex"
+danubec_parse.path = "../danubec_parse"
 danubec_syntax.path = "../danubec_syntax"
-drop_bomb.workspace = true
+indexmap.workspace = true
 insta.workspace = true
 miette.workspace = true
+slotmap.workspace = true

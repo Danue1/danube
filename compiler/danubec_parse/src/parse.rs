@@ -1,6 +1,6 @@
 use crate::{
     event::Event,
-    grammar::{Context, krate},
+    grammar::{Context, root},
 };
 use danubec_diagnostic::Diagnostic;
 use danubec_lex::lex;
@@ -10,7 +10,7 @@ pub fn parse(source: &str, diagnostic: &mut Diagnostic) -> SyntaxNode {
     let mut parse = |tokens: &[_]| {
         let tokens: Vec<_> = tokens.iter().map(|&(kind, _)| kind).collect();
         let mut context = Context::new(&tokens, diagnostic);
-        krate(&mut context);
+        root(&mut context);
 
         context.finish()
     };
