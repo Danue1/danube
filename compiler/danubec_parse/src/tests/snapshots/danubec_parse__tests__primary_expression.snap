@@ -2,1742 +2,472 @@
 source: compiler/danubec_parse/src/tests/mod.rs
 expression: node
 ---
-Some(
-    Krate {
-        attributes: [],
-        definitions: [
-            Definition {
-                attributes: [],
-                visibility: Private,
-                kind: Function {
-                    name: Identifier {
-                        name: Ident {
-                            hash: Hash64(
-                                4506850079084802999,
-                            ),
-                            raw: "foo",
-                        },
-                        span: SyntaxNodePtr {
-                            kind: IDENTIFIER_NODE,
-                            range: 4..7,
-                        },
-                    },
-                    type_parameters: [],
-                    parameters: [],
-                    return_type: None,
-                    type_bounds: [],
-                    body: Some(
-                        [
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: Break,
-                                        span: SyntaxNodePtr {
-                                            kind: BREAK_EXPRESSION_NODE,
-                                            range: 16..21,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 16..27,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: Continue,
-                                        span: SyntaxNodePtr {
-                                            kind: CONTINUE_EXPRESSION_NODE,
-                                            range: 27..35,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 27..41,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: Return {
-                                            value: None,
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: RETURN_EXPRESSION_NODE,
-                                            range: 41..47,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 41..53,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: For {
-                                            pattern: Pattern {
-                                                kind: Path {
-                                                    path: Path {
-                                                        segments: [
-                                                            PathSegment {
-                                                                kind: Identifier(
-                                                                    Identifier {
-                                                                        name: Ident {
-                                                                            hash: Hash64(
-                                                                                3644493224532480526,
-                                                                            ),
-                                                                            raw: "i",
-                                                                        },
-                                                                        span: SyntaxNodePtr {
-                                                                            kind: IDENTIFIER_NODE,
-                                                                            range: 57..59,
-                                                                        },
-                                                                    },
-                                                                ),
-                                                                span: SyntaxNodePtr {
-                                                                    kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                                    range: 57..59,
-                                                                },
-                                                            },
-                                                        ],
-                                                        span: SyntaxNodePtr {
-                                                            kind: PATH_NODE,
-                                                            range: 57..59,
-                                                        },
-                                                    },
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: PATH_PATTERN_NODE,
-                                                    range: 57..59,
-                                                },
-                                            },
-                                            iterable: Expression {
-                                                kind: Path {
-                                                    path: Path {
-                                                        segments: [
-                                                            PathSegment {
-                                                                kind: Identifier(
-                                                                    Identifier {
-                                                                        name: Ident {
-                                                                            hash: Hash64(
-                                                                                6258150132132877961,
-                                                                            ),
-                                                                            raw: "expr",
-                                                                        },
-                                                                        span: SyntaxNodePtr {
-                                                                            kind: IDENTIFIER_NODE,
-                                                                            range: 62..67,
-                                                                        },
-                                                                    },
-                                                                ),
-                                                                span: SyntaxNodePtr {
-                                                                    kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                                    range: 62..67,
-                                                                },
-                                                            },
-                                                        ],
-                                                        span: SyntaxNodePtr {
-                                                            kind: PATH_NODE,
-                                                            range: 62..67,
-                                                        },
-                                                    },
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: PATH_EXPRESSION_NODE,
-                                                    range: 62..67,
-                                                },
-                                            },
-                                            body: [],
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: FOR_EXPRESSION_NODE,
-                                            range: 53..74,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 53..74,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: While {
-                                            condition: Expression {
-                                                kind: Literal {
-                                                    value: Literal {
-                                                        kind: Boolean {
-                                                            value: true,
-                                                        },
-                                                        span: SyntaxNodePtr {
-                                                            kind: BOOLEAN_LITERAL_NODE,
-                                                            range: 80..85,
-                                                        },
-                                                    },
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: LITERAL_EXPRESSION_NODE,
-                                                    range: 80..85,
-                                                },
-                                            },
-                                            body: [],
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: WHILE_EXPRESSION_NODE,
-                                            range: 74..92,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 74..92,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: Loop {
-                                            body: [],
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: LOOP_EXPRESSION_NODE,
-                                            range: 92..104,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 92..104,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: If {
-                                            condition: Expression {
-                                                kind: Literal {
-                                                    value: Literal {
-                                                        kind: Boolean {
-                                                            value: true,
-                                                        },
-                                                        span: SyntaxNodePtr {
-                                                            kind: BOOLEAN_LITERAL_NODE,
-                                                            range: 107..112,
-                                                        },
-                                                    },
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: LITERAL_EXPRESSION_NODE,
-                                                    range: 107..112,
-                                                },
-                                            },
-                                            then_branch: [],
-                                            else_branch: Some(
-                                                Expression {
-                                                    kind: Literal {
-                                                        value: Literal {
-                                                            kind: Boolean {
-                                                                value: true,
-                                                            },
-                                                            span: SyntaxNodePtr {
-                                                                kind: BOOLEAN_LITERAL_NODE,
-                                                                range: 107..112,
-                                                            },
-                                                        },
-                                                    },
-                                                    span: SyntaxNodePtr {
-                                                        kind: LITERAL_EXPRESSION_NODE,
-                                                        range: 107..112,
-                                                    },
-                                                },
-                                            ),
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: IF_EXPRESSION_NODE,
-                                            range: 104..119,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 104..119,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: If {
-                                            condition: Expression {
-                                                kind: Literal {
-                                                    value: Literal {
-                                                        kind: Boolean {
-                                                            value: true,
-                                                        },
-                                                        span: SyntaxNodePtr {
-                                                            kind: BOOLEAN_LITERAL_NODE,
-                                                            range: 122..127,
-                                                        },
-                                                    },
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: LITERAL_EXPRESSION_NODE,
-                                                    range: 122..127,
-                                                },
-                                            },
-                                            then_branch: [],
-                                            else_branch: Some(
-                                                Expression {
-                                                    kind: Literal {
-                                                        value: Literal {
-                                                            kind: Boolean {
-                                                                value: true,
-                                                            },
-                                                            span: SyntaxNodePtr {
-                                                                kind: BOOLEAN_LITERAL_NODE,
-                                                                range: 122..127,
-                                                            },
-                                                        },
-                                                    },
-                                                    span: SyntaxNodePtr {
-                                                        kind: LITERAL_EXPRESSION_NODE,
-                                                        range: 122..127,
-                                                    },
-                                                },
-                                            ),
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: IF_EXPRESSION_NODE,
-                                            range: 119..142,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 119..142,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: Match {
-                                            expression: Expression {
-                                                kind: Literal {
-                                                    value: Literal {
-                                                        kind: Integer {
-                                                            value: 42,
-                                                        },
-                                                        span: SyntaxNodePtr {
-                                                            kind: INTEGER_LITERAL_NODE,
-                                                            range: 148..151,
-                                                        },
-                                                    },
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: LITERAL_EXPRESSION_NODE,
-                                                    range: 148..151,
-                                                },
-                                            },
-                                            arms: [
-                                                (
-                                                    Pattern {
-                                                        kind: Literal {
-                                                            value: Literal {
-                                                                kind: Integer {
-                                                                    value: 0,
-                                                                },
-                                                                span: SyntaxNodePtr {
-                                                                    kind: INTEGER_LITERAL_NODE,
-                                                                    range: 161..163,
-                                                                },
-                                                            },
-                                                        },
-                                                        span: SyntaxNodePtr {
-                                                            kind: LITERAL_PATTERN_NODE,
-                                                            range: 161..163,
-                                                        },
-                                                    },
-                                                    Expression {
-                                                        kind: Block {
-                                                            attributes: [],
-                                                            statements: [],
-                                                        },
-                                                        span: SyntaxNodePtr {
-                                                            kind: BLOCK_EXPRESSION_NODE,
-                                                            range: 166..168,
-                                                        },
-                                                    },
-                                                ),
-                                                (
-                                                    Pattern {
-                                                        kind: Or {
-                                                            patterns: [
-                                                                Pattern {
-                                                                    kind: Literal {
-                                                                        value: Literal {
-                                                                            kind: Integer {
-                                                                                value: 1,
-                                                                            },
-                                                                            span: SyntaxNodePtr {
-                                                                                kind: INTEGER_LITERAL_NODE,
-                                                                                range: 178..180,
-                                                                            },
-                                                                        },
-                                                                    },
-                                                                    span: SyntaxNodePtr {
-                                                                        kind: LITERAL_PATTERN_NODE,
-                                                                        range: 178..180,
-                                                                    },
-                                                                },
-                                                                Pattern {
-                                                                    kind: Literal {
-                                                                        value: Literal {
-                                                                            kind: Integer {
-                                                                                value: 2,
-                                                                            },
-                                                                            span: SyntaxNodePtr {
-                                                                                kind: INTEGER_LITERAL_NODE,
-                                                                                range: 182..184,
-                                                                            },
-                                                                        },
-                                                                    },
-                                                                    span: SyntaxNodePtr {
-                                                                        kind: LITERAL_PATTERN_NODE,
-                                                                        range: 182..184,
-                                                                    },
-                                                                },
-                                                            ],
-                                                        },
-                                                        span: SyntaxNodePtr {
-                                                            kind: OR_PATTERN_NODE,
-                                                            range: 178..184,
-                                                        },
-                                                    },
-                                                    Expression {
-                                                        kind: Block {
-                                                            attributes: [],
-                                                            statements: [],
-                                                        },
-                                                        span: SyntaxNodePtr {
-                                                            kind: BLOCK_EXPRESSION_NODE,
-                                                            range: 187..189,
-                                                        },
-                                                    },
-                                                ),
-                                                (
-                                                    Pattern {
-                                                        kind: At {
-                                                            name: Identifier {
-                                                                name: Ident {
-                                                                    hash: Hash64(
-                                                                        4506850079084802999,
-                                                                    ),
-                                                                    raw: "foo",
-                                                                },
-                                                                span: SyntaxNodePtr {
-                                                                    kind: IDENTIFIER_NODE,
-                                                                    range: 199..203,
-                                                                },
-                                                            },
-                                                            pattern: Pattern {
-                                                                kind: Literal {
-                                                                    value: Literal {
-                                                                        kind: Integer {
-                                                                            value: 3,
-                                                                        },
-                                                                        span: SyntaxNodePtr {
-                                                                            kind: INTEGER_LITERAL_NODE,
-                                                                            range: 205..207,
-                                                                        },
-                                                                    },
-                                                                },
-                                                                span: SyntaxNodePtr {
-                                                                    kind: LITERAL_PATTERN_NODE,
-                                                                    range: 205..207,
-                                                                },
-                                                            },
-                                                        },
-                                                        span: SyntaxNodePtr {
-                                                            kind: AT_PATTERN_NODE,
-                                                            range: 199..207,
-                                                        },
-                                                    },
-                                                    Expression {
-                                                        kind: Block {
-                                                            attributes: [],
-                                                            statements: [],
-                                                        },
-                                                        span: SyntaxNodePtr {
-                                                            kind: BLOCK_EXPRESSION_NODE,
-                                                            range: 210..212,
-                                                        },
-                                                    },
-                                                ),
-                                                (
-                                                    Pattern {
-                                                        kind: Placeholder,
-                                                        span: SyntaxNodePtr {
-                                                            kind: PLACEHOLDER_PATTERN_NODE,
-                                                            range: 222..224,
-                                                        },
-                                                    },
-                                                    Expression {
-                                                        kind: Block {
-                                                            attributes: [],
-                                                            statements: [],
-                                                        },
-                                                        span: SyntaxNodePtr {
-                                                            kind: BLOCK_EXPRESSION_NODE,
-                                                            range: 227..229,
-                                                        },
-                                                    },
-                                                ),
-                                            ],
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: MATCH_EXPRESSION_NODE,
-                                            range: 142..241,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 142..241,
-                                },
-                            },
-                            Statement {
-                                kind: Let {
-                                    pattern: Pattern {
-                                        kind: Path {
-                                            path: Path {
-                                                segments: [
-                                                    PathSegment {
-                                                        kind: Identifier(
-                                                            Identifier {
-                                                                name: Ident {
-                                                                    hash: Hash64(
-                                                                        8312289520117458465,
-                                                                    ),
-                                                                    raw: "x",
-                                                                },
-                                                                span: SyntaxNodePtr {
-                                                                    kind: IDENTIFIER_NODE,
-                                                                    range: 245..246,
-                                                                },
-                                                            },
-                                                        ),
-                                                        span: SyntaxNodePtr {
-                                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                            range: 245..246,
-                                                        },
-                                                    },
-                                                ],
-                                                span: SyntaxNodePtr {
-                                                    kind: PATH_NODE,
-                                                    range: 245..246,
-                                                },
-                                            },
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: PATH_PATTERN_NODE,
-                                            range: 245..246,
-                                        },
-                                    },
-                                    type: None,
-                                    initializer: None,
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: LET_STATEMENT_NODE,
-                                    range: 241..252,
-                                },
-                            },
-                            Statement {
-                                kind: Let {
-                                    pattern: Pattern {
-                                        kind: Path {
-                                            path: Path {
-                                                segments: [
-                                                    PathSegment {
-                                                        kind: Identifier(
-                                                            Identifier {
-                                                                name: Ident {
-                                                                    hash: Hash64(
-                                                                        8312289520117458465,
-                                                                    ),
-                                                                    raw: "x",
-                                                                },
-                                                                span: SyntaxNodePtr {
-                                                                    kind: IDENTIFIER_NODE,
-                                                                    range: 256..257,
-                                                                },
-                                                            },
-                                                        ),
-                                                        span: SyntaxNodePtr {
-                                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                            range: 256..257,
-                                                        },
-                                                    },
-                                                ],
-                                                span: SyntaxNodePtr {
-                                                    kind: PATH_NODE,
-                                                    range: 256..257,
-                                                },
-                                            },
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: PATH_PATTERN_NODE,
-                                            range: 256..257,
-                                        },
-                                    },
-                                    type: Some(
-                                        TypeExpression {
-                                            kind: Path {
-                                                path: Path {
-                                                    segments: [
-                                                        PathSegment {
-                                                            kind: Identifier(
-                                                                Identifier {
-                                                                    name: Ident {
-                                                                        hash: Hash64(
-                                                                            1851586956637574266,
-                                                                        ),
-                                                                        raw: "i32",
-                                                                    },
-                                                                    span: SyntaxNodePtr {
-                                                                        kind: IDENTIFIER_NODE,
-                                                                        range: 259..262,
-                                                                    },
-                                                                },
-                                                            ),
-                                                            span: SyntaxNodePtr {
-                                                                kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                                range: 259..262,
-                                                            },
-                                                        },
-                                                    ],
-                                                    span: SyntaxNodePtr {
-                                                        kind: PATH_NODE,
-                                                        range: 259..262,
-                                                    },
-                                                },
-                                            },
-                                            span: SyntaxNodePtr {
-                                                kind: PATH_TYPE_NODE,
-                                                range: 259..262,
-                                            },
-                                        },
-                                    ),
-                                    initializer: None,
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: LET_STATEMENT_NODE,
-                                    range: 252..268,
-                                },
-                            },
-                            Statement {
-                                kind: Let {
-                                    pattern: Pattern {
-                                        kind: Path {
-                                            path: Path {
-                                                segments: [
-                                                    PathSegment {
-                                                        kind: Identifier(
-                                                            Identifier {
-                                                                name: Ident {
-                                                                    hash: Hash64(
-                                                                        8312289520117458465,
-                                                                    ),
-                                                                    raw: "x",
-                                                                },
-                                                                span: SyntaxNodePtr {
-                                                                    kind: IDENTIFIER_NODE,
-                                                                    range: 272..274,
-                                                                },
-                                                            },
-                                                        ),
-                                                        span: SyntaxNodePtr {
-                                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                            range: 272..274,
-                                                        },
-                                                    },
-                                                ],
-                                                span: SyntaxNodePtr {
-                                                    kind: PATH_NODE,
-                                                    range: 272..274,
-                                                },
-                                            },
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: PATH_PATTERN_NODE,
-                                            range: 272..274,
-                                        },
-                                    },
-                                    type: None,
-                                    initializer: Some(
-                                        Expression {
-                                            kind: Literal {
-                                                value: Literal {
-                                                    kind: Integer {
-                                                        value: 42,
-                                                    },
-                                                    span: SyntaxNodePtr {
-                                                        kind: INTEGER_LITERAL_NODE,
-                                                        range: 276..278,
-                                                    },
-                                                },
-                                            },
-                                            span: SyntaxNodePtr {
-                                                kind: LITERAL_EXPRESSION_NODE,
-                                                range: 276..278,
-                                            },
-                                        },
-                                    ),
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: LET_STATEMENT_NODE,
-                                    range: 268..284,
-                                },
-                            },
-                            Statement {
-                                kind: Let {
-                                    pattern: Pattern {
-                                        kind: Path {
-                                            path: Path {
-                                                segments: [
-                                                    PathSegment {
-                                                        kind: Identifier(
-                                                            Identifier {
-                                                                name: Ident {
-                                                                    hash: Hash64(
-                                                                        8312289520117458465,
-                                                                    ),
-                                                                    raw: "x",
-                                                                },
-                                                                span: SyntaxNodePtr {
-                                                                    kind: IDENTIFIER_NODE,
-                                                                    range: 288..289,
-                                                                },
-                                                            },
-                                                        ),
-                                                        span: SyntaxNodePtr {
-                                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                            range: 288..289,
-                                                        },
-                                                    },
-                                                ],
-                                                span: SyntaxNodePtr {
-                                                    kind: PATH_NODE,
-                                                    range: 288..289,
-                                                },
-                                            },
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: PATH_PATTERN_NODE,
-                                            range: 288..289,
-                                        },
-                                    },
-                                    type: Some(
-                                        TypeExpression {
-                                            kind: Path {
-                                                path: Path {
-                                                    segments: [
-                                                        PathSegment {
-                                                            kind: Identifier(
-                                                                Identifier {
-                                                                    name: Ident {
-                                                                        hash: Hash64(
-                                                                            1851586956637574266,
-                                                                        ),
-                                                                        raw: "i32",
-                                                                    },
-                                                                    span: SyntaxNodePtr {
-                                                                        kind: IDENTIFIER_NODE,
-                                                                        range: 291..295,
-                                                                    },
-                                                                },
-                                                            ),
-                                                            span: SyntaxNodePtr {
-                                                                kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                                range: 291..295,
-                                                            },
-                                                        },
-                                                    ],
-                                                    span: SyntaxNodePtr {
-                                                        kind: PATH_NODE,
-                                                        range: 291..295,
-                                                    },
-                                                },
-                                            },
-                                            span: SyntaxNodePtr {
-                                                kind: PATH_TYPE_NODE,
-                                                range: 291..295,
-                                            },
-                                        },
-                                    ),
-                                    initializer: Some(
-                                        Expression {
-                                            kind: Literal {
-                                                value: Literal {
-                                                    kind: Integer {
-                                                        value: 42,
-                                                    },
-                                                    span: SyntaxNodePtr {
-                                                        kind: INTEGER_LITERAL_NODE,
-                                                        range: 297..299,
-                                                    },
-                                                },
-                                            },
-                                            span: SyntaxNodePtr {
-                                                kind: LITERAL_EXPRESSION_NODE,
-                                                range: 297..299,
-                                            },
-                                        },
-                                    ),
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: LET_STATEMENT_NODE,
-                                    range: 284..305,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: Array {
-                                            elements: [
-                                                Expression {
-                                                    kind: Literal {
-                                                        value: Literal {
-                                                            kind: Integer {
-                                                                value: 0,
-                                                            },
-                                                            span: SyntaxNodePtr {
-                                                                kind: INTEGER_LITERAL_NODE,
-                                                                range: 306..307,
-                                                            },
-                                                        },
-                                                    },
-                                                    span: SyntaxNodePtr {
-                                                        kind: LITERAL_EXPRESSION_NODE,
-                                                        range: 306..307,
-                                                    },
-                                                },
-                                                Expression {
-                                                    kind: Literal {
-                                                        value: Literal {
-                                                            kind: Integer {
-                                                                value: 1,
-                                                            },
-                                                            span: SyntaxNodePtr {
-                                                                kind: INTEGER_LITERAL_NODE,
-                                                                range: 309..310,
-                                                            },
-                                                        },
-                                                    },
-                                                    span: SyntaxNodePtr {
-                                                        kind: LITERAL_EXPRESSION_NODE,
-                                                        range: 309..310,
-                                                    },
-                                                },
-                                                Expression {
-                                                    kind: Literal {
-                                                        value: Literal {
-                                                            kind: Integer {
-                                                                value: 2,
-                                                            },
-                                                            span: SyntaxNodePtr {
-                                                                kind: INTEGER_LITERAL_NODE,
-                                                                range: 312..313,
-                                                            },
-                                                        },
-                                                    },
-                                                    span: SyntaxNodePtr {
-                                                        kind: LITERAL_EXPRESSION_NODE,
-                                                        range: 312..313,
-                                                    },
-                                                },
-                                            ],
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: ARRAY_EXPRESSION_NODE,
-                                            range: 305..314,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 305..320,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: Tuple {
-                                            elements: [
-                                                Expression {
-                                                    kind: Literal {
-                                                        value: Literal {
-                                                            kind: Integer {
-                                                                value: 42,
-                                                            },
-                                                            span: SyntaxNodePtr {
-                                                                kind: INTEGER_LITERAL_NODE,
-                                                                range: 321..323,
-                                                            },
-                                                        },
-                                                    },
-                                                    span: SyntaxNodePtr {
-                                                        kind: LITERAL_EXPRESSION_NODE,
-                                                        range: 321..323,
-                                                    },
-                                                },
-                                                Expression {
-                                                    kind: Literal {
-                                                        value: Literal {
-                                                            kind: String {
-                                                                segments: [
-                                                                    Text {
-                                                                        value: "hello",
-                                                                    },
-                                                                ],
-                                                            },
-                                                            span: SyntaxNodePtr {
-                                                                kind: STRING_LITERAL_NODE,
-                                                                range: 325..332,
-                                                            },
-                                                        },
-                                                    },
-                                                    span: SyntaxNodePtr {
-                                                        kind: LITERAL_EXPRESSION_NODE,
-                                                        range: 325..332,
-                                                    },
-                                                },
-                                                Expression {
-                                                    kind: Literal {
-                                                        value: Literal {
-                                                            kind: Boolean {
-                                                                value: true,
-                                                            },
-                                                            span: SyntaxNodePtr {
-                                                                kind: BOOLEAN_LITERAL_NODE,
-                                                                range: 334..338,
-                                                            },
-                                                        },
-                                                    },
-                                                    span: SyntaxNodePtr {
-                                                        kind: LITERAL_EXPRESSION_NODE,
-                                                        range: 334..338,
-                                                    },
-                                                },
-                                            ],
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: TUPLE_EXPRESSION_NODE,
-                                            range: 320..339,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 320..345,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: Block {
-                                            attributes: [],
-                                            statements: [
-                                                Statement {
-                                                    kind: Expression {
-                                                        value: Expression {
-                                                            kind: Literal {
-                                                                value: Literal {
-                                                                    kind: Integer {
-                                                                        value: 42,
-                                                                    },
-                                                                    span: SyntaxNodePtr {
-                                                                        kind: INTEGER_LITERAL_NODE,
-                                                                        range: 347..350,
-                                                                    },
-                                                                },
-                                                            },
-                                                            span: SyntaxNodePtr {
-                                                                kind: LITERAL_EXPRESSION_NODE,
-                                                                range: 347..350,
-                                                            },
-                                                        },
-                                                    },
-                                                    span: SyntaxNodePtr {
-                                                        kind: EXPRESSION_STATEMENT_NODE,
-                                                        range: 347..350,
-                                                    },
-                                                },
-                                            ],
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: BLOCK_EXPRESSION_NODE,
-                                            range: 345..351,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 345..357,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: FunctionCall {
-                                            callee: Expression {
-                                                kind: Path {
-                                                    path: Path {
-                                                        segments: [
-                                                            PathSegment {
-                                                                kind: Identifier(
-                                                                    Identifier {
-                                                                        name: Ident {
-                                                                            hash: Hash64(
-                                                                                4506850079084802999,
-                                                                            ),
-                                                                            raw: "foo",
-                                                                        },
-                                                                        span: SyntaxNodePtr {
-                                                                            kind: IDENTIFIER_NODE,
-                                                                            range: 357..360,
-                                                                        },
-                                                                    },
-                                                                ),
-                                                                span: SyntaxNodePtr {
-                                                                    kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                                    range: 357..360,
-                                                                },
-                                                            },
-                                                        ],
-                                                        span: SyntaxNodePtr {
-                                                            kind: PATH_NODE,
-                                                            range: 357..360,
-                                                        },
-                                                    },
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: PATH_EXPRESSION_NODE,
-                                                    range: 357..360,
-                                                },
-                                            },
-                                            type_arguments: [],
-                                            arguments: [
-                                                Expression {
-                                                    kind: Path {
-                                                        path: Path {
-                                                            segments: [
-                                                                PathSegment {
-                                                                    kind: Identifier(
-                                                                        Identifier {
-                                                                            name: Ident {
-                                                                                hash: Hash64(
-                                                                                    4506850079084802999,
-                                                                                ),
-                                                                                raw: "foo",
-                                                                            },
-                                                                            span: SyntaxNodePtr {
-                                                                                kind: IDENTIFIER_NODE,
-                                                                                range: 357..360,
-                                                                            },
-                                                                        },
-                                                                    ),
-                                                                    span: SyntaxNodePtr {
-                                                                        kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                                        range: 357..360,
-                                                                    },
-                                                                },
-                                                            ],
-                                                            span: SyntaxNodePtr {
-                                                                kind: PATH_NODE,
-                                                                range: 357..360,
-                                                            },
-                                                        },
-                                                    },
-                                                    span: SyntaxNodePtr {
-                                                        kind: PATH_EXPRESSION_NODE,
-                                                        range: 357..360,
-                                                    },
-                                                },
-                                            ],
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: FUNCTION_CALL_EXPRESSION_NODE,
-                                            range: 357..362,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 357..368,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: Field {
-                                            receiver: Expression {
-                                                kind: Path {
-                                                    path: Path {
-                                                        segments: [
-                                                            PathSegment {
-                                                                kind: Identifier(
-                                                                    Identifier {
-                                                                        name: Ident {
-                                                                            hash: Hash64(
-                                                                                4506850079084802999,
-                                                                            ),
-                                                                            raw: "foo",
-                                                                        },
-                                                                        span: SyntaxNodePtr {
-                                                                            kind: IDENTIFIER_NODE,
-                                                                            range: 368..371,
-                                                                        },
-                                                                    },
-                                                                ),
-                                                                span: SyntaxNodePtr {
-                                                                    kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                                    range: 368..371,
-                                                                },
-                                                            },
-                                                        ],
-                                                        span: SyntaxNodePtr {
-                                                            kind: PATH_NODE,
-                                                            range: 368..371,
-                                                        },
-                                                    },
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: PATH_EXPRESSION_NODE,
-                                                    range: 368..371,
-                                                },
-                                            },
-                                            field: Identifier {
-                                                name: Ident {
-                                                    hash: Hash64(
-                                                        3676438629107045207,
-                                                    ),
-                                                    raw: "bar",
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: IDENTIFIER_NODE,
-                                                    range: 372..375,
-                                                },
-                                            },
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: FIELD_EXPRESSION_NODE,
-                                            range: 368..375,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 368..381,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: MethodCall {
-                                            receiver: Expression {
-                                                kind: Path {
-                                                    path: Path {
-                                                        segments: [
-                                                            PathSegment {
-                                                                kind: Identifier(
-                                                                    Identifier {
-                                                                        name: Ident {
-                                                                            hash: Hash64(
-                                                                                4506850079084802999,
-                                                                            ),
-                                                                            raw: "foo",
-                                                                        },
-                                                                        span: SyntaxNodePtr {
-                                                                            kind: IDENTIFIER_NODE,
-                                                                            range: 381..384,
-                                                                        },
-                                                                    },
-                                                                ),
-                                                                span: SyntaxNodePtr {
-                                                                    kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                                    range: 381..384,
-                                                                },
-                                                            },
-                                                        ],
-                                                        span: SyntaxNodePtr {
-                                                            kind: PATH_NODE,
-                                                            range: 381..384,
-                                                        },
-                                                    },
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: PATH_EXPRESSION_NODE,
-                                                    range: 381..384,
-                                                },
-                                            },
-                                            method: Identifier {
-                                                name: Ident {
-                                                    hash: Hash64(
-                                                        3676438629107045207,
-                                                    ),
-                                                    raw: "bar",
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: IDENTIFIER_NODE,
-                                                    range: 385..388,
-                                                },
-                                            },
-                                            type_arguments: [],
-                                            arguments: [
-                                                Expression {
-                                                    kind: Path {
-                                                        path: Path {
-                                                            segments: [
-                                                                PathSegment {
-                                                                    kind: Identifier(
-                                                                        Identifier {
-                                                                            name: Ident {
-                                                                                hash: Hash64(
-                                                                                    4506850079084802999,
-                                                                                ),
-                                                                                raw: "foo",
-                                                                            },
-                                                                            span: SyntaxNodePtr {
-                                                                                kind: IDENTIFIER_NODE,
-                                                                                range: 381..384,
-                                                                            },
-                                                                        },
-                                                                    ),
-                                                                    span: SyntaxNodePtr {
-                                                                        kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                                        range: 381..384,
-                                                                    },
-                                                                },
-                                                            ],
-                                                            span: SyntaxNodePtr {
-                                                                kind: PATH_NODE,
-                                                                range: 381..384,
-                                                            },
-                                                        },
-                                                    },
-                                                    span: SyntaxNodePtr {
-                                                        kind: PATH_EXPRESSION_NODE,
-                                                        range: 381..384,
-                                                    },
-                                                },
-                                            ],
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: METHOD_CALL_EXPRESSION_NODE,
-                                            range: 381..390,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 381..396,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: Field {
-                                            receiver: Expression {
-                                                kind: Field {
-                                                    receiver: Expression {
-                                                        kind: Path {
-                                                            path: Path {
-                                                                segments: [
-                                                                    PathSegment {
-                                                                        kind: Identifier(
-                                                                            Identifier {
-                                                                                name: Ident {
-                                                                                    hash: Hash64(
-                                                                                        4506850079084802999,
-                                                                                    ),
-                                                                                    raw: "foo",
-                                                                                },
-                                                                                span: SyntaxNodePtr {
-                                                                                    kind: IDENTIFIER_NODE,
-                                                                                    range: 396..399,
-                                                                                },
-                                                                            },
-                                                                        ),
-                                                                        span: SyntaxNodePtr {
-                                                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                                            range: 396..399,
-                                                                        },
-                                                                    },
-                                                                ],
-                                                                span: SyntaxNodePtr {
-                                                                    kind: PATH_NODE,
-                                                                    range: 396..399,
-                                                                },
-                                                            },
-                                                        },
-                                                        span: SyntaxNodePtr {
-                                                            kind: PATH_EXPRESSION_NODE,
-                                                            range: 396..399,
-                                                        },
-                                                    },
-                                                    field: Identifier {
-                                                        name: Ident {
-                                                            hash: Hash64(
-                                                                3676438629107045207,
-                                                            ),
-                                                            raw: "bar",
-                                                        },
-                                                        span: SyntaxNodePtr {
-                                                            kind: IDENTIFIER_NODE,
-                                                            range: 400..403,
-                                                        },
-                                                    },
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: FIELD_EXPRESSION_NODE,
-                                                    range: 396..403,
-                                                },
-                                            },
-                                            field: Identifier {
-                                                name: Ident {
-                                                    hash: Hash64(
-                                                        16260972211344176173,
-                                                    ),
-                                                    raw: "baz",
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: IDENTIFIER_NODE,
-                                                    range: 404..407,
-                                                },
-                                            },
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: FIELD_EXPRESSION_NODE,
-                                            range: 396..407,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 396..413,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: MethodCall {
-                                            receiver: Expression {
-                                                kind: MethodCall {
-                                                    receiver: Expression {
-                                                        kind: Path {
-                                                            path: Path {
-                                                                segments: [
-                                                                    PathSegment {
-                                                                        kind: Identifier(
-                                                                            Identifier {
-                                                                                name: Ident {
-                                                                                    hash: Hash64(
-                                                                                        4506850079084802999,
-                                                                                    ),
-                                                                                    raw: "foo",
-                                                                                },
-                                                                                span: SyntaxNodePtr {
-                                                                                    kind: IDENTIFIER_NODE,
-                                                                                    range: 413..416,
-                                                                                },
-                                                                            },
-                                                                        ),
-                                                                        span: SyntaxNodePtr {
-                                                                            kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                                            range: 413..416,
-                                                                        },
-                                                                    },
-                                                                ],
-                                                                span: SyntaxNodePtr {
-                                                                    kind: PATH_NODE,
-                                                                    range: 413..416,
-                                                                },
-                                                            },
-                                                        },
-                                                        span: SyntaxNodePtr {
-                                                            kind: PATH_EXPRESSION_NODE,
-                                                            range: 413..416,
-                                                        },
-                                                    },
-                                                    method: Identifier {
-                                                        name: Ident {
-                                                            hash: Hash64(
-                                                                3676438629107045207,
-                                                            ),
-                                                            raw: "bar",
-                                                        },
-                                                        span: SyntaxNodePtr {
-                                                            kind: IDENTIFIER_NODE,
-                                                            range: 417..420,
-                                                        },
-                                                    },
-                                                    type_arguments: [],
-                                                    arguments: [
-                                                        Expression {
-                                                            kind: Path {
-                                                                path: Path {
-                                                                    segments: [
-                                                                        PathSegment {
-                                                                            kind: Identifier(
-                                                                                Identifier {
-                                                                                    name: Ident {
-                                                                                        hash: Hash64(
-                                                                                            4506850079084802999,
-                                                                                        ),
-                                                                                        raw: "foo",
-                                                                                    },
-                                                                                    span: SyntaxNodePtr {
-                                                                                        kind: IDENTIFIER_NODE,
-                                                                                        range: 413..416,
-                                                                                    },
-                                                                                },
-                                                                            ),
-                                                                            span: SyntaxNodePtr {
-                                                                                kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                                                range: 413..416,
-                                                                            },
-                                                                        },
-                                                                    ],
-                                                                    span: SyntaxNodePtr {
-                                                                        kind: PATH_NODE,
-                                                                        range: 413..416,
-                                                                    },
-                                                                },
-                                                            },
-                                                            span: SyntaxNodePtr {
-                                                                kind: PATH_EXPRESSION_NODE,
-                                                                range: 413..416,
-                                                            },
-                                                        },
-                                                    ],
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: METHOD_CALL_EXPRESSION_NODE,
-                                                    range: 413..422,
-                                                },
-                                            },
-                                            method: Identifier {
-                                                name: Ident {
-                                                    hash: Hash64(
-                                                        16260972211344176173,
-                                                    ),
-                                                    raw: "baz",
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: IDENTIFIER_NODE,
-                                                    range: 423..426,
-                                                },
-                                            },
-                                            type_arguments: [],
-                                            arguments: [
-                                                Expression {
-                                                    kind: MethodCall {
-                                                        receiver: Expression {
-                                                            kind: Path {
-                                                                path: Path {
-                                                                    segments: [
-                                                                        PathSegment {
-                                                                            kind: Identifier(
-                                                                                Identifier {
-                                                                                    name: Ident {
-                                                                                        hash: Hash64(
-                                                                                            4506850079084802999,
-                                                                                        ),
-                                                                                        raw: "foo",
-                                                                                    },
-                                                                                    span: SyntaxNodePtr {
-                                                                                        kind: IDENTIFIER_NODE,
-                                                                                        range: 413..416,
-                                                                                    },
-                                                                                },
-                                                                            ),
-                                                                            span: SyntaxNodePtr {
-                                                                                kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                                                range: 413..416,
-                                                                            },
-                                                                        },
-                                                                    ],
-                                                                    span: SyntaxNodePtr {
-                                                                        kind: PATH_NODE,
-                                                                        range: 413..416,
-                                                                    },
-                                                                },
-                                                            },
-                                                            span: SyntaxNodePtr {
-                                                                kind: PATH_EXPRESSION_NODE,
-                                                                range: 413..416,
-                                                            },
-                                                        },
-                                                        method: Identifier {
-                                                            name: Ident {
-                                                                hash: Hash64(
-                                                                    3676438629107045207,
-                                                                ),
-                                                                raw: "bar",
-                                                            },
-                                                            span: SyntaxNodePtr {
-                                                                kind: IDENTIFIER_NODE,
-                                                                range: 417..420,
-                                                            },
-                                                        },
-                                                        type_arguments: [],
-                                                        arguments: [
-                                                            Expression {
-                                                                kind: Path {
-                                                                    path: Path {
-                                                                        segments: [
-                                                                            PathSegment {
-                                                                                kind: Identifier(
-                                                                                    Identifier {
-                                                                                        name: Ident {
-                                                                                            hash: Hash64(
-                                                                                                4506850079084802999,
-                                                                                            ),
-                                                                                            raw: "foo",
-                                                                                        },
-                                                                                        span: SyntaxNodePtr {
-                                                                                            kind: IDENTIFIER_NODE,
-                                                                                            range: 413..416,
-                                                                                        },
-                                                                                    },
-                                                                                ),
-                                                                                span: SyntaxNodePtr {
-                                                                                    kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                                                    range: 413..416,
-                                                                                },
-                                                                            },
-                                                                        ],
-                                                                        span: SyntaxNodePtr {
-                                                                            kind: PATH_NODE,
-                                                                            range: 413..416,
-                                                                        },
-                                                                    },
-                                                                },
-                                                                span: SyntaxNodePtr {
-                                                                    kind: PATH_EXPRESSION_NODE,
-                                                                    range: 413..416,
-                                                                },
-                                                            },
-                                                        ],
-                                                    },
-                                                    span: SyntaxNodePtr {
-                                                        kind: METHOD_CALL_EXPRESSION_NODE,
-                                                        range: 413..422,
-                                                    },
-                                                },
-                                            ],
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: METHOD_CALL_EXPRESSION_NODE,
-                                            range: 413..428,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 413..434,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: Index {
-                                            collection: Expression {
-                                                kind: Path {
-                                                    path: Path {
-                                                        segments: [
-                                                            PathSegment {
-                                                                kind: Identifier(
-                                                                    Identifier {
-                                                                        name: Ident {
-                                                                            hash: Hash64(
-                                                                                4506850079084802999,
-                                                                            ),
-                                                                            raw: "foo",
-                                                                        },
-                                                                        span: SyntaxNodePtr {
-                                                                            kind: IDENTIFIER_NODE,
-                                                                            range: 434..437,
-                                                                        },
-                                                                    },
-                                                                ),
-                                                                span: SyntaxNodePtr {
-                                                                    kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                                    range: 434..437,
-                                                                },
-                                                            },
-                                                        ],
-                                                        span: SyntaxNodePtr {
-                                                            kind: PATH_NODE,
-                                                            range: 434..437,
-                                                        },
-                                                    },
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: PATH_EXPRESSION_NODE,
-                                                    range: 434..437,
-                                                },
-                                            },
-                                            index: Expression {
-                                                kind: Path {
-                                                    path: Path {
-                                                        segments: [
-                                                            PathSegment {
-                                                                kind: Identifier(
-                                                                    Identifier {
-                                                                        name: Ident {
-                                                                            hash: Hash64(
-                                                                                4506850079084802999,
-                                                                            ),
-                                                                            raw: "foo",
-                                                                        },
-                                                                        span: SyntaxNodePtr {
-                                                                            kind: IDENTIFIER_NODE,
-                                                                            range: 434..437,
-                                                                        },
-                                                                    },
-                                                                ),
-                                                                span: SyntaxNodePtr {
-                                                                    kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                                    range: 434..437,
-                                                                },
-                                                            },
-                                                        ],
-                                                        span: SyntaxNodePtr {
-                                                            kind: PATH_NODE,
-                                                            range: 434..437,
-                                                        },
-                                                    },
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: PATH_EXPRESSION_NODE,
-                                                    range: 434..437,
-                                                },
-                                            },
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: INDEX_EXPRESSION_NODE,
-                                            range: 434..440,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 434..446,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: Assignment {
-                                            left: Expression {
-                                                kind: Path {
-                                                    path: Path {
-                                                        segments: [
-                                                            PathSegment {
-                                                                kind: Identifier(
-                                                                    Identifier {
-                                                                        name: Ident {
-                                                                            hash: Hash64(
-                                                                                4506850079084802999,
-                                                                            ),
-                                                                            raw: "foo",
-                                                                        },
-                                                                        span: SyntaxNodePtr {
-                                                                            kind: IDENTIFIER_NODE,
-                                                                            range: 446..450,
-                                                                        },
-                                                                    },
-                                                                ),
-                                                                span: SyntaxNodePtr {
-                                                                    kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                                    range: 446..450,
-                                                                },
-                                                            },
-                                                        ],
-                                                        span: SyntaxNodePtr {
-                                                            kind: PATH_NODE,
-                                                            range: 446..450,
-                                                        },
-                                                    },
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: PATH_EXPRESSION_NODE,
-                                                    range: 446..450,
-                                                },
-                                            },
-                                            operator: Add,
-                                            right: Expression {
-                                                kind: Path {
-                                                    path: Path {
-                                                        segments: [
-                                                            PathSegment {
-                                                                kind: Identifier(
-                                                                    Identifier {
-                                                                        name: Ident {
-                                                                            hash: Hash64(
-                                                                                4506850079084802999,
-                                                                            ),
-                                                                            raw: "foo",
-                                                                        },
-                                                                        span: SyntaxNodePtr {
-                                                                            kind: IDENTIFIER_NODE,
-                                                                            range: 446..450,
-                                                                        },
-                                                                    },
-                                                                ),
-                                                                span: SyntaxNodePtr {
-                                                                    kind: PATH_SEGMENT_IDENTIFIER_NODE,
-                                                                    range: 446..450,
-                                                                },
-                                                            },
-                                                        ],
-                                                        span: SyntaxNodePtr {
-                                                            kind: PATH_NODE,
-                                                            range: 446..450,
-                                                        },
-                                                    },
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: PATH_EXPRESSION_NODE,
-                                                    range: 446..450,
-                                                },
-                                            },
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: ASSIGNMENT_EXPRESSION_NODE,
-                                            range: 446..454,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 446..456,
-                                },
-                            },
-                        ],
-                    ),
-                },
-                span: SyntaxNodePtr {
-                    kind: DEFINITION_NODE,
-                    range: 1..457,
-                },
-            },
-        ],
-        children: {},
-    },
-)
+KRATE_NODE@0..457
+  NEW_LINE@0..1 "\n"
+  DEFINITION_NODE@1..457
+    FUNCTION_DEFINITION_NODE@1..457
+      FN@1..3 "fn"
+      WHITESPACE@3..4 " "
+      IDENTIFIER_NODE@4..7
+        IDENTIFIER_SEGMENT@4..7
+          IDENTIFIER@4..7 "foo"
+      LEFT_PAREN@7..8 "("
+      RIGHT_PAREN@8..9 ")"
+      WHITESPACE@9..10 " "
+      FUNCTION_BODY_BLOCK_NODE@10..457
+        BLOCK_EXPRESSION_NODE@10..457
+          LEFT_BRACE@10..11 "{"
+          NEW_LINE@11..12 "\n"
+          WHITESPACE@12..16 "    "
+          EXPRESSION_STATEMENT_NODE@16..27
+            BREAK_EXPRESSION_NODE@16..21
+              BREAK@16..21 "break"
+            SEMICOLON@21..22 ";"
+            NEW_LINE@22..23 "\n"
+            WHITESPACE@23..27 "    "
+          EXPRESSION_STATEMENT_NODE@27..41
+            CONTINUE_EXPRESSION_NODE@27..35
+              CONTINUE@27..35 "continue"
+            SEMICOLON@35..36 ";"
+            NEW_LINE@36..37 "\n"
+            WHITESPACE@37..41 "    "
+          EXPRESSION_STATEMENT_NODE@41..53
+            RETURN_EXPRESSION_NODE@41..47
+              RETURN@41..47 "return"
+            SEMICOLON@47..48 ";"
+            NEW_LINE@48..49 "\n"
+            WHITESPACE@49..53 "    "
+          EXPRESSION_STATEMENT_NODE@53..74
+            FOR_EXPRESSION_NODE@53..74
+              FOR@53..56 "for"
+              WHITESPACE@56..57 " "
+              PATH_PATTERN_NODE@57..59
+                PATH_NODE@57..59
+                  PATH_SEGMENT_IDENTIFIER_NODE@57..59
+                    IDENTIFIER_NODE@57..59
+                      IDENTIFIER_SEGMENT@57..59
+                        IDENTIFIER@57..58 "i"
+                        WHITESPACE@58..59 " "
+              IN@59..61 "in"
+              WHITESPACE@61..62 " "
+              PATH_EXPRESSION_NODE@62..67
+                PATH_NODE@62..67
+                  PATH_SEGMENT_IDENTIFIER_NODE@62..67
+                    IDENTIFIER_NODE@62..67
+                      IDENTIFIER_SEGMENT@62..67
+                        IDENTIFIER@62..66 "expr"
+                        WHITESPACE@66..67 " "
+              BLOCK_EXPRESSION_NODE@67..74
+                LEFT_BRACE@67..68 "{"
+                RIGHT_BRACE@68..69 "}"
+                NEW_LINE@69..70 "\n"
+                WHITESPACE@70..74 "    "
+          EXPRESSION_STATEMENT_NODE@74..92
+            WHILE_EXPRESSION_NODE@74..92
+              WHILE@74..79 "while"
+              WHITESPACE@79..80 " "
+              LITERAL_EXPRESSION_NODE@80..85
+                BOOLEAN_LITERAL_NODE@80..85
+                  TRUE@80..84 "true"
+                  WHITESPACE@84..85 " "
+              BLOCK_EXPRESSION_NODE@85..92
+                LEFT_BRACE@85..86 "{"
+                RIGHT_BRACE@86..87 "}"
+                NEW_LINE@87..88 "\n"
+                WHITESPACE@88..92 "    "
+          EXPRESSION_STATEMENT_NODE@92..104
+            LOOP_EXPRESSION_NODE@92..104
+              LOOP@92..96 "loop"
+              WHITESPACE@96..97 " "
+              BLOCK_EXPRESSION_NODE@97..104
+                LEFT_BRACE@97..98 "{"
+                RIGHT_BRACE@98..99 "}"
+                NEW_LINE@99..100 "\n"
+                WHITESPACE@100..104 "    "
+          EXPRESSION_STATEMENT_NODE@104..119
+            IF_EXPRESSION_NODE@104..119
+              IF@104..106 "if"
+              WHITESPACE@106..107 " "
+              LITERAL_EXPRESSION_NODE@107..112
+                BOOLEAN_LITERAL_NODE@107..112
+                  TRUE@107..111 "true"
+                  WHITESPACE@111..112 " "
+              BLOCK_EXPRESSION_NODE@112..119
+                LEFT_BRACE@112..113 "{"
+                RIGHT_BRACE@113..114 "}"
+                NEW_LINE@114..115 "\n"
+                WHITESPACE@115..119 "    "
+          EXPRESSION_STATEMENT_NODE@119..142
+            IF_EXPRESSION_NODE@119..142
+              IF@119..121 "if"
+              WHITESPACE@121..122 " "
+              LITERAL_EXPRESSION_NODE@122..127
+                BOOLEAN_LITERAL_NODE@122..127
+                  TRUE@122..126 "true"
+                  WHITESPACE@126..127 " "
+              BLOCK_EXPRESSION_NODE@127..130
+                LEFT_BRACE@127..128 "{"
+                RIGHT_BRACE@128..129 "}"
+                WHITESPACE@129..130 " "
+              ELSE@130..134 "else"
+              WHITESPACE@134..135 " "
+              BLOCK_EXPRESSION_NODE@135..142
+                LEFT_BRACE@135..136 "{"
+                RIGHT_BRACE@136..137 "}"
+                NEW_LINE@137..138 "\n"
+                WHITESPACE@138..142 "    "
+          EXPRESSION_STATEMENT_NODE@142..241
+            MATCH_EXPRESSION_NODE@142..241
+              MATCH@142..147 "match"
+              WHITESPACE@147..148 " "
+              LITERAL_EXPRESSION_NODE@148..151
+                INTEGER_LITERAL_NODE@148..151
+                  INTEGER_SEGMENT@148..150 "42"
+                  WHITESPACE@150..151 " "
+              LEFT_BRACE@151..152 "{"
+              NEW_LINE@152..153 "\n"
+              WHITESPACE@153..161 "        "
+              MATCH_ARM_NODE@161..168
+                LITERAL_PATTERN_NODE@161..163
+                  LITERAL_EXPRESSION_NODE@161..163
+                    INTEGER_LITERAL_NODE@161..163
+                      INTEGER_SEGMENT@161..162 "0"
+                      WHITESPACE@162..163 " "
+                EQUAL@163..164 "="
+                RIGHT_CHEVRON@164..165 ">"
+                WHITESPACE@165..166 " "
+                BLOCK_EXPRESSION_NODE@166..168
+                  LEFT_BRACE@166..167 "{"
+                  RIGHT_BRACE@167..168 "}"
+              COMMA@168..169 ","
+              NEW_LINE@169..170 "\n"
+              WHITESPACE@170..178 "        "
+              MATCH_ARM_NODE@178..189
+                OR_PATTERN_NODE@178..184
+                  LITERAL_PATTERN_NODE@178..180
+                    LITERAL_EXPRESSION_NODE@178..180
+                      INTEGER_LITERAL_NODE@178..180
+                        INTEGER_SEGMENT@178..179 "1"
+                        WHITESPACE@179..180 " "
+                  PIPE@180..181 "|"
+                  WHITESPACE@181..182 " "
+                  LITERAL_PATTERN_NODE@182..184
+                    LITERAL_EXPRESSION_NODE@182..184
+                      INTEGER_LITERAL_NODE@182..184
+                        INTEGER_SEGMENT@182..183 "2"
+                        WHITESPACE@183..184 " "
+                EQUAL@184..185 "="
+                RIGHT_CHEVRON@185..186 ">"
+                WHITESPACE@186..187 " "
+                BLOCK_EXPRESSION_NODE@187..189
+                  LEFT_BRACE@187..188 "{"
+                  RIGHT_BRACE@188..189 "}"
+              COMMA@189..190 ","
+              NEW_LINE@190..191 "\n"
+              WHITESPACE@191..199 "        "
+              MATCH_ARM_NODE@199..212
+                AT_PATTERN_NODE@199..207
+                  PATH_PATTERN_NODE@199..203
+                    PATH_NODE@199..203
+                      PATH_SEGMENT_IDENTIFIER_NODE@199..203
+                        IDENTIFIER_NODE@199..203
+                          IDENTIFIER_SEGMENT@199..203
+                            IDENTIFIER@199..202 "foo"
+                            WHITESPACE@202..203 " "
+                  AT@203..204 "@"
+                  WHITESPACE@204..205 " "
+                  LITERAL_PATTERN_NODE@205..207
+                    LITERAL_EXPRESSION_NODE@205..207
+                      INTEGER_LITERAL_NODE@205..207
+                        INTEGER_SEGMENT@205..206 "3"
+                        WHITESPACE@206..207 " "
+                EQUAL@207..208 "="
+                RIGHT_CHEVRON@208..209 ">"
+                WHITESPACE@209..210 " "
+                BLOCK_EXPRESSION_NODE@210..212
+                  LEFT_BRACE@210..211 "{"
+                  RIGHT_BRACE@211..212 "}"
+              COMMA@212..213 ","
+              NEW_LINE@213..214 "\n"
+              WHITESPACE@214..222 "        "
+              MATCH_ARM_NODE@222..229
+                PLACEHOLDER_PATTERN_NODE@222..224
+                  PLACEHOLDER@222..223 "_"
+                  WHITESPACE@223..224 " "
+                EQUAL@224..225 "="
+                RIGHT_CHEVRON@225..226 ">"
+                WHITESPACE@226..227 " "
+                BLOCK_EXPRESSION_NODE@227..229
+                  LEFT_BRACE@227..228 "{"
+                  RIGHT_BRACE@228..229 "}"
+              COMMA@229..230 ","
+              NEW_LINE@230..231 "\n"
+              WHITESPACE@231..235 "    "
+              RIGHT_BRACE@235..236 "}"
+              NEW_LINE@236..237 "\n"
+              WHITESPACE@237..241 "    "
+          LET_STATEMENT_NODE@241..252
+            LET@241..244 "let"
+            WHITESPACE@244..245 " "
+            PATH_PATTERN_NODE@245..246
+              PATH_NODE@245..246
+                PATH_SEGMENT_IDENTIFIER_NODE@245..246
+                  IDENTIFIER_NODE@245..246
+                    IDENTIFIER_SEGMENT@245..246
+                      IDENTIFIER@245..246 "x"
+            SEMICOLON@246..247 ";"
+            NEW_LINE@247..248 "\n"
+            WHITESPACE@248..252 "    "
+          LET_STATEMENT_NODE@252..268
+            LET@252..255 "let"
+            WHITESPACE@255..256 " "
+            PATH_PATTERN_NODE@256..257
+              PATH_NODE@256..257
+                PATH_SEGMENT_IDENTIFIER_NODE@256..257
+                  IDENTIFIER_NODE@256..257
+                    IDENTIFIER_SEGMENT@256..257
+                      IDENTIFIER@256..257 "x"
+            COLON@257..258 ":"
+            WHITESPACE@258..259 " "
+            PATH_TYPE_NODE@259..262
+              PATH_NODE@259..262
+                PATH_SEGMENT_IDENTIFIER_NODE@259..262
+                  IDENTIFIER_NODE@259..262
+                    IDENTIFIER_SEGMENT@259..262
+                      IDENTIFIER@259..262 "i32"
+            SEMICOLON@262..263 ";"
+            NEW_LINE@263..264 "\n"
+            WHITESPACE@264..268 "    "
+          LET_STATEMENT_NODE@268..284
+            LET@268..271 "let"
+            WHITESPACE@271..272 " "
+            PATH_PATTERN_NODE@272..274
+              PATH_NODE@272..274
+                PATH_SEGMENT_IDENTIFIER_NODE@272..274
+                  IDENTIFIER_NODE@272..274
+                    IDENTIFIER_SEGMENT@272..274
+                      IDENTIFIER@272..273 "x"
+                      WHITESPACE@273..274 " "
+            EQUAL@274..275 "="
+            WHITESPACE@275..276 " "
+            LITERAL_EXPRESSION_NODE@276..278
+              INTEGER_LITERAL_NODE@276..278
+                INTEGER_SEGMENT@276..278 "42"
+            SEMICOLON@278..279 ";"
+            NEW_LINE@279..280 "\n"
+            WHITESPACE@280..284 "    "
+          LET_STATEMENT_NODE@284..305
+            LET@284..287 "let"
+            WHITESPACE@287..288 " "
+            PATH_PATTERN_NODE@288..289
+              PATH_NODE@288..289
+                PATH_SEGMENT_IDENTIFIER_NODE@288..289
+                  IDENTIFIER_NODE@288..289
+                    IDENTIFIER_SEGMENT@288..289
+                      IDENTIFIER@288..289 "x"
+            COLON@289..290 ":"
+            WHITESPACE@290..291 " "
+            PATH_TYPE_NODE@291..295
+              PATH_NODE@291..295
+                PATH_SEGMENT_IDENTIFIER_NODE@291..295
+                  IDENTIFIER_NODE@291..295
+                    IDENTIFIER_SEGMENT@291..295
+                      IDENTIFIER@291..294 "i32"
+                      WHITESPACE@294..295 " "
+            EQUAL@295..296 "="
+            WHITESPACE@296..297 " "
+            LITERAL_EXPRESSION_NODE@297..299
+              INTEGER_LITERAL_NODE@297..299
+                INTEGER_SEGMENT@297..299 "42"
+            SEMICOLON@299..300 ";"
+            NEW_LINE@300..301 "\n"
+            WHITESPACE@301..305 "    "
+          EXPRESSION_STATEMENT_NODE@305..320
+            ARRAY_EXPRESSION_NODE@305..314
+              LEFT_BRACKET@305..306 "["
+              LITERAL_EXPRESSION_NODE@306..307
+                INTEGER_LITERAL_NODE@306..307
+                  INTEGER_SEGMENT@306..307 "0"
+              COMMA@307..308 ","
+              WHITESPACE@308..309 " "
+              LITERAL_EXPRESSION_NODE@309..310
+                INTEGER_LITERAL_NODE@309..310
+                  INTEGER_SEGMENT@309..310 "1"
+              COMMA@310..311 ","
+              WHITESPACE@311..312 " "
+              LITERAL_EXPRESSION_NODE@312..313
+                INTEGER_LITERAL_NODE@312..313
+                  INTEGER_SEGMENT@312..313 "2"
+              RIGHT_BRACKET@313..314 "]"
+            SEMICOLON@314..315 ";"
+            NEW_LINE@315..316 "\n"
+            WHITESPACE@316..320 "    "
+          EXPRESSION_STATEMENT_NODE@320..345
+            TUPLE_EXPRESSION_NODE@320..339
+              LEFT_PAREN@320..321 "("
+              LITERAL_EXPRESSION_NODE@321..323
+                INTEGER_LITERAL_NODE@321..323
+                  INTEGER_SEGMENT@321..323 "42"
+              COMMA@323..324 ","
+              WHITESPACE@324..325 " "
+              LITERAL_EXPRESSION_NODE@325..332
+                STRING_LITERAL_NODE@325..332
+                  STRING_START@325..326 "\""
+                  STRING_LITERAL_TEXT_NODE@326..331
+                    STRING_SEGMENT@326..331 "hello"
+                  STRING_END@331..332 "\""
+              COMMA@332..333 ","
+              WHITESPACE@333..334 " "
+              LITERAL_EXPRESSION_NODE@334..338
+                BOOLEAN_LITERAL_NODE@334..338
+                  TRUE@334..338 "true"
+              RIGHT_PAREN@338..339 ")"
+            SEMICOLON@339..340 ";"
+            NEW_LINE@340..341 "\n"
+            WHITESPACE@341..345 "    "
+          EXPRESSION_STATEMENT_NODE@345..357
+            BLOCK_EXPRESSION_NODE@345..351
+              LEFT_BRACE@345..346 "{"
+              WHITESPACE@346..347 " "
+              EXPRESSION_STATEMENT_NODE@347..350
+                LITERAL_EXPRESSION_NODE@347..350
+                  INTEGER_LITERAL_NODE@347..350
+                    INTEGER_SEGMENT@347..349 "42"
+                    WHITESPACE@349..350 " "
+              RIGHT_BRACE@350..351 "}"
+            SEMICOLON@351..352 ";"
+            NEW_LINE@352..353 "\n"
+            WHITESPACE@353..357 "    "
+          EXPRESSION_STATEMENT_NODE@357..368
+            FUNCTION_CALL_EXPRESSION_NODE@357..362
+              PATH_EXPRESSION_NODE@357..360
+                PATH_NODE@357..360
+                  PATH_SEGMENT_IDENTIFIER_NODE@357..360
+                    IDENTIFIER_NODE@357..360
+                      IDENTIFIER_SEGMENT@357..360
+                        IDENTIFIER@357..360 "foo"
+              LEFT_PAREN@360..361
+                LEFT_PAREN@360..361 "("
+              RIGHT_PAREN@361..362 ")"
+            SEMICOLON@362..363 ";"
+            NEW_LINE@363..364 "\n"
+            WHITESPACE@364..368 "    "
+          EXPRESSION_STATEMENT_NODE@368..381
+            FIELD_EXPRESSION_NODE@368..375
+              PATH_EXPRESSION_NODE@368..371
+                PATH_NODE@368..371
+                  PATH_SEGMENT_IDENTIFIER_NODE@368..371
+                    IDENTIFIER_NODE@368..371
+                      IDENTIFIER_SEGMENT@368..371
+                        IDENTIFIER@368..371 "foo"
+              DOT@371..372
+                DOT@371..372 "."
+              IDENTIFIER_NODE@372..375
+                IDENTIFIER_SEGMENT@372..375
+                  IDENTIFIER@372..375 "bar"
+            SEMICOLON@375..376 ";"
+            NEW_LINE@376..377 "\n"
+            WHITESPACE@377..381 "    "
+          EXPRESSION_STATEMENT_NODE@381..396
+            METHOD_CALL_EXPRESSION_NODE@381..390
+              PATH_EXPRESSION_NODE@381..384
+                PATH_NODE@381..384
+                  PATH_SEGMENT_IDENTIFIER_NODE@381..384
+                    IDENTIFIER_NODE@381..384
+                      IDENTIFIER_SEGMENT@381..384
+                        IDENTIFIER@381..384 "foo"
+              DOT@384..385
+                DOT@384..385 "."
+              IDENTIFIER_NODE@385..388
+                IDENTIFIER_SEGMENT@385..388
+                  IDENTIFIER@385..388 "bar"
+              LEFT_PAREN@388..389 "("
+              RIGHT_PAREN@389..390 ")"
+            SEMICOLON@390..391 ";"
+            NEW_LINE@391..392 "\n"
+            WHITESPACE@392..396 "    "
+          EXPRESSION_STATEMENT_NODE@396..413
+            FIELD_EXPRESSION_NODE@396..407
+              FIELD_EXPRESSION_NODE@396..403
+                PATH_EXPRESSION_NODE@396..399
+                  PATH_NODE@396..399
+                    PATH_SEGMENT_IDENTIFIER_NODE@396..399
+                      IDENTIFIER_NODE@396..399
+                        IDENTIFIER_SEGMENT@396..399
+                          IDENTIFIER@396..399 "foo"
+                DOT@399..400
+                  DOT@399..400 "."
+                IDENTIFIER_NODE@400..403
+                  IDENTIFIER_SEGMENT@400..403
+                    IDENTIFIER@400..403 "bar"
+              DOT@403..404
+                DOT@403..404 "."
+              IDENTIFIER_NODE@404..407
+                IDENTIFIER_SEGMENT@404..407
+                  IDENTIFIER@404..407 "baz"
+            SEMICOLON@407..408 ";"
+            NEW_LINE@408..409 "\n"
+            WHITESPACE@409..413 "    "
+          EXPRESSION_STATEMENT_NODE@413..434
+            METHOD_CALL_EXPRESSION_NODE@413..428
+              METHOD_CALL_EXPRESSION_NODE@413..422
+                PATH_EXPRESSION_NODE@413..416
+                  PATH_NODE@413..416
+                    PATH_SEGMENT_IDENTIFIER_NODE@413..416
+                      IDENTIFIER_NODE@413..416
+                        IDENTIFIER_SEGMENT@413..416
+                          IDENTIFIER@413..416 "foo"
+                DOT@416..417
+                  DOT@416..417 "."
+                IDENTIFIER_NODE@417..420
+                  IDENTIFIER_SEGMENT@417..420
+                    IDENTIFIER@417..420 "bar"
+                LEFT_PAREN@420..421 "("
+                RIGHT_PAREN@421..422 ")"
+              DOT@422..423
+                DOT@422..423 "."
+              IDENTIFIER_NODE@423..426
+                IDENTIFIER_SEGMENT@423..426
+                  IDENTIFIER@423..426 "baz"
+              LEFT_PAREN@426..427 "("
+              RIGHT_PAREN@427..428 ")"
+            SEMICOLON@428..429 ";"
+            NEW_LINE@429..430 "\n"
+            WHITESPACE@430..434 "    "
+          EXPRESSION_STATEMENT_NODE@434..446
+            INDEX_EXPRESSION_NODE@434..440
+              PATH_EXPRESSION_NODE@434..437
+                PATH_NODE@434..437
+                  PATH_SEGMENT_IDENTIFIER_NODE@434..437
+                    IDENTIFIER_NODE@434..437
+                      IDENTIFIER_SEGMENT@434..437
+                        IDENTIFIER@434..437 "foo"
+              LEFT_BRACKET@437..438
+                LEFT_BRACKET@437..438 "["
+              LITERAL_EXPRESSION_NODE@438..439
+                INTEGER_LITERAL_NODE@438..439
+                  INTEGER_SEGMENT@438..439 "0"
+              RIGHT_BRACKET@439..440 "]"
+            SEMICOLON@440..441 ";"
+            NEW_LINE@441..442 "\n"
+            WHITESPACE@442..446 "    "
+          EXPRESSION_STATEMENT_NODE@446..456
+            ASSIGNMENT_EXPRESSION_NODE@446..454
+              PATH_EXPRESSION_NODE@446..450
+                PATH_NODE@446..450
+                  PATH_SEGMENT_IDENTIFIER_NODE@446..450
+                    IDENTIFIER_NODE@446..450
+                      IDENTIFIER_SEGMENT@446..450
+                        IDENTIFIER@446..449 "foo"
+                        WHITESPACE@449..450 " "
+              ASSIGNMENT_OPERATOR_NODE@450..453
+                PLUS__EQUAL@450..453
+                  PLUS@450..451 "+"
+                  EQUAL@451..452 "="
+                  WHITESPACE@452..453 " "
+              LITERAL_EXPRESSION_NODE@453..454
+                INTEGER_LITERAL_NODE@453..454
+                  INTEGER_SEGMENT@453..454 "1"
+            SEMICOLON@454..455 ";"
+            NEW_LINE@455..456 "\n"
+          RIGHT_BRACE@456..457 "}"

@@ -2,36 +2,14 @@
 source: compiler/danubec_parse/src/tests/mod.rs
 expression: node
 ---
-Some(
-    Krate {
-        attributes: [],
-        definitions: [
-            Definition {
-                attributes: [],
-                visibility: Private,
-                kind: Struct {
-                    name: Identifier {
-                        name: Ident {
-                            hash: Hash64(
-                                461893210254723387,
-                            ),
-                            raw: "Foo",
-                        },
-                        span: SyntaxNodePtr {
-                            kind: IDENTIFIER_NODE,
-                            range: 8..11,
-                        },
-                    },
-                    type_parameters: [],
-                    type_bounds: [],
-                    body: Unit,
-                },
-                span: SyntaxNodePtr {
-                    kind: DEFINITION_NODE,
-                    range: 1..12,
-                },
-            },
-        ],
-        children: {},
-    },
-)
+KRATE_NODE@0..12
+  NEW_LINE@0..1 "\n"
+  DEFINITION_NODE@1..12
+    STRUCT_DEFINITION_NODE@1..12
+      STRUCT@1..7 "struct"
+      WHITESPACE@7..8 " "
+      IDENTIFIER_NODE@8..11
+        IDENTIFIER_SEGMENT@8..11
+          IDENTIFIER@8..11 "Foo"
+      STRUCT_BODY_UNIT_NODE@11..12
+        SEMICOLON@11..12 ";"

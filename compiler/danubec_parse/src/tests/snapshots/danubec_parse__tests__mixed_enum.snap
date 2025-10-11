@@ -2,61 +2,108 @@
 source: compiler/danubec_parse/src/tests/mod.rs
 expression: node
 ---
-Some(
-    Krate {
-        attributes: [],
-        definitions: [
-            Definition {
-                attributes: [],
-                visibility: Private,
-                kind: Enum {
-                    name: Identifier {
-                        name: Ident {
-                            hash: Hash64(
-                                461893210254723387,
-                            ),
-                            raw: "Foo",
-                        },
-                        span: SyntaxNodePtr {
-                            kind: IDENTIFIER_NODE,
-                            range: 6..10,
-                        },
-                    },
-                    type_parameters: [],
-                    type_bounds: [],
-                    variants: [],
-                },
-                span: SyntaxNodePtr {
-                    kind: DEFINITION_NODE,
-                    range: 1..13,
-                },
-            },
-            Definition {
-                attributes: [],
-                visibility: Private,
-                kind: Enum {
-                    name: Identifier {
-                        name: Ident {
-                            hash: Hash64(
-                                7277881248784541008,
-                            ),
-                            raw: "Bar",
-                        },
-                        span: SyntaxNodePtr {
-                            kind: IDENTIFIER_NODE,
-                            range: 18..22,
-                        },
-                    },
-                    type_parameters: [],
-                    type_bounds: [],
-                    variants: [],
-                },
-                span: SyntaxNodePtr {
-                    kind: DEFINITION_NODE,
-                    range: 13..93,
-                },
-            },
-        ],
-        children: {},
-    },
-)
+KRATE_NODE@0..93
+  NEW_LINE@0..1 "\n"
+  DEFINITION_NODE@1..13
+    ENUM_DEFINITION_NODE@1..13
+      ENUM@1..5 "enum"
+      WHITESPACE@5..6 " "
+      IDENTIFIER_NODE@6..10
+        IDENTIFIER_SEGMENT@6..10
+          IDENTIFIER@6..9 "Foo"
+          WHITESPACE@9..10 " "
+      LEFT_BRACE@10..11 "{"
+      RIGHT_BRACE@11..12 "}"
+      NEW_LINE@12..13 "\n"
+  DEFINITION_NODE@13..93
+    ENUM_DEFINITION_NODE@13..93
+      ENUM@13..17 "enum"
+      WHITESPACE@17..18 " "
+      IDENTIFIER_NODE@18..22
+        IDENTIFIER_SEGMENT@18..22
+          IDENTIFIER@18..21 "Bar"
+          WHITESPACE@21..22 " "
+      LEFT_BRACE@22..23 "{"
+      NEW_LINE@23..24 "\n"
+      WHITESPACE@24..28 "    "
+      ENUM_VARIANT_UNIT_NODE@28..29
+        IDENTIFIER_NODE@28..29
+          IDENTIFIER_SEGMENT@28..29
+            IDENTIFIER@28..29 "A"
+      COMMA@29..30 ","
+      NEW_LINE@30..31 "\n"
+      WHITESPACE@31..35 "    "
+      ENUM_VARIANT_NAMED_NODE@35..58
+        IDENTIFIER_NODE@35..37
+          IDENTIFIER_SEGMENT@35..37
+            IDENTIFIER@35..36 "B"
+            WHITESPACE@36..37 " "
+        LEFT_BRACE@37..38 "{"
+        WHITESPACE@38..39 " "
+        ENUM_VARIANT_NAMED_FIELD_NODE@39..45
+          IDENTIFIER_NODE@39..40
+            IDENTIFIER_SEGMENT@39..40
+              IDENTIFIER@39..40 "a"
+          COLON@40..41 ":"
+          WHITESPACE@41..42 " "
+          PATH_TYPE_NODE@42..45
+            PATH_NODE@42..45
+              PATH_SEGMENT_IDENTIFIER_NODE@42..45
+                IDENTIFIER_NODE@42..45
+                  IDENTIFIER_SEGMENT@42..45
+                    IDENTIFIER@42..45 "i32"
+        COMMA@45..46 ","
+        WHITESPACE@46..47 " "
+        ENUM_VARIANT_NAMED_FIELD_NODE@47..57
+          IDENTIFIER_NODE@47..48
+            IDENTIFIER_SEGMENT@47..48
+              IDENTIFIER@47..48 "b"
+          COLON@48..49 ":"
+          WHITESPACE@49..50 " "
+          PATH_TYPE_NODE@50..57
+            PATH_NODE@50..57
+              PATH_SEGMENT_IDENTIFIER_NODE@50..57
+                IDENTIFIER_NODE@50..57
+                  IDENTIFIER_SEGMENT@50..57
+                    IDENTIFIER@50..56 "String"
+                    WHITESPACE@56..57 " "
+        RIGHT_BRACE@57..58 "}"
+      COMMA@58..59 ","
+      NEW_LINE@59..60 "\n"
+      WHITESPACE@60..64 "    "
+      ENUM_VARIANT_UNNAMED_NODE@64..78
+        IDENTIFIER_NODE@64..65
+          IDENTIFIER_SEGMENT@64..65
+            IDENTIFIER@64..65 "C"
+        LEFT_PAREN@65..66 "("
+        PATH_TYPE_NODE@66..69
+          PATH_NODE@66..69
+            PATH_SEGMENT_IDENTIFIER_NODE@66..69
+              IDENTIFIER_NODE@66..69
+                IDENTIFIER_SEGMENT@66..69
+                  IDENTIFIER@66..69 "i32"
+        COMMA@69..70 ","
+        WHITESPACE@70..71 " "
+        PATH_TYPE_NODE@71..77
+          PATH_NODE@71..77
+            PATH_SEGMENT_IDENTIFIER_NODE@71..77
+              IDENTIFIER_NODE@71..77
+                IDENTIFIER_SEGMENT@71..77
+                  IDENTIFIER@71..77 "String"
+        RIGHT_PAREN@77..78 ")"
+      COMMA@78..79 ","
+      NEW_LINE@79..80 "\n"
+      WHITESPACE@80..84 "    "
+      ENUM_VARIANT_SCALAR_NODE@84..90
+        IDENTIFIER_NODE@84..86
+          IDENTIFIER_SEGMENT@84..86
+            IDENTIFIER@84..85 "D"
+            WHITESPACE@85..86 " "
+        EQUAL@86..87 "="
+        WHITESPACE@87..88 " "
+        LITERAL_EXPRESSION_NODE@88..90
+          INTEGER_LITERAL_NODE@88..90
+            INTEGER_SEGMENT@88..90 "42"
+      COMMA@90..91 ","
+      NEW_LINE@91..92 "\n"
+      RIGHT_BRACE@92..93 "}"

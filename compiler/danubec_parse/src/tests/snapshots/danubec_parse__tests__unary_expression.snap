@@ -2,143 +2,51 @@
 source: compiler/danubec_parse/src/tests/mod.rs
 expression: node
 ---
-Some(
-    Krate {
-        attributes: [],
-        definitions: [
-            Definition {
-                attributes: [],
-                visibility: Private,
-                kind: Function {
-                    name: Identifier {
-                        name: Ident {
-                            hash: Hash64(
-                                4506850079084802999,
-                            ),
-                            raw: "foo",
-                        },
-                        span: SyntaxNodePtr {
-                            kind: IDENTIFIER_NODE,
-                            range: 4..7,
-                        },
-                    },
-                    type_parameters: [],
-                    parameters: [],
-                    return_type: None,
-                    type_bounds: [],
-                    body: Some(
-                        [
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: Unary {
-                                            operator: Negate,
-                                            operand: Expression {
-                                                kind: Literal {
-                                                    value: Literal {
-                                                        kind: Integer {
-                                                            value: 42,
-                                                        },
-                                                        span: SyntaxNodePtr {
-                                                            kind: INTEGER_LITERAL_NODE,
-                                                            range: 17..19,
-                                                        },
-                                                    },
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: LITERAL_EXPRESSION_NODE,
-                                                    range: 17..19,
-                                                },
-                                            },
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: UNARY_EXPRESSION_NODE,
-                                            range: 16..19,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 16..25,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: Unary {
-                                            operator: Not,
-                                            operand: Expression {
-                                                kind: Literal {
-                                                    value: Literal {
-                                                        kind: Boolean {
-                                                            value: true,
-                                                        },
-                                                        span: SyntaxNodePtr {
-                                                            kind: BOOLEAN_LITERAL_NODE,
-                                                            range: 26..30,
-                                                        },
-                                                    },
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: LITERAL_EXPRESSION_NODE,
-                                                    range: 26..30,
-                                                },
-                                            },
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: UNARY_EXPRESSION_NODE,
-                                            range: 25..30,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 25..36,
-                                },
-                            },
-                            Statement {
-                                kind: Expression {
-                                    value: Expression {
-                                        kind: Unary {
-                                            operator: BitwiseNot,
-                                            operand: Expression {
-                                                kind: Literal {
-                                                    value: Literal {
-                                                        kind: Integer {
-                                                            value: 0,
-                                                        },
-                                                        span: SyntaxNodePtr {
-                                                            kind: INTEGER_LITERAL_NODE,
-                                                            range: 37..38,
-                                                        },
-                                                    },
-                                                },
-                                                span: SyntaxNodePtr {
-                                                    kind: LITERAL_EXPRESSION_NODE,
-                                                    range: 37..38,
-                                                },
-                                            },
-                                        },
-                                        span: SyntaxNodePtr {
-                                            kind: UNARY_EXPRESSION_NODE,
-                                            range: 36..38,
-                                        },
-                                    },
-                                },
-                                span: SyntaxNodePtr {
-                                    kind: EXPRESSION_STATEMENT_NODE,
-                                    range: 36..40,
-                                },
-                            },
-                        ],
-                    ),
-                },
-                span: SyntaxNodePtr {
-                    kind: DEFINITION_NODE,
-                    range: 1..42,
-                },
-            },
-        ],
-        children: {},
-    },
-)
+KRATE_NODE@0..42
+  NEW_LINE@0..1 "\n"
+  DEFINITION_NODE@1..42
+    FUNCTION_DEFINITION_NODE@1..42
+      FN@1..3 "fn"
+      WHITESPACE@3..4 " "
+      IDENTIFIER_NODE@4..7
+        IDENTIFIER_SEGMENT@4..7
+          IDENTIFIER@4..7 "foo"
+      LEFT_PAREN@7..8 "("
+      RIGHT_PAREN@8..9 ")"
+      WHITESPACE@9..10 " "
+      FUNCTION_BODY_BLOCK_NODE@10..42
+        BLOCK_EXPRESSION_NODE@10..42
+          LEFT_BRACE@10..11 "{"
+          NEW_LINE@11..12 "\n"
+          WHITESPACE@12..16 "    "
+          EXPRESSION_STATEMENT_NODE@16..25
+            UNARY_EXPRESSION_NODE@16..19
+              UNARY_OPERATOR_NODE@16..17
+                HYPHEN@16..17 "-"
+              LITERAL_EXPRESSION_NODE@17..19
+                INTEGER_LITERAL_NODE@17..19
+                  INTEGER_SEGMENT@17..19 "42"
+            SEMICOLON@19..20 ";"
+            NEW_LINE@20..21 "\n"
+            WHITESPACE@21..25 "    "
+          EXPRESSION_STATEMENT_NODE@25..36
+            UNARY_EXPRESSION_NODE@25..30
+              UNARY_OPERATOR_NODE@25..26
+                EXCLAMATION@25..26 "!"
+              LITERAL_EXPRESSION_NODE@26..30
+                BOOLEAN_LITERAL_NODE@26..30
+                  TRUE@26..30 "true"
+            SEMICOLON@30..31 ";"
+            NEW_LINE@31..32 "\n"
+            WHITESPACE@32..36 "    "
+          EXPRESSION_STATEMENT_NODE@36..40
+            UNARY_EXPRESSION_NODE@36..38
+              UNARY_OPERATOR_NODE@36..37
+                TILDE@36..37 "~"
+              LITERAL_EXPRESSION_NODE@37..38
+                INTEGER_LITERAL_NODE@37..38
+                  INTEGER_SEGMENT@37..38 "0"
+            SEMICOLON@38..39 ";"
+            NEW_LINE@39..40 "\n"
+          RIGHT_BRACE@40..41 "}"
+          NEW_LINE@41..42 "\n"

@@ -1,12 +1,9 @@
-use crate::{grammar::krate, lower::lower_krate};
 use danubec_diagnostic::Diagnostic;
-use danubec_syntax::AstNode;
+use danubec_syntax::SyntaxNode;
 
-fn parse(source: &str) -> (Option<danubec_ast::Krate>, Diagnostic) {
-    let diagnostic = Diagnostic::new();
-    let (node, mut diagnostic) = crate::parse(source, diagnostic, krate);
-    let node =
-        danubec_syntax::Krate::cast(node).and_then(|node| lower_krate(node, &mut diagnostic).ok());
+fn parse(source: &str) -> (SyntaxNode, Diagnostic) {
+    let mut diagnostic = Diagnostic::new();
+    let node = crate::parse(source, &mut diagnostic);
 
     (node, diagnostic)
 }

@@ -2,36 +2,34 @@
 source: compiler/danubec_parse/src/tests/mod.rs
 expression: node
 ---
-Some(
-    Krate {
-        attributes: [],
-        definitions: [
-            Definition {
-                attributes: [],
-                visibility: Private,
-                kind: Struct {
-                    name: Identifier {
-                        name: Ident {
-                            hash: Hash64(
-                                461893210254723387,
-                            ),
-                            raw: "Foo",
-                        },
-                        span: SyntaxNodePtr {
-                            kind: IDENTIFIER_NODE,
-                            range: 22..25,
-                        },
-                    },
-                    type_parameters: [],
-                    type_bounds: [],
-                    body: Unit,
-                },
-                span: SyntaxNodePtr {
-                    kind: DEFINITION_NODE,
-                    range: 1..26,
-                },
-            },
-        ],
-        children: {},
-    },
-)
+KRATE_NODE@0..26
+  NEW_LINE@0..1 "\n"
+  DEFINITION_NODE@1..26
+    STRUCT_DEFINITION_NODE@1..26
+      ATTRIBUTE_NODE@1..15
+        HASH@1..2 "#"
+        LEFT_BRACKET@2..3 "["
+        NESTED_ATTRIBUTE_ARGUMENT_NODE@3..13
+          PATH_NODE@3..4
+            PATH_SEGMENT_IDENTIFIER_NODE@3..4
+              IDENTIFIER_NODE@3..4
+                IDENTIFIER_SEGMENT@3..4
+                  IDENTIFIER@3..4 "a"
+          LEFT_PAREN@4..5 "("
+          ATTRIBUTE_ARGUMENT_NODE@5..12
+            LITERAL_EXPRESSION_NODE@5..12
+              STRING_LITERAL_NODE@5..12
+                STRING_START@5..6 "\""
+                STRING_LITERAL_TEXT_NODE@6..11
+                  STRING_SEGMENT@6..11 "value"
+                STRING_END@11..12 "\""
+          RIGHT_PAREN@12..13 ")"
+        RIGHT_BRACKET@13..14 "]"
+        NEW_LINE@14..15 "\n"
+      STRUCT@15..21 "struct"
+      WHITESPACE@21..22 " "
+      IDENTIFIER_NODE@22..25
+        IDENTIFIER_SEGMENT@22..25
+          IDENTIFIER@22..25 "Foo"
+      STRUCT_BODY_UNIT_NODE@25..26
+        SEMICOLON@25..26 ";"

@@ -114,7 +114,6 @@ dependencies = [
  "danubec_ast",
  "danubec_diagnostic",
  "danubec_lex",
- "danubec_symbol",
  "danubec_syntax",
  "drop_bomb",
  "insta",
