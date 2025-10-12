@@ -1,0 +1,392 @@
+---
+source: compiler/danubec_semantic/src/tests/mod.rs
+expression: table
+---
+Environment {
+    modules: SlotMap {
+        slots: [
+            Slot {
+                version: 0,
+                next_free: 0,
+            },
+            Slot {
+                version: 1,
+                value: Module {
+                    parent: None,
+                    children: {
+                        Symbol(
+                            0,
+                        ): ModuleId(
+                            2v1,
+                        ),
+                        Symbol(
+                            2,
+                        ): ModuleId(
+                            4v1,
+                        ),
+                        Symbol(
+                            1,
+                        ): ModuleId(
+                            3v1,
+                        ),
+                        Symbol(
+                            3,
+                        ): ModuleId(
+                            5v1,
+                        ),
+                    },
+                    scope: ScopeId(
+                        1v1,
+                    ),
+                    file: FileId(
+                        1v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Module {
+                    parent: Some(
+                        ModuleId(
+                            1v1,
+                        ),
+                    ),
+                    children: {},
+                    scope: ScopeId(
+                        3v1,
+                    ),
+                    file: FileId(
+                        1v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Module {
+                    parent: Some(
+                        ModuleId(
+                            1v1,
+                        ),
+                    ),
+                    children: {},
+                    scope: ScopeId(
+                        5v1,
+                    ),
+                    file: FileId(
+                        1v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Module {
+                    parent: Some(
+                        ModuleId(
+                            1v1,
+                        ),
+                    ),
+                    children: {},
+                    scope: ScopeId(
+                        7v1,
+                    ),
+                    file: FileId(
+                        1v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Module {
+                    parent: Some(
+                        ModuleId(
+                            1v1,
+                        ),
+                    ),
+                    children: {},
+                    scope: ScopeId(
+                        9v1,
+                    ),
+                    file: FileId(
+                        2v1,
+                    ),
+                },
+            },
+        ],
+        free_head: 6,
+        num_elems: 5,
+        _k: PhantomData<fn(danubec_symbol::ModuleId) -> danubec_symbol::ModuleId>,
+    },
+    scopes: SlotMap {
+        slots: [
+            Slot {
+                version: 0,
+                next_free: 0,
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    parent_module: None,
+                    parent: None,
+                    kind: Module,
+                    imports: [],
+                    values: {},
+                    types: {
+                        Symbol(
+                            3,
+                        ): [
+                            DefinitionId(
+                                4v1,
+                            ),
+                        ],
+                    },
+                    implements: [],
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    parent_module: None,
+                    parent: Some(
+                        ScopeId(
+                            1v1,
+                        ),
+                    ),
+                    kind: Module,
+                    imports: [],
+                    values: {},
+                    types: {
+                        Symbol(
+                            0,
+                        ): [
+                            DefinitionId(
+                                1v1,
+                            ),
+                        ],
+                    },
+                    implements: [],
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    parent_module: Some(
+                        ModuleId(
+                            1v1,
+                        ),
+                    ),
+                    parent: None,
+                    kind: Module,
+                    imports: [],
+                    values: {},
+                    types: {},
+                    implements: [],
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    parent_module: None,
+                    parent: Some(
+                        ScopeId(
+                            2v1,
+                        ),
+                    ),
+                    kind: Module,
+                    imports: [],
+                    values: {},
+                    types: {
+                        Symbol(
+                            1,
+                        ): [
+                            DefinitionId(
+                                2v1,
+                            ),
+                        ],
+                    },
+                    implements: [],
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    parent_module: Some(
+                        ModuleId(
+                            1v1,
+                        ),
+                    ),
+                    parent: None,
+                    kind: Module,
+                    imports: [],
+                    values: {},
+                    types: {},
+                    implements: [],
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    parent_module: None,
+                    parent: Some(
+                        ScopeId(
+                            4v1,
+                        ),
+                    ),
+                    kind: Module,
+                    imports: [],
+                    values: {},
+                    types: {
+                        Symbol(
+                            2,
+                        ): [
+                            DefinitionId(
+                                3v1,
+                            ),
+                        ],
+                    },
+                    implements: [],
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    parent_module: Some(
+                        ModuleId(
+                            1v1,
+                        ),
+                    ),
+                    parent: None,
+                    kind: Module,
+                    imports: [],
+                    values: {},
+                    types: {},
+                    implements: [],
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    parent_module: None,
+                    parent: Some(
+                        ScopeId(
+                            6v1,
+                        ),
+                    ),
+                    kind: Module,
+                    imports: [],
+                    values: {},
+                    types: {},
+                    implements: [],
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    parent_module: Some(
+                        ModuleId(
+                            1v1,
+                        ),
+                    ),
+                    parent: None,
+                    kind: Module,
+                    imports: [],
+                    values: {},
+                    types: {},
+                    implements: [],
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    parent_module: None,
+                    parent: Some(
+                        ScopeId(
+                            9v1,
+                        ),
+                    ),
+                    kind: Module,
+                    imports: [],
+                    values: {},
+                    types: {},
+                    implements: [],
+                },
+            },
+        ],
+        free_head: 11,
+        num_elems: 10,
+        _k: PhantomData<fn(danubec_symbol::ScopeId) -> danubec_symbol::ScopeId>,
+    },
+    imports: SlotMap {
+        slots: [
+            Slot {
+                version: 0,
+                next_free: 0,
+            },
+        ],
+        free_head: 1,
+        num_elems: 0,
+        _k: PhantomData<fn(danubec_symbol::ImportId) -> danubec_symbol::ImportId>,
+    },
+    definitions: SlotMap {
+        slots: [
+            Slot {
+                version: 0,
+                next_free: 0,
+            },
+            Slot {
+                version: 1,
+                value: Definition {
+                    parent_scope: Some(
+                        ScopeId(
+                            2v1,
+                        ),
+                    ),
+                    file: FileId(
+                        1v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Definition {
+                    parent_scope: Some(
+                        ScopeId(
+                            4v1,
+                        ),
+                    ),
+                    file: FileId(
+                        1v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Definition {
+                    parent_scope: Some(
+                        ScopeId(
+                            6v1,
+                        ),
+                    ),
+                    file: FileId(
+                        1v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Definition {
+                    parent_scope: Some(
+                        ScopeId(
+                            1v1,
+                        ),
+                    ),
+                    file: FileId(
+                        1v1,
+                    ),
+                },
+            },
+        ],
+        free_head: 5,
+        num_elems: 4,
+        _k: PhantomData<fn(danubec_symbol::DefinitionId) -> danubec_symbol::DefinitionId>,
+    },
+}

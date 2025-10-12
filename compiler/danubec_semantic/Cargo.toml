@@ -1,11 +1,13 @@
 [package]
-name = "danubec_ast_lowering"
+name = "danubec_semantic"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+danubec_ast.path = "../danubec_ast"
 danubec_diagnostic.path = "../danubec_diagnostic"
 danubec_parse.path = "../danubec_parse"
+danubec_symbol.path = "../danubec_symbol"
 danubec_syntax.path = "../danubec_syntax"
 fxhash.workspace = true
 indexmap.workspace = true

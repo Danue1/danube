@@ -1,0 +1,57 @@
+---
+source: compiler/danubec_semantic/src/tests/mod.rs
+expression: fs
+---
+FileSystem {
+    inner: InnerFileSystem {
+        paths: SlotMap {
+            slots: [
+                Slot {
+                    version: 0,
+                    next_free: 0,
+                },
+                Slot {
+                    version: 1,
+                    value: "src/tests/fixtures/lib.dnb",
+                },
+                Slot {
+                    version: 1,
+                    value: "src/tests/fixtures/foo.dnb",
+                },
+            ],
+            free_head: 3,
+            num_elems: 2,
+            _k: PhantomData<fn(danubec_semantic::file_system::FileId) -> danubec_semantic::file_system::FileId>,
+        },
+        canonicals: SecondaryMap {
+            slots: [
+                Vacant,
+                Occupied {
+                    value: "/Users/danuel/Documents/internal/danube-lang/danube/compiler/danubec_semantic/src/tests/fixtures/lib.dnb",
+                    version: 1,
+                },
+                Occupied {
+                    value: "/Users/danuel/Documents/internal/danube-lang/danube/compiler/danubec_semantic/src/tests/fixtures/foo.dnb",
+                    version: 1,
+                },
+            ],
+            num_elems: 2,
+            _k: PhantomData<fn(danubec_semantic::file_system::FileId) -> danubec_semantic::file_system::FileId>,
+        },
+        files: SecondaryMap {
+            slots: [
+                Vacant,
+                Occupied {
+                    value: "mod foo;\n\nmod bar {\n  mod baz {\n    mod qux {\n      //\n    }\n  }\n}\n",
+                    version: 1,
+                },
+                Occupied {
+                    value: "",
+                    version: 1,
+                },
+            ],
+            num_elems: 2,
+            _k: PhantomData<fn(danubec_semantic::file_system::FileId) -> danubec_semantic::file_system::FileId>,
+        },
+    },
+}

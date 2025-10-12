@@ -1,29 +1,23 @@
-use fxhash::FxHashMap;
+use danubec_symbol::FileId;
 use slotmap::{SecondaryMap, SlotMap};
-use std::{collections::HashMap, path::PathBuf};
+use std::path::PathBuf;
 
-slotmap::new_key_type! {
-    pub struct FileId;
+#[derive(Debug)]
+pub struct Fs {
+    inner: Inner,
 }
 
 #[derive(Debug)]
-pub struct FileSystem {
-    inner: InnerFileSystem,
-}
-
-#[derive(Debug)]
-struct InnerFileSystem {
+struct Inner {
     paths: SlotMap<FileId, PathBuf>,
     canonicals: SecondaryMap<FileId, PathBuf>,
     files: SecondaryMap<FileId, String>,
-
-    path_to_id: FxHashMap<PathBuf, FileId>,
 }
 
-impl FileSystem {
+impl Fs {
     pub fn new() -> Self {
         Self {
-            inner: InnerFileSystem::new(),
+            inner: Inner::new(),
         }
     }
 
@@ -37,9 +31,6 @@ impl FileSystem {
 
         {
             let path = parent.with_extension("dnb");
-            if let Some(file_id) = self.inner.path_to_id(&path) {
-                return Some(file_id);
-            }
             if path.exists() {
                 return Some(self.inner.file(path));
             }
@@ -47,9 +38,6 @@ impl FileSystem {
 
         {
             let path = parent.join("mod").with_extension("dnb");
-            if let Some(file_id) = self.inner.path_to_id(&path) {
-                return Some(file_id);
-            }
             if path.exists() {
                 return Some(self.inner.file(path));
             }
@@ -69,35 +57,33 @@ impl FileSystem {
     }
 }
 
-impl InnerFileSystem {
+impl Inner {
     fn new() -> Self {
         Self {
             paths: SlotMap::with_key(),
             canonicals: SecondaryMap::new(),
             files: SecondaryMap::new(),
-
-            path_to_id: FxHashMap::default(),
         }
     }
 
     fn file(&mut self, path: PathBuf) -> FileId {
-        use std::collections::hash_map::Entry;
-
-        match self.path_to_id.entry(path.clone()) {
-            Entry::Occupied(entry) => *entry.get(),
-            Entry::Vacant(entry) => {
-                let canonical = path.canonicalize().ok();
-                let canonical = canonical.and_then(|c| if c != path { Some(c) } else { None });
-                let file_id = self.paths.insert(path);
-                entry.insert(file_id);
-
-                if let Some(canonical) = canonical {
-                    self.canonicals.insert(file_id, canonical);
-                }
-
-                file_id
-            }
+        if let Some(file_id) = self
+            .paths
+            .iter()
+            .find_map(|(id, p)| (p == &path).then_some(id))
+        {
+            return file_id;
         }
+
+        let canonical = path.canonicalize().ok();
+        let canonical = canonical.and_then(|c| if c != path { Some(c) } else { None });
+        let file_id = self.paths.insert(path);
+
+        if let Some(canonical) = canonical {
+            self.canonicals.insert(file_id, canonical);
+        }
+
+        file_id
     }
 
     fn canonicalized(&self, file_id: FileId) -> Option<&PathBuf> {
@@ -108,11 +94,6 @@ impl InnerFileSystem {
     #[inline]
     fn path(&self, file_id: FileId) -> Option<&PathBuf> {
         self.paths.get(file_id)
-    }
-
-    #[inline]
-    fn path_to_id(&self, path: &PathBuf) -> Option<FileId> {
-        self.path_to_id.get(path).copied()
     }
 
     fn source(&mut self, file_id: FileId) -> Option<&str> {

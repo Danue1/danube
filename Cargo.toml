@@ -1,11 +1,12 @@
 [workspace]
 resolver = "2"
 members = [
-  "compiler/danubec_ast_lowering",
   "compiler/danubec_ast",
   "compiler/danubec_diagnostic",
+  "compiler/danubec_hir",
   "compiler/danubec_lex",
   "compiler/danubec_parse",
+  "compiler/danubec_semantic",
   "compiler/danubec_symbol",
   "compiler/danubec_syntax",
   "compiler/danubec",

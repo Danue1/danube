@@ -5,6 +5,3 @@ edition = "2024"
 
 [dependencies]
 rowan.workspace = true
-
-[lib]
-doctest = false

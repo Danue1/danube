@@ -1,39 +1,32 @@
-use crate::{file_system::FileId, symbol::Symbol};
+use danubec_symbol::{DefinitionId, FileId, ImportId, ModuleId, ScopeId, Symbol};
 use fxhash::FxHashMap;
-
-slotmap::new_key_type! {
-    pub struct ModuleId;
-
-    pub struct ScopeId;
-
-    pub struct ImportId;
-
-    pub struct DefinitionId;
-}
+use slotmap::SlotMap;
 
 #[derive(Debug)]
-pub struct Table {
-    modules: slotmap::SlotMap<ModuleId, Module>,
-    scopes: slotmap::SlotMap<ScopeId, Scope>,
-    imports: slotmap::SlotMap<ImportId, Import>,
-    definitions: slotmap::SlotMap<DefinitionId, Definition>,
+pub struct Env {
+    modules: SlotMap<ModuleId, Module>,
+    scopes: SlotMap<ScopeId, Scope>,
+    imports: SlotMap<ImportId, Import>,
+    definitions: SlotMap<DefinitionId, Definition>,
 }
 
 #[derive(Debug)]
 pub struct Module {
     pub parent: Option<ModuleId>,
-    pub scope: ScopeId,
     pub children: FxHashMap<Symbol, ModuleId>,
-    pub imports: Vec<Import>,
+    pub scope: ScopeId,
     pub file: FileId,
 }
 
 #[derive(Debug)]
 pub struct Scope {
+    pub parent_module: Option<ModuleId>,
     pub parent: Option<ScopeId>,
     pub kind: ScopeKind,
-    pub values: FxHashMap<Symbol, DefinitionId>,
-    pub types: FxHashMap<Symbol, DefinitionId>,
+    pub imports: Vec<Import>,
+    pub values: FxHashMap<Symbol, Vec<DefinitionId>>,
+    pub types: FxHashMap<Symbol, Vec<DefinitionId>>,
+    pub implements: Vec<DefinitionId>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -45,32 +38,37 @@ pub enum ScopeKind {
 
 #[derive(Debug)]
 pub struct Import {
-    pub parent_scope: ScopeId,
     pub kind: ImportKind,
     pub file: FileId,
 }
 
 #[derive(Debug)]
 pub enum ImportKind {
-    Single {
-        path: Vec<Symbol>,
-        alias: Option<Symbol>,
-    },
-    Glob {
-        path: Vec<Symbol>,
-    },
-    Group {
-        base: Vec<Symbol>,
-        members: Vec<ImportKind>,
-    },
+    Path(Path, ImportNestedKind),
+    List(Vec<ImportKind>),
+}
+
+#[derive(Debug)]
+pub enum ImportNestedKind {
+    Glob,
+    Identifier(Option<Symbol>),
+    List(Vec<ImportKind>),
+}
+
+#[derive(Debug)]
+pub struct Path {
+    pub segments: Vec<PathSegment>,
+}
+
+#[derive(Debug)]
+pub struct PathSegment {
+    pub name: Symbol,
+    pub alias: Option<Symbol>,
 }
 
 #[derive(Debug)]
 pub struct Definition {
-    pub parent_scope: ScopeId,
-    pub name: Symbol,
-    pub namespace: Namespace,
-    pub kind: DefinitionKind,
+    pub parent_scope: Option<ScopeId>,
     pub file: FileId,
 }
 
@@ -80,38 +78,23 @@ pub enum Namespace {
     Type,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DefinitionKind {
-    Module,
-    Function,
-    Struct,
-    Enum,
-    Const,
-    Static,
-    Trait,
-    EnumVariant,
-    TypeAlias,
-    Implement,
-    Local,
-}
-
-impl Table {
+impl Env {
     pub fn new() -> Self {
         Self {
-            modules: slotmap::SlotMap::with_key(),
-            scopes: slotmap::SlotMap::with_key(),
-            imports: slotmap::SlotMap::with_key(),
-            definitions: slotmap::SlotMap::with_key(),
+            modules: SlotMap::with_key(),
+            scopes: SlotMap::with_key(),
+            imports: SlotMap::with_key(),
+            definitions: SlotMap::with_key(),
         }
     }
 
-    pub fn scope(&mut self, parent: Option<ScopeId>, kind: ScopeKind) -> ScopeId {
-        self.scopes.insert(Scope {
-            parent,
-            kind,
-            values: FxHashMap::default(),
-            types: FxHashMap::default(),
-        })
+    pub fn scope<F>(&mut self, kind: ScopeKind, f: F) -> ScopeId
+    where
+        F: FnOnce(&mut Scope),
+    {
+        let id = self.scopes.insert(Scope::new(kind));
+        f(&mut self.scopes[id]);
+        id
     }
 
     pub fn definition(&mut self, definition: Definition) -> DefinitionId {
@@ -123,18 +106,45 @@ impl Table {
     }
 
     pub fn module(&mut self, file: FileId, parent: Option<ModuleId>) -> ModuleId {
-        let scope = self.scope(parent.map(|p| self.modules[p].scope), ScopeKind::Module);
+        let scope = self.scope(ScopeKind::Module, |s| {
+            s.parent_module = parent;
+        });
         self.modules.insert(Module {
             parent,
             scope,
             children: FxHashMap::default(),
-            imports: vec![],
             file,
         })
     }
 }
 
-impl std::ops::Index<ModuleId> for Table {
+impl Scope {
+    pub fn new(kind: ScopeKind) -> Self {
+        Self {
+            parent_module: None,
+            parent: None,
+            kind,
+            imports: vec![],
+            values: FxHashMap::default(),
+            types: FxHashMap::default(),
+            implements: vec![],
+        }
+    }
+
+    #[inline]
+    pub fn with_parent_module(mut self, parent: ModuleId) -> Self {
+        self.parent_module = Some(parent);
+        self
+    }
+
+    #[inline]
+    pub fn with_parent(mut self, parent: ScopeId) -> Self {
+        self.parent = Some(parent);
+        self
+    }
+}
+
+impl std::ops::Index<ModuleId> for Env {
     type Output = Module;
 
     #[inline]
@@ -143,14 +153,14 @@ impl std::ops::Index<ModuleId> for Table {
     }
 }
 
-impl std::ops::IndexMut<ModuleId> for Table {
+impl std::ops::IndexMut<ModuleId> for Env {
     #[inline]
     fn index_mut(&mut self, index: ModuleId) -> &mut Self::Output {
         &mut self.modules[index]
     }
 }
 
-impl std::ops::Index<ScopeId> for Table {
+impl std::ops::Index<ScopeId> for Env {
     type Output = Scope;
 
     #[inline]
@@ -159,14 +169,14 @@ impl std::ops::Index<ScopeId> for Table {
     }
 }
 
-impl std::ops::IndexMut<ScopeId> for Table {
+impl std::ops::IndexMut<ScopeId> for Env {
     #[inline]
     fn index_mut(&mut self, index: ScopeId) -> &mut Self::Output {
         &mut self.scopes[index]
     }
 }
 
-impl std::ops::Index<DefinitionId> for Table {
+impl std::ops::Index<DefinitionId> for Env {
     type Output = Definition;
 
     #[inline]
@@ -175,7 +185,7 @@ impl std::ops::Index<DefinitionId> for Table {
     }
 }
 
-impl std::ops::Index<ImportId> for Table {
+impl std::ops::Index<ImportId> for Env {
     type Output = Import;
 
     #[inline]
@@ -194,7 +204,7 @@ impl std::ops::Index<Symbol> for Module {
 }
 
 impl std::ops::Index<Namespace> for Scope {
-    type Output = FxHashMap<Symbol, DefinitionId>;
+    type Output = FxHashMap<Symbol, Vec<DefinitionId>>;
 
     #[inline]
     fn index(&self, namespace: Namespace) -> &Self::Output {
@@ -212,14 +222,5 @@ impl std::ops::IndexMut<Namespace> for Scope {
             Namespace::Value => &mut self.values,
             Namespace::Type => &mut self.types,
         }
-    }
-}
-
-impl std::ops::Index<Symbol> for FxHashMap<Symbol, DefinitionId> {
-    type Output = DefinitionId;
-
-    #[inline]
-    fn index(&self, index: Symbol) -> &Self::Output {
-        &self[&index]
     }
 }

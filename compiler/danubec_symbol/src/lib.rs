@@ -1,100 +1,56 @@
-use std::{
-    collections::HashMap,
-    sync::{Mutex, OnceLock},
-};
+use fxhash::FxHashMap;
+use indexmap::IndexSet;
 
-static SYMBOLS: OnceLock<Symbols> = OnceLock::new();
+slotmap::new_key_type! {
+    pub struct FileId;
 
-struct Symbols {
-    map: Mutex<HashMap<Hash64, String>>,
+    pub struct ModuleId;
+
+    pub struct ScopeId;
+
+    pub struct ImportId;
+
+    pub struct DefinitionId;
+
+    pub struct LocalId;
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Symbol(Hash64);
+#[derive(Debug)]
+pub struct SymbolInterner {
+    inner: IndexSet<String>,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-struct Hash64(u64);
+pub struct Symbol(usize);
 
-impl Symbol {
-    pub const EMPTY: Self = Symbol(Hash64::new_unchecked(3476900567878811119));
-    pub const CRATE: Self = Symbol(Hash64::new_unchecked(3160908839602319882));
-    pub const SUPER: Self = Symbol(Hash64::new_unchecked(10332305186512876660));
-
-    pub fn new(raw: &str) -> Self {
-        let hash = Hash64::new(raw);
-        let map = SYMBOLS.get_or_init(Symbols::new);
-        map.insert(hash, raw.to_owned());
-
-        Symbol(hash)
-    }
-}
-
-impl std::fmt::Display for Symbol {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let map = SYMBOLS.get_or_init(Symbols::new);
-        let raw = map.get(self.0).expect("failed to get ident");
-
-        write!(f, "{}", raw)
-    }
-}
-
-impl std::fmt::Debug for Symbol {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let map = SYMBOLS.get_or_init(Symbols::new);
-        let raw = map.get(self.0).expect("failed to get ident");
-
-        f.debug_struct("Ident")
-            .field("hash", &self.0)
-            .field("raw", &raw)
-            .finish()
-    }
-}
-
-impl Symbols {
+impl SymbolInterner {
     pub fn new() -> Self {
-        Symbols {
-            map: Mutex::new(HashMap::new()),
+        Self {
+            inner: IndexSet::new(),
         }
     }
 
-    pub fn insert(&self, hash: Hash64, raw: String) {
-        let mut map = self.map.lock().expect("failed to lock ident map");
-        map.insert(hash, raw);
-    }
+    pub fn intern(&mut self, s: &str) -> Symbol {
+        let (index, _) = self.inner.insert_full(s.to_owned());
 
-    pub fn get(&self, hash: Hash64) -> Option<String> {
-        let map = self.map.lock().expect("failed to lock ident map");
-
-        map.get(&hash).cloned()
+        Symbol(index)
     }
 }
 
-impl Hash64 {
-    pub fn new(raw: &str) -> Self {
-        use std::hash::{DefaultHasher, Hash, Hasher};
-
-        let mut hasher = DefaultHasher::new();
-        raw.hash(&mut hasher);
-
-        Hash64(hasher.finish())
-    }
+impl std::ops::Index<Symbol> for SymbolInterner {
+    type Output = str;
 
     #[inline]
-    pub const fn new_unchecked(value: u64) -> Self {
-        Hash64(value)
+    fn index(&self, Symbol(index): Symbol) -> &Self::Output {
+        &self.inner[index]
     }
 }
 
-#[macro_export]
-macro_rules! symbol {
-    ($raw:expr) => {
-        $crate::Symbol::new($raw)
-    };
-}
+impl std::ops::Index<Symbol> for FxHashMap<Symbol, Vec<DefinitionId>> {
+    type Output = Vec<DefinitionId>;
 
-#[test]
-fn constant() {
-    assert_eq!(symbol!(""), Symbol::EMPTY);
-    assert_eq!(symbol!("crate"), Symbol::CRATE);
-    assert_eq!(symbol!("super"), Symbol::SUPER);
+    #[inline]
+    fn index(&self, index: Symbol) -> &Self::Output {
+        &self[&index]
+    }
 }

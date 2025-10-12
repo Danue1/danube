@@ -1,0 +1,5 @@
+---
+source: compiler/danubec_semantic/src/tests/mod.rs
+expression: diagnostic
+---
+

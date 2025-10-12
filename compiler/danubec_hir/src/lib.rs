@@ -1,16 +1,10 @@
-use danubec_symbol::Symbol;
-use danubec_syntax::{Span, SyntaxNode};
-use std::{collections::HashMap, path::PathBuf};
-
-#[derive(Debug)]
-pub struct Krate {
-    pub attributes: Vec<TopLevelAttribute>,
-    pub definitions: Vec<Definition>,
-    pub children: HashMap<Identifier, Root>,
-}
+use danubec_symbol::{DefinitionId, LocalId, Symbol};
+use danubec_syntax::Span;
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct Root {
+    pub attributes: Vec<TopLevelAttribute>,
     pub definitions: Vec<Definition>,
     pub children: HashMap<Identifier, Root>,
 }
@@ -78,7 +72,7 @@ pub enum DefinitionKind {
         variants: Vec<EnumVariant>,
     },
     Use {
-        tree: UseTree,
+        tree: Import,
     },
     Module {
         name: Identifier,
@@ -137,6 +131,13 @@ pub struct Identifier {
 }
 
 #[derive(Debug)]
+pub enum Binding {
+    Unresolved,
+    Definition(DefinitionId),
+    Local(LocalId),
+}
+
+#[derive(Debug)]
 pub struct TypeParameter {
     pub r#type: TypeExpression,
     pub constraints: Vec<TypeExpression>,
@@ -182,30 +183,17 @@ pub enum EnumVariantKind {
 }
 
 #[derive(Debug)]
-pub struct UseTree {
-    pub root: bool,
-    pub kind: UseTreeKind,
+pub struct Import {
+    pub path: Path,
+    pub kind: ImportKind,
     pub span: Span,
 }
 
 #[derive(Debug)]
-pub enum UseTreeKind {
-    List {
-        trees: Vec<UseTree>,
-    },
+pub enum ImportKind {
     Glob,
-    Element {
-        path: Path,
-        trailing: UseTreeTrailing,
-    },
-}
-
-#[derive(Debug)]
-pub enum UseTreeTrailing {
-    Identifier,
-    List { trees: Vec<UseTree> },
-    Glob,
-    Rename { name: Identifier },
+    Symbol(Symbol),
+    List(Vec<Import>),
 }
 
 #[derive(Debug)]
@@ -217,6 +205,7 @@ pub struct Path {
 #[derive(Debug)]
 pub struct PathSegment {
     pub kind: PathSegmentKind,
+    pub binding: Binding,
     pub span: Span,
 }
 
