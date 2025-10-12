@@ -18,14 +18,9 @@ Table {
                     ),
                     children: {
                         Symbol(
-                            3,
+                            0,
                         ): ModuleId(
-                            5v1,
-                        ),
-                        Symbol(
-                            1,
-                        ): ModuleId(
-                            3v1,
+                            2v1,
                         ),
                         Symbol(
                             2,
@@ -33,9 +28,14 @@ Table {
                             4v1,
                         ),
                         Symbol(
-                            0,
+                            1,
                         ): ModuleId(
-                            2v1,
+                            3v1,
+                        ),
+                        Symbol(
+                            3,
+                        ): ModuleId(
+                            5v1,
                         ),
                     },
                     imports: [],
@@ -135,14 +135,14 @@ Table {
                     values: {},
                     types: {
                         Symbol(
-                            3,
-                        ): DefinitionId(
-                            4v1,
-                        ),
-                        Symbol(
                             0,
                         ): DefinitionId(
                             1v1,
+                        ),
+                        Symbol(
+                            3,
+                        ): DefinitionId(
+                            4v1,
                         ),
                     },
                 },

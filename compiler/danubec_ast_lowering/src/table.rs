@@ -1,5 +1,5 @@
 use crate::{file_system::FileId, symbol::Symbol};
-use std::collections::HashMap;
+use fxhash::FxHashMap;
 
 slotmap::new_key_type! {
     pub struct ModuleId;
@@ -23,7 +23,7 @@ pub struct Table {
 pub struct Module {
     pub parent: Option<ModuleId>,
     pub scope: ScopeId,
-    children: HashMap<Symbol, ModuleId>,
+    pub children: FxHashMap<Symbol, ModuleId>,
     pub imports: Vec<Import>,
     pub file: FileId,
 }
@@ -32,8 +32,8 @@ pub struct Module {
 pub struct Scope {
     pub parent: Option<ScopeId>,
     pub kind: ScopeKind,
-    pub values: HashMap<Symbol, DefinitionId>,
-    pub types: HashMap<Symbol, DefinitionId>,
+    pub values: FxHashMap<Symbol, DefinitionId>,
+    pub types: FxHashMap<Symbol, DefinitionId>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -109,8 +109,8 @@ impl Table {
         self.scopes.insert(Scope {
             parent,
             kind,
-            values: HashMap::new(),
-            types: HashMap::new(),
+            values: FxHashMap::default(),
+            types: FxHashMap::default(),
         })
     }
 
@@ -127,7 +127,7 @@ impl Table {
         self.modules.insert(Module {
             parent,
             scope,
-            children: HashMap::new(),
+            children: FxHashMap::default(),
             imports: vec![],
             file,
         })
@@ -175,26 +175,12 @@ impl std::ops::Index<DefinitionId> for Table {
     }
 }
 
-impl std::ops::IndexMut<DefinitionId> for Table {
-    #[inline]
-    fn index_mut(&mut self, index: DefinitionId) -> &mut Self::Output {
-        &mut self.definitions[index]
-    }
-}
-
 impl std::ops::Index<ImportId> for Table {
     type Output = Import;
 
     #[inline]
     fn index(&self, index: ImportId) -> &Self::Output {
         &self.imports[index]
-    }
-}
-
-impl std::ops::IndexMut<ImportId> for Table {
-    #[inline]
-    fn index_mut(&mut self, index: ImportId) -> &mut Self::Output {
-        &mut self.imports[index]
     }
 }
 
@@ -207,15 +193,8 @@ impl std::ops::Index<Symbol> for Module {
     }
 }
 
-impl std::ops::IndexMut<Symbol> for Module {
-    #[inline]
-    fn index_mut(&mut self, index: Symbol) -> &mut Self::Output {
-        self.children.get_mut(&index).unwrap()
-    }
-}
-
 impl std::ops::Index<Namespace> for Scope {
-    type Output = HashMap<Symbol, DefinitionId>;
+    type Output = FxHashMap<Symbol, DefinitionId>;
 
     #[inline]
     fn index(&self, namespace: Namespace) -> &Self::Output {
@@ -236,18 +215,11 @@ impl std::ops::IndexMut<Namespace> for Scope {
     }
 }
 
-impl std::ops::Index<Symbol> for HashMap<Symbol, DefinitionId> {
+impl std::ops::Index<Symbol> for FxHashMap<Symbol, DefinitionId> {
     type Output = DefinitionId;
 
     #[inline]
     fn index(&self, index: Symbol) -> &Self::Output {
         &self[&index]
-    }
-}
-
-impl std::ops::IndexMut<Symbol> for HashMap<Symbol, DefinitionId> {
-    #[inline]
-    fn index_mut(&mut self, index: Symbol) -> &mut Self::Output {
-        self.get_mut(&index).unwrap()
     }
 }

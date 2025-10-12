@@ -1,5 +1,6 @@
+use fxhash::FxHashMap;
 use slotmap::{SecondaryMap, SlotMap};
-use std::path::PathBuf;
+use std::{collections::HashMap, path::PathBuf};
 
 slotmap::new_key_type! {
     pub struct FileId;
@@ -15,6 +16,8 @@ struct InnerFileSystem {
     paths: SlotMap<FileId, PathBuf>,
     canonicals: SecondaryMap<FileId, PathBuf>,
     files: SecondaryMap<FileId, String>,
+
+    path_to_id: FxHashMap<PathBuf, FileId>,
 }
 
 impl FileSystem {
@@ -26,29 +29,33 @@ impl FileSystem {
 
     #[inline]
     pub fn krate(&mut self, path: PathBuf) -> FileId {
-        self.file(path)
+        self.inner.file(path)
     }
 
     pub fn module(&mut self, parent_id: FileId, path: &str) -> Option<FileId> {
-        let path = self.inner.path(parent_id)?.parent()?.join(path);
+        let parent = self.inner.path(parent_id)?.parent()?.join(path);
 
-        let path = path.with_extension("dnb");
-        if path.exists() {
-            return Some(self.file(path));
+        {
+            let path = parent.with_extension("dnb");
+            if let Some(file_id) = self.inner.path_to_id(&path) {
+                return Some(file_id);
+            }
+            if path.exists() {
+                return Some(self.inner.file(path));
+            }
         }
 
-        let path = path.join("mod").with_extension("dnb");
-        dbg!(&path);
-        if path.exists() {
-            return Some(self.file(path));
+        {
+            let path = parent.join("mod").with_extension("dnb");
+            if let Some(file_id) = self.inner.path_to_id(&path) {
+                return Some(file_id);
+            }
+            if path.exists() {
+                return Some(self.inner.file(path));
+            }
         }
 
         None
-    }
-
-    #[inline]
-    pub fn file(&mut self, path: PathBuf) -> FileId {
-        self.inner.file(path)
     }
 
     #[inline]
@@ -68,19 +75,29 @@ impl InnerFileSystem {
             paths: SlotMap::with_key(),
             canonicals: SecondaryMap::new(),
             files: SecondaryMap::new(),
+
+            path_to_id: FxHashMap::default(),
         }
     }
 
     fn file(&mut self, path: PathBuf) -> FileId {
-        let canonical = path.canonicalize().ok();
-        let same = canonical.as_ref().map_or(false, |c| c == &path);
-        let file_id = self.paths.insert(path);
+        use std::collections::hash_map::Entry;
 
-        if !same && let Some(canonical) = canonical {
-            self.canonicals.insert(file_id, canonical);
+        match self.path_to_id.entry(path.clone()) {
+            Entry::Occupied(entry) => *entry.get(),
+            Entry::Vacant(entry) => {
+                let canonical = path.canonicalize().ok();
+                let canonical = canonical.and_then(|c| if c != path { Some(c) } else { None });
+                let file_id = self.paths.insert(path);
+                entry.insert(file_id);
+
+                if let Some(canonical) = canonical {
+                    self.canonicals.insert(file_id, canonical);
+                }
+
+                file_id
+            }
         }
-
-        file_id
     }
 
     fn canonicalized(&self, file_id: FileId) -> Option<&PathBuf> {
@@ -91,6 +108,11 @@ impl InnerFileSystem {
     #[inline]
     fn path(&self, file_id: FileId) -> Option<&PathBuf> {
         self.paths.get(file_id)
+    }
+
+    #[inline]
+    fn path_to_id(&self, path: &PathBuf) -> Option<FileId> {
+        self.path_to_id.get(path).copied()
     }
 
     fn source(&mut self, file_id: FileId) -> Option<&str> {

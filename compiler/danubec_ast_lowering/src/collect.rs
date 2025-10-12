@@ -145,12 +145,12 @@ impl<'lowering> DefinitionCollector<'lowering> {
             kind: crate::table::DefinitionKind::Module,
             file: self.file,
         });
-        let current = self.current_scope();
-        self.table[current][Namespace::Type][name] = definition;
+        let current_scope = self.current_scope();
+        self.table[current_scope][Namespace::Type].insert(name, definition);
 
-        let parent = self.module;
-        let child = self.table.module(self.file, Some(parent));
-        self.table[parent][name] = child;
+        let parent_module = self.module;
+        let child = self.table.module(self.file, Some(parent_module));
+        self.table[parent_module].children.insert(name, child);
 
         self.with_scope(ScopeKind::Module, |this| {
             for definition in inline_module.definitions() {

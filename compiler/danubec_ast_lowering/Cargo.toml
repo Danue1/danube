@@ -7,6 +7,7 @@ edition = "2024"
 danubec_diagnostic.path = "../danubec_diagnostic"
 danubec_parse.path = "../danubec_parse"
 danubec_syntax.path = "../danubec_syntax"
+fxhash.workspace = true
 indexmap.workspace = true
 insta.workspace = true
 miette.workspace = true

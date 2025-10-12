@@ -14,6 +14,7 @@ members = [
 [workspace.dependencies]
 anyhow = "1.0.100"
 drop_bomb = "0.1.5"
+fxhash = "0.2.1"
 indexmap = "2.11.4"
 insta = "1.43.2"
 miette = { version = "7.6.0", features = ["fancy"] }

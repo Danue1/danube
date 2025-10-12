@@ -45,11 +45,11 @@ pub fn build(
                 file,
             });
             let scope = table[module].scope;
-            table[scope][Namespace::Type][name] = definition;
+            table[scope][Namespace::Type].insert(name, definition);
 
             let parent = module;
             let child = table.module(child_file, Some(parent));
-            table[parent][name] = child;
+            table[parent].children.insert(name, child);
 
             queue.push_back(child);
         }

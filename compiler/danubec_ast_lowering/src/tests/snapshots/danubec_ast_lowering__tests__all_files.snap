@@ -53,5 +53,13 @@ FileSystem {
             num_elems: 2,
             _k: PhantomData<fn(danubec_ast_lowering::file_system::FileId) -> danubec_ast_lowering::file_system::FileId>,
         },
+        path_to_id: {
+            "src/tests/fixtures/foo.dnb": FileId(
+                2v1,
+            ),
+            "src/tests/fixtures/lib.dnb": FileId(
+                1v1,
+            ),
+        },
     },
 }
