@@ -2,14 +2,14 @@
 source: compiler/danubec_parse/src/tests/mod.rs
 expression: node
 ---
-KRATE_NODE@0..354
+ROOT_NODE@0..354
   NEW_LINE@0..1 "\n"
   DEFINITION_NODE@1..9
     USE_DEFINITION_NODE@1..9
       USE@1..4 "use"
       WHITESPACE@4..5 " "
       USE_TREE_NODE@5..7
-        USE_TREE_NESTED_NODE@5..7
+        USE_TREE_LIST_NODE@5..7
           LEFT_BRACE@5..6 "{"
           RIGHT_BRACE@6..7 "}"
       SEMICOLON@7..8 ";"
@@ -19,10 +19,10 @@ KRATE_NODE@0..354
       USE@9..12 "use"
       WHITESPACE@12..13 " "
       USE_TREE_NODE@13..63
-        USE_TREE_NESTED_NODE@13..63
+        USE_TREE_LIST_NODE@13..63
           LEFT_BRACE@13..14 "{"
           USE_TREE_NODE@14..16
-            USE_TREE_NESTED_NODE@14..16
+            USE_TREE_LIST_NODE@14..16
               LEFT_BRACE@14..15 "{"
               RIGHT_BRACE@15..16 "}"
           COMMA@16..17 ","
@@ -57,7 +57,7 @@ KRATE_NODE@0..354
             PATH_SEGMENT_ROOT_NODE@34..36
               COLON@34..35 ":"
               COLON@35..36 ":"
-            USE_TREE_NESTED_NODE@36..38
+            USE_TREE_LIST_NODE@36..38
               LEFT_BRACE@36..37 "{"
               RIGHT_BRACE@37..38 "}"
           COMMA@38..39 ","
@@ -153,7 +153,7 @@ KRATE_NODE@0..354
               IDENTIFIER_NODE@101..104
                 IDENTIFIER_SEGMENT@101..104
                   IDENTIFIER@101..104 "foo"
-          USE_TREE_NESTED_NODE@104..108
+          USE_TREE_LIST_NODE@104..108
             COLON@104..105 ":"
             COLON@105..106 ":"
             LEFT_BRACE@106..107 "{"
@@ -171,7 +171,7 @@ KRATE_NODE@0..354
               IDENTIFIER_NODE@114..117
                 IDENTIFIER_SEGMENT@114..117
                   IDENTIFIER@114..117 "foo"
-          USE_TREE_NESTED_NODE@117..168
+          USE_TREE_LIST_NODE@117..168
             COLON@117..118 ":"
             COLON@118..119 ":"
             LEFT_BRACE@119..120 "{"
@@ -203,7 +203,7 @@ KRATE_NODE@0..354
                       IDENTIFIER@133..136 "baz"
             COMMA@136..137 ","
             USE_TREE_NODE@137..139
-              USE_TREE_NESTED_NODE@137..139
+              USE_TREE_LIST_NODE@137..139
                 LEFT_BRACE@137..138 "{"
                 RIGHT_BRACE@138..139 "}"
             COMMA@139..140 ","
@@ -247,7 +247,7 @@ KRATE_NODE@0..354
               PATH_SEGMENT_ROOT_NODE@163..165
                 COLON@163..164 ":"
                 COLON@164..165 ":"
-              USE_TREE_NESTED_NODE@165..167
+              USE_TREE_LIST_NODE@165..167
                 LEFT_BRACE@165..166 "{"
                 RIGHT_BRACE@166..167 "}"
             RIGHT_BRACE@167..168 "}"
@@ -262,7 +262,7 @@ KRATE_NODE@0..354
         PATH_SEGMENT_ROOT_NODE@175..177
           COLON@175..176 ":"
           COLON@176..177 ":"
-        USE_TREE_NESTED_NODE@177..179
+        USE_TREE_LIST_NODE@177..179
           LEFT_BRACE@177..178 "{"
           RIGHT_BRACE@178..179 "}"
       SEMICOLON@179..180 ";"
@@ -275,10 +275,10 @@ KRATE_NODE@0..354
         PATH_SEGMENT_ROOT_NODE@185..187
           COLON@185..186 ":"
           COLON@186..187 ":"
-        USE_TREE_NESTED_NODE@187..237
+        USE_TREE_LIST_NODE@187..237
           LEFT_BRACE@187..188 "{"
           USE_TREE_NODE@188..190
-            USE_TREE_NESTED_NODE@188..190
+            USE_TREE_LIST_NODE@188..190
               LEFT_BRACE@188..189 "{"
               RIGHT_BRACE@189..190 "}"
           COMMA@190..191 ","
@@ -313,7 +313,7 @@ KRATE_NODE@0..354
             PATH_SEGMENT_ROOT_NODE@208..210
               COLON@208..209 ":"
               COLON@209..210 ":"
-            USE_TREE_NESTED_NODE@210..212
+            USE_TREE_LIST_NODE@210..212
               LEFT_BRACE@210..211 "{"
               RIGHT_BRACE@211..212 "}"
           COMMA@212..213 ","
@@ -421,7 +421,7 @@ KRATE_NODE@0..354
               IDENTIFIER_NODE@283..286
                 IDENTIFIER_SEGMENT@283..286
                   IDENTIFIER@283..286 "foo"
-          USE_TREE_NESTED_NODE@286..290
+          USE_TREE_LIST_NODE@286..290
             COLON@286..287 ":"
             COLON@287..288 ":"
             LEFT_BRACE@288..289 "{"
@@ -442,7 +442,7 @@ KRATE_NODE@0..354
               IDENTIFIER_NODE@298..301
                 IDENTIFIER_SEGMENT@298..301
                   IDENTIFIER@298..301 "foo"
-          USE_TREE_NESTED_NODE@301..352
+          USE_TREE_LIST_NODE@301..352
             COLON@301..302 ":"
             COLON@302..303 ":"
             LEFT_BRACE@303..304 "{"
@@ -474,7 +474,7 @@ KRATE_NODE@0..354
                       IDENTIFIER@317..320 "baz"
             COMMA@320..321 ","
             USE_TREE_NODE@321..323
-              USE_TREE_NESTED_NODE@321..323
+              USE_TREE_LIST_NODE@321..323
                 LEFT_BRACE@321..322 "{"
                 RIGHT_BRACE@322..323 "}"
             COMMA@323..324 ","
@@ -518,7 +518,7 @@ KRATE_NODE@0..354
               PATH_SEGMENT_ROOT_NODE@347..349
                 COLON@347..348 ":"
                 COLON@348..349 ":"
-              USE_TREE_NESTED_NODE@349..351
+              USE_TREE_LIST_NODE@349..351
                 LEFT_BRACE@349..350 "{"
                 RIGHT_BRACE@350..351 "}"
             RIGHT_BRACE@351..352 "}"

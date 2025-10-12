@@ -2,7 +2,7 @@
 source: compiler/danubec_parse/src/tests/mod.rs
 expression: node
 ---
-KRATE_NODE@0..57
+ROOT_NODE@0..57
   NEW_LINE@0..1 "\n"
   DEFINITION_NODE@1..23
     STATIC_DEFINITION_NODE@1..23
