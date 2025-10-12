@@ -1,5 +1,5 @@
 use crate::{
-    collect::DefinitionCollector,
+    collect::collect,
     file_system::{FileId, FileSystem},
     symbol::{Symbol, SymbolInterner},
     table::{Definition, DefinitionKind, Namespace, Table},
@@ -29,21 +29,15 @@ pub fn build(
         };
         let node = parse(&source, diagnostic);
 
-        {
-            let mut collector = DefinitionCollector::new(file, module, symbols, table);
-            collector.root(node.clone())
-        }
+        collect(diagnostic, file, module, symbols, table, node.clone());
 
         for name in external_modules(&node, symbols) {
             let Some(child_file) = fs.module(file, &symbols[name]) else {
                 diagnostic.report(miette!("Module '{}' not found", &symbols[name]));
                 continue;
             };
-            let child_module = table.module(child_file, Some(module));
-            table[module].children.insert(name, child_module);
-            queue.push_back(child_module);
 
-            let definition_id = table.definition(Definition {
+            let definition = table.definition(Definition {
                 parent_scope: table[module].scope,
                 name,
                 namespace: Namespace::Type,
@@ -51,7 +45,13 @@ pub fn build(
                 file,
             });
             let scope = table[module].scope;
-            table.scopes[scope].types.insert(name, definition_id);
+            table[scope][Namespace::Type][name] = definition;
+
+            let parent = module;
+            let child = table.module(child_file, Some(parent));
+            table[parent][name] = child;
+
+            queue.push_back(child);
         }
     }
 }

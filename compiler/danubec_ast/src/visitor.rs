@@ -296,7 +296,7 @@ pub fn walk_enum_variant<V: Visitor>(visitor: &mut V, node: crate::EnumVariant) 
 
 pub fn walk_use_tree<V: Visitor>(visitor: &mut V, node: crate::UseTree) {
     match node.kind {
-        crate::UseTreeKind::Nested { trees } => {
+        crate::UseTreeKind::List { trees } => {
             visit_each!(visitor.visit_use_tree(trees));
         }
         crate::UseTreeKind::Glob => {
@@ -314,7 +314,7 @@ pub fn walk_use_tree_trailing<V: Visitor>(visitor: &mut V, node: crate::UseTreeT
         crate::UseTreeTrailing::Identifier => {
             //
         }
-        crate::UseTreeTrailing::Nested { trees } => {
+        crate::UseTreeTrailing::List { trees } => {
             visit_each!(visitor.visit_use_tree(trees));
         }
         crate::UseTreeTrailing::Glob => {

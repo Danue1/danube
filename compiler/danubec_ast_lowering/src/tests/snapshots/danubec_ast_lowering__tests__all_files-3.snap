@@ -4,8 +4,9 @@ expression: symbols
 ---
 SymbolInterner {
     inner: {
-        "foo",
         "bar",
         "baz",
+        "qux",
+        "foo",
     },
 }

@@ -1,3 +1,9 @@
 mod foo;
-mod bar;
-mod baz;
+
+mod bar {
+  mod baz {
+    mod qux {
+      //
+    }
+  }
+}

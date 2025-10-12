@@ -18,19 +18,24 @@ Table {
                     ),
                     children: {
                         Symbol(
-                            1,
+                            3,
                         ): ModuleId(
-                            2v1,
+                            5v1,
                         ),
                         Symbol(
-                            0,
+                            1,
                         ): ModuleId(
-                            4v1,
+                            3v1,
                         ),
                         Symbol(
                             2,
                         ): ModuleId(
-                            3v1,
+                            4v1,
+                        ),
+                        Symbol(
+                            0,
+                        ): ModuleId(
+                            2v1,
                         ),
                     },
                     imports: [],
@@ -53,49 +58,67 @@ Table {
                     children: {},
                     imports: [],
                     file: FileId(
+                        1v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Module {
+                    parent: Some(
+                        ModuleId(
+                            1v1,
+                        ),
+                    ),
+                    scope: ScopeId(
+                        4v1,
+                    ),
+                    children: {},
+                    imports: [],
+                    file: FileId(
+                        1v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Module {
+                    parent: Some(
+                        ModuleId(
+                            1v1,
+                        ),
+                    ),
+                    scope: ScopeId(
+                        6v1,
+                    ),
+                    children: {},
+                    imports: [],
+                    file: FileId(
+                        1v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Module {
+                    parent: Some(
+                        ModuleId(
+                            1v1,
+                        ),
+                    ),
+                    scope: ScopeId(
+                        8v1,
+                    ),
+                    children: {},
+                    imports: [],
+                    file: FileId(
                         2v1,
                     ),
                 },
             },
-            Slot {
-                version: 1,
-                value: Module {
-                    parent: Some(
-                        ModuleId(
-                            1v1,
-                        ),
-                    ),
-                    scope: ScopeId(
-                        3v1,
-                    ),
-                    children: {},
-                    imports: [],
-                    file: FileId(
-                        3v1,
-                    ),
-                },
-            },
-            Slot {
-                version: 1,
-                value: Module {
-                    parent: Some(
-                        ModuleId(
-                            1v1,
-                        ),
-                    ),
-                    scope: ScopeId(
-                        4v1,
-                    ),
-                    children: {},
-                    imports: [],
-                    file: FileId(
-                        4v1,
-                    ),
-                },
-            },
         ],
-        free_head: 5,
-        num_elems: 4,
+        free_head: 6,
+        num_elems: 5,
         _k: PhantomData<fn(danubec_ast_lowering::table::ModuleId) -> danubec_ast_lowering::table::ModuleId>,
     },
     scopes: SlotMap {
@@ -112,19 +135,14 @@ Table {
                     values: {},
                     types: {
                         Symbol(
-                            1,
+                            3,
                         ): DefinitionId(
-                            1v1,
-                        ),
-                        Symbol(
-                            2,
-                        ): DefinitionId(
-                            2v1,
+                            4v1,
                         ),
                         Symbol(
                             0,
                         ): DefinitionId(
-                            3v1,
+                            1v1,
                         ),
                     },
                 },
@@ -152,6 +170,70 @@ Table {
                     ),
                     kind: Module,
                     values: {},
+                    types: {
+                        Symbol(
+                            1,
+                        ): DefinitionId(
+                            2v1,
+                        ),
+                    },
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    parent: Some(
+                        ScopeId(
+                            1v1,
+                        ),
+                    ),
+                    kind: Module,
+                    values: {},
+                    types: {},
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    parent: Some(
+                        ScopeId(
+                            3v1,
+                        ),
+                    ),
+                    kind: Module,
+                    values: {},
+                    types: {
+                        Symbol(
+                            2,
+                        ): DefinitionId(
+                            3v1,
+                        ),
+                    },
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    parent: Some(
+                        ScopeId(
+                            1v1,
+                        ),
+                    ),
+                    kind: Module,
+                    values: {},
+                    types: {},
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    parent: Some(
+                        ScopeId(
+                            5v1,
+                        ),
+                    ),
+                    kind: Module,
+                    values: {},
                     types: {},
                 },
             },
@@ -169,8 +251,8 @@ Table {
                 },
             },
         ],
-        free_head: 5,
-        num_elems: 4,
+        free_head: 9,
+        num_elems: 8,
         _k: PhantomData<fn(danubec_ast_lowering::table::ScopeId) -> danubec_ast_lowering::table::ScopeId>,
     },
     imports: SlotMap {
@@ -197,6 +279,22 @@ Table {
                         1v1,
                     ),
                     name: Symbol(
+                        0,
+                    ),
+                    namespace: Type,
+                    kind: Module,
+                    file: FileId(
+                        1v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Definition {
+                    parent_scope: ScopeId(
+                        3v1,
+                    ),
+                    name: Symbol(
                         1,
                     ),
                     namespace: Type,
@@ -210,7 +308,7 @@ Table {
                 version: 1,
                 value: Definition {
                     parent_scope: ScopeId(
-                        1v1,
+                        5v1,
                     ),
                     name: Symbol(
                         2,
@@ -229,7 +327,7 @@ Table {
                         1v1,
                     ),
                     name: Symbol(
-                        0,
+                        3,
                     ),
                     namespace: Type,
                     kind: Module,
@@ -239,8 +337,8 @@ Table {
                 },
             },
         ],
-        free_head: 4,
-        num_elems: 3,
+        free_head: 5,
+        num_elems: 4,
         _k: PhantomData<fn(danubec_ast_lowering::table::DefinitionId) -> danubec_ast_lowering::table::DefinitionId>,
     },
 }

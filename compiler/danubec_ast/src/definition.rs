@@ -190,7 +190,7 @@ pub struct UseTree {
 
 #[derive(Debug)]
 pub enum UseTreeKind {
-    Nested {
+    List {
         trees: Vec<UseTree>,
     },
     Glob,
@@ -203,7 +203,7 @@ pub enum UseTreeKind {
 #[derive(Debug)]
 pub enum UseTreeTrailing {
     Identifier,
-    Nested { trees: Vec<UseTree> },
+    List { trees: Vec<UseTree> },
     Glob,
     Rename { name: Identifier },
 }

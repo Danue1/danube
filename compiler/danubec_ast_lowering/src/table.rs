@@ -13,17 +13,17 @@ slotmap::new_key_type! {
 
 #[derive(Debug)]
 pub struct Table {
-    pub modules: slotmap::SlotMap<ModuleId, Module>,
-    pub scopes: slotmap::SlotMap<ScopeId, Scope>,
-    pub imports: slotmap::SlotMap<ImportId, Import>,
-    pub definitions: slotmap::SlotMap<DefinitionId, Definition>,
+    modules: slotmap::SlotMap<ModuleId, Module>,
+    scopes: slotmap::SlotMap<ScopeId, Scope>,
+    imports: slotmap::SlotMap<ImportId, Import>,
+    definitions: slotmap::SlotMap<DefinitionId, Definition>,
 }
 
 #[derive(Debug)]
 pub struct Module {
     pub parent: Option<ModuleId>,
     pub scope: ScopeId,
-    pub children: HashMap<Symbol, ModuleId>,
+    children: HashMap<Symbol, ModuleId>,
     pub imports: Vec<Import>,
     pub file: FileId,
 }
@@ -87,6 +87,11 @@ pub enum DefinitionKind {
     Struct,
     Enum,
     Const,
+    Static,
+    Trait,
+    EnumVariant,
+    TypeAlias,
+    Implement,
     Local,
 }
 
@@ -190,5 +195,59 @@ impl std::ops::IndexMut<ImportId> for Table {
     #[inline]
     fn index_mut(&mut self, index: ImportId) -> &mut Self::Output {
         &mut self.imports[index]
+    }
+}
+
+impl std::ops::Index<Symbol> for Module {
+    type Output = ModuleId;
+
+    #[inline]
+    fn index(&self, index: Symbol) -> &Self::Output {
+        &self.children[&index]
+    }
+}
+
+impl std::ops::IndexMut<Symbol> for Module {
+    #[inline]
+    fn index_mut(&mut self, index: Symbol) -> &mut Self::Output {
+        self.children.get_mut(&index).unwrap()
+    }
+}
+
+impl std::ops::Index<Namespace> for Scope {
+    type Output = HashMap<Symbol, DefinitionId>;
+
+    #[inline]
+    fn index(&self, namespace: Namespace) -> &Self::Output {
+        match namespace {
+            Namespace::Value => &self.values,
+            Namespace::Type => &self.types,
+        }
+    }
+}
+
+impl std::ops::IndexMut<Namespace> for Scope {
+    #[inline]
+    fn index_mut(&mut self, index: Namespace) -> &mut Self::Output {
+        match index {
+            Namespace::Value => &mut self.values,
+            Namespace::Type => &mut self.types,
+        }
+    }
+}
+
+impl std::ops::Index<Symbol> for HashMap<Symbol, DefinitionId> {
+    type Output = DefinitionId;
+
+    #[inline]
+    fn index(&self, index: Symbol) -> &Self::Output {
+        &self[&index]
+    }
+}
+
+impl std::ops::IndexMut<Symbol> for HashMap<Symbol, DefinitionId> {
+    #[inline]
+    fn index_mut(&mut self, index: Symbol) -> &mut Self::Output {
+        self.get_mut(&index).unwrap()
     }
 }

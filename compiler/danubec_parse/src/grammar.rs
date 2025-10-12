@@ -499,7 +499,7 @@ pub(crate) fn use_tree_nested(p: &mut Context, m: Marker) -> CompleteMarker {
     }
     expect!(p, RIGHT_BRACE, [m], '}');
 
-    p.complete(m, USE_TREE_NESTED_NODE)
+    p.complete(m, USE_TREE_LIST_NODE)
 }
 
 pub(crate) fn use_tree_glob(p: &mut Context, m: Marker) -> CompleteMarker {

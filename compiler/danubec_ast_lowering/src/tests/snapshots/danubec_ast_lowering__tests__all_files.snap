@@ -16,19 +16,11 @@ FileSystem {
                 },
                 Slot {
                     version: 1,
-                    value: "src/tests/fixtures/bar.dnb",
-                },
-                Slot {
-                    version: 1,
-                    value: "src/tests/fixtures/baz.dnb",
-                },
-                Slot {
-                    version: 1,
                     value: "src/tests/fixtures/foo.dnb",
                 },
             ],
-            free_head: 5,
-            num_elems: 4,
+            free_head: 3,
+            num_elems: 2,
             _k: PhantomData<fn(danubec_ast_lowering::file_system::FileId) -> danubec_ast_lowering::file_system::FileId>,
         },
         canonicals: SecondaryMap {
@@ -39,34 +31,18 @@ FileSystem {
                     version: 1,
                 },
                 Occupied {
-                    value: "/Users/danuel/Documents/internal/danube-lang/danube/compiler/danubec_ast_lowering/src/tests/fixtures/bar.dnb",
-                    version: 1,
-                },
-                Occupied {
-                    value: "/Users/danuel/Documents/internal/danube-lang/danube/compiler/danubec_ast_lowering/src/tests/fixtures/baz.dnb",
-                    version: 1,
-                },
-                Occupied {
                     value: "/Users/danuel/Documents/internal/danube-lang/danube/compiler/danubec_ast_lowering/src/tests/fixtures/foo.dnb",
                     version: 1,
                 },
             ],
-            num_elems: 4,
+            num_elems: 2,
             _k: PhantomData<fn(danubec_ast_lowering::file_system::FileId) -> danubec_ast_lowering::file_system::FileId>,
         },
         files: SecondaryMap {
             slots: [
                 Vacant,
                 Occupied {
-                    value: "mod foo;\nmod bar;\nmod baz;\n",
-                    version: 1,
-                },
-                Occupied {
-                    value: "",
-                    version: 1,
-                },
-                Occupied {
-                    value: "",
+                    value: "mod foo;\n\nmod bar {\n  mod baz {\n    mod qux {\n      //\n    }\n  }\n}\n",
                     version: 1,
                 },
                 Occupied {
@@ -74,7 +50,7 @@ FileSystem {
                     version: 1,
                 },
             ],
-            num_elems: 4,
+            num_elems: 2,
             _k: PhantomData<fn(danubec_ast_lowering::file_system::FileId) -> danubec_ast_lowering::file_system::FileId>,
         },
     },

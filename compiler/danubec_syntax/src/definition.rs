@@ -597,14 +597,14 @@ ast_node! {
     /// A tree in a use definition: `a::b::C`, `a::{b, c}`, `a::*`, etc.
     enum UseTreeKind;
 
-    variant Nested -> UseTreeNested;
+    variant List -> UseTreeList;
     variant Glob -> UseTreeGlob;
     variant Element -> UseTreeElement;
 }
 
 ast_node! {
     /// A renamed import in a use tree: `{ *, a, b as c, ::*, ::a, ::b as c }`, `::{ *, a, b as c, ::*, ::a, ::b as c }`
-    struct UseTreeNested where USE_TREE_NESTED_NODE;
+    struct UseTreeList where USE_TREE_LIST_NODE;
 
     token left_brace where LEFT_BRACE;
     nodes trees -> UseTree;
@@ -636,7 +636,7 @@ ast_node! {
 
 ast_node! {
     /// A renamed import in a use tree: `{ *, a, b as c, ::*, ::a, ::b as c }`, `::{ *, a, b as c, ::*, ::a, ::b as c }`
-    struct UseTreeTrailingNested where USE_TREE_NESTED_NODE;
+    struct UseTreeTrailingNested where USE_TREE_LIST_NODE;
 
     tokens colons where COLON;
     token left_brace where LEFT_BRACE;
