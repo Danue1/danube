@@ -11,5 +11,6 @@ mod fs;
 mod inference;
 mod resolve;
 mod semantic;
+mod ticker;
 
 pub use semantic::*;

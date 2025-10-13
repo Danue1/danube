@@ -1,5 +1,6 @@
 use crate::{
     check::check, collect::collect, env::Env, fs::Fs, inference::inference, resolve::resolve,
+    ticker::Ticker,
 };
 use danubec_diagnostic::Diagnostic;
 use danubec_symbol::SymbolInterner;
@@ -19,26 +20,15 @@ pub fn semantic(Context { path }: Context) -> (Fs, Env, SymbolInterner, Diagnost
 
     collect(&mut fs, &mut env, &mut symbols, &mut diagnostic, root);
 
-    fixed_point(|changed| {
-        resolve();
-        inference();
-        check();
-
-        *changed = false;
-    });
-
-    (fs, env, symbols, diagnostic)
-}
-
-fn fixed_point<F>(mut f: F)
-where
-    F: FnMut(&mut bool),
-{
     loop {
-        let mut changed = true;
-        f(&mut changed);
-        if !changed {
+        let mut ticker = Ticker::new();
+        resolve(&mut env, &mut symbols, &mut diagnostic, &mut ticker);
+        inference(&mut env, &mut symbols, &mut diagnostic, &mut ticker);
+        check(&mut env, &mut symbols, &mut diagnostic, &mut ticker);
+        if !ticker.changed() {
             break;
         }
     }
+
+    (fs, env, symbols, diagnostic)
 }
