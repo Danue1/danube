@@ -3,7 +3,7 @@ use crate::{Context, semantic};
 #[test]
 fn all_files() {
     let context = Context {
-        path: std::path::PathBuf::from("src/tests/fixtures/lib.dnb"),
+        root: std::path::PathBuf::from("src/tests/fixtures/lib.dnb"),
     };
     let (fs, table, symbols, diagnostic) = semantic(context);
 

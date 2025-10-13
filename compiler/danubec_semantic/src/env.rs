@@ -1,4 +1,5 @@
-use danubec_symbol::{DefinitionId, FileId, ImportId, ModuleId, ScopeId, Symbol};
+use danubec_hir::{Binding, Import, ImportKind, Path, PathSegment};
+use danubec_symbol::{DefinitionId, FileId, ModuleId, ScopeId, Symbol};
 use fxhash::FxHashMap;
 use slotmap::SlotMap;
 
@@ -6,7 +7,6 @@ use slotmap::SlotMap;
 pub struct Env {
     modules: SlotMap<ModuleId, Module>,
     scopes: SlotMap<ScopeId, Scope>,
-    imports: SlotMap<ImportId, Import>,
     definitions: SlotMap<DefinitionId, Definition>,
 }
 
@@ -20,13 +20,19 @@ pub struct Module {
 
 #[derive(Debug)]
 pub struct Scope {
-    pub parent_module: Option<ModuleId>,
+    pub module: Option<ModuleId>,
     pub parent: Option<ScopeId>,
     pub kind: ScopeKind,
-    pub imports: Vec<Import>,
-    pub values: FxHashMap<Symbol, Vec<DefinitionId>>,
     pub types: FxHashMap<Symbol, Vec<DefinitionId>>,
+    pub values: FxHashMap<Symbol, Vec<DefinitionId>>,
+    pub imports: Vec<Import>,
     pub implements: Vec<DefinitionId>,
+}
+
+#[derive(Debug)]
+pub struct Definition {
+    pub parent_scope: Option<ScopeId>,
+    pub file: FileId,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -34,42 +40,6 @@ pub enum ScopeKind {
     Module,
     Function,
     Block,
-}
-
-#[derive(Debug)]
-pub struct Import {
-    pub kind: ImportKind,
-    pub file: FileId,
-}
-
-#[derive(Debug)]
-pub enum ImportKind {
-    Path(Path, ImportNestedKind),
-    List(Vec<ImportKind>),
-}
-
-#[derive(Debug)]
-pub enum ImportNestedKind {
-    Glob,
-    Identifier(Option<Symbol>),
-    List(Vec<ImportKind>),
-}
-
-#[derive(Debug)]
-pub struct Path {
-    pub segments: Vec<PathSegment>,
-}
-
-#[derive(Debug)]
-pub struct PathSegment {
-    pub name: Symbol,
-    pub alias: Option<Symbol>,
-}
-
-#[derive(Debug)]
-pub struct Definition {
-    pub parent_scope: Option<ScopeId>,
-    pub file: FileId,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -83,7 +53,6 @@ impl Env {
         Self {
             modules: SlotMap::with_key(),
             scopes: SlotMap::with_key(),
-            imports: SlotMap::with_key(),
             definitions: SlotMap::with_key(),
         }
     }
@@ -101,13 +70,9 @@ impl Env {
         self.definitions.insert(definition)
     }
 
-    pub fn import(&mut self, import: Import) -> ImportId {
-        self.imports.insert(import)
-    }
-
     pub fn module(&mut self, file: FileId, parent: Option<ModuleId>) -> ModuleId {
         let scope = self.scope(ScopeKind::Module, |s| {
-            s.parent_module = parent;
+            s.module = parent;
         });
         self.modules.insert(Module {
             parent,
@@ -121,19 +86,19 @@ impl Env {
 impl Scope {
     pub fn new(kind: ScopeKind) -> Self {
         Self {
-            parent_module: None,
+            module: None,
             parent: None,
             kind,
-            imports: vec![],
-            values: FxHashMap::default(),
             types: FxHashMap::default(),
+            values: FxHashMap::default(),
+            imports: vec![],
             implements: vec![],
         }
     }
 
     #[inline]
     pub fn with_parent_module(mut self, parent: ModuleId) -> Self {
-        self.parent_module = Some(parent);
+        self.module = Some(parent);
         self
     }
 
@@ -141,6 +106,16 @@ impl Scope {
     pub fn with_parent(mut self, parent: ScopeId) -> Self {
         self.parent = Some(parent);
         self
+    }
+
+    pub fn import(&mut self, segments: &[PathSegment], kind: ImportKind) {
+        if !segments.is_empty() {
+            let path = Path {
+                segments: segments.to_vec(),
+                binding: Binding::Unresolved,
+            };
+            self.imports.push(Import { path, kind });
+        }
     }
 }
 
@@ -182,15 +157,6 @@ impl std::ops::Index<DefinitionId> for Env {
     #[inline]
     fn index(&self, index: DefinitionId) -> &Self::Output {
         &self.definitions[index]
-    }
-}
-
-impl std::ops::Index<ImportId> for Env {
-    type Output = Import;
-
-    #[inline]
-    fn index(&self, index: ImportId) -> &Self::Output {
-        &self.imports[index]
     }
 }
 

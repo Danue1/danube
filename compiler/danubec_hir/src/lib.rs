@@ -124,13 +124,13 @@ pub enum Visibility {
     Private,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Identifier {
     pub name: Symbol,
     pub span: Span,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Binding {
     Unresolved,
     Definition(DefinitionId),
@@ -186,36 +186,34 @@ pub enum EnumVariantKind {
 pub struct Import {
     pub path: Path,
     pub kind: ImportKind,
-    pub span: Span,
 }
 
 #[derive(Debug)]
 pub enum ImportKind {
     Glob,
-    Symbol(Symbol),
+    Symbol(Option<Symbol>),
     List(Vec<Import>),
 }
 
 #[derive(Debug)]
 pub struct Path {
     pub segments: Vec<PathSegment>,
-    pub span: Span,
+    pub binding: Binding,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PathSegment {
     pub kind: PathSegmentKind,
     pub binding: Binding,
-    pub span: Span,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum PathSegmentKind {
     Root,
     Self_,
     Super_,
     Krate,
-    Identifier(Identifier),
+    Identifier(Symbol),
 }
 
 #[derive(Debug)]

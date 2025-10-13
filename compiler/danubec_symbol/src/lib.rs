@@ -8,8 +8,6 @@ slotmap::new_key_type! {
 
     pub struct ScopeId;
 
-    pub struct ImportId;
-
     pub struct DefinitionId;
 
     pub struct LocalId;

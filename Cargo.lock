@@ -132,6 +132,7 @@ version = "0.1.0"
 dependencies = [
  "danubec_ast",
  "danubec_diagnostic",
+ "danubec_hir",
  "danubec_parse",
  "danubec_symbol",
  "danubec_syntax",

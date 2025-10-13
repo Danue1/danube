@@ -2,12 +2,8 @@ use crate::{
     env::{Env, Namespace, ScopeKind},
     fs::Fs,
 };
-use danubec_ast::{
-    ConstantDefinition, Definition, DefinitionKind, EnumDefinition, FunctionDefinition, Identifier,
-    ImplementDefinition, ModuleDefinition, ModuleDefinitionKind, StaticDefinition,
-    StructDefinition, TraitDefinition, TypeDefinition, UseDefinition,
-};
 use danubec_diagnostic::Diagnostic;
+use danubec_hir::{ImportKind, PathSegment, PathSegmentKind};
 use danubec_parse::parse;
 use danubec_symbol::{FileId, ModuleId, ScopeId, Symbol, SymbolInterner};
 use danubec_syntax::{AstNode, SyntaxNode};
@@ -65,10 +61,13 @@ pub fn collect(
 
 fn external_modules(node: &SyntaxNode, symbols: &mut SymbolInterner) -> HashSet<Symbol> {
     node.children()
-        .filter_map(Definition::cast)
+        .filter_map(danubec_ast::Definition::cast)
         .filter_map(|d| match d.kind() {
-            Some(DefinitionKind::Module(m))
-                if matches!(m.kind(), Some(ModuleDefinitionKind::External(_))) =>
+            Some(danubec_ast::DefinitionKind::Module(m))
+                if matches!(
+                    m.kind(),
+                    Some(danubec_ast::ModuleDefinitionKind::External(_))
+                ) =>
             {
                 m.name()
                     .and_then(|n| n.segment())
@@ -135,34 +134,47 @@ impl<'lowering> DefinitionCollector<'lowering> {
     fn exit_scope(&mut self) {
         self.scopes.pop();
     }
+}
 
+impl<'lowering> DefinitionCollector<'lowering> {
     pub fn root(&mut self, node: SyntaxNode) {
         self.with_scope(ScopeKind::Module, |this| {
-            for definition in node.children().filter_map(Definition::cast) {
+            for attribute in node
+                .children()
+                .filter_map(danubec_ast::TopLevelAttribute::cast)
+            {
+                this.top_level_attribute(attribute);
+            }
+
+            for definition in node.children().filter_map(danubec_ast::Definition::cast) {
                 this.definition(definition);
             }
         });
     }
 
-    fn definition(&mut self, node: Definition) {
+    fn top_level_attribute(&mut self, _: danubec_ast::TopLevelAttribute) {
+        //
+    }
+
+    fn definition(&mut self, node: danubec_ast::Definition) {
         match node.kind() {
-            Some(DefinitionKind::Function(node)) => self.function_definition(node),
-            Some(DefinitionKind::Struct(node)) => self.struct_definition(node),
-            Some(DefinitionKind::Enum(node)) => self.enum_definition(node),
-            Some(DefinitionKind::Use(node)) => self.use_definition(node),
-            Some(DefinitionKind::Module(node)) => self.module_definition(node),
-            Some(DefinitionKind::Trait(node)) => self.trait_definition(node),
-            Some(DefinitionKind::Constant(node)) => self.constant_definition(node),
-            Some(DefinitionKind::Static(node)) => self.static_definition(node),
-            Some(DefinitionKind::Type(node)) => self.type_definition(node),
-            Some(DefinitionKind::Implement(node)) => self.implement_definition(node),
+            Some(danubec_ast::DefinitionKind::Function(node)) => self.function_definition(node),
+            Some(danubec_ast::DefinitionKind::Struct(node)) => self.struct_definition(node),
+            Some(danubec_ast::DefinitionKind::Enum(node)) => self.enum_definition(node),
+            Some(danubec_ast::DefinitionKind::Use(node)) => self.use_definition(node),
+            Some(danubec_ast::DefinitionKind::Module(node)) => self.module_definition(node),
+            Some(danubec_ast::DefinitionKind::Trait(node)) => self.trait_definition(node),
+            Some(danubec_ast::DefinitionKind::Constant(node)) => self.constant_definition(node),
+            Some(danubec_ast::DefinitionKind::Static(node)) => self.static_definition(node),
+            Some(danubec_ast::DefinitionKind::Type(node)) => self.type_definition(node),
+            Some(danubec_ast::DefinitionKind::Implement(node)) => self.implement_definition(node),
             None => {
                 //
             }
         }
     }
 
-    fn function_definition(&mut self, node: FunctionDefinition) {
+    fn function_definition(&mut self, node: danubec_ast::FunctionDefinition) {
         let Some(_) = node.name().and_then(|n| self.identifier(n)) else {
             return self.diagnostic.report(miette!("Function without a name"));
         };
@@ -170,7 +182,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
         std::todo!();
     }
 
-    fn struct_definition(&mut self, node: StructDefinition) {
+    fn struct_definition(&mut self, node: danubec_ast::StructDefinition) {
         let Some(_) = node.name().and_then(|n| self.identifier(n)) else {
             return self.diagnostic.report(miette!("Struct without a name"));
         };
@@ -178,7 +190,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
         std::todo!();
     }
 
-    fn enum_definition(&mut self, node: EnumDefinition) {
+    fn enum_definition(&mut self, node: danubec_ast::EnumDefinition) {
         let Some(_) = node.name().and_then(|n| self.identifier(n)) else {
             return self.diagnostic.report(miette!("Enum without a name"));
         };
@@ -186,13 +198,17 @@ impl<'lowering> DefinitionCollector<'lowering> {
         std::todo!();
     }
 
-    fn use_definition(&mut self, _: UseDefinition) {
-        std::todo!();
+    fn use_definition(&mut self, node: danubec_ast::UseDefinition) {
+        let Some(tree) = node.tree() else {
+            return self.diagnostic.report(miette!("Use without a tree"));
+        };
+        let scope = self.current_scope();
+        self.use_tree(tree, scope, &[]);
     }
 
-    fn module_definition(&mut self, node: ModuleDefinition) {
+    fn module_definition(&mut self, node: danubec_ast::ModuleDefinition) {
         let inline_module = match node.kind() {
-            Some(ModuleDefinitionKind::Inline(inline)) => inline,
+            Some(danubec_ast::ModuleDefinitionKind::Inline(inline)) => inline,
             _ => return,
         };
 
@@ -221,7 +237,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
         });
     }
 
-    fn trait_definition(&mut self, node: TraitDefinition) {
+    fn trait_definition(&mut self, node: danubec_ast::TraitDefinition) {
         let Some(_) = node.name().and_then(|n| self.identifier(n)) else {
             return self.diagnostic.report(miette!("Trait without a name"));
         };
@@ -229,7 +245,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
         std::todo!();
     }
 
-    fn constant_definition(&mut self, node: ConstantDefinition) {
+    fn constant_definition(&mut self, node: danubec_ast::ConstantDefinition) {
         let Some(_) = node.name().and_then(|n| self.identifier(n)) else {
             return self.diagnostic.report(miette!("Constant without a name"));
         };
@@ -237,7 +253,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
         std::todo!();
     }
 
-    fn static_definition(&mut self, node: StaticDefinition) {
+    fn static_definition(&mut self, node: danubec_ast::StaticDefinition) {
         let Some(_) = node.name().and_then(|n| self.identifier(n)) else {
             return self.diagnostic.report(miette!("Static without a name"));
         };
@@ -245,7 +261,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
         std::todo!();
     }
 
-    fn type_definition(&mut self, node: TypeDefinition) {
+    fn type_definition(&mut self, node: danubec_ast::TypeDefinition) {
         let Some(_) = node.name().and_then(|n| self.identifier(n)) else {
             return self.diagnostic.report(miette!("Type without a name"));
         };
@@ -253,11 +269,122 @@ impl<'lowering> DefinitionCollector<'lowering> {
         std::todo!();
     }
 
-    fn implement_definition(&mut self, _: ImplementDefinition) {
+    fn implement_definition(&mut self, _: danubec_ast::ImplementDefinition) {
         std::todo!();
     }
 
-    fn identifier(&mut self, node: Identifier) -> Option<Symbol> {
+    fn use_tree(&mut self, node: danubec_ast::UseTree, scope: ScopeId, segments: &[PathSegment]) {
+        let Some(kind) = node.kind() else {
+            return self.diagnostic.report(miette!("Use tree without a kind"));
+        };
+
+        match kind {
+            danubec_ast::UseTreeKind::Glob(_) => {
+                if segments.is_empty() {
+                    self.diagnostic.report(miette!("Use glob without a path"));
+                    return;
+                }
+                self.env[scope].import(segments, ImportKind::Glob);
+            }
+            danubec_ast::UseTreeKind::Element(element) => {
+                let Some(path) = element.path() else {
+                    self.diagnostic
+                        .report(miette!("Use element without a path"));
+                    return;
+                };
+                let Some(tail) = self.path(path) else {
+                    self.diagnostic
+                        .report(miette!("Use element with invalid path"));
+                    return;
+                };
+                let segments = [segments, &tail].concat();
+                match element.trailing() {
+                    Some(trailing) => self.use_tree_trailing(trailing, scope, &segments),
+                    None => self.env[scope].import(&segments, ImportKind::Symbol(None)),
+                }
+            }
+            danubec_ast::UseTreeKind::List(list) => {
+                for tree in list.trees() {
+                    self.use_tree(tree, scope, &segments);
+                }
+            }
+        }
+    }
+
+    fn use_tree_trailing(
+        &mut self,
+        node: danubec_ast::UseTreeTrailing,
+        scope: ScopeId,
+        segments: &[PathSegment],
+    ) {
+        match node {
+            danubec_ast::UseTreeTrailing::Glob(_) => {
+                if segments.is_empty() {
+                    self.diagnostic.report(miette!("Use glob without a path"));
+                    return;
+                }
+                self.env[scope].import(segments, ImportKind::Glob);
+            }
+            danubec_ast::UseTreeTrailing::Rename(element) => {
+                let Some(name) = element.identifier() else {
+                    self.diagnostic.report(miette!("Use rename without a name"));
+                    return;
+                };
+                let Some(name) = self.identifier(name) else {
+                    self.diagnostic
+                        .report(miette!("Use rename with invalid name"));
+                    return;
+                };
+                self.env[scope].import(segments, ImportKind::Symbol(Some(name)));
+            }
+            danubec_ast::UseTreeTrailing::Nested(nested) => {
+                for tree in nested.trees() {
+                    self.use_tree(tree, scope, &segments);
+                }
+            }
+        }
+    }
+
+    fn path(&mut self, node: danubec_ast::Path) -> Option<Vec<PathSegment>> {
+        let mut segments = vec![];
+        for segment in node.segments() {
+            let Some(segment) = self.path_segment(segment) else {
+                return None;
+            };
+            segments.push(segment);
+        }
+
+        Some(segments)
+    }
+
+    fn path_segment(&mut self, node: danubec_ast::PathSegment) -> Option<PathSegment> {
+        let kind = match node {
+            danubec_ast::PathSegment::Krate(_) => PathSegmentKind::Krate,
+            danubec_ast::PathSegment::Self_(_) => PathSegmentKind::Self_,
+            danubec_ast::PathSegment::Super_(_) => PathSegmentKind::Super_,
+            danubec_ast::PathSegment::Root(_) => PathSegmentKind::Root,
+            danubec_ast::PathSegment::Identifier(ident) => {
+                let Some(ident) = ident.identifier() else {
+                    self.diagnostic
+                        .report(miette!("Path segment without identifier"));
+                    return None;
+                };
+                let Some(name) = self.identifier(ident) else {
+                    self.diagnostic
+                        .report(miette!("Path segment with invalid identifier"));
+                    return None;
+                };
+                PathSegmentKind::Identifier(name)
+            }
+        };
+
+        Some(PathSegment {
+            kind,
+            binding: danubec_hir::Binding::Unresolved,
+        })
+    }
+
+    fn identifier(&mut self, node: danubec_ast::Identifier) -> Option<Symbol> {
         node.segment()
             .and_then(|s| s.identifier())
             .map(|name| self.symbols.intern(name.text()))

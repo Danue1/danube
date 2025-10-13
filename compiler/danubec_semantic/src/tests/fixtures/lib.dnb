@@ -1,4 +1,4 @@
-mod foo;
+mod imports;
 
 mod bar {
   mod baz {

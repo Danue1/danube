@@ -2,8 +2,8 @@
 source: compiler/danubec_semantic/src/tests/mod.rs
 expression: fs
 ---
-FileSystem {
-    inner: InnerFileSystem {
+Fs {
+    inner: Inner {
         paths: SlotMap {
             slots: [
                 Slot {
@@ -16,12 +16,12 @@ FileSystem {
                 },
                 Slot {
                     version: 1,
-                    value: "src/tests/fixtures/foo.dnb",
+                    value: "src/tests/fixtures/imports.dnb",
                 },
             ],
             free_head: 3,
             num_elems: 2,
-            _k: PhantomData<fn(danubec_semantic::file_system::FileId) -> danubec_semantic::file_system::FileId>,
+            _k: PhantomData<fn(danubec_symbol::FileId) -> danubec_symbol::FileId>,
         },
         canonicals: SecondaryMap {
             slots: [
@@ -31,27 +31,27 @@ FileSystem {
                     version: 1,
                 },
                 Occupied {
-                    value: "/Users/danuel/Documents/internal/danube-lang/danube/compiler/danubec_semantic/src/tests/fixtures/foo.dnb",
+                    value: "/Users/danuel/Documents/internal/danube-lang/danube/compiler/danubec_semantic/src/tests/fixtures/imports.dnb",
                     version: 1,
                 },
             ],
             num_elems: 2,
-            _k: PhantomData<fn(danubec_semantic::file_system::FileId) -> danubec_semantic::file_system::FileId>,
+            _k: PhantomData<fn(danubec_symbol::FileId) -> danubec_symbol::FileId>,
         },
         files: SecondaryMap {
             slots: [
                 Vacant,
                 Occupied {
-                    value: "mod foo;\n\nmod bar {\n  mod baz {\n    mod qux {\n      //\n    }\n  }\n}\n",
+                    value: "mod imports;\n\nmod bar {\n  mod baz {\n    mod qux {\n      //\n    }\n  }\n}\n",
                     version: 1,
                 },
                 Occupied {
-                    value: "",
+                    value: "use *;\nuse a;\nuse {};\nuse {a::{b::{c::d}}};\n",
                     version: 1,
                 },
             ],
             num_elems: 2,
-            _k: PhantomData<fn(danubec_semantic::file_system::FileId) -> danubec_semantic::file_system::FileId>,
+            _k: PhantomData<fn(danubec_symbol::FileId) -> danubec_symbol::FileId>,
         },
     },
 }
