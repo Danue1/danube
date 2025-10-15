@@ -1,5 +1,5 @@
-use danubec_hir::{Binding, Import, ImportKind, Path, PathSegment};
-use danubec_symbol::{DefinitionId, FileId, ModuleId, ScopeId, Symbol};
+use danubec_hir::{Attribute, Binding, Import, ImportKind, Path, PathSegment, Visibility};
+use danubec_symbol::{AttributeId, DefinitionId, FileId, ModuleId, ScopeId, Symbol};
 use fxhash::FxHashMap;
 use slotmap::SlotMap;
 
@@ -7,6 +7,7 @@ use slotmap::SlotMap;
 pub struct Env {
     modules: SlotMap<ModuleId, Module>,
     scopes: SlotMap<ScopeId, Scope>,
+    attributes: SlotMap<AttributeId, Attribute>,
     definitions: SlotMap<DefinitionId, Definition>,
 }
 
@@ -31,7 +32,8 @@ pub struct Scope {
 
 #[derive(Debug)]
 pub struct Definition {
-    pub parent_scope: Option<ScopeId>,
+    pub scope: ScopeId,
+    pub definition: danubec_hir::Definition,
     pub file: FileId,
 }
 
@@ -53,21 +55,9 @@ impl Env {
         Self {
             modules: SlotMap::with_key(),
             scopes: SlotMap::with_key(),
+            attributes: SlotMap::with_key(),
             definitions: SlotMap::with_key(),
         }
-    }
-
-    pub fn scope<F>(&mut self, kind: ScopeKind, f: F) -> ScopeId
-    where
-        F: FnOnce(&mut Scope),
-    {
-        let id = self.scopes.insert(Scope::new(kind));
-        f(&mut self.scopes[id]);
-        id
-    }
-
-    pub fn definition(&mut self, definition: Definition) -> DefinitionId {
-        self.definitions.insert(definition)
     }
 
     pub fn module(&mut self, file: FileId, parent: Option<ModuleId>) -> ModuleId {
@@ -80,6 +70,23 @@ impl Env {
             children: FxHashMap::default(),
             file,
         })
+    }
+
+    pub fn scope<F>(&mut self, kind: ScopeKind, f: F) -> ScopeId
+    where
+        F: FnOnce(&mut Scope),
+    {
+        let id = self.scopes.insert(Scope::new(kind));
+        f(&mut self.scopes[id]);
+        id
+    }
+
+    pub fn attribute(&mut self, attribute: Attribute) -> AttributeId {
+        self.attributes.insert(attribute)
+    }
+
+    pub fn definition(&mut self, definition: Definition) -> DefinitionId {
+        self.definitions.insert(definition)
     }
 }
 
@@ -108,13 +115,25 @@ impl Scope {
         self
     }
 
-    pub fn import(&mut self, segments: &[PathSegment], kind: ImportKind) {
+    pub fn import(
+        &mut self,
+        attributes: &[AttributeId],
+        visibility: &Visibility,
+        segments: &[PathSegment],
+        kind: ImportKind,
+    ) {
         if !segments.is_empty() {
             let path = Path {
                 segments: segments.to_vec(),
                 binding: Binding::Unresolved,
             };
-            self.imports.push(Import { path, kind });
+            let import = Import {
+                attributes: attributes.to_vec(),
+                visibility: visibility.clone(),
+                path,
+                kind,
+            };
+            self.imports.push(import);
         }
     }
 }

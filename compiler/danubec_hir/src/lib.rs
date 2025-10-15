@@ -1,4 +1,4 @@
-use danubec_symbol::{DefinitionId, LocalId, Symbol};
+use danubec_symbol::{AttributeId, DefinitionId, LocalId, Symbol};
 use danubec_syntax::Span;
 use std::collections::HashMap;
 
@@ -43,7 +43,7 @@ pub enum AttributeArgumentKind {
 
 #[derive(Debug)]
 pub struct Definition {
-    pub attributes: Vec<Attribute>,
+    pub attributes: Vec<AttributeId>,
     pub visibility: Visibility,
     pub kind: DefinitionKind,
     pub span: Span,
@@ -115,7 +115,7 @@ pub enum ModuleDefinitionKind {
     Inline { definitions: Vec<Definition> },
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Visibility {
     Krate,
     Super,
@@ -124,9 +124,9 @@ pub enum Visibility {
     Private,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Identifier {
-    pub name: Symbol,
+    pub symbol: Symbol,
     pub span: Span,
 }
 
@@ -153,7 +153,7 @@ pub struct TypeBound {
 
 #[derive(Debug)]
 pub struct FunctionParameter {
-    pub attributes: Vec<Attribute>,
+    pub attributes: Vec<AttributeId>,
     pub pattern: Pattern,
     pub r#type: TypeExpression,
     pub span: Span,
@@ -168,7 +168,7 @@ pub enum StructBody {
 
 #[derive(Debug)]
 pub struct EnumVariant {
-    pub attributes: Vec<Attribute>,
+    pub attributes: Vec<AttributeId>,
     pub name: Identifier,
     pub kind: EnumVariantKind,
     pub span: Span,
@@ -178,12 +178,14 @@ pub struct EnumVariant {
 pub enum EnumVariantKind {
     Unit,
     Scalar(Expression),
-    Named(Vec<(Vec<Attribute>, Identifier, TypeExpression)>),
-    Unnamed(Vec<(Vec<Attribute>, TypeExpression)>),
+    Named(Vec<(Vec<AttributeId>, Identifier, TypeExpression)>),
+    Unnamed(Vec<(Vec<AttributeId>, TypeExpression)>),
 }
 
 #[derive(Debug)]
 pub struct Import {
+    pub attributes: Vec<AttributeId>,
+    pub visibility: Visibility,
     pub path: Path,
     pub kind: ImportKind,
 }
@@ -191,11 +193,11 @@ pub struct Import {
 #[derive(Debug)]
 pub enum ImportKind {
     Glob,
-    Symbol(Option<Symbol>),
+    Symbol(Option<Identifier>),
     List(Vec<Import>),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Path {
     pub segments: Vec<PathSegment>,
     pub binding: Binding,
@@ -213,12 +215,12 @@ pub enum PathSegmentKind {
     Self_,
     Super_,
     Krate,
-    Identifier(Symbol),
+    Identifier(Identifier),
 }
 
 #[derive(Debug)]
 pub struct AssociatedDefinition {
-    pub attributes: Vec<Attribute>,
+    pub attributes: Vec<AttributeId>,
     pub visibility: Visibility,
     pub kind: AssociatedDefinitionKind,
     pub span: Span,
@@ -293,7 +295,7 @@ pub enum ExpressionKind {
         elements: Vec<Expression>,
     },
     Block {
-        attributes: Vec<Attribute>,
+        attributes: Vec<AttributeId>,
         statements: Vec<Statement>,
     },
     Literal {
@@ -570,6 +572,7 @@ pub enum RangeOperator {
 
 #[derive(Debug)]
 pub struct TypeExpression {
+    pub mutable: bool,
     pub kind: TypeExpressionKind,
     pub span: Span,
 }
@@ -577,7 +580,6 @@ pub struct TypeExpression {
 #[derive(Debug)]
 pub enum TypeExpressionKind {
     Never,
-    Mutable { inner: Box<TypeExpression> },
     Path { path: Path },
     Slice { element: Box<TypeExpression> },
     Tuple { elements: Vec<TypeExpression> },

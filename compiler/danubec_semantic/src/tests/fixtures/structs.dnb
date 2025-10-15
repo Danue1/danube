@@ -1,0 +1,7 @@
+struct Foo;
+
+struct Bar(usize);
+
+struct Baz {
+  a: usize,
+}

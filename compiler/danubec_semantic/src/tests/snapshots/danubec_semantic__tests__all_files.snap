@@ -18,9 +18,17 @@ Fs {
                     version: 1,
                     value: "src/tests/fixtures/imports.dnb",
                 },
+                Slot {
+                    version: 1,
+                    value: "src/tests/fixtures/structs.dnb",
+                },
+                Slot {
+                    version: 1,
+                    value: "src/tests/fixtures/enums.dnb",
+                },
             ],
-            free_head: 3,
-            num_elems: 2,
+            free_head: 5,
+            num_elems: 4,
             _k: PhantomData<fn(danubec_symbol::FileId) -> danubec_symbol::FileId>,
         },
         canonicals: SecondaryMap {
@@ -34,23 +42,39 @@ Fs {
                     value: "/Users/danuel/Documents/internal/danube-lang/danube/compiler/danubec_semantic/src/tests/fixtures/imports.dnb",
                     version: 1,
                 },
+                Occupied {
+                    value: "/Users/danuel/Documents/internal/danube-lang/danube/compiler/danubec_semantic/src/tests/fixtures/structs.dnb",
+                    version: 1,
+                },
+                Occupied {
+                    value: "/Users/danuel/Documents/internal/danube-lang/danube/compiler/danubec_semantic/src/tests/fixtures/enums.dnb",
+                    version: 1,
+                },
             ],
-            num_elems: 2,
+            num_elems: 4,
             _k: PhantomData<fn(danubec_symbol::FileId) -> danubec_symbol::FileId>,
         },
         files: SecondaryMap {
             slots: [
                 Vacant,
                 Occupied {
-                    value: "mod imports;\n\nmod bar {\n  mod baz {\n    mod qux {\n      //\n    }\n  }\n}\n",
+                    value: "mod imports;\nmod structs;\nmod enums;\n\nmod bar {\n  mod baz {\n    mod qux {\n      //\n    }\n  }\n}\n",
                     version: 1,
                 },
                 Occupied {
                     value: "use *;\nuse a;\nuse {};\nuse {a::{b::{c::d}}};\n",
                     version: 1,
                 },
+                Occupied {
+                    value: "struct Foo;\n\nstruct Bar(usize);\n\nstruct Baz {\n  a: usize,\n}\n",
+                    version: 1,
+                },
+                Occupied {
+                    value: "enum Foo { }\nenum Bar {\n  A,\n  B = 1,\n  C(Foo),\n  D {\n    a: usize,\n  },\n}\n",
+                    version: 1,
+                },
             ],
-            num_elems: 2,
+            num_elems: 4,
             _k: PhantomData<fn(danubec_symbol::FileId) -> danubec_symbol::FileId>,
         },
     },

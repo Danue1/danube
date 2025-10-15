@@ -1,0 +1,9 @@
+enum Foo { }
+enum Bar {
+  A,
+  B = 1,
+  C(Foo),
+  D {
+    a: usize,
+  },
+}

@@ -3,3 +3,5 @@ source: compiler/danubec_semantic/src/tests/mod.rs
 expression: diagnostic
 ---
   [31m×[0m Use glob without a path
+
+  [31m×[0m Enum variant without a name

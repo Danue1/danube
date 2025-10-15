@@ -738,18 +738,8 @@ ast_node! {
 }
 
 ast_node! {
-    /// A variant in an enum: `Variant { a: Type }` or `Variant(Type)`
-    struct EnumVariant where ENUM_VARIANT_NODE;
-
-    nodes attributes -> Attribute;
-    node name -> Identifier;
-    node kind -> EnumVariantKind;
-    token comma where COMMA;
-}
-
-ast_node! {
     /// A variant in an enum: `Variant`, `Variant { a: Type }` or `Variant(Type)`
-    enum EnumVariantKind;
+    enum EnumVariant;
 
     variant Unit -> EnumVariantUnit;
     variant Scalar -> EnumVariantScalar;
@@ -760,23 +750,33 @@ ast_node! {
 ast_node! {
     /// A unit variant in an enum: `Variant`
     struct EnumVariantUnit where ENUM_VARIANT_UNIT_NODE;
+
+    nodes attributes -> Attribute;
+    node name -> Identifier;
+    token comma where COMMA;
 }
 
 ast_node! {
     /// A scalar variant in an enum: `Variant = 42`
     struct EnumVariantScalar where ENUM_VARIANT_SCALAR_NODE;
 
+    nodes attributes -> Attribute;
+    node name -> Identifier;
     token equal where EQUAL;
-    node value -> Expression;
+    node initializer -> Expression;
+    token comma where COMMA;
 }
 
 ast_node! {
     /// A named variant in an enum: `Variant { a: Type }`
     struct EnumVariantNamed where ENUM_VARIANT_NAMED_NODE;
 
+    nodes attributes -> Attribute;
+    node name -> Identifier;
     token left_brace where LEFT_BRACE;
     nodes fields -> EnumVariantNamedField;
     token right_brace where RIGHT_BRACE;
+    token comma where COMMA;
 }
 
 ast_node! {
@@ -799,6 +799,7 @@ ast_node! {
     token left_paren where LEFT_PAREN;
     nodes fields -> EnumVariantUnnamedField;
     token right_paren where RIGHT_PAREN;
+    token comma where COMMA;
 }
 
 ast_node! {
