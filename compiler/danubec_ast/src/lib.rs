@@ -887,14 +887,14 @@ ast_node! {
     /// A range pattern: `start..end`, `start..=end`, `..end`, `start..`
     enum RangePattern;
 
-    // `start..end`
-    variant FromTo -> RangeFromToPattern;
-    // `start..=end`
-    variant FromToInclusive -> RangeFromToInclusivePattern;
-    // `start..`
-    variant From -> RangeFromPattern;
     // `..end`
     variant To -> RangeToPattern;
+    // `start..end`
+    variant FromTo -> RangeFromToPattern;
+    // `start..`
+    variant From -> RangeFromPattern;
+    // `start..=end`
+    variant FromToInclusive -> RangeFromToInclusivePattern;
     // `..=end`
     variant ToInclusive -> RangeToInclusivePattern;
 }
@@ -945,29 +945,9 @@ ast_node! {
     /// An at pattern: `name @ pattern`
     struct AtPattern where AT_PATTERN_NODE;
 
-    // node name -> Pattern;
+    node name -> Identifier;
     token at where AT;
-    // node pattern -> Pattern;
-}
-
-impl AtPattern {
-    pub fn name(&self) -> Option<Pattern> {
-        use rowan::ast::AstNode;
-
-        self.syntax()
-            .children()
-            .take_while(|child| !matches!(child.kind(), SyntaxKind::AT))
-            .find_map(Pattern::cast)
-    }
-
-    pub fn pattern(&self) -> Option<Pattern> {
-        use rowan::ast::AstNode;
-
-        self.syntax()
-            .children()
-            .skip_while(|child| !matches!(child.kind(), SyntaxKind::AT))
-            .find_map(Pattern::cast)
-    }
+    node pattern -> Pattern;
 }
 
 ast_node! {
@@ -1245,10 +1225,12 @@ ast_node! {
     struct FunctionCallExpression where FUNCTION_CALL_EXPRESSION_NODE;
 
     node callee -> Expression;
+
     tokens colons where COLON;
     token left_chevron where LEFT_CHEVRON;
     nodes type_arguments -> TypeArgument;
     token right_chevron where RIGHT_CHEVRON;
+
     token left_paren where LEFT_PAREN;
     nodes arguments -> Expression;
     token right_paren where RIGHT_PAREN;
@@ -1301,14 +1283,14 @@ ast_node! {
     /// A range expression: `start..end`, `start..=end`, `..end`, `start..`
     enum RangeExpression;
 
+    // `..`
+    variant Full -> RangeFullExpression;
+    // `..end`
+    variant To -> RangeToExpression;
     // `start..end`
     variant FromTo -> RangeFromToExpression;
     // `start..`
     variant From -> RangeFromExpression;
-    // `..end`
-    variant To -> RangeToExpression;
-    // `..`
-    variant Full -> RangeFullExpression;
     // `start..=end`
     variant FromToInclusive -> RangeFromToInclusiveExpression;
     // `..=end`
@@ -1369,10 +1351,12 @@ ast_node! {
     struct StructExpression where STRUCT_EXPRESSION_NODE;
 
     node path -> PathExpression;
+
     tokens colons where COLON;
     token left_chevron where LEFT_CHEVRON;
     nodes type_arguments -> TypeArgument;
     token right_chevron where RIGHT_CHEVRON;
+
     token left_brace where LEFT_BRACE;
     nodes fields -> StructExpressionField;
     token right_brace where RIGHT_BRACE;
@@ -1416,12 +1400,11 @@ ast_node! {
 }
 
 ast_node! {
-    /// A unary operator: `-`, `!`, etc.
+    /// A unary operator: `+`, `-`, `!`, `~`.
     struct UnaryOperator where UNARY_OPERATOR_NODE;
 
     token positive where PLUS;
     token negate where HYPHEN;
-    token wrapping_negate where HYPHEN__PERCENT;
     token not where EXCLAMATION;
     token bitwise_not where TILDE;
 }

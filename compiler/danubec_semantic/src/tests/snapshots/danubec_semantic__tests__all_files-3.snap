@@ -4,19 +4,17 @@ expression: symbols
 ---
 SymbolInterner {
     inner: {
-        "bar",
-        "baz",
-        "qux",
         "imports",
         "structs",
         "enums",
-        "a",
-        "b",
-        "c",
-        "d",
         "Foo",
         "Bar",
         "usize",
         "Baz",
+        "a",
+        "A",
+        "B",
+        "C",
+        "D",
     },
 }

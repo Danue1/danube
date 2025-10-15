@@ -334,11 +334,12 @@ pub enum ExpressionKind {
         field: Identifier,
     },
     Index {
-        collection: Box<Expression>,
+        receiver: Box<Expression>,
         index: Box<Expression>,
     },
     Struct {
         path: Path,
+        type_arguments: Vec<TypeExpression>,
         fields: Vec<(Identifier, Expression)>,
     },
     Await {
@@ -348,10 +349,10 @@ pub enum ExpressionKind {
         range: RangeExpression,
     },
     Try {
-        expression: Box<Expression>,
+        value: Box<Expression>,
     },
     Yield {
-        expression: Option<Box<Expression>>,
+        value: Option<Box<Expression>>,
     },
 }
 
@@ -361,20 +362,20 @@ pub enum RangeExpression {
     Full,
     /// `..end`
     To { end: Box<Expression> },
-    /// `..=end`
-    ToInclusive { end: Box<Expression> },
-    /// `start..`
-    From { start: Box<Expression> },
     /// `start..end`
     FromTo {
         start: Box<Expression>,
         end: Box<Expression>,
     },
+    /// `start..`
+    From { start: Box<Expression> },
     /// `start..=end`
     FromToInclusive {
         start: Box<Expression>,
         end: Box<Expression>,
     },
+    /// `..=end`
+    ToInclusive { end: Box<Expression> },
 }
 
 #[derive(Debug)]
@@ -386,7 +387,7 @@ pub struct Statement {
 #[derive(Debug)]
 pub enum StatementKind {
     Definition {
-        definition: Definition,
+        definition: DefinitionId,
     },
     Let {
         pattern: Pattern,
@@ -401,6 +402,7 @@ pub enum StatementKind {
 
 #[derive(Debug)]
 pub struct Pattern {
+    pub mutable: bool,
     pub kind: PatternKind,
     pub span: Span,
 }
@@ -411,9 +413,6 @@ pub enum PatternKind {
     Placeholder,
     Path {
         path: Path,
-    },
-    Mutable {
-        pattern: Box<Pattern>,
     },
     Tuple {
         elements: Vec<Pattern>,
@@ -442,6 +441,7 @@ pub enum PatternKind {
         fields: Vec<(Identifier, Pattern)>,
     },
     Unnamed {
+        path: Path,
         elements: Vec<Pattern>,
     },
 }
@@ -491,8 +491,6 @@ pub enum StringSegment {
 
 #[derive(Debug)]
 pub enum UnaryOperator {
-    /// mut
-    Mutable,
     /// +
     Positive,
     /// -

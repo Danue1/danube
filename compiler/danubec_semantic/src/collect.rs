@@ -6,7 +6,7 @@ use danubec_ast as ast;
 use danubec_diagnostic::Diagnostic;
 use danubec_hir as hir;
 use danubec_parse::parse;
-use danubec_symbol::{AttributeId, FileId, ModuleId, ScopeId, SymbolInterner};
+use danubec_symbol::{AttributeId, DefinitionId, FileId, ModuleId, ScopeId, SymbolInterner};
 use danubec_syntax::{AstNode, Span, SyntaxNode};
 use std::collections::VecDeque;
 
@@ -127,14 +127,16 @@ impl<'lowering> DefinitionCollector<'lowering> {
         }
     }
 
-    fn with_scope<F>(&mut self, kind: ScopeKind, f: F)
+    fn with_scope<T, F>(&mut self, kind: ScopeKind, f: F) -> T
     where
-        F: FnOnce(&mut Self),
+        F: FnOnce(&mut Self) -> T,
     {
         let scope = self.enter_scope(kind);
-        f(self);
+        let result = f(self);
         assert_eq!(self.current_scope(), scope);
         self.exit_scope();
+
+        result
     }
 
     fn current_scope(&self) -> ScopeId {
@@ -157,14 +159,16 @@ impl<'lowering> DefinitionCollector<'lowering> {
 
 impl<'lowering> DefinitionCollector<'lowering> {
     pub fn root(&mut self, node: SyntaxNode) {
-        self.with_scope(ScopeKind::Module, |this| {
+        let _ = self.with_scope(ScopeKind::Module, |this| -> Result<(), ()> {
             for attribute in node.children().filter_map(ast::TopLevelAttribute::cast) {
                 this.top_level_attribute(attribute);
             }
 
             for definition in node.children().filter_map(ast::Definition::cast) {
-                this.definition(definition);
+                this.definition(definition)?;
             }
+
+            Ok(())
         });
     }
 
@@ -172,11 +176,11 @@ impl<'lowering> DefinitionCollector<'lowering> {
         //
     }
 
-    fn attribute(&mut self, _: ast::Attribute) -> Option<AttributeId> {
+    fn attribute(&mut self, _: ast::Attribute) -> Result<AttributeId, ()> {
         std::todo!();
     }
 
-    fn definition(&mut self, node: ast::Definition) -> Option<()> {
+    fn definition(&mut self, node: ast::Definition) -> Result<Option<DefinitionId>, ()> {
         let mut attributes = vec![];
         for attribute in node.syntax().children().filter_map(ast::Attribute::cast) {
             attributes.push(self.attribute(attribute)?);
@@ -184,30 +188,46 @@ impl<'lowering> DefinitionCollector<'lowering> {
 
         let visibility = self.visibility(node.visibility());
 
-        match node.kind()? {
+        let Some(kind) = node.kind() else {
+            self.diagnostic.report(miette!("Definition without a kind"));
+            return Err(());
+        };
+        let definition = match kind {
             ast::DefinitionKind::Function(node) => {
-                self.function_definition(node, attributes, visibility)
+                Some(self.function_definition(node, attributes, visibility)?)
             }
             ast::DefinitionKind::Struct(node) => {
-                self.struct_definition(node, attributes, visibility)
+                Some(self.struct_definition(node, attributes, visibility)?)
             }
-            ast::DefinitionKind::Enum(node) => self.enum_definition(node, attributes, visibility),
+            ast::DefinitionKind::Enum(node) => {
+                Some(self.enum_definition(node, attributes, visibility)?)
+            }
             ast::DefinitionKind::Module(node) => {
-                self.module_definition(node, attributes, visibility)
+                Some(self.module_definition(node, attributes, visibility)?)
             }
-            ast::DefinitionKind::Trait(node) => self.trait_definition(node, attributes, visibility),
+            ast::DefinitionKind::Trait(node) => {
+                Some(self.trait_definition(node, attributes, visibility)?)
+            }
             ast::DefinitionKind::Constant(node) => {
-                self.constant_definition(node, attributes, visibility)
+                Some(self.constant_definition(node, attributes, visibility)?)
             }
             ast::DefinitionKind::Static(node) => {
-                self.static_definition(node, attributes, visibility)
+                Some(self.static_definition(node, attributes, visibility)?)
             }
-            ast::DefinitionKind::Type(node) => self.type_definition(node, attributes, visibility),
-            ast::DefinitionKind::Use(node) => self.use_definition(node, attributes, visibility),
+            ast::DefinitionKind::Type(node) => {
+                Some(self.type_definition(node, attributes, visibility)?)
+            }
+            ast::DefinitionKind::Use(node) => {
+                self.use_definition(node, attributes, visibility)?;
+                None
+            }
             ast::DefinitionKind::Implement(node) => {
-                self.implement_definition(node, attributes, visibility)
+                self.implement_definition(node, attributes, visibility)?;
+                None
             }
-        }
+        };
+
+        Ok(definition)
     }
 
     fn function_definition(
@@ -215,10 +235,10 @@ impl<'lowering> DefinitionCollector<'lowering> {
         node: ast::FunctionDefinition,
         attributes: Vec<AttributeId>,
         visibility: hir::Visibility,
-    ) -> Option<()> {
+    ) -> Result<DefinitionId, ()> {
         let Some(name) = node.name() else {
             self.diagnostic.report(miette!("Function without a name"));
-            return None;
+            return Err(());
         };
         let _ = self.identifier(name)?;
 
@@ -230,10 +250,10 @@ impl<'lowering> DefinitionCollector<'lowering> {
         node: ast::StructDefinition,
         attributes: Vec<AttributeId>,
         visibility: hir::Visibility,
-    ) -> Option<()> {
+    ) -> Result<DefinitionId, ()> {
         let Some(name) = node.name() else {
             self.diagnostic.report(miette!("Struct without a name"));
-            return None;
+            return Err(());
         };
         let name = self.identifier(name)?;
 
@@ -243,7 +263,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
 
         let Some(body) = node.body() else {
             self.diagnostic.report(miette!("Struct without a body"));
-            return None;
+            return Err(());
         };
         let body = self.struct_definition_body(body)?;
 
@@ -269,7 +289,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
             .or_default()
             .push(definition);
 
-        Some(())
+        Ok(definition)
     }
 
     fn enum_definition(
@@ -277,10 +297,10 @@ impl<'lowering> DefinitionCollector<'lowering> {
         node: ast::EnumDefinition,
         attributes: Vec<AttributeId>,
         visibility: hir::Visibility,
-    ) -> Option<()> {
+    ) -> Result<DefinitionId, ()> {
         let Some(name) = node.name() else {
             self.diagnostic.report(miette!("Enum without a name"));
-            return None;
+            return Err(());
         };
         let name = self.identifier(name)?;
 
@@ -288,10 +308,17 @@ impl<'lowering> DefinitionCollector<'lowering> {
 
         let type_bounds = vec![];
 
-        let mut variants = vec![];
-        for variant in node.variants() {
-            variants.push(self.enum_variant(variant)?);
-        }
+        let variants = self.with_scope(
+            ScopeKind::Block,
+            |this| -> Result<Vec<hir::EnumVariant>, ()> {
+                let mut variants = vec![];
+                for variant in node.variants() {
+                    variants.push(this.enum_variant(variant)?);
+                }
+
+                Ok(variants)
+            },
+        )?;
 
         let scope = self.current_scope();
         let definition = self.env.definition(crate::env::Definition {
@@ -315,7 +342,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
             .or_default()
             .push(definition);
 
-        Some(())
+        Ok(definition)
     }
 
     fn use_definition(
@@ -323,15 +350,15 @@ impl<'lowering> DefinitionCollector<'lowering> {
         node: ast::UseDefinition,
         attributes: Vec<AttributeId>,
         visibility: hir::Visibility,
-    ) -> Option<()> {
+    ) -> Result<(), ()> {
         let Some(tree) = node.tree() else {
             self.diagnostic.report(miette!("Use without a tree"));
-            return None;
+            return Err(());
         };
         let scope = self.current_scope();
         self.use_tree(tree, scope, &attributes, &visibility, &[])?;
 
-        Some(())
+        Ok(())
     }
 
     fn module_definition(
@@ -339,15 +366,15 @@ impl<'lowering> DefinitionCollector<'lowering> {
         node: ast::ModuleDefinition,
         attributes: Vec<AttributeId>,
         visibility: hir::Visibility,
-    ) -> Option<()> {
-        let inline_module = match node.kind()? {
-            ast::ModuleDefinitionKind::Inline(inline) => inline,
-            _ => return None,
+    ) -> Result<DefinitionId, ()> {
+        let inline_module = match node.kind() {
+            Some(ast::ModuleDefinitionKind::Inline(inline)) => inline,
+            _ => return Err(()),
         };
 
         let Some(name) = node.name() else {
             self.diagnostic.report(miette!("Module without a name"));
-            return None;
+            return Err(());
         };
         let name = self.identifier(name)?;
 
@@ -377,13 +404,15 @@ impl<'lowering> DefinitionCollector<'lowering> {
         let child = self.env.module(self.file, Some(parent_module));
         self.env[parent_module].children.insert(name.symbol, child);
 
-        self.with_scope(ScopeKind::Module, |this| {
+        self.with_scope(ScopeKind::Module, |this| -> Result<(), ()> {
             for definition in inline_module.definitions() {
-                this.definition(definition);
+                this.definition(definition)?;
             }
-        });
 
-        Some(())
+            Ok(())
+        })?;
+
+        Ok(definition)
     }
 
     fn trait_definition(
@@ -391,10 +420,10 @@ impl<'lowering> DefinitionCollector<'lowering> {
         node: ast::TraitDefinition,
         attributes: Vec<AttributeId>,
         visibility: hir::Visibility,
-    ) -> Option<()> {
+    ) -> Result<DefinitionId, ()> {
         let Some(name) = node.name() else {
             self.diagnostic.report(miette!("Trait without a name"));
-            return None;
+            return Err(());
         };
         let _ = self.identifier(name)?;
 
@@ -406,10 +435,10 @@ impl<'lowering> DefinitionCollector<'lowering> {
         node: ast::ConstantDefinition,
         attributes: Vec<AttributeId>,
         visibility: hir::Visibility,
-    ) -> Option<()> {
+    ) -> Result<DefinitionId, ()> {
         let Some(name) = node.name() else {
             self.diagnostic.report(miette!("Constant without a name"));
-            return None;
+            return Err(());
         };
         let _ = self.identifier(name)?;
 
@@ -421,10 +450,10 @@ impl<'lowering> DefinitionCollector<'lowering> {
         node: ast::StaticDefinition,
         attributes: Vec<AttributeId>,
         visibility: hir::Visibility,
-    ) -> Option<()> {
+    ) -> Result<DefinitionId, ()> {
         let Some(name) = node.name() else {
             self.diagnostic.report(miette!("Static without a name"));
-            return None;
+            return Err(());
         };
         let _ = self.identifier(name)?;
 
@@ -436,10 +465,10 @@ impl<'lowering> DefinitionCollector<'lowering> {
         node: ast::TypeDefinition,
         attributes: Vec<AttributeId>,
         visibility: hir::Visibility,
-    ) -> Option<()> {
+    ) -> Result<DefinitionId, ()> {
         let Some(name) = node.name() else {
             self.diagnostic.report(miette!("Type without a name"));
-            return None;
+            return Err(());
         };
         let _ = self.identifier(name)?;
 
@@ -451,7 +480,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
         _: ast::ImplementDefinition,
         attributes: Vec<AttributeId>,
         visibility: hir::Visibility,
-    ) -> Option<()> {
+    ) -> Result<(), ()> {
         std::todo!();
     }
 
@@ -462,17 +491,17 @@ impl<'lowering> DefinitionCollector<'lowering> {
         attributes: &[AttributeId],
         visibility: &hir::Visibility,
         segments: &[hir::PathSegment],
-    ) -> Option<()> {
+    ) -> Result<(), ()> {
         let Some(kind) = node.kind() else {
             self.diagnostic.report(miette!("Use tree without a kind"));
-            return None;
+            return Err(());
         };
 
         match kind {
             ast::UseTreeKind::Glob(_) => {
                 if segments.is_empty() {
                     self.diagnostic.report(miette!("Use glob without a path"));
-                    return None;
+                    return Err(());
                 }
 
                 self.env[scope].import(attributes, visibility, segments, hir::ImportKind::Glob);
@@ -481,7 +510,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
                 let Some(path) = element.path() else {
                     self.diagnostic
                         .report(miette!("Use element without a path"));
-                    return None;
+                    return Err(());
                 };
                 let tail = self.path(path)?;
                 let segments = [segments, &tail].concat();
@@ -505,7 +534,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
             }
         }
 
-        Some(())
+        Ok(())
     }
 
     fn use_tree_trailing(
@@ -515,12 +544,12 @@ impl<'lowering> DefinitionCollector<'lowering> {
         attributes: &[AttributeId],
         visibility: &hir::Visibility,
         segments: &[hir::PathSegment],
-    ) -> Option<()> {
+    ) -> Result<(), ()> {
         match node {
             ast::UseTreeTrailing::Glob(_) => {
                 if segments.is_empty() {
                     self.diagnostic.report(miette!("Use glob without a path"));
-                    return None;
+                    return Err(());
                 }
 
                 self.env[scope].import(attributes, visibility, segments, hir::ImportKind::Glob);
@@ -528,7 +557,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
             ast::UseTreeTrailing::Rename(element) => {
                 let Some(name) = element.identifier() else {
                     self.diagnostic.report(miette!("Use rename without a name"));
-                    return None;
+                    return Err(());
                 };
                 let name = self.identifier(name)?;
 
@@ -546,12 +575,12 @@ impl<'lowering> DefinitionCollector<'lowering> {
             }
         }
 
-        Some(())
+        Ok(())
     }
 
-    fn struct_definition_body(&mut self, node: ast::StructBody) -> Option<hir::StructBody> {
+    fn struct_definition_body(&mut self, node: ast::StructBody) -> Result<hir::StructBody, ()> {
         match node {
-            ast::StructBody::Unit(_) => Some(hir::StructBody::Unit),
+            ast::StructBody::Unit(_) => Ok(hir::StructBody::Unit),
             ast::StructBody::Named(record) => {
                 let mut fields = vec![];
                 for field in record.fields() {
@@ -560,21 +589,21 @@ impl<'lowering> DefinitionCollector<'lowering> {
                     let Some(name) = field.name() else {
                         self.diagnostic
                             .report(miette!("Struct field without a name"));
-                        return None;
+                        return Err(());
                     };
                     let name = self.identifier(name)?;
 
                     let Some(ty) = field.r#type() else {
                         self.diagnostic
                             .report(miette!("Struct field without a type"));
-                        return None;
+                        return Err(());
                     };
                     let ty = self.type_expression(ty, false)?;
 
                     fields.push((visibility, name, ty));
                 }
 
-                Some(hir::StructBody::Named(fields))
+                Ok(hir::StructBody::Named(fields))
             }
             ast::StructBody::Unnamed(unnamed) => {
                 let mut fields = vec![];
@@ -584,18 +613,18 @@ impl<'lowering> DefinitionCollector<'lowering> {
                     let Some(ty) = field.r#type() else {
                         self.diagnostic
                             .report(miette!("Tuple struct field without a type"));
-                        return None;
+                        return Err(());
                     };
                     let ty = self.type_expression(ty, false)?;
 
                     fields.push((visibility, ty));
                 }
-                Some(hir::StructBody::Unnamed(fields))
+                Ok(hir::StructBody::Unnamed(fields))
             }
         }
     }
 
-    fn enum_variant(&mut self, node: ast::EnumVariant) -> Option<hir::EnumVariant> {
+    fn enum_variant(&mut self, node: ast::EnumVariant) -> Result<hir::EnumVariant, ()> {
         let span = Span::new(node.syntax());
         let (attributes, name, kind) = match node {
             ast::EnumVariant::Unit(node) => {
@@ -607,7 +636,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
                 let Some(name) = node.name() else {
                     self.diagnostic
                         .report(miette!("Enum variant without a name"));
-                    return None;
+                    return Err(());
                 };
                 let name = self.identifier(name)?;
 
@@ -622,14 +651,14 @@ impl<'lowering> DefinitionCollector<'lowering> {
                 let Some(name) = node.name() else {
                     self.diagnostic
                         .report(miette!("Enum variant without a name"));
-                    return None;
+                    return Err(());
                 };
                 let name = self.identifier(name)?;
 
                 let Some(initializer) = node.initializer() else {
                     self.diagnostic
                         .report(miette!("Enum variant scalar without a value"));
-                    return None;
+                    return Err(());
                 };
                 let initializer = self.expression(initializer)?;
 
@@ -644,7 +673,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
                 let Some(name) = node.name() else {
                     self.diagnostic
                         .report(miette!("Enum variant without a name"));
-                    return None;
+                    return Err(());
                 };
                 let name = self.identifier(name)?;
 
@@ -658,14 +687,14 @@ impl<'lowering> DefinitionCollector<'lowering> {
                     let Some(name) = field.name() else {
                         self.diagnostic
                             .report(miette!("Enum variant field without a name"));
-                        return None;
+                        return Err(());
                     };
                     let name = self.identifier(name)?;
 
                     let Some(ty) = field.r#type() else {
                         self.diagnostic
                             .report(miette!("Enum variant field without a type"));
-                        return None;
+                        return Err(());
                     };
                     let ty = self.type_expression(ty, false)?;
 
@@ -683,7 +712,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
                 let Some(name) = node.name() else {
                     self.diagnostic
                         .report(miette!("Enum variant without a name"));
-                    return None;
+                    return Err(());
                 };
                 let name = self.identifier(name)?;
 
@@ -697,7 +726,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
                     let Some(ty) = field.r#type() else {
                         self.diagnostic
                             .report(miette!("Enum variant field without a type"));
-                        return None;
+                        return Err(());
                     };
                     let ty = self.type_expression(ty, false)?;
 
@@ -708,7 +737,9 @@ impl<'lowering> DefinitionCollector<'lowering> {
             }
         };
 
-        Some(hir::EnumVariant {
+        // TODO: Add fields to scope
+
+        Ok(hir::EnumVariant {
             attributes,
             name,
             kind,
@@ -739,9 +770,9 @@ impl<'lowering> DefinitionCollector<'lowering> {
         &mut self,
         node: ast::TypeExpression,
         mutable: bool,
-    ) -> Option<hir::TypeExpression> {
+    ) -> Result<hir::TypeExpression, ()> {
         match node {
-            ast::TypeExpression::Never(_) => Some(hir::TypeExpression {
+            ast::TypeExpression::Never(_) => Ok(hir::TypeExpression {
                 mutable,
                 kind: hir::TypeExpressionKind::Never,
                 span: Span::new(node.syntax()),
@@ -750,22 +781,22 @@ impl<'lowering> DefinitionCollector<'lowering> {
                 let Some(inner) = mutable.r#type() else {
                     self.diagnostic
                         .report(miette!("Mutable type without an inner type"));
-                    return None;
+                    return Err(());
                 };
                 let mut inner = self.type_expression(inner, true)?;
                 inner.mutable = true;
 
-                Some(inner)
+                Ok(inner)
             }
             ast::TypeExpression::Path(path) => {
                 let span = Span::new(path.syntax());
                 let Some(path) = path.path() else {
                     self.diagnostic.report(miette!("Path type without a path"));
-                    return None;
+                    return Err(());
                 };
                 let segments = self.path(path)?;
 
-                Some(hir::TypeExpression {
+                Ok(hir::TypeExpression {
                     mutable,
                     kind: hir::TypeExpressionKind::Path {
                         path: hir::Path {
@@ -780,11 +811,11 @@ impl<'lowering> DefinitionCollector<'lowering> {
                 let Some(type_expression) = slice.r#type() else {
                     self.diagnostic
                         .report(miette!("Slice type without an element type"));
-                    return None;
+                    return Err(());
                 };
                 let type_expression = self.type_expression(type_expression, false)?;
 
-                Some(hir::TypeExpression {
+                Ok(hir::TypeExpression {
                     mutable,
                     kind: hir::TypeExpressionKind::Slice {
                         element: Box::new(type_expression),
@@ -798,13 +829,12 @@ impl<'lowering> DefinitionCollector<'lowering> {
                     let Some(type_expression) = argument.r#type() else {
                         self.diagnostic
                             .report(miette!("Tuple type without an element type"));
-                        return None;
+                        return Err(());
                     };
-                    let argument = self.type_expression(type_expression, false)?;
-                    arguments.push(argument);
+                    arguments.push(self.type_expression(type_expression, false)?);
                 }
 
-                Some(hir::TypeExpression {
+                Ok(hir::TypeExpression {
                     mutable,
                     kind: hir::TypeExpressionKind::Tuple {
                         elements: arguments,
@@ -815,20 +845,1127 @@ impl<'lowering> DefinitionCollector<'lowering> {
         }
     }
 
-    fn expression(&mut self, node: ast::Expression) -> Option<hir::Expression> {
-        std::todo!();
+    fn expression(&mut self, node: ast::Expression) -> Result<hir::Expression, ()> {
+        let kind = match node.clone() {
+            ast::Expression::Break(_) => hir::ExpressionKind::Break,
+            ast::Expression::Continue(_) => hir::ExpressionKind::Continue,
+            ast::Expression::Return(node) => {
+                let value = match node.expression() {
+                    None => None,
+                    Some(expr) => Some(Box::new(self.expression(expr)?)),
+                };
+
+                hir::ExpressionKind::Return { value }
+            }
+            ast::Expression::For(node) => {
+                let Some(pattern) = node.pattern() else {
+                    self.diagnostic
+                        .report(miette!("For expression without a pattern"));
+                    return Err(());
+                };
+                let pattern = self.pattern(pattern, false)?;
+
+                let Some(iterable) = node.iterable() else {
+                    self.diagnostic
+                        .report(miette!("For expression without an iterable"));
+                    return Err(());
+                };
+                let iterable = self.expression(iterable)?;
+                let iterable = Box::new(iterable);
+
+                let Some(body) = node.body() else {
+                    self.diagnostic
+                        .report(miette!("For expression without a body"));
+                    return Err(());
+                };
+                let body = self.block_expression(body)?;
+
+                hir::ExpressionKind::For {
+                    pattern,
+                    iterable,
+                    body,
+                }
+            }
+            ast::Expression::While(node) => {
+                let Some(condition) = node.condition() else {
+                    self.diagnostic
+                        .report(miette!("While expression without a condition"));
+                    return Err(());
+                };
+                let condition = self.expression(condition)?;
+                let condition = Box::new(condition);
+
+                let Some(body) = node.body() else {
+                    self.diagnostic
+                        .report(miette!("While expression without a body"));
+                    return Err(());
+                };
+                let body = self.block_expression(body)?;
+
+                hir::ExpressionKind::While { condition, body }
+            }
+            ast::Expression::Loop(node) => {
+                let Some(body) = node.body() else {
+                    self.diagnostic
+                        .report(miette!("Loop expression without a body"));
+                    return Err(());
+                };
+                let body = self.block_expression(body)?;
+
+                hir::ExpressionKind::Loop { body }
+            }
+            ast::Expression::If(node) => {
+                let Some(condition) = node.condition() else {
+                    self.diagnostic
+                        .report(miette!("If expression without a condition"));
+                    return Err(());
+                };
+                let condition = self.expression(condition)?;
+                let condition = Box::new(condition);
+
+                let Some(then_branch) = node.then_branch() else {
+                    self.diagnostic
+                        .report(miette!("If expression without a then branch"));
+                    return Err(());
+                };
+                let then_branch = self.block_expression(then_branch)?;
+
+                let else_branch = match node.else_branch() {
+                    None => None,
+                    Some(else_branch) => Some(Box::new(self.expression(else_branch)?)),
+                };
+
+                hir::ExpressionKind::If {
+                    condition,
+                    then_branch,
+                    else_branch,
+                }
+            }
+            ast::Expression::Match(node) => {
+                let Some(expression) = node.expression() else {
+                    self.diagnostic
+                        .report(miette!("Match expression without an expression"));
+                    return Err(());
+                };
+                let expression = self.expression(expression)?;
+                let expression = Box::new(expression);
+
+                let mut arms = vec![];
+                for arm in node.arms() {
+                    let Some(pattern) = arm.pattern() else {
+                        self.diagnostic
+                            .report(miette!("Match arm without a pattern"));
+                        return Err(());
+                    };
+                    let pattern = self.pattern(pattern, false)?;
+
+                    let Some(expression) = arm.expression() else {
+                        self.diagnostic
+                            .report(miette!("Match arm without an expression"));
+                        return Err(());
+                    };
+                    let expression = self.expression(expression)?;
+
+                    arms.push((pattern, expression));
+                }
+
+                hir::ExpressionKind::Match { expression, arms }
+            }
+            ast::Expression::Let(node) => {
+                let Some(pattern) = node.pattern() else {
+                    self.diagnostic
+                        .report(miette!("Let expression without a pattern"));
+                    return Err(());
+                };
+                let pattern = self.pattern(pattern, false)?;
+
+                let r#type = match node.r#type() {
+                    None => None,
+                    Some(ty) => Some(self.type_expression(ty, false)?),
+                };
+
+                let initializer = match node.initializer() {
+                    None => None,
+                    Some(expr) => Some(Box::new(self.expression(expr)?)),
+                };
+
+                // TODO: Add let expressions to scope
+
+                hir::ExpressionKind::Let {
+                    pattern,
+                    r#type,
+                    initializer,
+                }
+            }
+            ast::Expression::Array(node) => {
+                let mut elements = vec![];
+                for element in node.elements() {
+                    elements.push(self.expression(element)?);
+                }
+
+                hir::ExpressionKind::Array { elements }
+            }
+            ast::Expression::Tuple(node) => {
+                let mut elements = vec![];
+                for element in node.elements() {
+                    elements.push(self.expression(element)?);
+                }
+
+                hir::ExpressionKind::Tuple { elements }
+            }
+            ast::Expression::Block(node) => {
+                let mut attributes = vec![];
+                for attribute in node.attributes() {
+                    attributes.push(self.attribute(attribute)?);
+                }
+
+                let statements = self.block_expression(node)?;
+
+                hir::ExpressionKind::Block {
+                    attributes,
+                    statements,
+                }
+            }
+            ast::Expression::Literal(node) => {
+                let Some(value) = node.literal() else {
+                    self.diagnostic
+                        .report(miette!("Literal expression without a literal"));
+                    return Err(());
+                };
+                let value = self.literal(value)?;
+
+                hir::ExpressionKind::Literal { value }
+            }
+            ast::Expression::Path(node) => {
+                let Some(path) = node.path() else {
+                    self.diagnostic
+                        .report(miette!("Path expression without a path"));
+                    return Err(());
+                };
+                let path = self.path(path)?;
+                let path = hir::Path {
+                    segments: path,
+                    binding: hir::Binding::Unresolved,
+                };
+
+                hir::ExpressionKind::Path { path }
+            }
+            ast::Expression::Unary(node) => {
+                let operator = self.unary_operator(node.operator())?;
+
+                let Some(operand) = node.operand() else {
+                    self.diagnostic
+                        .report(miette!("Unary expression without an operand"));
+                    return Err(());
+                };
+                let operand = self.expression(operand)?;
+                let operand = Box::new(operand);
+
+                hir::ExpressionKind::Unary { operator, operand }
+            }
+            ast::Expression::Binary(node) => {
+                let Some(left) = node.left() else {
+                    self.diagnostic
+                        .report(miette!("Binary expression without a left operand"));
+                    return Err(());
+                };
+                let left = self.expression(left)?;
+                let left = Box::new(left);
+
+                let operator = self.binary_operator(node.operator())?;
+
+                let Some(right) = node.right() else {
+                    self.diagnostic
+                        .report(miette!("Binary expression without a right operand"));
+                    return Err(());
+                };
+                let right = self.expression(right)?;
+                let right = Box::new(right);
+
+                hir::ExpressionKind::Binary {
+                    left,
+                    operator,
+                    right,
+                }
+            }
+            ast::Expression::Assignment(node) => {
+                let Some(left) = node.left() else {
+                    self.diagnostic
+                        .report(miette!("Assignment expression without a left operand"));
+                    return Err(());
+                };
+                let left = self.expression(left)?;
+                let left = Box::new(left);
+
+                let operator = self.assignment_operator(node.operator())?;
+
+                let Some(right) = node.right() else {
+                    self.diagnostic
+                        .report(miette!("Assignment expression without a right operand"));
+                    return Err(());
+                };
+                let right = self.expression(right)?;
+                let right = Box::new(right);
+
+                hir::ExpressionKind::Assignment {
+                    left,
+                    operator,
+                    right,
+                }
+            }
+            ast::Expression::FunctionCall(node) => {
+                let Some(callee) = node.callee() else {
+                    self.diagnostic
+                        .report(miette!("Function call expression without a callee"));
+                    return Err(());
+                };
+                let callee = self.expression(callee)?;
+                let callee = Box::new(callee);
+
+                let type_arguments = vec![];
+
+                let mut arguments = vec![];
+                for argument in node.arguments() {
+                    arguments.push(self.expression(argument)?);
+                }
+
+                hir::ExpressionKind::FunctionCall {
+                    callee,
+                    type_arguments,
+                    arguments,
+                }
+            }
+            ast::Expression::MethodCall(node) => {
+                let Some(receiver) = node.receiver() else {
+                    self.diagnostic
+                        .report(miette!("Method call expression without a receiver"));
+                    return Err(());
+                };
+                let receiver = self.expression(receiver)?;
+                let receiver = Box::new(receiver);
+
+                let Some(method) = node.method() else {
+                    self.diagnostic
+                        .report(miette!("Method call expression without a name"));
+                    return Err(());
+                };
+                let method = self.identifier(method)?;
+
+                let type_arguments = vec![];
+
+                let mut arguments = vec![];
+                for argument in node.arguments() {
+                    arguments.push(self.expression(argument)?);
+                }
+
+                hir::ExpressionKind::MethodCall {
+                    receiver,
+                    method,
+                    type_arguments,
+                    arguments,
+                }
+            }
+            ast::Expression::Field(node) => {
+                let Some(receiver) = node.receiver() else {
+                    self.diagnostic
+                        .report(miette!("Field expression without a receiver"));
+                    return Err(());
+                };
+                let receiver = self.expression(receiver)?;
+                let receiver = Box::new(receiver);
+
+                let Some(field) = node.field() else {
+                    self.diagnostic
+                        .report(miette!("Field expression without a field"));
+                    return Err(());
+                };
+                let field = self.identifier(field)?;
+
+                hir::ExpressionKind::Field { receiver, field }
+            }
+            ast::Expression::Index(node) => {
+                let Some(receiver) = node.receiver() else {
+                    self.diagnostic
+                        .report(miette!("Index expression without a receiver"));
+                    return Err(());
+                };
+                let receiver = self.expression(receiver)?;
+                let receiver = Box::new(receiver);
+
+                let Some(index) = node.index() else {
+                    self.diagnostic
+                        .report(miette!("Index expression without an index"));
+                    return Err(());
+                };
+                let index = self.expression(index)?;
+                let index = Box::new(index);
+
+                hir::ExpressionKind::Index { receiver, index }
+            }
+            ast::Expression::Await(node) => {
+                let Some(expression) = node.expression() else {
+                    self.diagnostic
+                        .report(miette!("Await expression without an expression"));
+                    return Err(());
+                };
+                let expression = self.expression(expression)?;
+                let expression = Box::new(expression);
+
+                hir::ExpressionKind::Await { expression }
+            }
+            ast::Expression::Range(node) => {
+                let range = match node {
+                    ast::RangeExpression::Full(_) => hir::RangeExpression::Full,
+                    ast::RangeExpression::To(node) => {
+                        let Some(end) = node.end() else {
+                            self.diagnostic
+                                .report(miette!("Range to expression without an end"));
+                            return Err(());
+                        };
+                        let end = self.expression(end)?;
+                        let end = Box::new(end);
+
+                        hir::RangeExpression::To { end }
+                    }
+                    ast::RangeExpression::FromTo(node) => {
+                        let Some(start) = node.start() else {
+                            self.diagnostic
+                                .report(miette!("Range from-to expression without a start"));
+                            return Err(());
+                        };
+                        let start = self.expression(start)?;
+                        let start = Box::new(start);
+
+                        let Some(end) = node.end() else {
+                            self.diagnostic
+                                .report(miette!("Range from-to expression without an end"));
+                            return Err(());
+                        };
+                        let end = self.expression(end)?;
+                        let end = Box::new(end);
+
+                        hir::RangeExpression::FromTo { start, end }
+                    }
+                    ast::RangeExpression::From(node) => {
+                        let Some(start) = node.start() else {
+                            self.diagnostic
+                                .report(miette!("Range from expression without a start"));
+                            return Err(());
+                        };
+                        let start = self.expression(start)?;
+                        let start = Box::new(start);
+
+                        hir::RangeExpression::From { start }
+                    }
+                    ast::RangeExpression::FromToInclusive(node) => {
+                        let Some(start) = node.start() else {
+                            self.diagnostic.report(miette!(
+                                "Range from-to-inclusive expression without a start"
+                            ));
+                            return Err(());
+                        };
+                        let start = self.expression(start)?;
+                        let start = Box::new(start);
+
+                        let Some(end) = node.end() else {
+                            self.diagnostic.report(miette!(
+                                "Range from-to-inclusive expression without an end"
+                            ));
+                            return Err(());
+                        };
+                        let end = self.expression(end)?;
+                        let end = Box::new(end);
+
+                        hir::RangeExpression::FromToInclusive { start, end }
+                    }
+                    ast::RangeExpression::ToInclusive(node) => {
+                        let Some(end) = node.end() else {
+                            self.diagnostic
+                                .report(miette!("Range to-inclusive expression without an end"));
+                            return Err(());
+                        };
+                        let end = self.expression(end)?;
+                        let end = Box::new(end);
+
+                        hir::RangeExpression::ToInclusive { end }
+                    }
+                };
+
+                hir::ExpressionKind::Range { range }
+            }
+            ast::Expression::Struct(node) => {
+                let Some(path) = node.path() else {
+                    self.diagnostic
+                        .report(miette!("Struct expression without a path"));
+                    return Err(());
+                };
+                let path = self.path_expression(path)?;
+
+                let type_arguments = vec![];
+
+                let mut fields = vec![];
+                for field in node.fields() {
+                    let Some(name) = field.name() else {
+                        self.diagnostic
+                            .report(miette!("Struct field without a name"));
+                        return Err(());
+                    };
+                    let name = self.identifier(name)?;
+
+                    let Some(value) = field.value() else {
+                        self.diagnostic
+                            .report(miette!("Struct field without a value"));
+                        return Err(());
+                    };
+                    let value = self.expression(value)?;
+
+                    fields.push((name, value));
+                }
+
+                hir::ExpressionKind::Struct {
+                    path,
+                    type_arguments,
+                    fields,
+                }
+            }
+            ast::Expression::Try(node) => {
+                let Some(value) = node.expression() else {
+                    self.diagnostic
+                        .report(miette!("Try expression without an expression"));
+                    return Err(());
+                };
+                let value = self.expression(value)?;
+                let value = Box::new(value);
+
+                hir::ExpressionKind::Try { value }
+            }
+            ast::Expression::Yield(node) => {
+                let value = match node.expression() {
+                    Some(expr) => Some(Box::new(self.expression(expr)?)),
+                    None => None,
+                };
+
+                hir::ExpressionKind::Yield { value }
+            }
+        };
+
+        Ok(hir::Expression {
+            kind,
+            span: Span::new(node.syntax()),
+        })
     }
 
-    fn path(&mut self, node: ast::Path) -> Option<Vec<hir::PathSegment>> {
+    fn block_expression(&mut self, node: ast::BlockExpression) -> Result<Vec<hir::Statement>, ()> {
+        let mut statements = vec![];
+        for statement in node.statements() {
+            match self.statement(statement)? {
+                Some(statement) => statements.push(statement),
+                None => continue,
+            }
+        }
+
+        Ok(statements)
+    }
+
+    fn path_expression(&mut self, node: ast::PathExpression) -> Result<hir::Path, ()> {
+        let Some(path) = node.path() else {
+            self.diagnostic
+                .report(miette!("Path expression without a path"));
+            return Err(());
+        };
+        let segments = self.path(path)?;
+
+        Ok(hir::Path {
+            segments,
+            binding: hir::Binding::Unresolved,
+        })
+    }
+
+    fn statement(&mut self, node: ast::Statement) -> Result<Option<hir::Statement>, ()> {
+        let kind = match node.clone() {
+            ast::Statement::Definition(node) => {
+                let Some(definition) = node.definition() else {
+                    self.diagnostic
+                        .report(miette!("Definition statement without a definition"));
+                    return Err(());
+                };
+                let definition = match self.definition(definition)? {
+                    Some(definition) => definition,
+                    None => return Ok(None),
+                };
+
+                hir::StatementKind::Definition { definition }
+            }
+            ast::Statement::Expression(node) => {
+                let Some(expression) = node.expression() else {
+                    self.diagnostic
+                        .report(miette!("Expression statement without an expression"));
+                    return Err(());
+                };
+                let value = self.expression(expression)?;
+
+                hir::StatementKind::Expression { value }
+            }
+            ast::Statement::Let(node) => {
+                let Some(pattern) = node.pattern() else {
+                    self.diagnostic
+                        .report(miette!("Let statement without a pattern"));
+                    return Err(());
+                };
+                let pattern = self.pattern(pattern, false)?;
+
+                let r#type = match node.r#type() {
+                    None => None,
+                    Some(ty) => Some(self.type_expression(ty, false)?),
+                };
+
+                let initializer = match node.initializer() {
+                    None => None,
+                    Some(expr) => Some(self.expression(expr)?),
+                };
+
+                hir::StatementKind::Let {
+                    pattern,
+                    r#type,
+                    initializer,
+                }
+            }
+            ast::Statement::Semicolon(_) => hir::StatementKind::Semicolon,
+        };
+
+        Ok(Some(hir::Statement {
+            kind,
+            span: Span::new(node.syntax()),
+        }))
+    }
+
+    fn pattern(&mut self, node: ast::Pattern, mutable: bool) -> Result<hir::Pattern, ()> {
+        match node.clone() {
+            ast::Pattern::Never(_) => Ok(hir::Pattern {
+                mutable,
+                kind: hir::PatternKind::Never,
+                span: Span::new(node.syntax()),
+            }),
+            ast::Pattern::Placeholder(_) => Ok(hir::Pattern {
+                mutable,
+                kind: hir::PatternKind::Placeholder,
+                span: Span::new(node.syntax()),
+            }),
+            ast::Pattern::Path(node) => {
+                let Some(path) = node.path() else {
+                    self.diagnostic
+                        .report(miette!("Path pattern without a path"));
+                    return Err(());
+                };
+                let segments = self.path(path)?;
+                let path = hir::Path {
+                    segments,
+                    binding: hir::Binding::Unresolved,
+                };
+
+                Ok(hir::Pattern {
+                    mutable,
+                    kind: hir::PatternKind::Path { path },
+                    span: Span::new(node.syntax()),
+                })
+            }
+            ast::Pattern::Mutable(node) => {
+                let Some(pattern) = node.pattern() else {
+                    self.diagnostic
+                        .report(miette!("Mutable pattern without an inner pattern"));
+                    return Err(());
+                };
+                let mut pattern = self.pattern(pattern, true)?;
+                pattern.mutable = true;
+
+                Ok(pattern)
+            }
+            ast::Pattern::Tuple(node) => {
+                let mut elements = vec![];
+                for element in node.elements() {
+                    elements.push(self.pattern(element, false)?);
+                }
+
+                Ok(hir::Pattern {
+                    mutable,
+                    kind: hir::PatternKind::Tuple { elements },
+                    span: Span::new(node.syntax()),
+                })
+            }
+            ast::Pattern::Array(node) => {
+                let mut elements = vec![];
+                for element in node.elements() {
+                    elements.push(self.pattern(element, false)?);
+                }
+
+                Ok(hir::Pattern {
+                    mutable,
+                    kind: hir::PatternKind::Array { elements },
+                    span: Span::new(node.syntax()),
+                })
+            }
+            ast::Pattern::Literal(node) => {
+                let Some(value) = node.literal() else {
+                    self.diagnostic
+                        .report(miette!("Literal pattern without a literal"));
+                    return Err(());
+                };
+                let value = self.literal_expression(value)?;
+
+                Ok(hir::Pattern {
+                    mutable,
+                    kind: hir::PatternKind::Literal { value },
+                    span: Span::new(node.syntax()),
+                })
+            }
+            ast::Pattern::Range(node) => match node {
+                ast::RangePattern::To(node) => {
+                    let Some(end) = node.end() else {
+                        self.diagnostic
+                            .report(miette!("Range to pattern without an end"));
+                        return Err(());
+                    };
+                    let end = self.pattern(end, false)?;
+                    let end = Box::new(end);
+
+                    Ok(hir::Pattern {
+                        mutable,
+                        kind: hir::PatternKind::Range {
+                            range: hir::RangePattern::To { end },
+                        },
+                        span: Span::new(node.syntax()),
+                    })
+                }
+                ast::RangePattern::FromTo(node) => {
+                    let Some(start) = node.start() else {
+                        self.diagnostic
+                            .report(miette!("Range from-to pattern without a start"));
+                        return Err(());
+                    };
+                    let start = self.pattern(start, false)?;
+                    let start = Box::new(start);
+
+                    let Some(end) = node.end() else {
+                        self.diagnostic
+                            .report(miette!("Range from-to pattern without an end"));
+                        return Err(());
+                    };
+                    let end = self.pattern(end, false)?;
+                    let end = Box::new(end);
+
+                    Ok(hir::Pattern {
+                        mutable,
+                        kind: hir::PatternKind::Range {
+                            range: hir::RangePattern::FromTo { start, end },
+                        },
+                        span: Span::new(node.syntax()),
+                    })
+                }
+                ast::RangePattern::From(node) => {
+                    let Some(start) = node.start() else {
+                        self.diagnostic
+                            .report(miette!("Range from pattern without a start"));
+                        return Err(());
+                    };
+                    let start = self.pattern(start, false)?;
+                    let start = Box::new(start);
+
+                    Ok(hir::Pattern {
+                        mutable,
+                        kind: hir::PatternKind::Range {
+                            range: hir::RangePattern::From { start },
+                        },
+                        span: Span::new(node.syntax()),
+                    })
+                }
+                ast::RangePattern::FromToInclusive(node) => {
+                    let Some(start) = node.start() else {
+                        self.diagnostic
+                            .report(miette!("Range from-to-inclusive pattern without a start"));
+                        return Err(());
+                    };
+                    let start = self.pattern(start, false)?;
+                    let start = Box::new(start);
+
+                    let Some(end) = node.end() else {
+                        self.diagnostic
+                            .report(miette!("Range from-to-inclusive pattern without an end"));
+                        return Err(());
+                    };
+                    let end = self.pattern(end, false)?;
+                    let end = Box::new(end);
+
+                    Ok(hir::Pattern {
+                        mutable,
+                        kind: hir::PatternKind::Range {
+                            range: hir::RangePattern::FromToInclusive { start, end },
+                        },
+                        span: Span::new(node.syntax()),
+                    })
+                }
+                ast::RangePattern::ToInclusive(node) => {
+                    let Some(end) = node.end() else {
+                        self.diagnostic
+                            .report(miette!("Range to-inclusive pattern without an end"));
+                        return Err(());
+                    };
+                    let end = self.pattern(end, false)?;
+                    let end = Box::new(end);
+
+                    Ok(hir::Pattern {
+                        mutable,
+                        kind: hir::PatternKind::Range {
+                            range: hir::RangePattern::ToInclusive { end },
+                        },
+                        span: Span::new(node.syntax()),
+                    })
+                }
+            },
+            ast::Pattern::At(node) => {
+                let Some(name) = node.name() else {
+                    self.diagnostic.report(miette!("At pattern without a name"));
+                    return Err(());
+                };
+                let name = self.identifier(name)?;
+
+                let Some(pattern) = node.pattern() else {
+                    self.diagnostic
+                        .report(miette!("At pattern without an inner pattern"));
+                    return Err(());
+                };
+                let pattern = self.pattern(pattern, false)?;
+                let pattern = Box::new(pattern);
+
+                Ok(hir::Pattern {
+                    mutable,
+                    kind: hir::PatternKind::At { name, pattern },
+                    span: Span::new(node.syntax()),
+                })
+            }
+            ast::Pattern::Or(node) => {
+                let mut patterns = vec![];
+                for option in node.patterns() {
+                    patterns.push(self.pattern(option, false)?);
+                }
+
+                Ok(hir::Pattern {
+                    mutable,
+                    kind: hir::PatternKind::Or { patterns },
+                    span: Span::new(node.syntax()),
+                })
+            }
+            ast::Pattern::Named(node) => {
+                let Some(path) = node.path() else {
+                    self.diagnostic
+                        .report(miette!("Named pattern without a path"));
+                    return Err(());
+                };
+                let path = self.path_pattern(path)?;
+
+                let mut fields = vec![];
+                for field in node.fields() {
+                    let Some(name) = field.name() else {
+                        self.diagnostic
+                            .report(miette!("Named pattern field without a name"));
+                        return Err(());
+                    };
+                    let name = self.identifier(name)?;
+
+                    let Some(pattern) = field.pattern() else {
+                        self.diagnostic
+                            .report(miette!("Named pattern field without a pattern"));
+                        return Err(());
+                    };
+                    let pattern = self.pattern(pattern, false)?;
+
+                    fields.push((name, pattern));
+                }
+
+                Ok(hir::Pattern {
+                    mutable,
+                    kind: hir::PatternKind::Named { path, fields },
+                    span: Span::new(node.syntax()),
+                })
+            }
+            ast::Pattern::Unnamed(node) => {
+                let Some(path) = node.path() else {
+                    self.diagnostic
+                        .report(miette!("Unnamed pattern without a path"));
+                    return Err(());
+                };
+                let path = self.path_pattern(path)?;
+
+                let mut elements = vec![];
+                for element in node.elements() {
+                    elements.push(self.pattern(element, false)?);
+                }
+
+                Ok(hir::Pattern {
+                    mutable,
+                    kind: hir::PatternKind::Unnamed { path, elements },
+                    span: Span::new(node.syntax()),
+                })
+            }
+        }
+    }
+
+    fn path_pattern(&mut self, node: ast::PathPattern) -> Result<hir::Path, ()> {
+        let Some(path) = node.path() else {
+            self.diagnostic
+                .report(miette!("Path pattern without a path"));
+            return Err(());
+        };
+        let segments = self.path(path)?;
+
+        Ok(hir::Path {
+            segments,
+            binding: hir::Binding::Unresolved,
+        })
+    }
+
+    fn literal_expression(&mut self, node: ast::LiteralExpression) -> Result<hir::Literal, ()> {
+        let Some(literal) = node.literal() else {
+            self.diagnostic
+                .report(miette!("Literal expression without a literal"));
+            return Err(());
+        };
+        self.literal(literal)
+    }
+
+    fn literal(&mut self, node: ast::Literal) -> Result<hir::Literal, ()> {
+        let kind = match node.clone() {
+            ast::Literal::Boolean(node) => {
+                let value = if node.r#true().is_some() {
+                    true
+                } else if node.r#false().is_some() {
+                    false
+                } else {
+                    self.diagnostic
+                        .report(miette!("Boolean literal without a value"));
+                    return Err(());
+                };
+
+                hir::LiteralKind::Boolean { value }
+            }
+            ast::Literal::Character(node) => {
+                let Some(kind) = node.kind() else {
+                    self.diagnostic
+                        .report(miette!("Character literal without a value"));
+                    return Err(());
+                };
+                let value = match kind {
+                    ast::CharacterLiteralKind::One(node) => {
+                        let Some(text) = node.character() else {
+                            self.diagnostic
+                                .report(miette!("Character literal without a character"));
+                            return Err(());
+                        };
+                        let text = text.text();
+                        let Some(c) = text.chars().next() else {
+                            self.diagnostic
+                                .report(miette!("Character literal is empty"));
+                            return Err(());
+                        };
+
+                        c
+                    }
+                    ast::CharacterLiteralKind::Escape(node) => {
+                        let Some(text) = node.segment() else {
+                            self.diagnostic
+                                .report(miette!("Character literal without an escape sequence"));
+                            return Err(());
+                        };
+                        let text = text.text();
+                        let Some(c) = text.chars().next() else {
+                            self.diagnostic
+                                .report(miette!("Character literal escape sequence is empty"));
+                            return Err(());
+                        };
+
+                        match c {
+                            '\\' => '\\',
+                            '\'' => '\'',
+                            '\"' => '\"',
+                            'n' => '\n',
+                            't' => '\t',
+                            _ => {
+                                self.diagnostic.report(miette!(
+                                    "Character literal with unknown escape sequence: \\{}",
+                                    c
+                                ));
+                                return Err(());
+                            }
+                        }
+                    }
+                    ast::CharacterLiteralKind::Unicode(node) => {
+                        let code_point: String =
+                            node.segments().map(|s| s.text().to_owned()).collect();
+                        let Ok(value) = u32::from_str_radix(&code_point, 16) else {
+                            self.diagnostic.report(miette!(
+                                "Character literal with invalid unicode code point: {}",
+                                code_point
+                            ));
+                            return Err(());
+                        };
+                        let Some(c) = std::char::from_u32(value) else {
+                            self.diagnostic.report(miette!(
+                                "Character literal with invalid unicode code point: {}",
+                                code_point
+                            ));
+                            return Err(());
+                        };
+
+                        c
+                    }
+                };
+
+                hir::LiteralKind::Character { value }
+            }
+            ast::Literal::Integer(node) => {
+                let text = node.syntax().text().to_owned().to_string();
+                let Some(value) = text.replace('_', "").parse().ok() else {
+                    self.diagnostic
+                        .report(miette!("Integer literal with invalid value: {}", text));
+                    return Err(());
+                };
+
+                hir::LiteralKind::Integer { value }
+            }
+            ast::Literal::Float(node) => {
+                let text = node.syntax().text().to_owned().to_string();
+                let Some(value) = text.replace('_', "").parse().ok() else {
+                    self.diagnostic
+                        .report(miette!("Float literal with invalid value: {}", text));
+                    return Err(());
+                };
+
+                hir::LiteralKind::Float { value }
+            }
+            ast::Literal::String(node) => {
+                let mut segments = vec![];
+                for segment in node.segments() {
+                    let segment = match segment {
+                        ast::StringSegment::Text(node) => {
+                            let value = node.syntax().text().to_owned().to_string();
+
+                            hir::StringSegment::Text { value }
+                        }
+                        ast::StringSegment::Escape(node) => {
+                            let Some(value) = node.segment() else {
+                                self.diagnostic.report(miette!(
+                                    "String escape segment without an escape sequence"
+                                ));
+                                return Err(());
+                            };
+                            let value = match value.text().chars().next() {
+                                Some('\\') => '\\',
+                                Some('\'') => '\'',
+                                Some('\"') => '\"',
+                                Some('n') => '\n',
+                                Some('t') => '\t',
+                                Some(c) => {
+                                    self.diagnostic.report(miette!(
+                                        "String literal with unknown escape sequence: \\{}",
+                                        c
+                                    ));
+                                    return Err(());
+                                }
+                                None => {
+                                    self.diagnostic.report(miette!(
+                                        "String escape segment with empty escape sequence"
+                                    ));
+                                    return Err(());
+                                }
+                            };
+
+                            hir::StringSegment::Escape { value }
+                        }
+                        ast::StringSegment::Unicode(node) => {
+                            let code_point: String =
+                                node.segments().map(|s| s.text().to_owned()).collect();
+                            let Some(value) = u32::from_str_radix(&code_point, 16).ok() else {
+                                self.diagnostic.report(miette!(
+                                    "String literal with invalid unicode code point: {}",
+                                    code_point
+                                ));
+                                return Err(());
+                            };
+                            let Some(value) = std::char::from_u32(value) else {
+                                self.diagnostic.report(miette!(
+                                    "String literal with invalid unicode code point: {}",
+                                    code_point
+                                ));
+                                return Err(());
+                            };
+
+                            hir::StringSegment::Unicode { value }
+                        }
+                        ast::StringSegment::Interpolation(node) => {
+                            let Some(expression) = node.expression() else {
+                                self.diagnostic.report(miette!(
+                                    "String interpolation segment without an expression"
+                                ));
+                                return Err(());
+                            };
+                            let expression = self.expression(expression)?;
+
+                            hir::StringSegment::Interpolation { expression }
+                        }
+                    };
+
+                    segments.push(segment);
+                }
+
+                hir::LiteralKind::String { segments }
+            }
+            ast::Literal::Binary(node) => {
+                let text = node.syntax().text().to_owned().to_string();
+                let Some(value) = i128::from_str_radix(&text[2..], 2).ok() else {
+                    self.diagnostic
+                        .report(miette!("Binary literal with invalid value: {}", text));
+                    return Err(());
+                };
+
+                hir::LiteralKind::Integer { value }
+            }
+            ast::Literal::Octal(node) => {
+                let text = node.syntax().text().to_owned().to_string();
+                let Some(value) = i128::from_str_radix(&text[2..], 8).ok() else {
+                    self.diagnostic
+                        .report(miette!("Octal literal with invalid value: {}", text));
+                    return Err(());
+                };
+
+                hir::LiteralKind::Integer { value }
+            }
+            ast::Literal::Hex(node) => {
+                let text = node.syntax().text().to_owned().to_string();
+                let Some(value) = i128::from_str_radix(&text[2..], 16).ok() else {
+                    self.diagnostic
+                        .report(miette!("Hex literal with invalid value: {}", text));
+                    return Err(());
+                };
+
+                hir::LiteralKind::Integer { value }
+            }
+        };
+
+        Ok(hir::Literal {
+            kind,
+            span: Span::new(node.syntax()),
+        })
+    }
+
+    fn path(&mut self, node: ast::Path) -> Result<Vec<hir::PathSegment>, ()> {
         let mut segments = vec![];
         for segment in node.segments() {
             segments.push(self.path_segment(segment)?);
         }
 
-        Some(segments)
+        Ok(segments)
     }
 
-    fn path_segment(&mut self, node: ast::PathSegment) -> Option<hir::PathSegment> {
+    fn path_segment(&mut self, node: ast::PathSegment) -> Result<hir::PathSegment, ()> {
         let kind = match node {
             ast::PathSegment::Krate(_) => hir::PathSegmentKind::Krate,
             ast::PathSegment::Self_(_) => hir::PathSegmentKind::Self_,
@@ -838,7 +1975,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
                 let Some(ident) = ident.identifier() else {
                     self.diagnostic
                         .report(miette!("Path segment without identifier"));
-                    return None;
+                    return Err(());
                 };
                 let name = self.identifier(ident)?;
 
@@ -846,27 +1983,170 @@ impl<'lowering> DefinitionCollector<'lowering> {
             }
         };
 
-        Some(hir::PathSegment {
+        Ok(hir::PathSegment {
             kind,
             binding: hir::Binding::Unresolved,
         })
     }
 
-    fn identifier(&mut self, node: ast::Identifier) -> Option<hir::Identifier> {
+    fn identifier(&mut self, node: ast::Identifier) -> Result<hir::Identifier, ()> {
         let Some(segment) = node.segment() else {
             self.diagnostic
                 .report(miette!("Identifier without a segment"));
-            return None;
+            return Err(());
         };
         let Some(name) = segment.identifier() else {
             self.diagnostic
                 .report(miette!("Identifier segment without an identifier"));
-            return None;
+            return Err(());
         };
 
-        Some(hir::Identifier {
+        Ok(hir::Identifier {
             symbol: self.symbols.intern(name.text()),
             span: Span::new(node.syntax()),
         })
+    }
+
+    fn unary_operator(
+        &mut self,
+        node: Option<ast::UnaryOperator>,
+    ) -> Result<hir::UnaryOperator, ()> {
+        use danubec_syntax::SyntaxKind::*;
+
+        let Some(node) = node else {
+            self.diagnostic
+                .report(miette!("Binary operator is missing"));
+            return Err(());
+        };
+
+        match node
+            .syntax()
+            .descendants_with_tokens()
+            .find_map(|node| node.into_token())
+            .map(|t| t.kind())
+        {
+            Some(PLUS) => Ok(hir::UnaryOperator::Positive),
+            Some(HYPHEN) => Ok(hir::UnaryOperator::Negate),
+            Some(EXCLAMATION) => Ok(hir::UnaryOperator::Not),
+            Some(TILDE) => Ok(hir::UnaryOperator::BitwiseNot),
+            _ => {
+                self.diagnostic.report(miette!("Unknown unary operator"));
+                Err(())
+            }
+        }
+    }
+
+    fn binary_operator(
+        &mut self,
+        node: Option<ast::BinaryOperator>,
+    ) -> Result<hir::BinaryOperator, ()> {
+        use danubec_syntax::SyntaxKind::*;
+
+        let Some(node) = node else {
+            self.diagnostic
+                .report(miette!("Binary operator is missing"));
+            return Err(());
+        };
+
+        match node
+            .syntax()
+            .descendants_with_tokens()
+            .find_map(|node| node.into_token())
+            .map(|t| t.kind())
+        {
+            Some(PLUS) => Ok(hir::BinaryOperator::Add),
+            Some(PLUS__PIPE) => Ok(hir::BinaryOperator::SaturatingAdd),
+            Some(PLUS__PERCENT) => Ok(hir::BinaryOperator::WrappingAdd),
+            Some(HYPHEN) => Ok(hir::BinaryOperator::Subtract),
+            Some(HYPHEN__PIPE) => Ok(hir::BinaryOperator::SaturatingSubtract),
+            Some(HYPHEN__PERCENT) => Ok(hir::BinaryOperator::WrappingSubtract),
+            Some(ASTERISK) => Ok(hir::BinaryOperator::Multiply),
+            Some(ASTERISK__PIPE) => Ok(hir::BinaryOperator::SaturatingMultiply),
+            Some(ASTERISK__PERCENT) => Ok(hir::BinaryOperator::WrappingMultiply),
+            Some(SLASH) => Ok(hir::BinaryOperator::Divide),
+            Some(PERCENT) => Ok(hir::BinaryOperator::Remainder),
+            Some(ASTERISK__ASTERISK) => Ok(hir::BinaryOperator::Exponent),
+            Some(ASTERISK__ASTERISK__PIPE) => Ok(hir::BinaryOperator::SaturatingExponent),
+            Some(ASTERISK__ASTERISK__PERCENT) => Ok(hir::BinaryOperator::WrappingExponent),
+            Some(CARET) => Ok(hir::BinaryOperator::BitwiseXor),
+            Some(AMPERSAND) => Ok(hir::BinaryOperator::BitwiseAnd),
+            Some(PIPE) => Ok(hir::BinaryOperator::BitwiseOr),
+            Some(AMPERSAND__AMPERSAND) => Ok(hir::BinaryOperator::LogicalAnd),
+            Some(PIPE__PIPE) => Ok(hir::BinaryOperator::LogicalOr),
+            Some(EQUAL__EQUAL) => Ok(hir::BinaryOperator::Equal),
+            Some(EXCLAMATION__EQUAL) => Ok(hir::BinaryOperator::NotEqual),
+            Some(LEFT_CHEVRON) => Ok(hir::BinaryOperator::Less),
+            Some(LEFT_CHEVRON__EQUAL) => Ok(hir::BinaryOperator::LessOrEqual),
+            Some(RIGHT_CHEVRON) => Ok(hir::BinaryOperator::Greater),
+            Some(RIGHT_CHEVRON__EQUAL) => Ok(hir::BinaryOperator::GreaterOrEqual),
+            Some(LEFT_CHEVRON__LEFT_CHEVRON) => Ok(hir::BinaryOperator::LeftShift),
+            Some(RIGHT_CHEVRON__RIGHT_CHEVRON) => Ok(hir::BinaryOperator::RightShift),
+            Some(LEFT_CHEVRON__LEFT_CHEVRON__PIPE) => Ok(hir::BinaryOperator::LeftShift),
+            Some(RIGHT_CHEVRON__RIGHT_CHEVRON__RIGHT_CHEVRON) => {
+                Ok(hir::BinaryOperator::RightShiftUnsigned)
+            }
+            _ => {
+                self.diagnostic.report(miette!("Unknown binary operator"));
+                Err(())
+            }
+        }
+    }
+
+    fn assignment_operator(
+        &mut self,
+        node: Option<ast::AssignmentOperator>,
+    ) -> Result<hir::AssignmentOperator, ()> {
+        use danubec_syntax::SyntaxKind::*;
+
+        let Some(node) = node else {
+            self.diagnostic
+                .report(miette!("Binary operator is missing"));
+            return Err(());
+        };
+
+        match node
+            .syntax()
+            .descendants_with_tokens()
+            .find_map(|node| node.into_token())
+            .map(|t| t.kind())
+        {
+            Some(EQUAL) => Ok(hir::AssignmentOperator::Assign),
+            Some(PLUS__EQUAL) => Ok(hir::AssignmentOperator::Add),
+            Some(PLUS__PIPE__EQUAL) => Ok(hir::AssignmentOperator::SaturatingAdd),
+            Some(PLUS__PERCENT__EQUAL) => Ok(hir::AssignmentOperator::WrappingAdd),
+            Some(HYPHEN__EQUAL) => Ok(hir::AssignmentOperator::Subtract),
+            Some(HYPHEN__PIPE__EQUAL) => Ok(hir::AssignmentOperator::SaturatingSubtract),
+            Some(HYPHEN__PERCENT__EQUAL) => Ok(hir::AssignmentOperator::WrappingSubtract),
+            Some(ASTERISK__EQUAL) => Ok(hir::AssignmentOperator::Multiply),
+            Some(ASTERISK__PIPE__EQUAL) => Ok(hir::AssignmentOperator::SaturatingMultiply),
+            Some(ASTERISK__PERCENT__EQUAL) => Ok(hir::AssignmentOperator::WrappingMultiply),
+            Some(SLASH__EQUAL) => Ok(hir::AssignmentOperator::Divide),
+            Some(PERCENT__EQUAL) => Ok(hir::AssignmentOperator::Remainder),
+            Some(ASTERISK__ASTERISK__EQUAL) => Ok(hir::AssignmentOperator::Exponent),
+            Some(ASTERISK__ASTERISK__PIPE__EQUAL) => {
+                Ok(hir::AssignmentOperator::SaturatingExponent)
+            }
+            Some(ASTERISK__ASTERISK__PERCENT__EQUAL) => {
+                Ok(hir::AssignmentOperator::WrappingExponent)
+            }
+            Some(CARET__EQUAL) => Ok(hir::AssignmentOperator::BitwiseXor),
+            Some(AMPERSAND__EQUAL) => Ok(hir::AssignmentOperator::BitwiseAnd),
+            Some(PIPE__EQUAL) => Ok(hir::AssignmentOperator::BitwiseOr),
+            Some(AMPERSAND__AMPERSAND__EQUAL) => Ok(hir::AssignmentOperator::LogicalAnd),
+            Some(PIPE__PIPE__EQUAL) => Ok(hir::AssignmentOperator::LogicalOr),
+            Some(LEFT_CHEVRON__LEFT_CHEVRON__EQUAL) => Ok(hir::AssignmentOperator::LeftShift),
+            Some(LEFT_CHEVRON__LEFT_CHEVRON__PIPE__EQUAL) => {
+                Ok(hir::AssignmentOperator::SaturatingLeftShift)
+            }
+            Some(RIGHT_CHEVRON__RIGHT_CHEVRON__EQUAL) => Ok(hir::AssignmentOperator::RightShift),
+            Some(RIGHT_CHEVRON__RIGHT_CHEVRON__RIGHT_CHEVRON__EQUAL) => {
+                Ok(hir::AssignmentOperator::RightShiftUnsigned)
+            }
+            _ => {
+                self.diagnostic
+                    .report(miette!("Unknown assignment operator"));
+                return Err(());
+            }
+        }
     }
 }

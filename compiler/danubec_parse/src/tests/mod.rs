@@ -270,6 +270,7 @@ fn foo() {
     foo.bar().baz();
     foo[0];
     foo += 1;
+    1 + 2;
 }"#;
     let (node, diagnostic) = parse(&source);
 

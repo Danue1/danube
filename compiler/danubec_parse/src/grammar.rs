@@ -824,7 +824,6 @@ pub(crate) fn pattern_bp(p: &mut Context, bp: usize) -> CompleteMarker {
 
     loop {
         let r_bp = match p.nth(0) {
-            kind if matches!(kind, AT) && 3 >= bp => 2,
             kind if matches!(kind, PIPE) && 1 >= bp => 0,
             _ => break,
         };
@@ -845,6 +844,9 @@ pub(crate) fn primary_pattern(p: &mut Context) -> CompleteMarker {
     }
     if p.at(PLACEHOLDER) {
         return placeholder_pattern(p, m);
+    }
+    if p.at(IDENTIFIER) && p.nth_at(1, AT) {
+        return at_pattern(p, m, 3);
     }
     if at_path(p) {
         return path_pattern(p, m);
@@ -877,6 +879,11 @@ pub(crate) fn infix_pattern(p: &mut Context, m: Marker, bp: usize) -> CompleteMa
 }
 
 pub(crate) fn at_pattern(p: &mut Context, m: Marker, bp: usize) -> CompleteMarker {
+    if !at_identifier(p) {
+        return p.report(vec![m], miette!("Expected identifier before `@`"));
+    }
+
+    identifier(p);
     expect!(p, AT, [m], '@');
     pattern_bp(p, bp);
 

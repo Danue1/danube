@@ -2,10 +2,10 @@
 source: compiler/danubec_parse/src/tests/mod.rs
 expression: node
 ---
-ROOT_NODE@0..457
+ROOT_NODE@0..468
   NEW_LINE@0..1 "\n"
-  DEFINITION_NODE@1..457
-    FUNCTION_DEFINITION_NODE@1..457
+  DEFINITION_NODE@1..468
+    FUNCTION_DEFINITION_NODE@1..468
       FN@1..3 "fn"
       WHITESPACE@3..4 " "
       IDENTIFIER_NODE@4..7
@@ -14,8 +14,8 @@ ROOT_NODE@0..457
       LEFT_PAREN@7..8 "("
       RIGHT_PAREN@8..9 ")"
       WHITESPACE@9..10 " "
-      FUNCTION_BODY_BLOCK_NODE@10..457
-        BLOCK_EXPRESSION_NODE@10..457
+      FUNCTION_BODY_BLOCK_NODE@10..468
+        BLOCK_EXPRESSION_NODE@10..468
           LEFT_BRACE@10..11 "{"
           NEW_LINE@11..12 "\n"
           WHITESPACE@12..16 "    "
@@ -167,13 +167,10 @@ ROOT_NODE@0..457
               WHITESPACE@191..199 "        "
               MATCH_ARM_NODE@199..212
                 AT_PATTERN_NODE@199..207
-                  PATH_PATTERN_NODE@199..203
-                    PATH_NODE@199..203
-                      PATH_SEGMENT_IDENTIFIER_NODE@199..203
-                        IDENTIFIER_NODE@199..203
-                          IDENTIFIER_SEGMENT@199..203
-                            IDENTIFIER@199..202 "foo"
-                            WHITESPACE@202..203 " "
+                  IDENTIFIER_NODE@199..203
+                    IDENTIFIER_SEGMENT@199..203
+                      IDENTIFIER@199..202 "foo"
+                      WHITESPACE@202..203 " "
                   AT@203..204 "@"
                   WHITESPACE@204..205 " "
                   LITERAL_PATTERN_NODE@205..207
@@ -451,7 +448,7 @@ ROOT_NODE@0..457
             SEMICOLON@440..441 ";"
             NEW_LINE@441..442 "\n"
             WHITESPACE@442..446 "    "
-          EXPRESSION_STATEMENT_NODE@446..456
+          EXPRESSION_STATEMENT_NODE@446..460
             ASSIGNMENT_EXPRESSION_NODE@446..454
               PATH_EXPRESSION_NODE@446..450
                 PATH_NODE@446..450
@@ -470,4 +467,20 @@ ROOT_NODE@0..457
                   INTEGER_SEGMENT@453..454 "1"
             SEMICOLON@454..455 ";"
             NEW_LINE@455..456 "\n"
-          RIGHT_BRACE@456..457 "}"
+            WHITESPACE@456..460 "    "
+          EXPRESSION_STATEMENT_NODE@460..467
+            BINARY_EXPRESSION_NODE@460..465
+              LITERAL_EXPRESSION_NODE@460..462
+                INTEGER_LITERAL_NODE@460..462
+                  INTEGER_SEGMENT@460..461 "1"
+                  WHITESPACE@461..462 " "
+              BINARY_OPERATOR_NODE@462..464
+                PLUS@462..464
+                  PLUS@462..463 "+"
+                  WHITESPACE@463..464 " "
+              LITERAL_EXPRESSION_NODE@464..465
+                INTEGER_LITERAL_NODE@464..465
+                  INTEGER_SEGMENT@464..465 "2"
+            SEMICOLON@465..466 ";"
+            NEW_LINE@466..467 "\n"
+          RIGHT_BRACE@467..468 "}"
