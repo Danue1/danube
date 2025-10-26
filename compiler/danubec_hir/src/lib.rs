@@ -45,6 +45,7 @@ pub enum AttributeArgumentKind {
 pub struct Definition {
     pub attributes: Vec<AttributeId>,
     pub visibility: Visibility,
+    pub name: Identifier,
     pub kind: DefinitionKind,
     pub span: Span,
 }
@@ -52,7 +53,6 @@ pub struct Definition {
 #[derive(Debug)]
 pub enum DefinitionKind {
     Function {
-        name: Identifier,
         type_parameters: Vec<TypeParameter>,
         parameters: Vec<FunctionParameter>,
         return_type: Option<TypeExpression>,
@@ -60,53 +60,48 @@ pub enum DefinitionKind {
         body: Option<Vec<Statement>>,
     },
     Struct {
-        name: Identifier,
         type_parameters: Vec<TypeParameter>,
         type_bounds: Vec<TypeBound>,
         body: StructBody,
     },
     Enum {
-        name: Identifier,
         type_parameters: Vec<TypeParameter>,
         type_bounds: Vec<TypeBound>,
         variants: Vec<EnumVariant>,
     },
-    Use {
-        tree: Import,
-    },
     Module {
-        name: Identifier,
         kind: ModuleDefinitionKind,
     },
     Trait {
-        name: Identifier,
         type_parameters: Vec<TypeParameter>,
         type_bounds: Vec<TypeBound>,
-        definitions: Vec<AssociatedDefinition>,
+        definitions: HashMap<Symbol, Vec<DefinitionId>>,
     },
     Constant {
-        name: Identifier,
-        r#type: TypeExpression,
-        initializer: Expression,
+        r#type: Option<TypeExpression>,
+        initializer: Option<Expression>,
     },
     Static {
-        name: Identifier,
         r#type: TypeExpression,
         initializer: Expression,
     },
     Type {
-        name: Identifier,
         type_parameters: Vec<TypeParameter>,
         type_bounds: Vec<TypeBound>,
         initializer: Option<TypeExpression>,
     },
-    Implement {
-        type_parameters: Vec<TypeParameter>,
-        trait_type: Option<TypeExpression>,
-        target_type: TypeExpression,
-        type_bounds: Vec<TypeBound>,
-        definitions: Vec<AssociatedDefinition>,
-    },
+}
+
+#[derive(Debug)]
+pub struct Implement {
+    pub attributes: Vec<AttributeId>,
+    pub visibility: Visibility,
+    pub type_parameters: Vec<TypeParameter>,
+    pub trait_type: Option<TypeExpression>,
+    pub for_type: TypeExpression,
+    pub type_bounds: Vec<TypeBound>,
+    pub definitions: HashMap<Symbol, Vec<DefinitionId>>,
+    pub span: Span,
 }
 
 #[derive(Debug)]
@@ -216,37 +211,6 @@ pub enum PathSegmentKind {
     Super_,
     Krate,
     Identifier(Identifier),
-}
-
-#[derive(Debug)]
-pub struct AssociatedDefinition {
-    pub attributes: Vec<AttributeId>,
-    pub visibility: Visibility,
-    pub kind: AssociatedDefinitionKind,
-    pub span: Span,
-}
-
-#[derive(Debug)]
-pub enum AssociatedDefinitionKind {
-    Function {
-        name: Identifier,
-        type_parameters: Vec<TypeParameter>,
-        parameters: Vec<FunctionParameter>,
-        return_type: Option<TypeExpression>,
-        type_bounds: Vec<TypeBound>,
-        body: Option<Vec<Statement>>,
-    },
-    Constant {
-        name: Identifier,
-        r#type: Option<TypeExpression>,
-        initializer: Option<Expression>,
-    },
-    Type {
-        name: Identifier,
-        type_parameters: Vec<TypeParameter>,
-        type_bounds: Vec<TypeBound>,
-        initializer: Option<TypeExpression>,
-    },
 }
 
 #[derive(Debug)]

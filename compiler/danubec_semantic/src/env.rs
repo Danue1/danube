@@ -1,5 +1,5 @@
 use danubec_hir::{Attribute, Binding, Import, ImportKind, Path, PathSegment, Visibility};
-use danubec_symbol::{AttributeId, DefinitionId, FileId, ModuleId, ScopeId, Symbol};
+use danubec_symbol::{AttributeId, DefinitionId, FileId, ImplementId, ModuleId, ScopeId, Symbol};
 use fxhash::FxHashMap;
 use slotmap::SlotMap;
 
@@ -9,6 +9,7 @@ pub struct Env {
     scopes: SlotMap<ScopeId, Scope>,
     attributes: SlotMap<AttributeId, Attribute>,
     definitions: SlotMap<DefinitionId, Definition>,
+    implements: SlotMap<ImplementId, Implement>,
 }
 
 #[derive(Debug)]
@@ -27,13 +28,20 @@ pub struct Scope {
     pub types: FxHashMap<Symbol, Vec<DefinitionId>>,
     pub values: FxHashMap<Symbol, Vec<DefinitionId>>,
     pub imports: Vec<Import>,
-    pub implements: Vec<DefinitionId>,
+    pub implements: Vec<ImplementId>,
 }
 
 #[derive(Debug)]
 pub struct Definition {
     pub scope: ScopeId,
     pub definition: danubec_hir::Definition,
+    pub file: FileId,
+}
+
+#[derive(Debug)]
+pub struct Implement {
+    pub scope: ScopeId,
+    pub implement: danubec_hir::Implement,
     pub file: FileId,
 }
 
@@ -57,6 +65,7 @@ impl Env {
             scopes: SlotMap::with_key(),
             attributes: SlotMap::with_key(),
             definitions: SlotMap::with_key(),
+            implements: SlotMap::with_key(),
         }
     }
 
@@ -87,6 +96,10 @@ impl Env {
 
     pub fn definition(&mut self, definition: Definition) -> DefinitionId {
         self.definitions.insert(definition)
+    }
+
+    pub fn implement(&mut self, implement: Implement) -> ImplementId {
+        self.implements.insert(implement)
     }
 }
 

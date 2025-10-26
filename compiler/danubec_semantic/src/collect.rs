@@ -6,9 +6,11 @@ use danubec_ast as ast;
 use danubec_diagnostic::Diagnostic;
 use danubec_hir as hir;
 use danubec_parse::parse;
-use danubec_symbol::{AttributeId, DefinitionId, FileId, ModuleId, ScopeId, SymbolInterner};
-use danubec_syntax::{AstNode, Span, SyntaxNode};
-use std::collections::VecDeque;
+use danubec_symbol::{
+    AttributeId, DefinitionId, FileId, ModuleId, ScopeId, Symbol, SymbolInterner,
+};
+use danubec_syntax::{AstNode, Span};
+use std::collections::{HashMap, VecDeque};
 
 pub fn collect(
     fs: &mut Fs,
@@ -29,6 +31,7 @@ pub fn collect(
             continue;
         };
         let node = parse(&source, diagnostic);
+        let node = ast::Root::cast(node).unwrap();
 
         {
             let mut collector = DefinitionCollector::new(file, module, env, symbols, diagnostic);
@@ -48,8 +51,8 @@ pub fn collect(
                 definition: hir::Definition {
                     attributes: vec![],
                     visibility: hir::Visibility::Private,
+                    name,
                     kind: hir::DefinitionKind::Module {
-                        name,
                         kind: hir::ModuleDefinitionKind::External,
                     },
                     span: Span::new(definition.syntax()),
@@ -72,13 +75,12 @@ pub fn collect(
 }
 
 fn external_modules(
-    node: SyntaxNode,
+    node: ast::Root,
     symbols: &mut SymbolInterner,
 ) -> Vec<(ast::Definition, hir::Identifier)> {
     use danubec_syntax::AstNode;
 
-    node.children()
-        .filter_map(ast::Definition::cast)
+    node.definitions()
         .filter_map(|definition| match definition.kind() {
             Some(ast::DefinitionKind::Module(module))
                 if matches!(module.kind(), Some(ast::ModuleDefinitionKind::External(_))) =>
@@ -158,13 +160,13 @@ impl<'lowering> DefinitionCollector<'lowering> {
 }
 
 impl<'lowering> DefinitionCollector<'lowering> {
-    pub fn root(&mut self, node: SyntaxNode) {
+    pub fn root(&mut self, node: ast::Root) {
         let _ = self.with_scope(ScopeKind::Module, |this| -> Result<(), ()> {
-            for attribute in node.children().filter_map(ast::TopLevelAttribute::cast) {
+            for attribute in node.attributes() {
                 this.top_level_attribute(attribute);
             }
 
-            for definition in node.children().filter_map(ast::Definition::cast) {
+            for definition in node.definitions() {
                 this.definition(definition)?;
             }
 
@@ -180,9 +182,50 @@ impl<'lowering> DefinitionCollector<'lowering> {
         std::todo!();
     }
 
+    fn associated_definition(
+        &mut self,
+        node: ast::AssociatedDefinition,
+    ) -> Result<(Symbol, DefinitionId), ()> {
+        let mut attributes = vec![];
+        for attribute in node.attributes() {
+            attributes.push(self.attribute(attribute)?);
+        }
+
+        let visibility = self.visibility(node.visibility());
+
+        let Some(definition) = node.kind() else {
+            self.diagnostic
+                .report(miette!("Trait definition without a kind"));
+            return Err(());
+        };
+        let (symbol, definition) =
+            self.associated_definition_kind(definition, attributes, visibility)?;
+
+        Ok((symbol, definition))
+    }
+
+    fn associated_definition_kind(
+        &mut self,
+        node: ast::AssociatedDefinitionKind,
+        attributes: Vec<AttributeId>,
+        visibility: hir::Visibility,
+    ) -> Result<(Symbol, DefinitionId), ()> {
+        match node {
+            ast::AssociatedDefinitionKind::Function(node) => {
+                self.function_definition(node, attributes, visibility)
+            }
+            ast::AssociatedDefinitionKind::Constant(node) => {
+                self.constant_definition(node, attributes, visibility)
+            }
+            ast::AssociatedDefinitionKind::Type(node) => {
+                self.type_definition(node, attributes, visibility)
+            }
+        }
+    }
+
     fn definition(&mut self, node: ast::Definition) -> Result<Option<DefinitionId>, ()> {
         let mut attributes = vec![];
-        for attribute in node.syntax().children().filter_map(ast::Attribute::cast) {
+        for attribute in node.attributes() {
             attributes.push(self.attribute(attribute)?);
         }
 
@@ -194,7 +237,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
         };
         let definition = match kind {
             ast::DefinitionKind::Function(node) => {
-                Some(self.function_definition(node, attributes, visibility)?)
+                Some(self.function_definition(node, attributes, visibility)?.1)
             }
             ast::DefinitionKind::Struct(node) => {
                 Some(self.struct_definition(node, attributes, visibility)?)
@@ -209,13 +252,13 @@ impl<'lowering> DefinitionCollector<'lowering> {
                 Some(self.trait_definition(node, attributes, visibility)?)
             }
             ast::DefinitionKind::Constant(node) => {
-                Some(self.constant_definition(node, attributes, visibility)?)
+                Some(self.constant_definition(node, attributes, visibility)?.1)
             }
             ast::DefinitionKind::Static(node) => {
                 Some(self.static_definition(node, attributes, visibility)?)
             }
             ast::DefinitionKind::Type(node) => {
-                Some(self.type_definition(node, attributes, visibility)?)
+                Some(self.type_definition(node, attributes, visibility)?.1)
             }
             ast::DefinitionKind::Use(node) => {
                 self.use_definition(node, attributes, visibility)?;
@@ -233,9 +276,9 @@ impl<'lowering> DefinitionCollector<'lowering> {
     fn function_definition(
         &mut self,
         node: ast::FunctionDefinition,
-        attributes: Vec<AttributeId>,
-        visibility: hir::Visibility,
-    ) -> Result<DefinitionId, ()> {
+        _attributes: Vec<AttributeId>,
+        _visibility: hir::Visibility,
+    ) -> Result<(Symbol, DefinitionId), ()> {
         let Some(name) = node.name() else {
             self.diagnostic.report(miette!("Function without a name"));
             return Err(());
@@ -273,8 +316,8 @@ impl<'lowering> DefinitionCollector<'lowering> {
             definition: hir::Definition {
                 attributes,
                 visibility,
+                name,
                 kind: hir::DefinitionKind::Struct {
-                    name,
                     type_parameters,
                     type_bounds,
                     body,
@@ -326,8 +369,8 @@ impl<'lowering> DefinitionCollector<'lowering> {
             definition: hir::Definition {
                 attributes,
                 visibility,
+                name,
                 kind: hir::DefinitionKind::Enum {
-                    name,
                     type_parameters,
                     type_bounds,
                     variants,
@@ -384,8 +427,8 @@ impl<'lowering> DefinitionCollector<'lowering> {
             definition: hir::Definition {
                 attributes,
                 visibility,
+                name,
                 kind: hir::DefinitionKind::Module {
-                    name,
                     kind: hir::ModuleDefinitionKind::Inline {
                         definitions: vec![],
                     },
@@ -425,9 +468,47 @@ impl<'lowering> DefinitionCollector<'lowering> {
             self.diagnostic.report(miette!("Trait without a name"));
             return Err(());
         };
-        let _ = self.identifier(name)?;
+        let name = self.identifier(name)?;
 
-        std::todo!();
+        let type_parameters = vec![];
+
+        let type_bounds = vec![];
+
+        let definitions = self.with_scope(ScopeKind::Block, |this| {
+            let mut definitions = HashMap::new();
+            for definition in node.definitions() {
+                let (symbol, definition) = this.associated_definition(definition)?;
+                definitions
+                    .entry(symbol)
+                    .or_insert_with(Vec::new)
+                    .push(definition);
+            }
+
+            Ok(definitions)
+        })?;
+
+        let scope = self.current_scope();
+        let definition = self.env.definition(crate::env::Definition {
+            scope,
+            definition: hir::Definition {
+                attributes,
+                visibility,
+                name,
+                kind: hir::DefinitionKind::Trait {
+                    type_parameters,
+                    type_bounds,
+                    definitions,
+                },
+                span: Span::new(node.syntax()),
+            },
+            file: self.file,
+        });
+        self.env[scope][Namespace::Type]
+            .entry(name.symbol)
+            .or_default()
+            .push(definition);
+
+        Ok(definition)
     }
 
     fn constant_definition(
@@ -435,14 +516,44 @@ impl<'lowering> DefinitionCollector<'lowering> {
         node: ast::ConstantDefinition,
         attributes: Vec<AttributeId>,
         visibility: hir::Visibility,
-    ) -> Result<DefinitionId, ()> {
+    ) -> Result<(Symbol, DefinitionId), ()> {
         let Some(name) = node.name() else {
             self.diagnostic.report(miette!("Constant without a name"));
             return Err(());
         };
-        let _ = self.identifier(name)?;
+        let name = self.identifier(name)?;
 
-        std::todo!();
+        let r#type = match node.r#type() {
+            Some(r#type) => Some(self.type_expression(r#type, false)?),
+            None => None,
+        };
+
+        let initializer = match node.initializer() {
+            Some(initializer) => Some(self.expression(initializer)?),
+            None => None,
+        };
+
+        let scope = self.current_scope();
+        let definition = self.env.definition(crate::env::Definition {
+            scope,
+            definition: hir::Definition {
+                attributes,
+                visibility,
+                name,
+                kind: hir::DefinitionKind::Constant {
+                    r#type,
+                    initializer,
+                },
+                span: Span::new(node.syntax()),
+            },
+            file: self.file,
+        });
+        self.env[scope][Namespace::Value]
+            .entry(name.symbol)
+            .or_default()
+            .push(definition);
+
+        Ok((name.symbol, definition))
     }
 
     fn static_definition(
@@ -455,9 +566,42 @@ impl<'lowering> DefinitionCollector<'lowering> {
             self.diagnostic.report(miette!("Static without a name"));
             return Err(());
         };
-        let _ = self.identifier(name)?;
+        let name = self.identifier(name)?;
 
-        std::todo!();
+        let Some(r#type) = node.r#type() else {
+            self.diagnostic.report(miette!("Static without a type"));
+            return Err(());
+        };
+        let r#type = self.type_expression(r#type, false)?;
+
+        let Some(initializer) = node.initializer() else {
+            self.diagnostic
+                .report(miette!("Static without an initializer"));
+            return Err(());
+        };
+        let initializer = self.expression(initializer)?;
+
+        let scope = self.current_scope();
+        let definition = self.env.definition(crate::env::Definition {
+            scope,
+            definition: hir::Definition {
+                attributes,
+                visibility,
+                name,
+                kind: hir::DefinitionKind::Static {
+                    r#type,
+                    initializer,
+                },
+                span: Span::new(node.syntax()),
+            },
+            file: self.file,
+        });
+        self.env[scope][Namespace::Value]
+            .entry(name.symbol)
+            .or_default()
+            .push(definition);
+
+        Ok(definition)
     }
 
     fn type_definition(
@@ -465,23 +609,97 @@ impl<'lowering> DefinitionCollector<'lowering> {
         node: ast::TypeDefinition,
         attributes: Vec<AttributeId>,
         visibility: hir::Visibility,
-    ) -> Result<DefinitionId, ()> {
+    ) -> Result<(Symbol, DefinitionId), ()> {
         let Some(name) = node.name() else {
             self.diagnostic.report(miette!("Type without a name"));
             return Err(());
         };
-        let _ = self.identifier(name)?;
+        let name = self.identifier(name)?;
 
-        std::todo!();
+        let type_parameters = vec![];
+
+        let type_bounds = vec![];
+
+        let initializer = match node.initializer() {
+            Some(initializer) => Some(self.type_expression(initializer, false)?),
+            None => None,
+        };
+
+        let scope = self.current_scope();
+        let definition = self.env.definition(crate::env::Definition {
+            scope,
+            definition: hir::Definition {
+                attributes,
+                visibility,
+                name,
+                kind: hir::DefinitionKind::Type {
+                    type_parameters,
+                    type_bounds,
+                    initializer,
+                },
+                span: Span::new(node.syntax()),
+            },
+            file: self.file,
+        });
+        self.env[scope][Namespace::Value]
+            .entry(name.symbol)
+            .or_default()
+            .push(definition);
+
+        Ok((name.symbol, definition))
     }
 
     fn implement_definition(
         &mut self,
-        _: ast::ImplementDefinition,
+        node: ast::ImplementDefinition,
         attributes: Vec<AttributeId>,
         visibility: hir::Visibility,
     ) -> Result<(), ()> {
-        std::todo!();
+        let trait_type = match node.trait_type() {
+            None => None,
+            Some(trait_type) => Some(self.type_expression(trait_type, false)?),
+        };
+
+        let Some(for_type) = node.target_type() else {
+            self.diagnostic
+                .report(miette!("Implement without a for type"));
+            return Err(());
+        };
+        let for_type = self.type_expression(for_type, false)?;
+
+        let type_parameters = vec![];
+
+        let type_bounds = vec![];
+
+        let definitions = self.with_scope(ScopeKind::Block, |this| {
+            let mut definitions = HashMap::new();
+            for definition in node.definitions() {
+                let (symbol, definition) = this.associated_definition(definition)?;
+                definitions
+                    .entry(symbol)
+                    .or_insert_with(Vec::new)
+                    .push(definition);
+            }
+
+            Ok(definitions)
+        })?;
+
+        self.env.implement(crate::env::Implement {
+            scope: self.current_scope(),
+            implement: hir::Implement {
+                attributes,
+                visibility,
+                trait_type,
+                for_type,
+                type_parameters,
+                type_bounds,
+                definitions,
+                span: Span::new(node.syntax()),
+            },
+            file: self.file,
+        });
+
+        Ok(())
     }
 
     fn use_tree(
@@ -680,7 +898,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
                 let mut fields = vec![];
                 for field in node.fields() {
                     let mut attributes = vec![];
-                    for attribute in field.syntax().children().filter_map(ast::Attribute::cast) {
+                    for attribute in field.attributes() {
                         attributes.push(self.attribute(attribute)?);
                     }
 
@@ -719,7 +937,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
                 let mut fields = vec![];
                 for field in node.fields() {
                     let mut attributes = vec![];
-                    for attribute in field.syntax().children().filter_map(ast::Attribute::cast) {
+                    for attribute in field.attributes() {
                         attributes.push(self.attribute(attribute)?);
                     }
 
@@ -736,8 +954,6 @@ impl<'lowering> DefinitionCollector<'lowering> {
                 (attributes, name, hir::EnumVariantKind::Unnamed(fields))
             }
         };
-
-        // TODO: Add fields to scope
 
         Ok(hir::EnumVariant {
             attributes,
@@ -1019,7 +1235,8 @@ impl<'lowering> DefinitionCollector<'lowering> {
                     attributes.push(self.attribute(attribute)?);
                 }
 
-                let statements = self.block_expression(node)?;
+                let statements =
+                    self.with_scope(ScopeKind::Block, |this| this.block_expression(node))?;
 
                 hir::ExpressionKind::Block {
                     attributes,

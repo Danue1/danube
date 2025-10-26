@@ -12,6 +12,8 @@ slotmap::new_key_type! {
 
     pub struct DefinitionId;
 
+    pub struct ImplementId;
+
     pub struct LocalId;
 }
 
