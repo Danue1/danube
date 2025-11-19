@@ -20,14 +20,19 @@ Env {
                             2v1,
                         ),
                         Symbol(
+                            2,
+                        ): ModuleId(
+                            4v1,
+                        ),
+                        Symbol(
                             1,
                         ): ModuleId(
                             3v1,
                         ),
                         Symbol(
-                            2,
+                            3,
                         ): ModuleId(
-                            4v1,
+                            5v1,
                         ),
                     },
                     scope: ScopeId(
@@ -89,9 +94,26 @@ Env {
                     ),
                 },
             },
+            Slot {
+                version: 1,
+                value: Module {
+                    parent: Some(
+                        ModuleId(
+                            1v1,
+                        ),
+                    ),
+                    children: {},
+                    scope: ScopeId(
+                        6v1,
+                    ),
+                    file: FileId(
+                        5v1,
+                    ),
+                },
+            },
         ],
-        free_head: 5,
-        num_elems: 4,
+        free_head: 6,
+        num_elems: 5,
         _k: PhantomData<fn(danubec_symbol::ModuleId) -> danubec_symbol::ModuleId>,
     },
     scopes: SlotMap {
@@ -106,30 +128,48 @@ Env {
                     module: None,
                     parent: None,
                     kind: Module,
-                    types: {
-                        Symbol(
-                            0,
-                        ): [
-                            DefinitionId(
-                                1v1,
+                    definitions: {
+                        (
+                            Type,
+                            Symbol(
+                                2,
                             ),
-                        ],
-                        Symbol(
-                            1,
-                        ): [
-                            DefinitionId(
-                                2v1,
-                            ),
-                        ],
-                        Symbol(
-                            2,
                         ): [
                             DefinitionId(
                                 3v1,
                             ),
                         ],
+                        (
+                            Type,
+                            Symbol(
+                                0,
+                            ),
+                        ): [
+                            DefinitionId(
+                                1v1,
+                            ),
+                        ],
+                        (
+                            Type,
+                            Symbol(
+                                3,
+                            ),
+                        ): [
+                            DefinitionId(
+                                4v1,
+                            ),
+                        ],
+                        (
+                            Type,
+                            Symbol(
+                                1,
+                            ),
+                        ): [
+                            DefinitionId(
+                                2v1,
+                            ),
+                        ],
                     },
-                    values: {},
                     imports: [],
                     implements: [],
                 },
@@ -144,8 +184,7 @@ Env {
                         ),
                     ),
                     kind: Module,
-                    types: {},
-                    values: {},
+                    definitions: {},
                     imports: [],
                     implements: [],
                 },
@@ -160,8 +199,7 @@ Env {
                     ),
                     parent: None,
                     kind: Module,
-                    types: {},
-                    values: {},
+                    definitions: {},
                     imports: [],
                     implements: [],
                 },
@@ -176,8 +214,7 @@ Env {
                     ),
                     parent: None,
                     kind: Module,
-                    types: {},
-                    values: {},
+                    definitions: {},
                     imports: [],
                     implements: [],
                 },
@@ -192,8 +229,22 @@ Env {
                     ),
                     parent: None,
                     kind: Module,
-                    types: {},
-                    values: {},
+                    definitions: {},
+                    imports: [],
+                    implements: [],
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    module: Some(
+                        ModuleId(
+                            1v1,
+                        ),
+                    ),
+                    parent: None,
+                    kind: Module,
+                    definitions: {},
                     imports: [],
                     implements: [],
                 },
@@ -208,8 +259,7 @@ Env {
                         ),
                     ),
                     kind: Module,
-                    types: {},
-                    values: {},
+                    definitions: {},
                     imports: [],
                     implements: [],
                 },
@@ -224,30 +274,38 @@ Env {
                         ),
                     ),
                     kind: Module,
-                    types: {
-                        Symbol(
-                            4,
+                    definitions: {
+                        (
+                            Value,
+                            Symbol(
+                                4,
+                            ),
                         ): [
                             DefinitionId(
                                 5v1,
                             ),
                         ],
-                        Symbol(
-                            6,
+                        (
+                            Value,
+                            Symbol(
+                                5,
+                            ),
                         ): [
                             DefinitionId(
                                 6v1,
                             ),
                         ],
-                        Symbol(
-                            3,
+                        (
+                            Value,
+                            Symbol(
+                                7,
+                            ),
                         ): [
                             DefinitionId(
-                                4v1,
+                                7v1,
                             ),
                         ],
                     },
-                    values: {},
                     imports: [],
                     implements: [],
                 },
@@ -262,23 +320,28 @@ Env {
                         ),
                     ),
                     kind: Module,
-                    types: {
-                        Symbol(
-                            4,
+                    definitions: {
+                        (
+                            Value,
+                            Symbol(
+                                4,
+                            ),
                         ): [
                             DefinitionId(
                                 8v1,
                             ),
                         ],
-                        Symbol(
-                            3,
+                        (
+                            Value,
+                            Symbol(
+                                5,
+                            ),
                         ): [
                             DefinitionId(
-                                7v1,
+                                9v1,
                             ),
                         ],
                     },
-                    values: {},
                     imports: [],
                     implements: [],
                 },
@@ -289,12 +352,11 @@ Env {
                     module: None,
                     parent: Some(
                         ScopeId(
-                            8v1,
+                            9v1,
                         ),
                     ),
                     kind: Block,
-                    types: {},
-                    values: {},
+                    definitions: {},
                     imports: [],
                     implements: [],
                 },
@@ -305,19 +367,104 @@ Env {
                     module: None,
                     parent: Some(
                         ScopeId(
-                            8v1,
+                            9v1,
                         ),
                     ),
                     kind: Block,
-                    types: {},
-                    values: {},
+                    definitions: {},
+                    imports: [],
+                    implements: [],
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    module: None,
+                    parent: Some(
+                        ScopeId(
+                            6v1,
+                        ),
+                    ),
+                    kind: Module,
+                    definitions: {
+                        (
+                            Value,
+                            Symbol(
+                                13,
+                            ),
+                        ): [
+                            DefinitionId(
+                                10v1,
+                            ),
+                        ],
+                        (
+                            Value,
+                            Symbol(
+                                18,
+                            ),
+                        ): [
+                            DefinitionId(
+                                12v1,
+                            ),
+                        ],
+                        (
+                            Type,
+                            Symbol(
+                                19,
+                            ),
+                        ): [
+                            DefinitionId(
+                                13v1,
+                            ),
+                        ],
+                        (
+                            Value,
+                            Symbol(
+                                14,
+                            ),
+                        ): [
+                            DefinitionId(
+                                11v1,
+                            ),
+                        ],
+                    },
+                    imports: [],
+                    implements: [],
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    module: None,
+                    parent: Some(
+                        ScopeId(
+                            12v1,
+                        ),
+                    ),
+                    kind: Function,
+                    definitions: {},
+                    imports: [],
+                    implements: [],
+                },
+            },
+            Slot {
+                version: 1,
+                value: Scope {
+                    module: None,
+                    parent: Some(
+                        ScopeId(
+                            12v1,
+                        ),
+                    ),
+                    kind: Block,
+                    definitions: {},
                     imports: [],
                     implements: [],
                 },
             },
         ],
-        free_head: 11,
-        num_elems: 10,
+        free_head: 15,
+        num_elems: 14,
         _k: PhantomData<fn(danubec_symbol::ScopeId) -> danubec_symbol::ScopeId>,
     },
     attributes: SlotMap {
@@ -346,16 +493,16 @@ Env {
                     definition: Definition {
                         attributes: [],
                         visibility: Private,
-                        kind: Module {
-                            name: Identifier {
-                                symbol: Symbol(
-                                    0,
-                                ),
-                                span: SyntaxNodePtr {
-                                    kind: IDENTIFIER_NODE,
-                                    range: 4..11,
-                                },
+                        name: Identifier {
+                            symbol: Symbol(
+                                0,
+                            ),
+                            span: SyntaxNodePtr {
+                                kind: IDENTIFIER_NODE,
+                                range: 4..11,
                             },
+                        },
+                        kind: Module {
                             kind: External,
                         },
                         span: SyntaxNodePtr {
@@ -377,16 +524,16 @@ Env {
                     definition: Definition {
                         attributes: [],
                         visibility: Private,
-                        kind: Module {
-                            name: Identifier {
-                                symbol: Symbol(
-                                    1,
-                                ),
-                                span: SyntaxNodePtr {
-                                    kind: IDENTIFIER_NODE,
-                                    range: 17..24,
-                                },
+                        name: Identifier {
+                            symbol: Symbol(
+                                1,
+                            ),
+                            span: SyntaxNodePtr {
+                                kind: IDENTIFIER_NODE,
+                                range: 17..24,
                             },
+                        },
+                        kind: Module {
                             kind: External,
                         },
                         span: SyntaxNodePtr {
@@ -408,21 +555,21 @@ Env {
                     definition: Definition {
                         attributes: [],
                         visibility: Private,
-                        kind: Module {
-                            name: Identifier {
-                                symbol: Symbol(
-                                    2,
-                                ),
-                                span: SyntaxNodePtr {
-                                    kind: IDENTIFIER_NODE,
-                                    range: 30..35,
-                                },
+                        name: Identifier {
+                            symbol: Symbol(
+                                2,
+                            ),
+                            span: SyntaxNodePtr {
+                                kind: IDENTIFIER_NODE,
+                                range: 30..35,
                             },
+                        },
+                        kind: Module {
                             kind: External,
                         },
                         span: SyntaxNodePtr {
                             kind: DEFINITION_NODE,
-                            range: 26..38,
+                            range: 26..37,
                         },
                     },
                     file: FileId(
@@ -434,21 +581,52 @@ Env {
                 version: 1,
                 value: Definition {
                     scope: ScopeId(
-                        7v1,
+                        1v1,
                     ),
                     definition: Definition {
                         attributes: [],
                         visibility: Private,
-                        kind: Struct {
-                            name: Identifier {
-                                symbol: Symbol(
-                                    3,
-                                ),
-                                span: SyntaxNodePtr {
-                                    kind: IDENTIFIER_NODE,
-                                    range: 7..10,
-                                },
+                        name: Identifier {
+                            symbol: Symbol(
+                                3,
+                            ),
+                            span: SyntaxNodePtr {
+                                kind: IDENTIFIER_NODE,
+                                range: 41..50,
                             },
+                        },
+                        kind: Module {
+                            kind: External,
+                        },
+                        span: SyntaxNodePtr {
+                            kind: DEFINITION_NODE,
+                            range: 37..53,
+                        },
+                    },
+                    file: FileId(
+                        1v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Definition {
+                    scope: ScopeId(
+                        8v1,
+                    ),
+                    definition: Definition {
+                        attributes: [],
+                        visibility: Private,
+                        name: Identifier {
+                            symbol: Symbol(
+                                4,
+                            ),
+                            span: SyntaxNodePtr {
+                                kind: IDENTIFIER_NODE,
+                                range: 7..10,
+                            },
+                        },
+                        kind: Struct {
                             type_parameters: [],
                             type_bounds: [],
                             body: Unit,
@@ -467,21 +645,21 @@ Env {
                 version: 1,
                 value: Definition {
                     scope: ScopeId(
-                        7v1,
+                        8v1,
                     ),
                     definition: Definition {
                         attributes: [],
                         visibility: Private,
-                        kind: Struct {
-                            name: Identifier {
-                                symbol: Symbol(
-                                    4,
-                                ),
-                                span: SyntaxNodePtr {
-                                    kind: IDENTIFIER_NODE,
-                                    range: 20..23,
-                                },
+                        name: Identifier {
+                            symbol: Symbol(
+                                5,
+                            ),
+                            span: SyntaxNodePtr {
+                                kind: IDENTIFIER_NODE,
+                                range: 20..23,
                             },
+                        },
+                        kind: Struct {
                             type_parameters: [],
                             type_bounds: [],
                             body: Unnamed(
@@ -497,7 +675,7 @@ Env {
                                                             kind: Identifier(
                                                                 Identifier {
                                                                     symbol: Symbol(
-                                                                        5,
+                                                                        6,
                                                                     ),
                                                                     span: SyntaxNodePtr {
                                                                         kind: IDENTIFIER_NODE,
@@ -534,21 +712,21 @@ Env {
                 version: 1,
                 value: Definition {
                     scope: ScopeId(
-                        7v1,
+                        8v1,
                     ),
                     definition: Definition {
                         attributes: [],
                         visibility: Private,
-                        kind: Struct {
-                            name: Identifier {
-                                symbol: Symbol(
-                                    6,
-                                ),
-                                span: SyntaxNodePtr {
-                                    kind: IDENTIFIER_NODE,
-                                    range: 40..44,
-                                },
+                        name: Identifier {
+                            symbol: Symbol(
+                                7,
+                            ),
+                            span: SyntaxNodePtr {
+                                kind: IDENTIFIER_NODE,
+                                range: 40..44,
                             },
+                        },
+                        kind: Struct {
                             type_parameters: [],
                             type_bounds: [],
                             body: Named(
@@ -557,7 +735,7 @@ Env {
                                         Private,
                                         Identifier {
                                             symbol: Symbol(
-                                                7,
+                                                8,
                                             ),
                                             span: SyntaxNodePtr {
                                                 kind: IDENTIFIER_NODE,
@@ -573,7 +751,7 @@ Env {
                                                             kind: Identifier(
                                                                 Identifier {
                                                                     symbol: Symbol(
-                                                                        5,
+                                                                        6,
                                                                     ),
                                                                     span: SyntaxNodePtr {
                                                                         kind: IDENTIFIER_NODE,
@@ -610,21 +788,21 @@ Env {
                 version: 1,
                 value: Definition {
                     scope: ScopeId(
-                        8v1,
+                        9v1,
                     ),
                     definition: Definition {
                         attributes: [],
                         visibility: Private,
-                        kind: Enum {
-                            name: Identifier {
-                                symbol: Symbol(
-                                    3,
-                                ),
-                                span: SyntaxNodePtr {
-                                    kind: IDENTIFIER_NODE,
-                                    range: 5..9,
-                                },
+                        name: Identifier {
+                            symbol: Symbol(
+                                4,
+                            ),
+                            span: SyntaxNodePtr {
+                                kind: IDENTIFIER_NODE,
+                                range: 5..9,
                             },
+                        },
+                        kind: Enum {
                             type_parameters: [],
                             type_bounds: [],
                             variants: [],
@@ -643,21 +821,21 @@ Env {
                 version: 1,
                 value: Definition {
                     scope: ScopeId(
-                        8v1,
+                        9v1,
                     ),
                     definition: Definition {
                         attributes: [],
                         visibility: Private,
-                        kind: Enum {
-                            name: Identifier {
-                                symbol: Symbol(
-                                    4,
-                                ),
-                                span: SyntaxNodePtr {
-                                    kind: IDENTIFIER_NODE,
-                                    range: 18..22,
-                                },
+                        name: Identifier {
+                            symbol: Symbol(
+                                5,
+                            ),
+                            span: SyntaxNodePtr {
+                                kind: IDENTIFIER_NODE,
+                                range: 18..22,
                             },
+                        },
+                        kind: Enum {
                             type_parameters: [],
                             type_bounds: [],
                             variants: [
@@ -665,7 +843,7 @@ Env {
                                     attributes: [],
                                     name: Identifier {
                                         symbol: Symbol(
-                                            8,
+                                            9,
                                         ),
                                         span: SyntaxNodePtr {
                                             kind: IDENTIFIER_NODE,
@@ -682,7 +860,7 @@ Env {
                                     attributes: [],
                                     name: Identifier {
                                         symbol: Symbol(
-                                            9,
+                                            10,
                                         ),
                                         span: SyntaxNodePtr {
                                             kind: IDENTIFIER_NODE,
@@ -717,7 +895,7 @@ Env {
                                     attributes: [],
                                     name: Identifier {
                                         symbol: Symbol(
-                                            10,
+                                            11,
                                         ),
                                         span: SyntaxNodePtr {
                                             kind: IDENTIFIER_NODE,
@@ -736,7 +914,7 @@ Env {
                                     attributes: [],
                                     name: Identifier {
                                         symbol: Symbol(
-                                            11,
+                                            12,
                                         ),
                                         span: SyntaxNodePtr {
                                             kind: IDENTIFIER_NODE,
@@ -749,7 +927,7 @@ Env {
                                                 [],
                                                 Identifier {
                                                     symbol: Symbol(
-                                                        7,
+                                                        8,
                                                     ),
                                                     span: SyntaxNodePtr {
                                                         kind: IDENTIFIER_NODE,
@@ -765,7 +943,7 @@ Env {
                                                                     kind: Identifier(
                                                                         Identifier {
                                                                             symbol: Symbol(
-                                                                                5,
+                                                                                6,
                                                                             ),
                                                                             span: SyntaxNodePtr {
                                                                                 kind: IDENTIFIER_NODE,
@@ -804,9 +982,479 @@ Env {
                     ),
                 },
             },
+            Slot {
+                version: 1,
+                value: Definition {
+                    scope: ScopeId(
+                        12v1,
+                    ),
+                    definition: Definition {
+                        attributes: [],
+                        visibility: Private,
+                        name: Identifier {
+                            symbol: Symbol(
+                                13,
+                            ),
+                            span: SyntaxNodePtr {
+                                kind: IDENTIFIER_NODE,
+                                range: 3..6,
+                            },
+                        },
+                        kind: Function {
+                            type_parameters: [],
+                            parameters: [],
+                            return_type: None,
+                            type_bounds: [],
+                            body: None,
+                        },
+                        span: SyntaxNodePtr {
+                            kind: FUNCTION_DEFINITION_NODE,
+                            range: 0..11,
+                        },
+                    },
+                    file: FileId(
+                        5v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Definition {
+                    scope: ScopeId(
+                        12v1,
+                    ),
+                    definition: Definition {
+                        attributes: [],
+                        visibility: Private,
+                        name: Identifier {
+                            symbol: Symbol(
+                                14,
+                            ),
+                            span: SyntaxNodePtr {
+                                kind: IDENTIFIER_NODE,
+                                range: 14..17,
+                            },
+                        },
+                        kind: Function {
+                            type_parameters: [],
+                            parameters: [
+                                FunctionParameter {
+                                    attributes: [],
+                                    pattern: Pattern {
+                                        mutable: false,
+                                        kind: Path {
+                                            path: Path {
+                                                segments: [
+                                                    PathSegment {
+                                                        kind: Identifier(
+                                                            Identifier {
+                                                                symbol: Symbol(
+                                                                    15,
+                                                                ),
+                                                                span: SyntaxNodePtr {
+                                                                    kind: IDENTIFIER_NODE,
+                                                                    range: 18..21,
+                                                                },
+                                                            },
+                                                        ),
+                                                        binding: Unresolved,
+                                                    },
+                                                ],
+                                                binding: Unresolved,
+                                            },
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: PATH_PATTERN_NODE,
+                                            range: 18..21,
+                                        },
+                                    },
+                                    type: TypeExpression {
+                                        mutable: false,
+                                        kind: Path {
+                                            path: Path {
+                                                segments: [
+                                                    PathSegment {
+                                                        kind: Identifier(
+                                                            Identifier {
+                                                                symbol: Symbol(
+                                                                    6,
+                                                                ),
+                                                                span: SyntaxNodePtr {
+                                                                    kind: IDENTIFIER_NODE,
+                                                                    range: 23..28,
+                                                                },
+                                                            },
+                                                        ),
+                                                        binding: Unresolved,
+                                                    },
+                                                ],
+                                                binding: Unresolved,
+                                            },
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: PATH_TYPE_NODE,
+                                            range: 23..28,
+                                        },
+                                    },
+                                    span: SyntaxNodePtr {
+                                        kind: FUNCTION_PARAMETER_NODE,
+                                        range: 18..28,
+                                    },
+                                },
+                                FunctionParameter {
+                                    attributes: [],
+                                    pattern: Pattern {
+                                        mutable: false,
+                                        kind: Path {
+                                            path: Path {
+                                                segments: [
+                                                    PathSegment {
+                                                        kind: Identifier(
+                                                            Identifier {
+                                                                symbol: Symbol(
+                                                                    16,
+                                                                ),
+                                                                span: SyntaxNodePtr {
+                                                                    kind: IDENTIFIER_NODE,
+                                                                    range: 30..33,
+                                                                },
+                                                            },
+                                                        ),
+                                                        binding: Unresolved,
+                                                    },
+                                                ],
+                                                binding: Unresolved,
+                                            },
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: PATH_PATTERN_NODE,
+                                            range: 30..33,
+                                        },
+                                    },
+                                    type: TypeExpression {
+                                        mutable: false,
+                                        kind: Path {
+                                            path: Path {
+                                                segments: [
+                                                    PathSegment {
+                                                        kind: Identifier(
+                                                            Identifier {
+                                                                symbol: Symbol(
+                                                                    6,
+                                                                ),
+                                                                span: SyntaxNodePtr {
+                                                                    kind: IDENTIFIER_NODE,
+                                                                    range: 35..40,
+                                                                },
+                                                            },
+                                                        ),
+                                                        binding: Unresolved,
+                                                    },
+                                                ],
+                                                binding: Unresolved,
+                                            },
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: PATH_TYPE_NODE,
+                                            range: 35..40,
+                                        },
+                                    },
+                                    span: SyntaxNodePtr {
+                                        kind: FUNCTION_PARAMETER_NODE,
+                                        range: 30..40,
+                                    },
+                                },
+                            ],
+                            return_type: Some(
+                                TypeExpression {
+                                    mutable: false,
+                                    kind: Path {
+                                        path: Path {
+                                            segments: [
+                                                PathSegment {
+                                                    kind: Identifier(
+                                                        Identifier {
+                                                            symbol: Symbol(
+                                                                6,
+                                                            ),
+                                                            span: SyntaxNodePtr {
+                                                                kind: IDENTIFIER_NODE,
+                                                                range: 45..51,
+                                                            },
+                                                        },
+                                                    ),
+                                                    binding: Unresolved,
+                                                },
+                                            ],
+                                            binding: Unresolved,
+                                        },
+                                    },
+                                    span: SyntaxNodePtr {
+                                        kind: PATH_TYPE_NODE,
+                                        range: 45..51,
+                                    },
+                                },
+                            ),
+                            type_bounds: [],
+                            body: Some(
+                                [
+                                    Statement {
+                                        kind: Let {
+                                            pattern: Pattern {
+                                                mutable: false,
+                                                kind: Path {
+                                                    path: Path {
+                                                        segments: [
+                                                            PathSegment {
+                                                                kind: Identifier(
+                                                                    Identifier {
+                                                                        symbol: Symbol(
+                                                                            17,
+                                                                        ),
+                                                                        span: SyntaxNodePtr {
+                                                                            kind: IDENTIFIER_NODE,
+                                                                            range: 61..64,
+                                                                        },
+                                                                    },
+                                                                ),
+                                                                binding: Unresolved,
+                                                            },
+                                                        ],
+                                                        binding: Unresolved,
+                                                    },
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: PATH_PATTERN_NODE,
+                                                    range: 61..64,
+                                                },
+                                            },
+                                            type: Some(
+                                                TypeExpression {
+                                                    mutable: false,
+                                                    kind: Path {
+                                                        path: Path {
+                                                            segments: [
+                                                                PathSegment {
+                                                                    kind: Identifier(
+                                                                        Identifier {
+                                                                            symbol: Symbol(
+                                                                                6,
+                                                                            ),
+                                                                            span: SyntaxNodePtr {
+                                                                                kind: IDENTIFIER_NODE,
+                                                                                range: 66..72,
+                                                                            },
+                                                                        },
+                                                                    ),
+                                                                    binding: Unresolved,
+                                                                },
+                                                            ],
+                                                            binding: Unresolved,
+                                                        },
+                                                    },
+                                                    span: SyntaxNodePtr {
+                                                        kind: PATH_TYPE_NODE,
+                                                        range: 66..72,
+                                                    },
+                                                },
+                                            ),
+                                            initializer: Some(
+                                                Expression {
+                                                    kind: Path {
+                                                        path: Path {
+                                                            segments: [
+                                                                PathSegment {
+                                                                    kind: Identifier(
+                                                                        Identifier {
+                                                                            symbol: Symbol(
+                                                                                15,
+                                                                            ),
+                                                                            span: SyntaxNodePtr {
+                                                                                kind: IDENTIFIER_NODE,
+                                                                                range: 74..77,
+                                                                            },
+                                                                        },
+                                                                    ),
+                                                                    binding: Unresolved,
+                                                                },
+                                                            ],
+                                                            binding: Unresolved,
+                                                        },
+                                                    },
+                                                    span: SyntaxNodePtr {
+                                                        kind: PATH_EXPRESSION_NODE,
+                                                        range: 74..77,
+                                                    },
+                                                },
+                                            ),
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: LET_STATEMENT_NODE,
+                                            range: 57..83,
+                                        },
+                                    },
+                                    Statement {
+                                        kind: Expression {
+                                            value: Expression {
+                                                kind: Path {
+                                                    path: Path {
+                                                        segments: [
+                                                            PathSegment {
+                                                                kind: Identifier(
+                                                                    Identifier {
+                                                                        symbol: Symbol(
+                                                                            17,
+                                                                        ),
+                                                                        span: SyntaxNodePtr {
+                                                                            kind: IDENTIFIER_NODE,
+                                                                            range: 83..87,
+                                                                        },
+                                                                    },
+                                                                ),
+                                                                binding: Unresolved,
+                                                            },
+                                                        ],
+                                                        binding: Unresolved,
+                                                    },
+                                                },
+                                                span: SyntaxNodePtr {
+                                                    kind: PATH_EXPRESSION_NODE,
+                                                    range: 83..87,
+                                                },
+                                            },
+                                        },
+                                        span: SyntaxNodePtr {
+                                            kind: EXPRESSION_STATEMENT_NODE,
+                                            range: 83..87,
+                                        },
+                                    },
+                                ],
+                            ),
+                        },
+                        span: SyntaxNodePtr {
+                            kind: FUNCTION_DEFINITION_NODE,
+                            range: 11..90,
+                        },
+                    },
+                    file: FileId(
+                        5v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Definition {
+                    scope: ScopeId(
+                        12v1,
+                    ),
+                    definition: Definition {
+                        attributes: [],
+                        visibility: Private,
+                        name: Identifier {
+                            symbol: Symbol(
+                                18,
+                            ),
+                            span: SyntaxNodePtr {
+                                kind: IDENTIFIER_NODE,
+                                range: 97..104,
+                            },
+                        },
+                        kind: Struct {
+                            type_parameters: [],
+                            type_bounds: [],
+                            body: Unnamed(
+                                [
+                                    (
+                                        Private,
+                                        TypeExpression {
+                                            mutable: false,
+                                            kind: Path {
+                                                path: Path {
+                                                    segments: [
+                                                        PathSegment {
+                                                            kind: Identifier(
+                                                                Identifier {
+                                                                    symbol: Symbol(
+                                                                        6,
+                                                                    ),
+                                                                    span: SyntaxNodePtr {
+                                                                        kind: IDENTIFIER_NODE,
+                                                                        range: 105..110,
+                                                                    },
+                                                                },
+                                                            ),
+                                                            binding: Unresolved,
+                                                        },
+                                                    ],
+                                                    binding: Unresolved,
+                                                },
+                                            },
+                                            span: SyntaxNodePtr {
+                                                kind: PATH_TYPE_NODE,
+                                                range: 105..110,
+                                            },
+                                        },
+                                    ),
+                                ],
+                            ),
+                        },
+                        span: SyntaxNodePtr {
+                            kind: STRUCT_DEFINITION_NODE,
+                            range: 90..114,
+                        },
+                    },
+                    file: FileId(
+                        5v1,
+                    ),
+                },
+            },
+            Slot {
+                version: 1,
+                value: Definition {
+                    scope: ScopeId(
+                        12v1,
+                    ),
+                    definition: Definition {
+                        attributes: [],
+                        visibility: Private,
+                        name: Identifier {
+                            symbol: Symbol(
+                                19,
+                            ),
+                            span: SyntaxNodePtr {
+                                kind: IDENTIFIER_NODE,
+                                range: 119..125,
+                            },
+                        },
+                        kind: Type {
+                            type_parameters: [],
+                            type_bounds: [],
+                            initializer: None,
+                        },
+                        span: SyntaxNodePtr {
+                            kind: TYPE_DEFINITION_NODE,
+                            range: 114..137,
+                        },
+                    },
+                    file: FileId(
+                        5v1,
+                    ),
+                },
+            },
         ],
-        free_head: 9,
-        num_elems: 8,
+        free_head: 14,
+        num_elems: 13,
         _k: PhantomData<fn(danubec_symbol::DefinitionId) -> danubec_symbol::DefinitionId>,
+    },
+    implements: SlotMap {
+        slots: [
+            Slot {
+                version: 0,
+                next_free: 0,
+            },
+        ],
+        free_head: 1,
+        num_elems: 0,
+        _k: PhantomData<fn(danubec_symbol::ImplementId) -> danubec_symbol::ImplementId>,
     },
 }

@@ -1,0 +1,26 @@
+fn log();
+
+fn add(lhs: usize, rhs: usize) -> usize {
+    let sum: usize = lhs;
+    sum
+}
+
+struct Wrapper(usize);
+
+type Alias = Wrapper;
+
+trait Trait {
+    fn call(&self, value: usize) -> usize;
+    type Output;
+    const VALUE: usize;
+}
+
+impl Trait for Wrapper {
+    fn call(&self, value: usize) -> usize {
+        value
+    }
+
+    type Output = Wrapper;
+
+    const VALUE: usize = 1;
+}

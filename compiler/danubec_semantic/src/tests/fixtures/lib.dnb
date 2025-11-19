@@ -1,6 +1,7 @@
 mod imports;
 mod structs;
 mod enums;
+mod functions;
 
 mod bar {
   mod baz {

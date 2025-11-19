@@ -26,9 +26,13 @@ Fs {
                     version: 1,
                     value: "src/tests/fixtures/enums.dnb",
                 },
+                Slot {
+                    version: 1,
+                    value: "src/tests/fixtures/functions.dnb",
+                },
             ],
-            free_head: 5,
-            num_elems: 4,
+            free_head: 6,
+            num_elems: 5,
             _k: PhantomData<fn(danubec_symbol::FileId) -> danubec_symbol::FileId>,
         },
         canonicals: SecondaryMap {
@@ -50,15 +54,19 @@ Fs {
                     value: "/Users/danuel/Documents/internal/danube-lang/danube/compiler/danubec_semantic/src/tests/fixtures/enums.dnb",
                     version: 1,
                 },
+                Occupied {
+                    value: "/Users/danuel/Documents/internal/danube-lang/danube/compiler/danubec_semantic/src/tests/fixtures/functions.dnb",
+                    version: 1,
+                },
             ],
-            num_elems: 4,
+            num_elems: 5,
             _k: PhantomData<fn(danubec_symbol::FileId) -> danubec_symbol::FileId>,
         },
         files: SecondaryMap {
             slots: [
                 Vacant,
                 Occupied {
-                    value: "mod imports;\nmod structs;\nmod enums;\n\nmod bar {\n  mod baz {\n    mod qux {\n      //\n    }\n  }\n}\n",
+                    value: "mod imports;\nmod structs;\nmod enums;\nmod functions;\n\nmod bar {\n  mod baz {\n    mod qux {\n      //\n    }\n  }\n}\n",
                     version: 1,
                 },
                 Occupied {
@@ -73,8 +81,12 @@ Fs {
                     value: "enum Foo { }\nenum Bar {\n  A,\n  B = 1,\n  C(Foo),\n  D {\n    a: usize,\n  },\n}\n",
                     version: 1,
                 },
+                Occupied {
+                    value: "fn log();\n\nfn add(lhs: usize, rhs: usize) -> usize {\n    let sum: usize = lhs;\n    sum\n}\n\nstruct Wrapper(usize);\n\ntype Alias = Wrapper;\n\ntrait Trait {\n    fn call(&self, value: usize) -> usize;\n    type Output;\n    const VALUE: usize;\n}\n\nimpl Trait for Wrapper {\n    fn call(&self, value: usize) -> usize {\n        value\n    }\n\n    type Output = Wrapper;\n\n    const VALUE: usize = 1;\n}\n",
+                    version: 1,
+                },
             ],
-            num_elems: 4,
+            num_elems: 5,
             _k: PhantomData<fn(danubec_symbol::FileId) -> danubec_symbol::FileId>,
         },
     },

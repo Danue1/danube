@@ -1,5 +1,5 @@
 use crate::{
-    env::{Env, Namespace, ScopeKind},
+    env::{Env, Namespace, Scope, ScopeKind},
     fs::Fs,
 };
 use danubec_ast as ast;
@@ -44,8 +44,6 @@ pub fn collect(
                 continue;
             };
 
-            // let visibility = collector.visibility(definition.visibility());
-
             let definition = env.definition(crate::env::Definition {
                 scope: env[module].scope,
                 definition: hir::Definition {
@@ -60,10 +58,7 @@ pub fn collect(
                 file,
             });
             let scope = env[module].scope;
-            env[scope][Namespace::Type]
-                .entry(name.symbol)
-                .or_default()
-                .push(definition);
+            env[scope].definition((Namespace::Type, name.symbol), definition);
 
             let parent = module;
             let child = env.module(child_file, Some(parent));
@@ -147,9 +142,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
 
     fn enter_scope(&mut self, kind: ScopeKind) -> ScopeId {
         let parent = self.current_scope();
-        let scope = self.env.scope(kind, |s| {
-            s.parent = Some(parent);
-        });
+        let scope = self.env.scope(Scope::new(kind).parent_scope(Some(parent)));
         self.scopes.push(scope);
         scope
     }
@@ -174,12 +167,85 @@ impl<'lowering> DefinitionCollector<'lowering> {
         });
     }
 
-    fn top_level_attribute(&mut self, _: ast::TopLevelAttribute) {
-        //
+    fn top_level_attribute(&mut self, node: ast::TopLevelAttribute) {
+        std::todo!();
     }
 
-    fn attribute(&mut self, _: ast::Attribute) -> Result<AttributeId, ()> {
-        std::todo!();
+    fn attribute(&mut self, node: ast::Attribute) -> Result<AttributeId, ()> {
+        let Some(argument) = node.argument() else {
+            self.diagnostic
+                .report(miette!("Attribute without an argument"));
+            return Err(());
+        };
+        let argument = self.attribute_argument(argument)?;
+
+        Ok(self.env.attribute(hir::Attribute {
+            argument,
+            span: Span::new(node.syntax()),
+        }))
+    }
+
+    fn attribute_argument(
+        &mut self,
+        node: ast::AttributeArgument,
+    ) -> Result<hir::AttributeArgument, ()> {
+        let kind = match node.clone() {
+            ast::AttributeArgument::Expression(node) => {
+                let Some(value) = node.value() else {
+                    self.diagnostic
+                        .report(miette!("Attribute expression argument without a value"));
+                    return Err(());
+                };
+                let value = self.expression(value)?;
+
+                hir::AttributeArgumentKind::Expression { value }
+            }
+            ast::AttributeArgument::KeyValue(node) => {
+                let Some(key) = node.key() else {
+                    self.diagnostic
+                        .report(miette!("Attribute key-value argument without a key"));
+                    return Err(());
+                };
+                let key = self.path(key)?;
+                let key = hir::Path {
+                    segments: key,
+                    binding: hir::Binding::Unresolved,
+                };
+
+                let Some(value) = node.value() else {
+                    self.diagnostic
+                        .report(miette!("Attribute key-value argument without a value"));
+                    return Err(());
+                };
+                let value = self.expression(value)?;
+
+                hir::AttributeArgumentKind::KeyValue {
+                    key,
+                    value: Some(value),
+                }
+            }
+            ast::AttributeArgument::Nested(node) => {
+                let Some(path) = node.path() else {
+                    self.diagnostic
+                        .report(miette!("Nested attribute without a path"));
+                    return Err(());
+                };
+                let segments = self.path(path)?;
+                let path = hir::Path {
+                    segments,
+                    binding: hir::Binding::Unresolved,
+                };
+
+                let mut arguments = vec![];
+                for argument in node.arguments() {
+                    arguments.push(self.attribute_argument(argument)?);
+                }
+
+                hir::AttributeArgumentKind::Nested { path, arguments }
+            }
+        };
+
+        Ok(hir::AttributeArgument { kind })
     }
 
     fn associated_definition(
@@ -276,16 +342,63 @@ impl<'lowering> DefinitionCollector<'lowering> {
     fn function_definition(
         &mut self,
         node: ast::FunctionDefinition,
-        _attributes: Vec<AttributeId>,
-        _visibility: hir::Visibility,
+        attributes: Vec<AttributeId>,
+        visibility: hir::Visibility,
     ) -> Result<(Symbol, DefinitionId), ()> {
         let Some(name) = node.name() else {
             self.diagnostic.report(miette!("Function without a name"));
             return Err(());
         };
-        let _ = self.identifier(name)?;
+        let name = self.identifier(name)?;
 
-        std::todo!();
+        let type_parameters = self.type_parameters(node.type_parameters())?;
+
+        let type_bounds = self.type_bounds(node.type_bounds())?;
+
+        let parameters = self.function_parameters(node.parameters())?;
+
+        let return_type = match node.return_type() {
+            Some(r#type) => Some(self.type_expression(r#type, false)?),
+            None => None,
+        };
+
+        let body = match node.body() {
+            None => {
+                self.diagnostic.report(miette!("Function without a body"));
+                return Err(());
+            }
+            Some(ast::FunctionBodyKind::Block(body)) => {
+                let Some(block) = body.body() else {
+                    self.diagnostic
+                        .report(miette!("Function body without a block"));
+                    return Err(());
+                };
+                Some(self.with_scope(ScopeKind::Function, |this| this.block_expression(block))?)
+            }
+            Some(ast::FunctionBodyKind::Unit(_)) => None,
+        };
+
+        let scope = self.current_scope();
+        let definition = self.env.definition(crate::env::Definition {
+            scope,
+            definition: hir::Definition {
+                attributes,
+                visibility,
+                name,
+                kind: hir::DefinitionKind::Function {
+                    type_parameters,
+                    parameters,
+                    return_type,
+                    type_bounds,
+                    body,
+                },
+                span: Span::new(node.syntax()),
+            },
+            file: self.file,
+        });
+        self.env[scope].definition((Namespace::Value, name.symbol), definition);
+
+        Ok((name.symbol, definition))
     }
 
     fn struct_definition(
@@ -300,9 +413,9 @@ impl<'lowering> DefinitionCollector<'lowering> {
         };
         let name = self.identifier(name)?;
 
-        let type_parameters = vec![];
+        let type_parameters = self.type_parameters(node.type_parameters())?;
 
-        let type_bounds = vec![];
+        let type_bounds = self.type_bounds(node.type_bounds())?;
 
         let Some(body) = node.body() else {
             self.diagnostic.report(miette!("Struct without a body"));
@@ -326,11 +439,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
             },
             file: self.file,
         });
-
-        self.env[scope][Namespace::Type]
-            .entry(name.symbol)
-            .or_default()
-            .push(definition);
+        self.env[scope].definition((Namespace::Value, name.symbol), definition);
 
         Ok(definition)
     }
@@ -347,9 +456,9 @@ impl<'lowering> DefinitionCollector<'lowering> {
         };
         let name = self.identifier(name)?;
 
-        let type_parameters = vec![];
+        let type_parameters = self.type_parameters(node.type_parameters())?;
 
-        let type_bounds = vec![];
+        let type_bounds = self.type_bounds(node.type_bounds())?;
 
         let variants = self.with_scope(
             ScopeKind::Block,
@@ -379,11 +488,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
             },
             file: self.file,
         });
-
-        self.env[scope][Namespace::Type]
-            .entry(name.symbol)
-            .or_default()
-            .push(definition);
+        self.env[scope].definition((Namespace::Value, name.symbol), definition);
 
         Ok(definition)
     }
@@ -437,11 +542,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
             },
             file: self.file,
         });
-        let current_scope = self.current_scope();
-        self.env[current_scope][Namespace::Type]
-            .entry(name.symbol)
-            .or_default()
-            .push(definition);
+        self.env[scope].definition((Namespace::Value, name.symbol), definition);
 
         let parent_module = self.module;
         let child = self.env.module(self.file, Some(parent_module));
@@ -470,9 +571,9 @@ impl<'lowering> DefinitionCollector<'lowering> {
         };
         let name = self.identifier(name)?;
 
-        let type_parameters = vec![];
+        let type_parameters = self.type_parameters(node.type_parameters())?;
 
-        let type_bounds = vec![];
+        let type_bounds = self.type_bounds(node.type_bounds())?;
 
         let definitions = self.with_scope(ScopeKind::Block, |this| {
             let mut definitions = HashMap::new();
@@ -503,12 +604,122 @@ impl<'lowering> DefinitionCollector<'lowering> {
             },
             file: self.file,
         });
-        self.env[scope][Namespace::Type]
-            .entry(name.symbol)
-            .or_default()
-            .push(definition);
+        self.env[scope].definition((Namespace::Value, name.symbol), definition);
 
         Ok(definition)
+    }
+
+    fn type_parameters(
+        &mut self,
+        nodes: impl Iterator<Item = ast::TypeParameter>,
+    ) -> Result<Vec<hir::TypeParameter>, ()> {
+        let mut parameters = vec![];
+        for parameter in nodes {
+            parameters.push(self.type_parameter(parameter)?);
+        }
+        Ok(parameters)
+    }
+
+    fn type_parameter(&mut self, node: ast::TypeParameter) -> Result<hir::TypeParameter, ()> {
+        let Some(r#type) = node.r#type() else {
+            self.diagnostic
+                .report(miette!("Type parameter without a type"));
+            return Err(());
+        };
+        let r#type = self.type_expression(r#type, false)?;
+
+        let mut constraints = vec![];
+        for constraint in node.constraints() {
+            let Some(r#type) = constraint.r#type() else {
+                self.diagnostic
+                    .report(miette!("Type parameter constraint without a type"));
+                return Err(());
+            };
+            constraints.push(self.type_expression(r#type, false)?);
+        }
+
+        Ok(hir::TypeParameter {
+            r#type,
+            constraints,
+            span: Span::new(node.syntax()),
+        })
+    }
+
+    fn type_bounds(
+        &mut self,
+        nodes: impl Iterator<Item = ast::TypeBound>,
+    ) -> Result<Vec<hir::TypeBound>, ()> {
+        let mut bounds = vec![];
+        for bound in nodes {
+            bounds.push(self.type_bound(bound)?);
+        }
+        Ok(bounds)
+    }
+
+    fn type_bound(&mut self, node: ast::TypeBound) -> Result<hir::TypeBound, ()> {
+        let Some(r#type) = node.r#type() else {
+            self.diagnostic.report(miette!("Type bound without a type"));
+            return Err(());
+        };
+        let r#type = self.type_expression(r#type, false)?;
+
+        let mut constraints = vec![];
+        for constraint in node.constraints() {
+            let Some(r#type) = constraint.r#type() else {
+                self.diagnostic
+                    .report(miette!("Type bound constraint without a type"));
+                return Err(());
+            };
+            constraints.push(self.type_expression(r#type, false)?);
+        }
+
+        Ok(hir::TypeBound {
+            r#type,
+            constraints,
+            span: Span::new(node.syntax()),
+        })
+    }
+
+    fn function_parameters(
+        &mut self,
+        nodes: impl Iterator<Item = ast::FunctionParameter>,
+    ) -> Result<Vec<hir::FunctionParameter>, ()> {
+        let mut parameters = vec![];
+        for parameter in nodes {
+            parameters.push(self.function_parameter(parameter)?);
+        }
+        Ok(parameters)
+    }
+
+    fn function_parameter(
+        &mut self,
+        node: ast::FunctionParameter,
+    ) -> Result<hir::FunctionParameter, ()> {
+        let mut attributes = vec![];
+        for attribute in node.attributes() {
+            attributes.push(self.attribute(attribute)?);
+        }
+
+        let Some(pattern) = node.pattern() else {
+            self.diagnostic
+                .report(miette!("Function parameter without a pattern"));
+            return Err(());
+        };
+        let pattern = self.pattern(pattern, false)?;
+
+        let Some(r#type) = node.r#type() else {
+            self.diagnostic
+                .report(miette!("Function parameter without a type"));
+            return Err(());
+        };
+        let r#type = self.type_expression(r#type, false)?;
+
+        Ok(hir::FunctionParameter {
+            attributes,
+            pattern,
+            r#type,
+            span: Span::new(node.syntax()),
+        })
     }
 
     fn constant_definition(
@@ -548,10 +759,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
             },
             file: self.file,
         });
-        self.env[scope][Namespace::Value]
-            .entry(name.symbol)
-            .or_default()
-            .push(definition);
+        self.env[scope].definition((Namespace::Value, name.symbol), definition);
 
         Ok((name.symbol, definition))
     }
@@ -596,10 +804,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
             },
             file: self.file,
         });
-        self.env[scope][Namespace::Value]
-            .entry(name.symbol)
-            .or_default()
-            .push(definition);
+        self.env[scope].definition((Namespace::Value, name.symbol), definition);
 
         Ok(definition)
     }
@@ -616,9 +821,9 @@ impl<'lowering> DefinitionCollector<'lowering> {
         };
         let name = self.identifier(name)?;
 
-        let type_parameters = vec![];
+        let type_parameters = self.type_parameters(node.type_parameters())?;
 
-        let type_bounds = vec![];
+        let type_bounds = self.type_bounds(node.type_bounds())?;
 
         let initializer = match node.initializer() {
             Some(initializer) => Some(self.type_expression(initializer, false)?),
@@ -641,10 +846,7 @@ impl<'lowering> DefinitionCollector<'lowering> {
             },
             file: self.file,
         });
-        self.env[scope][Namespace::Value]
-            .entry(name.symbol)
-            .or_default()
-            .push(definition);
+        self.env[scope].definition((Namespace::Type, name.symbol), definition);
 
         Ok((name.symbol, definition))
     }
@@ -667,9 +869,9 @@ impl<'lowering> DefinitionCollector<'lowering> {
         };
         let for_type = self.type_expression(for_type, false)?;
 
-        let type_parameters = vec![];
+        let type_parameters = self.type_parameters(node.type_parameters())?;
 
-        let type_bounds = vec![];
+        let type_bounds = self.type_bounds(node.type_bounds())?;
 
         let definitions = self.with_scope(ScopeKind::Block, |this| {
             let mut definitions = HashMap::new();

@@ -24,11 +24,10 @@ pub struct Module {
 pub struct Scope {
     pub module: Option<ModuleId>,
     pub parent: Option<ScopeId>,
-    pub kind: ScopeKind,
-    pub types: FxHashMap<Symbol, Vec<DefinitionId>>,
-    pub values: FxHashMap<Symbol, Vec<DefinitionId>>,
-    pub imports: Vec<Import>,
-    pub implements: Vec<ImplementId>,
+    kind: ScopeKind,
+    definitions: FxHashMap<(Namespace, Symbol), Vec<DefinitionId>>,
+    imports: Vec<Import>,
+    implements: Vec<ImplementId>,
 }
 
 #[derive(Debug)]
@@ -52,7 +51,7 @@ pub enum ScopeKind {
     Block,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Namespace {
     Value,
     Type,
@@ -70,9 +69,7 @@ impl Env {
     }
 
     pub fn module(&mut self, file: FileId, parent: Option<ModuleId>) -> ModuleId {
-        let scope = self.scope(ScopeKind::Module, |s| {
-            s.module = parent;
-        });
+        let scope = self.scope(Scope::new(ScopeKind::Module).parent_module(parent));
         self.modules.insert(Module {
             parent,
             scope,
@@ -81,13 +78,8 @@ impl Env {
         })
     }
 
-    pub fn scope<F>(&mut self, kind: ScopeKind, f: F) -> ScopeId
-    where
-        F: FnOnce(&mut Scope),
-    {
-        let id = self.scopes.insert(Scope::new(kind));
-        f(&mut self.scopes[id]);
-        id
+    pub fn scope(&mut self, scope: Scope) -> ScopeId {
+        self.scopes.insert(scope)
     }
 
     pub fn attribute(&mut self, attribute: Attribute) -> AttributeId {
@@ -109,23 +101,33 @@ impl Scope {
             module: None,
             parent: None,
             kind,
-            types: FxHashMap::default(),
-            values: FxHashMap::default(),
+            definitions: FxHashMap::default(),
             imports: vec![],
             implements: vec![],
         }
     }
 
     #[inline]
-    pub fn with_parent_module(mut self, parent: ModuleId) -> Self {
-        self.module = Some(parent);
+    pub fn parent_module(mut self, parent: Option<ModuleId>) -> Self {
+        self.module = parent;
         self
     }
 
     #[inline]
-    pub fn with_parent(mut self, parent: ScopeId) -> Self {
-        self.parent = Some(parent);
+    pub fn parent_scope(mut self, parent: Option<ScopeId>) -> Self {
+        self.parent = parent;
         self
+    }
+
+    pub fn definition(
+        &mut self,
+        (namespace, symbol): (Namespace, Symbol),
+        definition: DefinitionId,
+    ) {
+        self.definitions
+            .entry((namespace, symbol))
+            .or_default()
+            .push(definition);
     }
 
     pub fn import(
@@ -198,27 +200,5 @@ impl std::ops::Index<Symbol> for Module {
     #[inline]
     fn index(&self, index: Symbol) -> &Self::Output {
         &self.children[&index]
-    }
-}
-
-impl std::ops::Index<Namespace> for Scope {
-    type Output = FxHashMap<Symbol, Vec<DefinitionId>>;
-
-    #[inline]
-    fn index(&self, namespace: Namespace) -> &Self::Output {
-        match namespace {
-            Namespace::Value => &self.values,
-            Namespace::Type => &self.types,
-        }
-    }
-}
-
-impl std::ops::IndexMut<Namespace> for Scope {
-    #[inline]
-    fn index_mut(&mut self, index: Namespace) -> &mut Self::Output {
-        match index {
-            Namespace::Value => &mut self.values,
-            Namespace::Type => &mut self.types,
-        }
     }
 }

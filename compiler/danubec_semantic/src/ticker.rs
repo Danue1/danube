@@ -13,7 +13,7 @@ impl Ticker {
         self.index != 0
     }
 
-    pub const fn increment(&mut self) {
+    pub const fn mark(&mut self) {
         self.index += 1;
     }
 }

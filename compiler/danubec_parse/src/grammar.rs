@@ -99,10 +99,7 @@ impl<'source> Context<'source> {
     fn recover(&mut self, m: Marker, kinds: &[SyntaxKind]) {
         loop {
             let kind = self.nth(0);
-            if kind == END_OF_FILE {
-                break;
-            }
-            if kinds.contains(&kind) {
+            if kind == END_OF_FILE || kinds.contains(&kind) {
                 break;
             }
             self.bump();
@@ -281,9 +278,8 @@ pub(crate) fn definition(p: &mut Context) {
             implement_definition(p, m1);
         }
         _ => {
-            p.report(vec![], miette!("Expected definition"));
             p.recover(m1, &DEFINITION_START);
-            return;
+            p.report(vec![], miette!("Expected definition"));
         }
     };
 
@@ -568,7 +564,10 @@ pub(crate) fn associated_item(p: &mut Context) -> CompleteMarker {
         kind if matches!(kind, FN) => function_definition(p, m1),
         kind if matches!(kind, CONST) => constant_definition(p, m1),
         kind if matches!(kind, TYPE) => type_definition(p, m1),
-        _ => return p.report(vec![m1, m], miette!("Expected trait item")),
+        _ => {
+            p.recover(m1, &[RIGHT_BRACE]);
+            return p.report(vec![m], miette!("Expected trait item"));
+        }
     };
 
     p.complete(m, ASSOCIATED_DEFINITION_NODE)
